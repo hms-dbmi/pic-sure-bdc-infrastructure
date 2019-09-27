@@ -20,7 +20,6 @@ resource "aws_security_group" "inbound-hpds-from-app" {
     Name        = "FISMA Terraform Playground - inbound-hpds-from-app Security Group"
   }
 }
-
 resource "aws_security_group" "inbound-mysql-from-app" {
   name = "allow_inbound_from_app_private_subnet_to_mysql"
   description = "Allow inbound traffic from app-private-subnets on port 3306"
@@ -33,10 +32,11 @@ resource "aws_security_group" "inbound-mysql-from-app" {
     cidr_blocks = [
       aws_subnet.app-private-subnet-us-east-1a.cidr_block, 
       aws_subnet.app-private-subnet-us-east-1b.cidr_block, 
-      aws_subnet.app-private-subnet-us-east-1c.cidr_block
+      aws_subnet.app-private-subnet-us-east-1c.cidr_block,
+
     ]
   }
-
+  
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"

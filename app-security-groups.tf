@@ -42,6 +42,28 @@ resource "aws_security_group" "outbound-to-hpds" {
     Name        = "FISMA Terraform Playground - outbound-to-hpds Security Group"
   }
 }
+
+resource "aws_security_group" "inbound-app-from-lma-for-dev-only" {
+  name = "allow_inbound_from_lma_subnet_to_app_server"
+  description = "Allow inbound traffic from LMA on port 22"
+  vpc_id = aws_vpc.app-vpc.id
+
+  ingress {
+    from_port = 22
+    to_port = 22
+    protocol = "tcp"
+    cidr_blocks = [
+      "134.174.0.0/16"
+    ]
+  }
+
+  tags = {
+    Owner       = "Avillach_Lab"
+    Environment = "development"
+    Name        = "FISMA Terraform Playground - inbound-app-from-lma-for-dev-only Security Group"
+  }
+}
+
 resource "aws_security_group" "outbound-to-aurora" {
   name = "allow_outbound_from_app_vpc_to_mysql_port_in_data_vpc"
   description = "Allow outbound traffic to data-db-subnets on port 3306"

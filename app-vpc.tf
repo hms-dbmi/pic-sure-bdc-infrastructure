@@ -62,3 +62,14 @@ resource "aws_default_security_group" "app-default" {
     Name        = "FISMA Terraform Playground - No Access Security Group"
   }
 }
+
+resource "aws_internet_gateway" "app-gw-for-dev-only" {
+  vpc_id = aws_vpc.app-vpc.id
+
+  tags = {
+    Owner       = "Avillach_Lab"
+    Environment = "development"
+    Name        = "FISMA Terraform Playground - App VPC Internet Gateway - For dev only"
+  }  
+}
+

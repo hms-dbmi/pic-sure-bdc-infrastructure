@@ -40,6 +40,10 @@ resource "aws_route_table_association" "edge-route-table-us-east-1c-association"
 resource "aws_route_table" "app-route-table" {
   vpc_id = aws_vpc.app-vpc.id
   route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.app-gw-for-dev-only.id
+  }
+  route {
     cidr_block    = aws_subnet.data-hpds-subnet-us-east-1a.cidr_block
     vpc_peering_connection_id = aws_vpc_peering_connection.app-data.id
   }
@@ -66,7 +70,7 @@ resource "aws_route_table" "app-route-table" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "FISMA Terraform Playground - Edge VPC Route Table"
+    Name        = "FISMA Terraform Playground - App VPC Route Table"
   }
 }
 

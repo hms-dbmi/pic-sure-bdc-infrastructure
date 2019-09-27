@@ -11,8 +11,6 @@ resource "aws_launch_template" "httpd-launch-template" {
     }
   }
 
-  key_name = "jps49"
-
   vpc_security_group_ids = [
     aws_security_group.inbound-from-public-internet.id,
     aws_security_group.outbound-to-app.id
@@ -26,7 +24,7 @@ resource "aws_launch_template" "httpd-launch-template" {
   tag_specifications {
     resource_type = "instance" 
     tags = {
-      Name = "Apache HTTPD"
+      Name = "FISMA Terraform Playground - Apache HTTPD"
     }
   }
 }
@@ -48,7 +46,7 @@ resource "aws_autoscaling_group" "httpd-autoscaling-group" {
 
   tag {
     key = "Name"
-    value = "Apache HTTPD"
+    value = "FISMA Terraform Playground - Apache HTTPD"
     propagate_at_launch = true
   }
 }

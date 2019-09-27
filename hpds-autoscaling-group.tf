@@ -11,8 +11,6 @@ resource "aws_launch_template" "hpds-launch-template" {
     }
   }
 
-  key_name = "jps49"
-
   vpc_security_group_ids = [
     aws_security_group.inbound-hpds-from-app.id
   ]
@@ -24,7 +22,7 @@ resource "aws_launch_template" "hpds-launch-template" {
   tag_specifications {
     resource_type = "instance"
     tags = {
-      Name = "HPDS"
+      Name = "FISMA Terraform Playground - HPDS"
     }
   }
 }
@@ -46,7 +44,7 @@ resource "aws_autoscaling_group" "hpds-autoscaling-group" {
 
   tag {
     key = "Name"
-    value = "HPDS"
+    value = "FISMA Terraform Playground - HPDS"
     propagate_at_launch = true
   }
 }
