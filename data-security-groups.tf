@@ -32,8 +32,7 @@ resource "aws_security_group" "inbound-mysql-from-app" {
     cidr_blocks = [
       aws_subnet.app-private-subnet-us-east-1a.cidr_block, 
       aws_subnet.app-private-subnet-us-east-1b.cidr_block, 
-      aws_subnet.app-private-subnet-us-east-1c.cidr_block,
-
+      aws_subnet.app-private-subnet-us-east-1c.cidr_block
     ]
   }
   
