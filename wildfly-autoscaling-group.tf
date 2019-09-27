@@ -22,17 +22,15 @@ resource "aws_launch_template" "wildfly-launch-template" {
       volume_size = 20
     }
   }
-  network_interfaces {
-    associate_public_ip_address = true
-    security_groups = [
-      aws_security_group.inbound-from-edge.id,
-      aws_security_group.outbound-to-hpds.id,
-      aws_security_group.outbound-to-aurora.id,
-      aws_security_group.inbound-app-from-lma-for-dev-only.id
-    ]
-  }
 
   key_name = aws_key_pair.generated_key.key_name
+  
+  vpc_security_group_ids = [
+    aws_security_group.inbound-from-edge.id,
+    aws_security_group.outbound-to-hpds.id,
+    aws_security_group.outbound-to-aurora.id,
+    aws_security_group.inbound-app-from-lma-for-dev-only.id
+  ]
   
   tags = {
     Owner       = "Avillach_Lab"
@@ -42,7 +40,7 @@ resource "aws_launch_template" "wildfly-launch-template" {
   tag_specifications {
     resource_type = "instance" 
     tags = {
-      Name = "FISMA Terraform Playground - WILDFLY"
+      Name = "WILDFLY"
     }
   }
 }
@@ -64,7 +62,7 @@ resource "aws_autoscaling_group" "wildfly-autoscaling-group" {
 
   tag {
     key = "Name"
-    value = "FISMA Terraform Playground - Wildfly"
+    value = "Wildfly"
     propagate_at_launch = true
   }
 }
