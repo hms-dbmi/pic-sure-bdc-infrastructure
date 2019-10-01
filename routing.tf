@@ -6,6 +6,10 @@ resource "aws_route_table" "edge-route-table" {
     gateway_id = aws_internet_gateway.edge-gw.id
   }
   route {
+    cidr_block  = aws_vpc.app-vpc.cidr_block
+    vpc_peering_connection_id = aws_vpc_peering_connection.edge-app.id
+  }
+  route {
     cidr_block = aws_subnet.app-private-subnet-us-east-1a.cidr_block
     vpc_peering_connection_id = aws_vpc_peering_connection.edge-app.id
   }
@@ -43,6 +47,10 @@ resource "aws_route_table" "app-route-table" {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.app-gw-for-dev-only.id
   }
+  route {
+    cidr_block  = aws_vpc.data-vpc.cidr_block
+    vpc_peering_connection_id = aws_vpc_peering_connection.app-data.id
+  }  
   route {
     cidr_block    = aws_subnet.data-hpds-subnet-us-east-1a.cidr_block
     vpc_peering_connection_id = aws_vpc_peering_connection.app-data.id
