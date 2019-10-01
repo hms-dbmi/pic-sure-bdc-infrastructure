@@ -12,6 +12,8 @@ resource "aws_rds_cluster" "aurora-db-cluster" {
   db_cluster_parameter_group_name     = "default.aurora-mysql5.7"
   skip_final_snapshot				  = true
 
+  vpc_security_group_ids = [aws_security_group.inbound-mysql-from-app.id]
+
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
