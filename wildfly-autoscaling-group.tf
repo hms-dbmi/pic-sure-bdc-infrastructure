@@ -40,7 +40,7 @@ resource "aws_launch_template" "wildfly-launch-template" {
   tag_specifications {
     resource_type = "instance" 
     tags = {
-      Name = "WILDFLY"
+      Name = "FISMA Terraform Playground - Wildfly"
     }
   }
 }
@@ -62,7 +62,7 @@ resource "aws_autoscaling_group" "wildfly-autoscaling-group" {
 
   tag {
     key = "Name"
-    value = "Wildfly"
+    value = "FISMA Terraform Playground - Wildfly"
     propagate_at_launch = true
   }
 }
