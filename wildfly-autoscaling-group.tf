@@ -47,9 +47,9 @@ resource "aws_launch_template" "wildfly-launch-template" {
 
 resource "aws_autoscaling_group" "wildfly-autoscaling-group" {
   vpc_zone_identifier = [
-    aws_subnet.app-private-subnet-us-east-1a.id,
-    aws_subnet.app-private-subnet-us-east-1b.id,
-    aws_subnet.app-private-subnet-us-east-1c.id
+    aws_subnet.app-subnet-us-east-1a.id,
+    aws_subnet.app-subnet-us-east-1b.id,
+    aws_subnet.app-subnet-us-east-1c.id
   ]
 
   desired_capacity = 1

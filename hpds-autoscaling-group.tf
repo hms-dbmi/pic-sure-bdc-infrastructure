@@ -29,9 +29,9 @@ resource "aws_launch_template" "hpds-launch-template" {
 
 resource "aws_autoscaling_group" "hpds-autoscaling-group" {
   vpc_zone_identifier = [
-    aws_subnet.data-hpds-subnet-us-east-1a.id,
-    aws_subnet.data-hpds-subnet-us-east-1b.id,
-    aws_subnet.data-hpds-subnet-us-east-1c.id
+    aws_subnet.hpds-subnet-us-east-1a.id,
+    aws_subnet.hpds-subnet-us-east-1b.id,
+    aws_subnet.hpds-subnet-us-east-1c.id
   ]
 
   desired_capacity = 1

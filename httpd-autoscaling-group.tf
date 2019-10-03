@@ -31,9 +31,9 @@ resource "aws_launch_template" "httpd-launch-template" {
 
 resource "aws_autoscaling_group" "httpd-autoscaling-group" {
   vpc_zone_identifier = [
-    aws_subnet.edge-public-subnet-us-east-1a.id,
-    aws_subnet.edge-public-subnet-us-east-1b.id,
-    aws_subnet.edge-public-subnet-us-east-1c.id
+    aws_subnet.edge-subnet-us-east-1a.id,
+    aws_subnet.edge-subnet-us-east-1b.id,
+    aws_subnet.edge-subnet-us-east-1c.id
   ]
 
   desired_capacity = 1

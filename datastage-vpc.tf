@@ -29,7 +29,7 @@ resource "aws_default_security_group" "data-default" {
   }
 }
 
-resource "aws_internet_gateway" "edge-gw" {
+resource "aws_internet_gateway" "inet-gw" {
   vpc_id = aws_vpc.datastage-vpc.id
 
   tags = {

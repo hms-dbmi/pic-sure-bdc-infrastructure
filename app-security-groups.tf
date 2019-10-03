@@ -1,16 +1,16 @@
 resource "aws_security_group" "inbound-from-edge" {
-  name = "allow_inbound_from_edge_private_subnet_to_app_vpc"
+  name = "allow_inbound_from_edge_subnet_to_app_subnet"
   description = "Allow inbound traffic from edge-private-subnets on port 8080 until we have TLS in place for app server"
-  vpc_id = aws_vpc.app-vpc.id
+  vpc_id = aws_vpc.datastage-vpc.id
 
   ingress {
     from_port = 8080
     to_port = 8080
     protocol = "tcp"
     cidr_blocks = [
-      aws_subnet.edge-public-subnet-us-east-1a.cidr_block, 
-      aws_subnet.edge-public-subnet-us-east-1b.cidr_block, 
-      aws_subnet.edge-public-subnet-us-east-1c.cidr_block
+      aws_subnet.edge-subnet-us-east-1a.cidr_block, 
+      aws_subnet.edge-subnet-us-east-1b.cidr_block, 
+      aws_subnet.edge-subnet-us-east-1c.cidr_block
     ]
   }
 
@@ -21,18 +21,18 @@ resource "aws_security_group" "inbound-from-edge" {
   }
 }
 resource "aws_security_group" "outbound-to-hpds" {
-  name = "allow_outbound_from_app_vpc_to_hpds_port_in_data_vpc"
-  description = "Allow outbound traffic to data-hpds-private-subnets on port 8080 until we have TLS in place for app server"
-  vpc_id = aws_vpc.app-vpc.id
+  name = "allow_outbound_from_app_subnets_to_hpds_port_in_hpds_subnets"
+  description = "Allow outbound traffic to data-hpds-subnets on port 8080 until we have TLS in place for app server"
+  vpc_id = aws_vpc.datastage-vpc.id
 
   egress {
     from_port = 8080
     to_port = 8080
     protocol = "tcp"
     cidr_blocks = [
-      aws_subnet.data-hpds-subnet-us-east-1a.cidr_block, 
-      aws_subnet.data-hpds-subnet-us-east-1b.cidr_block, 
-      aws_subnet.data-hpds-subnet-us-east-1c.cidr_block
+      aws_subnet.hpds-subnet-us-east-1a.cidr_block, 
+      aws_subnet.hpds-subnet-us-east-1b.cidr_block, 
+      aws_subnet.hpds-subnet-us-east-1c.cidr_block
     ]
   }
 
@@ -46,7 +46,7 @@ resource "aws_security_group" "outbound-to-hpds" {
 resource "aws_security_group" "inbound-app-from-lma-for-dev-only" {
   name = "allow_inbound_from_lma_subnet_to_app_server"
   description = "Allow inbound traffic from LMA on port 22"
-  vpc_id = aws_vpc.app-vpc.id
+  vpc_id = aws_vpc.datastage-vpc.id
 
   ingress {
     from_port = 22
@@ -72,18 +72,18 @@ resource "aws_security_group" "inbound-app-from-lma-for-dev-only" {
 }
 
 resource "aws_security_group" "outbound-to-aurora" {
-  name = "allow_outbound_from_app_vpc_to_mysql_port_in_data_vpc"
+  name = "allow_outbound_from_app_subneets_to_mysql_port_in_db_subnets"
   description = "Allow outbound traffic to data-db-subnets on port 3306"
-  vpc_id = aws_vpc.app-vpc.id
+  vpc_id = aws_vpc.datastage-vpc.id
 
   egress {
     from_port = 3306
     to_port = 3306
     protocol = "tcp"
     cidr_blocks = [
-      aws_subnet.data-db-subnet-us-east-1a.cidr_block, 
-      aws_subnet.data-db-subnet-us-east-1b.cidr_block, 
-      aws_subnet.data-db-subnet-us-east-1c.cidr_block
+      aws_subnet.db-subnet-us-east-1a.cidr_block, 
+      aws_subnet.db-subnet-us-east-1b.cidr_block, 
+      aws_subnet.db-subnet-us-east-1c.cidr_block
     ]
   }
 
