@@ -1,6 +1,6 @@
 resource "aws_launch_template" "hpds-launch-template" {
   name_prefix = "hpds"
-  image_id = "ami-0ebb652e41c8f97fc"
+  image_id = "ami-05091d5b01d0fda35"
   instance_type = "m5.large"
   block_device_mappings {
     device_name = "/dev/sda1"
@@ -14,6 +14,10 @@ resource "aws_launch_template" "hpds-launch-template" {
   vpc_security_group_ids = [
     aws_security_group.inbound-hpds-from-app.id
   ]
+  iam_instance_profile {
+    name = aws_iam_instance_profile.hpds-deployment-s3-profile.name
+  }
+
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"

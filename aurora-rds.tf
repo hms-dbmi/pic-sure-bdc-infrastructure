@@ -11,6 +11,7 @@ resource "aws_rds_cluster" "aurora-db-cluster" {
   db_subnet_group_name  			  = "${aws_db_subnet_group.data-subnet-group.name}"
   db_cluster_parameter_group_name     = "default.aurora-mysql5.7"
   skip_final_snapshot				  = true
+  snapshot_identifier = "arn:aws:rds:us-east-1:281165049757:cluster-snapshot:test-snapshot-of-empty-database"
 
   vpc_security_group_ids = [aws_security_group.inbound-mysql-from-app.id]
 

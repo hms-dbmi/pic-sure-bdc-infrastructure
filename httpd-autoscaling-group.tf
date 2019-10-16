@@ -1,13 +1,13 @@
 resource "aws_launch_template" "httpd-launch-template" {
   name_prefix = "httpd"
-  image_id = "ami-0ebb652e41c8f97fc"
+  image_id = "ami-05091d5b01d0fda35"
   instance_type = "m5.large"
   block_device_mappings {
     device_name = "/dev/sda1"
     ebs {
       delete_on_termination = true
       encrypted = true
-      volume_size = 20
+      volume_size = 30
     }
   }
 
@@ -15,7 +15,10 @@ resource "aws_launch_template" "httpd-launch-template" {
     aws_security_group.inbound-from-public-internet.id,
     aws_security_group.outbound-to-app.id
   ]
-
+  iam_instance_profile {
+    name = aws_iam_instance_profile.httpd-deployment-s3-profile.name
+  }
+  
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
