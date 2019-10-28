@@ -1,6 +1,3 @@
-variable "stack_githash" {
-  type = string
-}
 
 resource "aws_iam_role_policy" "wildfly-deployment-s3-policy" {
   name = "wildfly-deployment-s3-policy-${var.stack_githash}"
