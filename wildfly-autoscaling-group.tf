@@ -32,23 +32,25 @@ resource "aws_launch_template" "wildfly-launch-template" {
     aws_security_group.inbound-from-edge.id,
     aws_security_group.outbound-to-hpds.id,
     aws_security_group.outbound-to-aurora.id,
-    aws_security_group.inbound-app-from-lma-for-dev-only.id
+    aws_security_group.inbound-app-from-lma-for-dev-only.id,
+    aws_security_group.outbound-to-trend-micro.id
   ]
   
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "FISMA Terraform Playground - Wildfly Launch Template"
+    Name        = "FISMA Terraform Playground - ${var.stack_githash} - Wildfly Launch Template"
   }
   tag_specifications {
     resource_type = "instance" 
     tags = {
-      Name = "FISMA Terraform Playground - Wildfly"
+      Name = "FISMA Terraform Playground - ${var.stack_githash} - Wildfly"
     }
   }
 }
 
 resource "aws_autoscaling_group" "wildfly-autoscaling-group" {
+  depends_on = [aws_rds_cluster_instance.aurora-cluster-instance]
   vpc_zone_identifier = [
     aws_subnet.app-subnet-us-east-1a.id,
     aws_subnet.app-subnet-us-east-1b.id,
@@ -65,7 +67,7 @@ resource "aws_autoscaling_group" "wildfly-autoscaling-group" {
 
   tag {
     key = "Name"
-    value = "FISMA Terraform Playground - Wildfly"
+    value = "FISMA Terraform Playground - ${var.stack_githash} - Wildfly"
     propagate_at_launch = true
   }
 }

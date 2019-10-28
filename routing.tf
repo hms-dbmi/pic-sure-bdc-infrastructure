@@ -8,7 +8,7 @@ resource "aws_default_route_table" "datastage-route-table" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "FISMA Terraform Playground - DataSTAGE VPC Route Table"
+    Name        = "FISMA Terraform Playground - ${var.stack_githash} - DataSTAGE VPC Route Table"
   }
 }
 
