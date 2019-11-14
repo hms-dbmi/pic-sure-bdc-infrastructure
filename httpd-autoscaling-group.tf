@@ -13,21 +13,22 @@ resource "aws_launch_template" "httpd-launch-template" {
 
   vpc_security_group_ids = [
     aws_security_group.inbound-from-public-internet.id,
-    aws_security_group.outbound-to-app.id
+    aws_security_group.outbound-to-app.id,
+    aws_security_group.outbound-to-trend-micro.id
   ]
   iam_instance_profile {
     name = aws_iam_instance_profile.httpd-deployment-s3-profile.name
   }
-  
+
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "FISMA Terraform Playground - Apache HTTPD Launch Template"
+    Name        = "FISMA Terraform Playground - ${var.stack_githash} - Apache HTTPD Launch Template"
   }
   tag_specifications {
     resource_type = "instance" 
     tags = {
-      Name = "FISMA Terraform Playground - Apache HTTPD"
+      Name = "FISMA Terraform Playground - ${var.stack_githash} - Apache HTTPD"
     }
   }
 }
@@ -49,7 +50,7 @@ resource "aws_autoscaling_group" "httpd-autoscaling-group" {
 
   tag {
     key = "Name"
-    value = "FISMA Terraform Playground - Apache HTTPD"
+    value = "FISMA Terraform Playground - ${var.stack_githash} - Apache HTTPD"
     propagate_at_launch = true
   }
 }

@@ -1,5 +1,6 @@
+
 resource "aws_iam_role_policy" "wildfly-deployment-s3-policy" {
-  name = "wildfly-deployment-s3-policy"
+  name = "wildfly-deployment-s3-policy-${var.stack_githash}"
   role = aws_iam_role.wildfly-deployment-s3-role.id
   policy = <<EOF
 {
@@ -18,7 +19,7 @@ EOF
 }
 
 resource "aws_iam_role" "wildfly-deployment-s3-role" {
-  name               = "wildfly-deployment-s3-role"
+  name               = "wildfly-deployment-s3-role-${var.stack_githash}"
   path               = "/deployment/"
   assume_role_policy = <<EOF
 {

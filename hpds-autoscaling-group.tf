@@ -12,7 +12,8 @@ resource "aws_launch_template" "hpds-launch-template" {
   }
 
   vpc_security_group_ids = [
-    aws_security_group.inbound-hpds-from-app.id
+    aws_security_group.inbound-hpds-from-app.id,
+    aws_security_group.outbound-to-trend-micro.id
   ]
   iam_instance_profile {
     name = aws_iam_instance_profile.hpds-deployment-s3-profile.name
@@ -26,7 +27,7 @@ resource "aws_launch_template" "hpds-launch-template" {
   tag_specifications {
     resource_type = "instance"
     tags = {
-      Name = "FISMA Terraform Playground - HPDS"
+      Name = "FISMA Terraform Playground - ${var.stack_githash} - HPDS"
     }
   }
 }
@@ -48,7 +49,7 @@ resource "aws_autoscaling_group" "hpds-autoscaling-group" {
 
   tag {
     key = "Name"
-    value = "FISMA Terraform Playground - HPDS"
+    value = "FISMA Terraform Playground - ${var.stack_githash} - HPDS"
     propagate_at_launch = true
   }
 }

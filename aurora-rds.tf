@@ -18,7 +18,7 @@ resource "aws_rds_cluster" "aurora-db-cluster" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "FISMA Terraform Playground - RDS Aurora Cluster"
+    Name        = "FISMA Terraform Playground - ${var.stack_githash} - RDS Aurora Cluster"
   }  
 }
 
@@ -36,6 +36,6 @@ resource "aws_rds_cluster_instance" "aurora-cluster-instance" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "FISMA Terraform Playground - RDS Aurora DB Instance - ${count.index}"
+    Name        = "FISMA Terraform Playground - ${var.stack_githash} - RDS Aurora DB Instance - ${count.index}"
   }  
 }

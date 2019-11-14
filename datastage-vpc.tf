@@ -8,7 +8,7 @@ resource "aws_vpc" "datastage-vpc" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "FISMA Terraform Playground - DataStage VPC"
+    Name        = "FISMA Terraform Playground - ${var.stack_githash} - DataStage VPC"
   }
 
 }
@@ -25,7 +25,7 @@ resource "aws_default_security_group" "data-default" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "FISMA Terraform Playground - No Access Security Group"
+    Name        = "FISMA Terraform Playground - ${var.stack_githash} - No Access Security Group"
   }
 }
 
@@ -35,6 +35,6 @@ resource "aws_internet_gateway" "inet-gw" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "FISMA Terraform Playground - DataSTAGE Internet Gateway"
+    Name        = "FISMA Terraform Playground - ${var.stack_githash} - DataSTAGE Internet Gateway"
   }  
 }

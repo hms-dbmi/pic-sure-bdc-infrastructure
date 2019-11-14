@@ -5,7 +5,7 @@ resource "aws_subnet" "hpds-subnet-us-east-1a" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "FISMA Terraform Playground - HPDS Subnet us-east-1a"
+    Name        = "FISMA Terraform Playground - ${var.stack_githash} - HPDS Subnet us-east-1a"
   }
 }
 
@@ -16,7 +16,7 @@ resource "aws_subnet" "hpds-subnet-us-east-1b" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "FISMA Terraform Playground - HPDS Subnet us-east-1b"
+    Name        = "FISMA Terraform Playground - ${var.stack_githash} - HPDS Subnet us-east-1b"
   }
 }
 
@@ -27,7 +27,7 @@ resource "aws_subnet" "hpds-subnet-us-east-1c" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "FISMA Terraform Playground - HPDS Subnet us-east-1c"
+    Name        = "FISMA Terraform Playground - ${var.stack_githash} - HPDS Subnet us-east-1c"
   }
 }
 
@@ -41,7 +41,7 @@ resource "aws_db_subnet_group" "data-subnet-group" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "FISMA Terraform Playground - DB Subnet Group"
+    Name        = "FISMA Terraform Playground - ${var.stack_githash} - DB Subnet Group"
   }
 }
 
@@ -52,7 +52,7 @@ resource "aws_subnet" "db-subnet-us-east-1a" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "FISMA Terraform Playground - DB Subnet us-east-1a"
+    Name        = "FISMA Terraform Playground - ${var.stack_githash} - DB Subnet us-east-1a"
   }
 }
 
@@ -63,7 +63,7 @@ resource "aws_subnet" "db-subnet-us-east-1b" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "FISMA Terraform Playground - DB Subnet us-east-1b"
+    Name        = "FISMA Terraform Playground - ${var.stack_githash} - DB Subnet us-east-1b"
   }
 }
 
@@ -74,7 +74,7 @@ resource "aws_subnet" "db-subnet-us-east-1c" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "FISMA Terraform Playground - DB Subnet us-east-1c"
+    Name        = "FISMA Terraform Playground - ${var.stack_githash} - DB Subnet us-east-1c"
   }
 }
 

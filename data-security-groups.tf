@@ -17,7 +17,7 @@ resource "aws_security_group" "inbound-hpds-from-app" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "FISMA Terraform Playground - inbound-hpds-from-app Security Group"
+    Name        = "FISMA Terraform Playground - ${var.stack_githash} - inbound-hpds-from-app Security Group"
   }
 }
 resource "aws_security_group" "inbound-mysql-from-app" {
@@ -39,7 +39,7 @@ resource "aws_security_group" "inbound-mysql-from-app" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "FISMA Terraform Playground - inbound-mysql-from-app Security Group"
+    Name        = "FISMA Terraform Playground - ${var.stack_githash} - inbound-mysql-from-app Security Group"
   }
 }
 
