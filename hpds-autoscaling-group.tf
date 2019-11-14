@@ -22,7 +22,7 @@ resource "aws_launch_template" "hpds-launch-template" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "FISMA Terraform Playground - HPDS Launch Template"
+    Name        = "FISMA Terraform Playground - ${var.stack_githash} - HPDS Launch Template"
   }
   tag_specifications {
     resource_type = "instance"

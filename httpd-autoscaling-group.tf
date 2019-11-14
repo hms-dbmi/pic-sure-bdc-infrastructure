@@ -13,8 +13,7 @@ resource "aws_launch_template" "httpd-launch-template" {
 
   vpc_security_group_ids = [
     aws_security_group.inbound-from-public-internet.id,
-    aws_security_group.outbound-to-app.id,
-    aws_security_group.outbound-to-trend-micro.id
+    aws_security_group.outbound-to-app.id
   ]
   iam_instance_profile {
     name = aws_iam_instance_profile.httpd-deployment-s3-profile.name
