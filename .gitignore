@@ -1,3 +1,4 @@
+app-infrastructure/stack_variables*
 provisioning-private-key
 .terraform.tfstate.lock.info
 terraform.tfstate.backup
