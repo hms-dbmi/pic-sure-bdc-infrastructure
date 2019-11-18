@@ -8,7 +8,7 @@ resource "aws_rds_cluster" "aurora-db-cluster" {
   backup_retention_period			  = 5
   preferred_backup_window 			  = "07:00-09:00"
   apply_immediately                   = true
-  db_subnet_group_name  			  = "${aws_db_subnet_group.data-subnet-group.name}"
+  db_subnet_group_name  			  = var.db-subnet-group-name
   db_cluster_parameter_group_name     = "default.aurora-mysql5.7"
   skip_final_snapshot				  = true
   snapshot_identifier = "arn:aws:rds:us-east-1:281165049757:cluster-snapshot:test-snapshot-of-empty-database"
@@ -26,7 +26,7 @@ resource "aws_rds_cluster_instance" "aurora-cluster-instance" {
   count						   = 1
   identifier         		   = "${var.environment_name}-aurora-instance-${count.index}"
   cluster_identifier           = "${aws_rds_cluster.aurora-db-cluster.id}"
-  db_subnet_group_name  	   = "${aws_db_subnet_group.data-subnet-group.name}"
+  db_subnet_group_name  	   = var.db-subnet-group-name
   engine                       = "aurora-mysql"
   engine_version               = "5.7.mysql_aurora.2.03.2"
   instance_class               = "db.t2.small"
@@ -37,5 +37,5 @@ resource "aws_rds_cluster_instance" "aurora-cluster-instance" {
     Owner       = "Avillach_Lab"
     Environment = "development"
     Name        = "FISMA Terraform Playground - ${var.stack_githash} - RDS Aurora DB Instance - ${count.index}"
-  }  
+  }
 }

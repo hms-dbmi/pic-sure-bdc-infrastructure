@@ -52,9 +52,8 @@ resource "aws_launch_template" "wildfly-launch-template" {
 resource "aws_autoscaling_group" "wildfly-autoscaling-group" {
   depends_on = [aws_rds_cluster_instance.aurora-cluster-instance]
   vpc_zone_identifier = [
-    aws_subnet.app-subnet-us-east-1a.id,
-    aws_subnet.app-subnet-us-east-1b.id,
-    aws_subnet.app-subnet-us-east-1c.id
+      var.app-subnet-us-east-1a-id, 
+      var.app-subnet-us-east-1b-id
   ]
 
   desired_capacity = 1

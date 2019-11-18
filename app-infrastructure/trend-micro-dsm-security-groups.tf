@@ -2,7 +2,7 @@
 resource "aws_security_group" "inbound-from-trend-micro" {
   name = "inbound-from-trend-micro"
   description = "Allow inbound traffic from TrendMicro DSA"
-  vpc_id = aws_vpc.datastage-vpc.id
+  vpc_id = var.target-vpc
 
   ingress {
     from_port = 4118
@@ -23,7 +23,7 @@ resource "aws_security_group" "inbound-from-trend-micro" {
 resource "aws_security_group" "outbound-to-trend-micro" {
   name = "outbound-to-trend-micro"
   description = "Allow outbound traffic from TrendMicro DSA"
-  vpc_id = aws_vpc.datastage-vpc.id
+  vpc_id = var.target-vpc
 
   egress {
     from_port = 4120
