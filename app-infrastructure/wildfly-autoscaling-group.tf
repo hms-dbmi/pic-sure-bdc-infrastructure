@@ -7,7 +7,7 @@ output "provisioning-private-key" {
 }
 resource "aws_key_pair" "generated_key" {
   key_name   = "development-only-app-server-key"
-  public_key = "${tls_private_key.development-only-app-server-key.public_key_openssh}"
+  public_key = tls_private_key.development-only-app-server-key.public_key_openssh
 }
 
 data "template_cloudinit_config" "wildfly-user-data" {
@@ -17,7 +17,7 @@ data "template_cloudinit_config" "wildfly-user-data" {
   # user_data
   part {
     content_type = "text/x-shellscript"
-    content      = "" #replace(file("wildfly-userdata.sh"), "${stack_githash}", var.stack_githash)
+    content      = replace(file("wildfly-user_data.sh"), "${stack_githash}", var.stack_githash)
   }
 
 }
@@ -35,7 +35,7 @@ resource "aws_launch_template" "wildfly-launch-template" {
     }
   }
 
-  #user_data = data.template_cloudinit_config.wildfly-user-data.rendered
+  user_data = data.template_cloudinit_config.wildfly-user-data.rendered
 
   iam_instance_profile {
     name = aws_iam_instance_profile.wildfly-deployment-s3-profile.name
