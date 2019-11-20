@@ -10,6 +10,13 @@ resource "aws_key_pair" "generated_key" {
   public_key = tls_private_key.development-only-app-server-key.public_key_openssh
 }
 
+data "template_file" "wildfly-user_data" {
+  template = file("wildfly-scripts/wildfly-user_data.sh")
+  vars = {
+    stack_githash = var.stack_githash
+  }
+}
+
 data "template_cloudinit_config" "wildfly-user-data" {
   gzip          = true
   base64_encode = true
@@ -17,7 +24,7 @@ data "template_cloudinit_config" "wildfly-user-data" {
   # user_data
   part {
     content_type = "text/x-shellscript"
-    content      = replace(file("wildfly-scripts/wildfly-user_data.sh"), "stack_githash", var.stack_githash)
+    content      = data.template_file.wildfly-user_data.rendered
   }
 
 }
@@ -64,7 +71,7 @@ resource "aws_launch_template" "wildfly-launch-template" {
 }
 
 resource "aws_autoscaling_group" "wildfly-autoscaling-group" {
-  depends_on = [aws_rds_cluster_instance.aurora-cluster-instance]
+  # depends_on = [aws_rds_cluster_instance.aurora-cluster-instance]
   vpc_zone_identifier = [
       var.app-subnet-us-east-1a-id, 
       var.app-subnet-us-east-1b-id
