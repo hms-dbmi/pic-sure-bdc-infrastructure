@@ -10,6 +10,18 @@ resource "aws_key_pair" "generated_key" {
   public_key = "${tls_private_key.development-only-app-server-key.public_key_openssh}"
 }
 
+data "template_cloudinit_config" "wildfly-user-data" {
+  gzip          = true
+  base64_encode = true
+
+  # user_data
+  part {
+    content_type = "text/x-shellscript"
+    content      = replace(file("wildfly-userdata.sh"), "${stack_githash}", var.stack_githash)
+  }
+
+}
+
 resource "aws_launch_template" "wildfly-launch-template" {
   name_prefix = "wildfly"
   image_id = "ami-05091d5b01d0fda35"
@@ -22,6 +34,8 @@ resource "aws_launch_template" "wildfly-launch-template" {
       volume_size = 30
     }
   }
+
+  user_data = data.template_cloudinit_config.wildfly-user-data.rendered
 
   iam_instance_profile {
     name = aws_iam_instance_profile.wildfly-deployment-s3-profile.name

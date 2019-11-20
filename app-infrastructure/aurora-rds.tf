@@ -2,8 +2,8 @@ resource "aws_rds_cluster" "aurora-db-cluster" {
   cluster_identifier         		  = "${var.environment_name}-aurora-db-cluster"
   engine             				  = "aurora-mysql"
   engine_version                      = "5.7.mysql_aurora.2.03.2"
-  master_username                     = "${var.rds_master_username}"
-  master_password                     = "${var.rds_master_password}"
+  master_username                     = var.rds_master_username
+  master_password                     = var.rds_master_password
   port                                = 3306
   backup_retention_period			  = 5
   preferred_backup_window 			  = "07:00-09:00"
@@ -25,7 +25,7 @@ resource "aws_rds_cluster" "aurora-db-cluster" {
 resource "aws_rds_cluster_instance" "aurora-cluster-instance" { 
   count						   = 1
   identifier         		   = "${var.environment_name}-aurora-instance-${count.index}"
-  cluster_identifier           = "${aws_rds_cluster.aurora-db-cluster.id}"
+  cluster_identifier           = aws_rds_cluster.aurora-db-cluster.id
   db_subnet_group_name  	   = var.db-subnet-group-name
   engine                       = "aurora-mysql"
   engine_version               = "5.7.mysql_aurora.2.03.2"

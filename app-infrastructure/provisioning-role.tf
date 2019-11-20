@@ -78,6 +78,6 @@ data "aws_iam_policy_document" "wildfly-provisioning-policy" {
 resource "aws_iam_policy" "wildfly-provisioning-policy" {
   name   = "example_policy"
   path   = "/"
-  policy = "${data.aws_iam_policy_document.example.json}"
+  policy = data.aws_iam_policy_document.example.json
 }
 */
