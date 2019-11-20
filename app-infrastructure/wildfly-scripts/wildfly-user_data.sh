@@ -12,7 +12,7 @@ sudo service docker start
 sudo mkdir /home/centos/wildfly
 sudo chown centos:centos -R /home/centos
 cd /home/centos/wildfly
-sudo yum install python3-pip
+sudo yum -y install python3-pip
 sudo pip3 install --no-input awscli --upgrade
 sudo /usr/local/bin/aws s3 cp s3://avillach-datastage-pic-sure-jenkins-dev-builds-3/releases/jenkins_pipeline_build_stack_githash/pic-sure-wildfly.tar.gz .
 
