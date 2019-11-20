@@ -11,7 +11,7 @@ resource "aws_iam_role_policy" "wildfly-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::avillach-datastage-pic-sure-jenkins-dev-builds-2/*"
+      "Resource": "arn:aws:s3:::avillach-datastage-pic-sure-jenkins-dev-builds-3/*"
     }
   ]
 }
@@ -55,7 +55,7 @@ resource "aws_iam_role_policy" "httpd-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::avillach-datastage-pic-sure-jenkins-dev-builds-2/*"
+      "Resource": "arn:aws:s3:::avillach-datastage-pic-sure-jenkins-dev-builds-3/*"
     }
   ]
 }
@@ -99,7 +99,7 @@ resource "aws_iam_role_policy" "hpds-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::avillach-datastage-pic-sure-jenkins-dev-builds-2/*"
+      "Resource": "arn:aws:s3:::avillach-datastage-pic-sure-jenkins-dev-builds-3/*"
     }
   ]
 }
