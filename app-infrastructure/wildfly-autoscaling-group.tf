@@ -17,7 +17,7 @@ data "template_cloudinit_config" "wildfly-user-data" {
   # user_data
   part {
     content_type = "text/x-shellscript"
-    content      = replace(file("wildfly-user_data.sh"), "${stack_githash}", var.stack_githash)
+    content      = replace(file("wildfly-user_data.sh"), "stack_githash", var.stack_githash)
   }
 
 }

@@ -20,7 +20,7 @@ cd /home/centos/
 mkdir wildfly
 cd wildfly
 
-aws s3 cp s3://avillach-datastage-pic-sure-jenkins-dev-builds-3/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-wildfly.tar.gz .
+aws s3 cp s3://avillach-datastage-pic-sure-jenkins-dev-builds-3/releases/jenkins_pipeline_build_stack_githash/pic-sure-wildfly.tar.gz .
 
 WILDFLY_IMAGE=`docker load pic-sure-wildfly.tar.gz | cud -d ' ' -f 3'
 JAVA_OPTS="-Xms1024m -Xmx2g -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=256m -Djava.net.preferIPv4Stack=true"
