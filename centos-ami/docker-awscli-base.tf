@@ -24,7 +24,7 @@ resource "aws_security_group" "outbound-to-internet" {
 
 resource "aws_iam_instance_profile" "docker-awscli-base-profile" {
   name = "docker-awscli-base-profile"
-  role = "jenkins-s3-policy"
+  role = "jenkins-s3-role"
 }
 
 resource "aws_instance" "docker-awscli-base" {
@@ -33,7 +33,7 @@ resource "aws_instance" "docker-awscli-base" {
   key_name = "jenkins-provisioning-key"
 
   iam_instance_profile = aws_iam_instance_profile.docker-awscli-base-profile.name
-  
+
   root_block_device {
     delete_on_termination = true
     encrypted = true
