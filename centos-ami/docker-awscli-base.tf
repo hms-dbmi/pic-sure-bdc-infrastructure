@@ -20,9 +20,6 @@ resource "aws_security_group" "outbound-to-internet" {
 
 data "template_file" "docker-aws-cli-user_data" {
   template = file("install_docker_and_awscli.sh")
-  vars = {
-    stack_githash = var.stack_githash_long
-  }
 }
 
 data "template_cloudinit_config" "docker-aws-cli-user_data" {
