@@ -1,7 +1,7 @@
 
-resource "aws_security_group" "inbound-app-from-lma-for-dev-only" {
-  name = "allow_inbound_from_lma_subnet_to_app_server"
-  description = "Allow inbound traffic from LMA on port 22"
+resource "aws_security_group" "outbound-to-internet" {
+  name = "outbound-to-internet"
+  description = "Allow outbound traffic"
   vpc_id = var.target-vpc
 
   egress {
@@ -14,7 +14,7 @@ resource "aws_security_group" "inbound-app-from-lma-for-dev-only" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "FISMA Terraform Playground - ${var.stack_githash} - inbound-app-from-lma-for-dev-only Security Group"
+    Name        = "FISMA Terraform Playground - outbound-to-internet for AMI creation"
   }
 }
 
@@ -37,40 +37,25 @@ data "template_cloudinit_config" "docker-aws-cli-user_data" {
 
 }
 
-resource "aws_launch_template" "docker-aws-cli-launch-template" {
-  depends_on = [
-    aws_key_pair.generated_key
-  ]
-  name_prefix = "hpds"
-  image_id = "ami-05091d5b01d0fda35"
+resource "aws_instance" "docker-awscli-base" {
+  ami = "ami-05091d5b01d0fda35"
   instance_type = "m5.large"
-  block_device_mappings {
-    device_name = "/dev/sda1"
-    ebs {
-      delete_on_termination = true
-      encrypted = true
-      volume_size = 50
-    }
-  }
-  user_data = data.template_cloudinit_config.hpds-user_data.rendered
+  key_name = "jenkins-provisioning-key"
 
-  vpc_security_group_ids = [
-    aws_security_group.inbound-hpds-from-app.id,
-    aws_security_group.outbound-to-trend-micro.id
-  ]
-  iam_instance_profile {
-    name = aws_iam_instance_profile.hpds-deployment-s3-profile.name
+  root_block_device {
+    delete_on_termination = true
+    encrypted = true
+    volume_size = 50
   }
+
+  subnet_id = aws_subnet.jenkins-subnet-us-east-1a.id
 
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "FISMA Terraform Playground - ${var.stack_githash} - HPDS Launch Template"
+    Name        = "FISMA Terraform Playground - Docker AWS CLI AMI"
   }
-  tag_specifications {
-    resource_type = "instance"
-    tags = {
-      Name = "FISMA Terraform Playground - ${var.stack_githash} - HPDS"
-    }
-  }
+
+  user_data = data.template_cloudinit_config.docker-aws-cli-user_data.rendered
+
 }
