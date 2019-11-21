@@ -19,6 +19,10 @@ data "template_cloudinit_config" "httpd-user-data" {
 }
 
 resource "aws_launch_template" "httpd-launch-template" {
+  depends_on = [
+    aws_key_pair.generated_key
+  ]
+
   name_prefix = "httpd"
   image_id = "ami-05091d5b01d0fda35"
   instance_type = "m5.large"
@@ -31,6 +35,7 @@ resource "aws_launch_template" "httpd-launch-template" {
     }
   }
 
+  key_name = aws_key_pair.generated_key.key_name
   user_data = data.template_cloudinit_config.httpd-user-data.rendered
 
   vpc_security_group_ids = [
