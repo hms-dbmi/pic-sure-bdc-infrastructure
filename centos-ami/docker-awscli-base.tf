@@ -32,9 +32,8 @@ resource "aws_instance" "docker-awscli-base" {
   instance_type = "m5.large"
   key_name = "jenkins-provisioning-key"
 
-  iam_instance_profile {
-    name = aws_iam_instance_profile.docker-awscli-base-profile.name
-  }
+  iam_instance_profile = aws_iam_instance_profile.docker-awscli-base-profile.name
+  
   root_block_device {
     delete_on_termination = true
     encrypted = true
