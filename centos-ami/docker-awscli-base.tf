@@ -30,11 +30,50 @@ resource "aws_security_group" "outbound-to-internet" {
     Name        = "FISMA Terraform Playground - outbound-to-internet for AMI creation"
   }
 }
+resource "aws_iam_role_policy" "docker-awscli-base-policy" {
+  name = "docker-awscli-base-policy"
+  role = aws_iam_role.docker-awscli-base-role.id
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "ec2:CreateTags"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:ec2:*:*:instance/*"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role" "docker-awscli-base-role" {
+  name               = "docker-awscli-base-role"
+  path               = "/system/"
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+}
 
 resource "aws_iam_instance_profile" "docker-awscli-base-profile" {
   name = "docker-awscli-base-profile"
-  role = "jenkins-s3-role"
+  role = aws_iam_role.docker-awscli-base-role.name
 }
+
 
 resource "aws_instance" "docker-awscli-base" {
   ami = "ami-05091d5b01d0fda35"
