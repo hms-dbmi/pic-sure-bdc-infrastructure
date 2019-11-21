@@ -13,7 +13,7 @@ resource "aws_key_pair" "generated_key" {
 data "template_file" "wildfly-user_data" {
   template = file("wildfly-scripts/wildfly-user_data.sh")
   vars = {
-    stack_githash = var.stack_githash
+    stack_githash = var.stack_githash_long
   }
 }
 
