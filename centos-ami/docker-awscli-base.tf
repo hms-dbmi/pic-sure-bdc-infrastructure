@@ -71,7 +71,7 @@ EOF
 
 resource "aws_iam_instance_profile" "docker-awscli-base-profile" {
   name = "docker-awscli-base-profile"
-  roles = [aws_iam_role.docker-awscli-base-role.name]
+  roles = aws_iam_role.docker-awscli-base-role.name
 }
 
 
@@ -91,7 +91,7 @@ resource "aws_instance" "docker-awscli-base" {
   vpc_security_group_ids = [
     aws_security_group.outbound-to-internet.id
   ]
-  
+
   subnet_id = var.edge-subnet-us-east-1a-id
 
   tags = {
