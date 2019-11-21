@@ -18,22 +18,6 @@ resource "aws_security_group" "outbound-to-internet" {
   }
 }
 
-data "template_file" "docker-aws-cli-user_data" {
-  template = file("install_docker_and_awscli.sh")
-}
-
-data "template_cloudinit_config" "docker-aws-cli-user_data" {
-  gzip          = true
-  base64_encode = true
-
-  # user_data
-  part {
-    content_type = "text/x-shellscript"
-    content      = data.template_file.docker-aws-cli-user_data.rendered
-  }
-
-}
-
 resource "aws_instance" "docker-awscli-base" {
   ami = "ami-05091d5b01d0fda35"
   instance_type = "m5.large"
@@ -53,6 +37,6 @@ resource "aws_instance" "docker-awscli-base" {
     Name        = "FISMA Terraform Playground - Docker AWS CLI AMI"
   }
 
-  user_data = data.template_cloudinit_config.docker-aws-cli-user_data.rendered
+  user_data = file("install_docker_and_awscli.sh")
 
 }
