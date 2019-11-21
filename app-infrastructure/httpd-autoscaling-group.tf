@@ -1,3 +1,23 @@
+
+data "template_file" "httpd-user_data" {
+  template = file("scripts/httpd-user_data.sh")
+  vars = {
+    stack_githash = var.stack_githash_long
+  }
+}
+
+data "template_cloudinit_config" "httpd-user-data" {
+  gzip          = true
+  base64_encode = true
+
+  # user_data
+  part {
+    content_type = "text/x-shellscript"
+    content      = data.template_file.httpd-user_data.rendered
+  }
+
+}
+
 resource "aws_launch_template" "httpd-launch-template" {
   name_prefix = "httpd"
   image_id = "ami-05091d5b01d0fda35"
@@ -10,6 +30,8 @@ resource "aws_launch_template" "httpd-launch-template" {
       volume_size = 30
     }
   }
+
+  user_data = data.template_cloudinit_config.httpd-user-data.rendered
 
   vpc_security_group_ids = [
     aws_security_group.inbound-from-public-internet.id,

@@ -1,3 +1,23 @@
+
+data "template_file" "hpds-user_data" {
+  template = file("scripts/hpds-user_data.sh")
+  vars = {
+    stack_githash = var.stack_githash_long
+  }
+}
+
+data "template_cloudinit_config" "hpds-user-data" {
+  gzip          = true
+  base64_encode = true
+
+  # user_data
+  part {
+    content_type = "text/x-shellscript"
+    content      = data.template_file.hpds-user_data.rendered
+  }
+
+}
+
 resource "aws_launch_template" "hpds-launch-template" {
   name_prefix = "hpds"
   image_id = "ami-05091d5b01d0fda35"
@@ -10,6 +30,8 @@ resource "aws_launch_template" "hpds-launch-template" {
       volume_size = 50
     }
   }
+
+  user_data = data.template_cloudinit_config.hpds-user-data.rendered
 
   vpc_security_group_ids = [
     aws_security_group.inbound-hpds-from-app.id,
