@@ -15,6 +15,15 @@ resource "aws_security_group" "outbound-to-internet" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  ingress {
+    from_port = 22
+    to_port = 22
+    protocol = "tcp"
+    cidr_blocks = [
+      "134.174.0.0/16"
+    ]
+  }
+
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
@@ -40,6 +49,9 @@ resource "aws_instance" "docker-awscli-base" {
     volume_size = 50
   }
 
+  vpc_security_group_ids = [
+    aws_security_group.outbound-to-internet.id
+  ]
   subnet_id = var.edge-subnet-us-east-1a-id
 
   tags = {
