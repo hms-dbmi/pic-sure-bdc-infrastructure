@@ -71,7 +71,11 @@ EOF
 
 resource "aws_iam_instance_profile" "docker-awscli-base-profile" {
   name = "docker-awscli-base-profile"
-  roles = aws_iam_role.docker-awscli-base-role.name
+  role = aws_iam_role.docker-awscli-base-role.name
+
+  provisioner "local-exec" {
+    command = "sleep 10"
+  }
 }
 
 
