@@ -91,6 +91,7 @@ resource "aws_instance" "docker-awscli-base" {
   vpc_security_group_ids = [
     aws_security_group.outbound-to-internet.id
   ]
+  
   subnet_id = var.edge-subnet-us-east-1a-id
 
   tags = {
