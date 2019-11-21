@@ -45,7 +45,7 @@ resource "aws_instance" "docker-awscli-base" {
     volume_size = 50
   }
 
-  subnet_id = aws_subnet.jenkins-subnet-us-east-1a.id
+  subnet_id = var.edge-subnet-us-east-1a-id
 
   tags = {
     Owner       = "Avillach_Lab"
