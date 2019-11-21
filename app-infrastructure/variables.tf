@@ -1,6 +1,9 @@
 variable "stack_githash" {
   type = string
 }
+variable "stack_githash_long" {
+  type = string
+}
 
 variable "environment_name" {
   description = "The name of the environment"
