@@ -1,3 +1,7 @@
+provider "aws" {
+  region     = "us-east-1" 
+  profile    = "avillachlab-secure-infrastructure"
+}
 
 resource "aws_security_group" "outbound-to-internet" {
   name = "outbound-to-internet"
