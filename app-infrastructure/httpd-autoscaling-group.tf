@@ -24,7 +24,7 @@ resource "aws_launch_template" "httpd-launch-template" {
   ]
 
   name_prefix = "httpd"
-  image_id = "ami-05091d5b01d0fda35"
+  image_id = "ami-08fd3c35c71332c8e"#"ami-05091d5b01d0fda35"
   instance_type = "m5.large"
   block_device_mappings {
     device_name = "/dev/sda1"
