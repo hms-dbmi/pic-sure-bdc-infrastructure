@@ -31,7 +31,7 @@ resource "aws_launch_template" "httpd-launch-template" {
     ebs {
       delete_on_termination = true
       encrypted = true
-      volume_size = 30
+      volume_size = 50
     }
   }
 
