@@ -20,7 +20,8 @@ data "template_cloudinit_config" "httpd-user-data" {
 
 resource "aws_instance" "httpd-ec2" {
   depends_on = [
-    aws_key_pair.generated_key
+    aws_key_pair.generated_key,
+    aws_iam_instance_profile.httpd-deployment-s3-profile
   ]
 
   ami = "ami-08b6e848c06d13bb3"
