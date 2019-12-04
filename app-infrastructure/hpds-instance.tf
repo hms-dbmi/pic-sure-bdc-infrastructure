@@ -18,10 +18,10 @@ data "template_cloudinit_config" "hpds-user-data" {
 
 }
 
-resource "aws_instance" "httpd-ec2" {
+resource "aws_instance" "hpds-ec2" {
   depends_on = [
     aws_key_pair.generated_key,
-    aws_iam_instance_profile.httpd-deployment-s3-profile
+    aws_iam_instance_profile.hpds-deployment-s3-profile
   ]
 
   ami = "ami-08b6e848c06d13bb3"
@@ -29,16 +29,16 @@ resource "aws_instance" "httpd-ec2" {
 
   associate_public_ip_address = true
 
-  subnet_id = var.edge-subnet-us-east-1a-id
+  subnet_id = var.db-subnet-us-east-1a-id
 
-  iam_instance_profile = aws_iam_instance_profile.httpd-deployment-s3-profile.name
+  iam_instance_profile = aws_iam_instance_profile.hpds-deployment-s3-profile.name
 
   key_name = aws_key_pair.generated_key.key_name
-  user_data = data.template_cloudinit_config.httpd-user-data.rendered
+  user_data = data.template_cloudinit_config.hpds-user-data.rendered
 
   vpc_security_group_ids = [
-    aws_security_group.inbound-from-public-internet.id,
-    aws_security_group.outbound-to-app.id
+    aws_security_group.inbound-hpds-from-app.id,
+    aws_security_group.outbound-to-trend-micro.id
   ]
   root_block_device {
     delete_on_termination = true
@@ -49,7 +49,7 @@ resource "aws_instance" "httpd-ec2" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "FISMA Terraform Playground - ${var.stack_githash} - Apache HTTPD"
+    Name        = "FISMA Terraform Playground - ${var.stack_githash} - HPDS"
   }
 
 }
