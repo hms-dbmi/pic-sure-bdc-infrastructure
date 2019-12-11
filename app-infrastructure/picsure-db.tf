@@ -11,6 +11,7 @@ resource "aws_db_instance" "pic-sure-mysql" {
   storage_encrypted = true
   db_subnet_group_name = "main-b"
   copy_tags_to_snapshot = true
+  skip_final_snapshot = true
   snapshot_identifier = "arn:aws:rds:us-east-1:281165049757:snapshot:pic-sure-baseline"
   vpc_security_group_ids = [aws_security_group.inbound-mysql-from-app.id]
   tags = {
