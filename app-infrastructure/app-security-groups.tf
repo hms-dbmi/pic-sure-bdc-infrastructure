@@ -19,8 +19,8 @@ resource "aws_security_group" "inbound-from-edge" {
     Name        = "FISMA Terraform Playground - ${var.stack_githash} - inbound-from-edge Security Group"
   }
 }
-resource "aws_security_group" "outbound-to-hpds_${var.stack_githash}" {
-  name = "allow_outbound_from_app_subnets_to_hpds_port_in_hpds_subnets"
+resource "aws_security_group" "outbound-to-hpds" {
+  name = "allow_outbound_from_app_subnets_to_hpds_port_in_hpds_subnets_${var.stack_githash}"
   description = "Allow outbound traffic to data-hpds-subnets on port 8080 until we have TLS in place for app server"
   vpc_id = var.target-vpc
 
