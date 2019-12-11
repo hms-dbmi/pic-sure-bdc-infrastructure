@@ -1,6 +1,6 @@
 
 resource "aws_security_group" "inbound-from-trend-micro" {
-  name = "inbound-from-trend-micro"
+  name = "inbound-from-trend-micro_${var.stack_githash}"
   description = "Allow inbound traffic from TrendMicro DSA"
   vpc_id = var.target-vpc
 
@@ -21,7 +21,7 @@ resource "aws_security_group" "inbound-from-trend-micro" {
 }
 
 resource "aws_security_group" "outbound-to-trend-micro" {
-  name = "outbound-to-trend-micro"
+  name = "outbound-to-trend-micro_${var.stack_githash}"
   description = "Allow outbound traffic from TrendMicro DSA"
   vpc_id = var.target-vpc
 

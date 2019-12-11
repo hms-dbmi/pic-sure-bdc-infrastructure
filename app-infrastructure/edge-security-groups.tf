@@ -1,5 +1,5 @@
 resource "aws_security_group" "inbound-from-public-internet" {
-  name = "allow_inbound_from_public_internet_to_httpd"
+  name = "allow_inbound_from_public_internet_to_httpd_${var.stack_githash}"
   description = "Allow inbound traffic from public internet to httpd servers"
   vpc_id = var.target-vpc
 
@@ -20,7 +20,7 @@ resource "aws_security_group" "inbound-from-public-internet" {
 }
 
 resource "aws_security_group" "outbound-to-app" {
-  name = "allow_outbound_from_edge_to_wildfly_port_in_app_vpc"
+  name = "allow_outbound_from_edge_to_wildfly_port_in_app_vpc_${var.stack_githash}"
   description = "Allow outbound traffic to app-subnets on port 8080 until we have TLS in place for app server"
   vpc_id = var.target-vpc
 
