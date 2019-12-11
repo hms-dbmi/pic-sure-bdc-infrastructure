@@ -68,8 +68,8 @@ resource "aws_instance" "wildfly-ec2" {
 
 }
 
-resource "aws_route53_record" "www" {
-  zone_id = internal-dns-zone-id
+resource "aws_route53_record" "wildfly" {
+  zone_id = var.internal-dns-zone-id
   name    = "wildfly"
   type    = "A"
   ttl     = "300"
