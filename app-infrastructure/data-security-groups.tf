@@ -1,5 +1,5 @@
-resource "aws_security_group" "inbound-hpds-from-app_${var.stack_githash}" {
-  name = "allow_inbound_from_app_subnet_to_hpds"
+resource "aws_security_group" "inbound-hpds-from-app" {
+  name = "allow_inbound_from_app_subnet_to_hpds_${var.stack_githash}"
   description = "Allow inbound traffic from app-subnets on port 8080 until we have TLS in place for hpds server"
   vpc_id = var.target-vpc
 
@@ -19,8 +19,8 @@ resource "aws_security_group" "inbound-hpds-from-app_${var.stack_githash}" {
     Name        = "FISMA Terraform Playground - ${var.stack_githash} - inbound-hpds-from-app Security Group"
   }
 }
-resource "aws_security_group" "inbound-mysql-from-app_${var.stack_githash}" {
-  name = "allow_inbound_from_app_subnet_to_mysql"
+resource "aws_security_group" "inbound-mysql-from-app" {
+  name = "allow_inbound_from_app_subnet_to_mysql_${var.stack_githash}"
   description = "Allow inbound traffic from app-subnets on port 3306"
   vpc_id = var.target-vpc
 
