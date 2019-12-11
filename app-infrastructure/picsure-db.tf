@@ -1,6 +1,6 @@
 resource "aws_db_instance" "pic-sure-mysql" {
   allocated_storage = 50
-  storage_type = "hp2"
+  storage_type = "gp2"
   engine = "mysql"
   engine_version = "5.7"
   instance_class = "db.t3.small"
@@ -11,7 +11,7 @@ resource "aws_db_instance" "pic-sure-mysql" {
   storage_encrypted = true
   db_subnet_group_name = "main-b"
   copy_tags_to_snapshot = true
-  
+
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
