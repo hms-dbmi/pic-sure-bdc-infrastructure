@@ -33,7 +33,7 @@ resource "aws_instance" "wildfly-ec2" {
   depends_on = [
     aws_key_pair.generated_key,
     aws_iam_instance_profile.wildfly-deployment-s3-profile,
-    template_file.wildfly-standalone-xml
+    data.template_file.wildfly-standalone-xml
   ]
 
   ami = "ami-08b6e848c06d13bb3"
