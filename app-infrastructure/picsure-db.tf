@@ -20,3 +20,11 @@ resource "aws_db_instance" "pic-sure-mysql" {
     Name        = "FISMA Terraform Playground - ${var.stack_githash} - PIC-SURE DB Instance"
   }
 }
+
+resource "aws_route53_record" "picsure-db" {
+  zone_id = var.internal-dns-zone-id
+  name    = "picsure-db"
+  type    = "A"
+  ttl     = "300"
+  records = [aws_db_instance.pic-sure-mysql.address]
+}
