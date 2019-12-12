@@ -32,7 +32,8 @@ data "template_cloudinit_config" "wildfly-user-data" {
 resource "aws_instance" "wildfly-ec2" {
   depends_on = [
     aws_key_pair.generated_key,
-    aws_iam_instance_profile.wildfly-deployment-s3-profile
+    aws_iam_instance_profile.wildfly-deployment-s3-profile,
+    template_file.wildfly-standalone-xml
   ]
 
   ami = "ami-08b6e848c06d13bb3"
@@ -74,4 +75,23 @@ resource "aws_route53_record" "wildfly" {
   type    = "A"
   ttl     = "300"
   records = [aws_instance.wildfly-ec2.private_ip]
+}
+
+data "template_file" "wildfly-standalone-xml" {
+  depends_on = [
+    aws_route53_record.picsure-db
+  ]
+  template = file("configs/standalone.xml")
+  vars = {
+    picsure-db-password = random_password.picsure-db-password.result
+    picsure_client_secret = var.picsure_client_secret
+    fence_client_secret = var.fence_client_secret
+    fence_client_id = var.fence_client_id
+  }
+}
+
+resource "aws_s3_bucket_object" "standalone-xml-in-s3" {
+  bucket = "avillach-datastage-pic-sure-jenkins-dev-builds-3"
+  key    = "/configs/jenkins_pipeline_build_${var.stack_githash_long}/standalone.xml"
+  content = template_file.wildfly-standalone-xml.rendered
 }

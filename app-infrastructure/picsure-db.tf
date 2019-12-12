@@ -6,7 +6,7 @@ resource "aws_db_instance" "pic-sure-mysql" {
   instance_class = "db.t3.small"
   name = "picsure"
   username = "root"
-  password = "password"
+  password = random_password.picsure-db-password.result
   parameter_group_name = "default.mysql5.7"
   storage_encrypted = true
   db_subnet_group_name = "main-b"
@@ -27,4 +27,10 @@ resource "aws_route53_record" "picsure-db" {
   type    = "CNAME"
   ttl     = "300"
   records = [aws_db_instance.pic-sure-mysql.address]
+}
+
+resource "random_password" "picsure-db-password" {
+  length = 16
+  special = true
+  override_special = "_%@"
 }
