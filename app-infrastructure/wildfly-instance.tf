@@ -93,5 +93,5 @@ data "template_file" "wildfly-standalone-xml" {
 resource "aws_s3_bucket_object" "standalone-xml-in-s3" {
   bucket = "avillach-datastage-pic-sure-jenkins-dev-builds-3"
   key    = "/configs/jenkins_pipeline_build_${var.stack_githash_long}/standalone.xml"
-  content = template_file.wildfly-standalone-xml.rendered
+  content = data.template_file.wildfly-standalone-xml.rendered
 }
