@@ -31,6 +31,5 @@ resource "aws_route53_record" "picsure-db" {
 
 resource "random_password" "picsure-db-password" {
   length = 16
-  special = true
-  override_special = "/\"_%@"
+  special = false
 }
