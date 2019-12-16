@@ -3,6 +3,7 @@ data "template_file" "hpds-user_data" {
   template = file("scripts/hpds-user_data.sh")
   vars = {
     stack_githash = var.stack_githash_long
+    dataset_s3_url = var.dataset_s3_url
   }
 }
 
