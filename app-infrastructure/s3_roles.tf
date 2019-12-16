@@ -118,6 +118,13 @@ resource "aws_iam_role_policy" "hpds-deployment-s3-policy" {
       ],
       "Effect": "Allow",
       "Resource": "arn:aws:s3:::avillach-datastage-pic-sure-jenkins-dev-builds-3/releases/jenkins_pipeline_build_${var.stack_githash_long}/pic-sure-hpds.tar.gz"
+    },
+    {
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": ${var.dataset_s3_url}
     }
   ]
 }
@@ -141,5 +148,5 @@ resource "aws_iam_role" "hpds-deployment-s3-role" {
   ]
 }
 EOF
-}
+
 
