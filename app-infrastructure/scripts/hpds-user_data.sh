@@ -6,7 +6,7 @@ cd /opt/local/hpds
 tar -xvzf hpds_data.tar.gz
 cd ~
 
-HPDS_IMAGE=`sudo docker load < pic-sure-hpds.tar.gz | cut -d ' ' -f 3`
+HPDS_IMAGE=`sudo docker load < /pic-sure-hpds.tar.gz | cut -d ' ' -f 3`
 ENTRY_POINT='java -XX:+UseParallelGC -XX:SurvivorRatio=250 -Xms1g -Xmx4g -server -jar hpds.jar -httpPort 8080 -DCACHE_SIZE=10000 -DSMALL_TASK_THREADS=1 -DLARGE_TASK_THREADS=1 -DSMALL_JOB_LIMIT=100 -DID_BATCH_SIZE=2000 "-DALL_IDS_CONCEPT=NONE"  "-DID_CUBE_NAME=NONE" > /var/log/hpds.log'
 sudo docker run --name=hpds -v /var/log/hpds-docker-logs/:/var/log -v /opt/local/hpds:/opt/local/hpds -p 8080:8080 --entrypoint=$ENTRY_POINT -d $HPDS_IMAGE
 sudo docker logs -f hpds > /var/log/hpds-docker-logs/hpds.log &
