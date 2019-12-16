@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://avillach-datastage-pic-sure-jenkins-dev-builds-3/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-hpds.tar.gz . && break || sleep 30; done
-mkdir -p /opt/local/hpds
+mkdir -p /opt/local/hpds/all
 for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp ${dataset_s3_url} /opt/local/hpds/hpds_data.tar.gz && break || sleep 30; done
 for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://avillach-datastage-pic-sure-jenkins-dev-builds-3/configs/jenkins_pipeline_build_${stack_githash}/hpds-log4j.properties /opt/local/hpds/log4j.properties && break || sleep 30; done
 cd /opt/local/hpds
