@@ -124,7 +124,7 @@ resource "aws_iam_role_policy" "hpds-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "${var.dataset_s3_url}"
+      "Resource": "${dataset_s3_arn}"
     }
   ]
 }
