@@ -131,7 +131,7 @@ resource "aws_iam_role_policy" "hpds-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::avillach-datastage-pic-sure-jenkins-dev-builds-3/configs/jenkins_pipeline_build_${stack_githash}/hpds-log4j.properties"
+      "Resource": "arn:aws:s3:::avillach-datastage-pic-sure-jenkins-dev-builds-3/configs/jenkins_pipeline_build_${var.stack_githash_long}/hpds-log4j.properties"
     }
   ]
 }
