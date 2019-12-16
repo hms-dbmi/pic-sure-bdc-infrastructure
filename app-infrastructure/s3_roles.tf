@@ -148,5 +148,5 @@ resource "aws_iam_role" "hpds-deployment-s3-role" {
   ]
 }
 EOF
-
+}
 
