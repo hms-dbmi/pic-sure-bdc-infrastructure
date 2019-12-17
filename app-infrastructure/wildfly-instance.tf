@@ -88,6 +88,7 @@ data "template_file" "wildfly-standalone-xml" {
     picsure_client_secret = var.picsure_client_secret
     fence_client_secret = var.fence_client_secret
     fence_client_id = var.fence_client_id
+    picsure_token_introspection_token = var.picsure_token_introspection_token
   }
 }
 
