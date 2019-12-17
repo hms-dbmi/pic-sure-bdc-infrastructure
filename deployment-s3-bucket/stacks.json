@@ -1,0 +1,14 @@
+{
+  "stacks": {
+    "a": {
+      "current_git_hash": ""
+    },
+    "b": {
+      "current_git_hash": ""
+    }
+  },
+  "environments": {
+    "prod": "a",
+    "next_prod": "b"
+  }
+}
