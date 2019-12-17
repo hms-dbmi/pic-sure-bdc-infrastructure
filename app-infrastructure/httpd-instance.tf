@@ -3,6 +3,7 @@ data "template_file" "httpd-user_data" {
   template = file("scripts/httpd-user_data.sh")
   vars = {
     stack_githash = var.stack_githash_long
+    fence_client_id = var.fence_client_id
   }
 }
 
@@ -61,3 +62,44 @@ resource "aws_route53_record" "httpd" {
   ttl     = "300"
   records = [aws_instance.httpd-ec2.private_ip]
 }
+
+
+data "template_file" "httpd-vhosts-conf" {
+  template = file("configs/httpd-vhosts.conf")
+  vars = {
+    wildfly-base-url = var.wildfly-base-url
+  }
+}
+
+resource "aws_s3_bucket_object" "httpd-vhosts-in-s3" {
+  bucket = "avillach-datastage-pic-sure-jenkins-dev-builds-3"
+  key    = "/configs/jenkins_pipeline_build_${var.stack_githash_long}/httpd-vhosts.conf"
+  content = data.template_file.httpd-vhosts-conf.rendered
+}
+
+data "template_file" "picsureui_settings" {
+  template = file("configs/picsureui_settings.json")
+  vars = {
+  }
+}
+
+resource "aws_s3_bucket_object" "picsureui_settings-in-s3" {
+  bucket = "avillach-datastage-pic-sure-jenkins-dev-builds-3"
+  key    = "/configs/jenkins_pipeline_build_${var.stack_githash_long}/picsureui_settings.json"
+  content = data.template_file.picsureui_settings.conf.rendered
+}
+
+data "template_file" "psamaui_settings" {
+  template = file("configs/picsureui_settings.json")
+  vars = {
+    fence_client_id = var.fence_client_id
+  }
+}
+
+resource "aws_s3_bucket_object" "psamaui_settings-in-s3" {
+  bucket = "avillach-datastage-pic-sure-jenkins-dev-builds-3"
+  key    = "/configs/jenkins_pipeline_build_${var.stack_githash_long}/psamaui_settings.json"
+  content = data.template_file.psamaui_settings.conf.rendered
+}
+
+

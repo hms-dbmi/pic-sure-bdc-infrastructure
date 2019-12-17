@@ -1,0 +1,60 @@
+{
+  "resources": [
+    {
+            "id" : "datastage",
+            "name" : "datastage",
+            "basePath" : "/picsure",
+            "findPath" : "/PIC-SURE/search"
+        }
+  ],
+  "picSureResourceId":"02e23f52-f354-4e8b-992c-d37c8b9ba140",
+  "applicationIdForBaseQuery":"8b5722c9-62fd-48d6-b0bf-4f67e53efb2b",
+  "helpLink": "mailto:sample@email.com",
+  "advancedSearchLink": "/transmart/login/callback_processor",
+  "logoPath":"/static/images/logo.png",
+  "categoryAliases": {
+			"DCC_Harmonized_data_set" : "HarmonizedVariables",
+			"Atherosclerosis_Risk_in_Communities_ARIC_Cohort":"ARIC",
+			"CCF_AFIB_GWAS_study":"CCFx",
+			"Cardiovascular_Health_Study_CHS_Cohort":"CHS",
+			"Coronary_Artery_Risk_Development_in_Young_Adults_CARDIA" : "CARDIA",
+			"Framingham_Cohort":"FHS",
+			"GeneSTAR_NextGen_Functional_Genomics_of_Platelet_Aggregation":"GeneSTAR",
+			"Genes_Environments_and_Admixture_in_Latino_Asthmatics_GALA_II_Study":"GALAII",
+			"Genetic_Epidemiology_Network_of_Arteriopathy_GENOA_":"GENOA",
+			"Genetic_Epidemiology_Network_of_Salt_Sensitivity_GenSalt_":"GenSalt",
+			"Genetic_Epidemiology_of_COPD_COPDGene_":"COPDGene",
+			"Genetics_of_Lipid_Lowering_Drugs_and_Diet_Network_GOLDN_Lipidomics_Study":"GOLDN",
+			"Genome_wide_Association_Study_of_Adiposity_in_Samoans":"SAS",
+			"Heart_and_Vascular_Health_Study_HVH_":"HVH",
+			"MGH_Atrial_Fibrillation_Study":"MGH_AF",
+			"Multi_Ethnic_Study_of_Atherosclerosis_MESA_Cohort":"MESA",
+			"NHGRI_Genome_Wide_Association_Study_of_Venous_Thromboembolism_GWAS_of_VTE_":"Mayo_VTE",
+			"NHLBI_Cleveland_Family_Study_CFS_Candidate_Gene_Association_Resource_CARe_":"CFS",
+			"NHLBI_TOPMed_African_American_Sarcoidosis_Genetics_Resource":"Sarcoidosis",
+			"NHLBI_TOPMed_Boston_Early_Onset_COPD_Study_in_the_TOPMed_Program":"EOCOPD",
+			"NHLBI_TOPMed_Diabetes_Heart_Study_DHS_African_American_Coronary_Artery_Calcification_AA_CAC_":"DHS",
+			"NHLBI_TOPMed_Genetics_of_Cardiometabolic_Health_in_the_Amish":"Amish",
+			"NHLBI_TOPMed_HyperGEN_Genetics_of_Left_Ventricular_LV_Hypertrophy":"HyperGEN",
+			"NHLBI_TOPMed_Novel_Risk_Factors_for_the_Development_of_Atrial_Fibrillation_in_Women":"WGHS",
+			"NHLBI_TOPMed_Partners_HealthCare_Biobank":"Partners",
+			"NHLBI_TOPMed_Rare_Variants_for_Hypertension_in_Taiwan_Chinese_THRV_":"THRV",
+			"NHLBI_TOPMed_San_Antonio_Family_Heart_Study_SAFHS_":"SAFS",
+			"NHLBI_TOPMed_Study_of_African_Americans_Asthma_Genes_and_Environment_SAGE_Study":"SAGE",
+			"NHLBI_TOPMed_The_Genetic_Epidemiology_of_Asthma_in_Costa_Rica":"CRA",
+			"NHLBI_TOPMed_The_Genetics_and_Epidemiology_of_Asthma_in_Barbados":"BAGS",
+			"NHLBI_TOPMed_The_Vanderbilt_AF_Ablation_Registry":"VAFAR",
+			"NHLBI_TOPMed_The_Vanderbilt_Atrial_Fibrillation_Registry":"VU_AF",
+			"The_Jackson_Heart_Study_JHS_":"JHS",
+			"Women_s_Health_Initiative":"WHI"
+	},
+  "categorySearchResultList" : [
+            "DCC_Harmonized_data_set",
+            "Coronary_Artery_Risk_Development_in_Young_Adults_CARDIA",
+            "Framingham_Cohort",
+            "Genetic_Epidemiology_of_COPD_COPDGene_",
+            "Multi_Ethnic_Study_of_Atherosclerosis_MESA_Cohort",
+            "The_Jackson_Heart_Study_JHS_",
+            "_Consents"
+             ]
+}

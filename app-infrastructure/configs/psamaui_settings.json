@@ -1,0 +1,11 @@
+{
+  "servicesPath" : "/psama",
+  "basePath" : "/psama",
+  "uiPath": "",
+  "helpLink": "",
+  "customizeAuth0Login": true,
+  "idp_provider":"fence",
+  "idp_provider_uri":"https://gen3.datastage.io/",
+  "fence_client_id":"${fence_client_id}",
+  "fence_redirect_url":"https://biodatacatalyst.integration.hms.harvard.edu/psamaui/login/"
+}
