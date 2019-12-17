@@ -1,10 +1,10 @@
 
 variable "target-vpc" {
   type = string
-  default = "__VPC_ID__"
+  default = "__TARGET_VPC__"
 }
 
-variable "edge-subnet-us-east-1a-id" {
+variable "target-subnet-id" {
   type = string
-  default = "__SUBNET_ID__"
+  default = "__TARGET_SUBNET_ID__"
 }
