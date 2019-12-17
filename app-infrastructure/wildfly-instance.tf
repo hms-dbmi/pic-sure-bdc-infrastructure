@@ -14,6 +14,7 @@ data "template_file" "wildfly-user_data" {
   template = file("scripts/wildfly-user_data.sh")
   vars = {
     stack_githash = var.stack_githash_long
+    stack_s3_bucket = var.stack_s3_bucket
   }
 }
 
@@ -91,7 +92,7 @@ data "template_file" "wildfly-standalone-xml" {
 }
 
 resource "aws_s3_bucket_object" "standalone-xml-in-s3" {
-  bucket = "avillach-datastage-pic-sure-jenkins-dev-builds-3"
+  bucket = "${stack_s3_bucket}"
   key    = "/configs/jenkins_pipeline_build_${var.stack_githash_long}/standalone.xml"
   content = data.template_file.wildfly-standalone-xml.rendered
 }

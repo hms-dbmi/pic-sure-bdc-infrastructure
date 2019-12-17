@@ -15,21 +15,21 @@ resource "aws_iam_role_policy" "wildfly-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::avillach-datastage-pic-sure-jenkins-dev-builds-3/releases/jenkins_pipeline_build_${var.stack_githash_long}/pic-sure-wildfly.tar.gz"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/releases/jenkins_pipeline_build_${var.stack_githash_long}/pic-sure-wildfly.tar.gz"
     },
     {
       "Action": [
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::avillach-datastage-pic-sure-jenkins-dev-builds-3/configs/jenkins_pipeline_build_${var.stack_githash_long}/standalone.xml"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/jenkins_pipeline_build_${var.stack_githash_long}/standalone.xml"
     },
     {
       "Action": [
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::avillach-datastage-pic-sure-jenkins-dev-builds-3/modules/*"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/modules/*"
     }
   ]
 }
@@ -73,43 +73,43 @@ resource "aws_iam_role_policy" "httpd-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::avillach-datastage-pic-sure-jenkins-dev-builds-3/releases/jenkins_pipeline_build_${var.stack_githash_long}/pic-sure-hpds-copdgene-ui.tar.gz"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/releases/jenkins_pipeline_build_${var.stack_githash_long}/pic-sure-hpds-copdgene-ui.tar.gz"
     },{
       "Action": [
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::avillach-datastage-pic-sure-jenkins-dev-builds-3/certs/httpd/server.crt"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/certs/httpd/server.crt"
     },{
       "Action": [
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::avillach-datastage-pic-sure-jenkins-dev-builds-3/certs/httpd/server.chain"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/certs/httpd/server.chain"
     },{
       "Action": [
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::avillach-datastage-pic-sure-jenkins-dev-builds-3/certs/httpd/server.key"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/certs/httpd/server.key"
     },{
       "Action": [
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::avillach-datastage-pic-sure-jenkins-dev-builds-3/configs/jenkins_pipeline_build_${var.stack_githash_long}/httpd-vhosts.conf"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/jenkins_pipeline_build_${var.stack_githash_long}/httpd-vhosts.conf"
     },{
       "Action": [
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::avillach-datastage-pic-sure-jenkins-dev-builds-3/configs/jenkins_pipeline_build_${var.stack_githash_long}/psamaui_settings.json"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/jenkins_pipeline_build_${var.stack_githash_long}/psamaui_settings.json"
     },{
       "Action": [
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::avillach-datastage-pic-sure-jenkins-dev-builds-3/configs/jenkins_pipeline_build_${var.stack_githash_long}/picsureui_settings.json"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/jenkins_pipeline_build_${var.stack_githash_long}/picsureui_settings.json"
     }
   ]
 }
@@ -153,7 +153,7 @@ resource "aws_iam_role_policy" "hpds-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::avillach-datastage-pic-sure-jenkins-dev-builds-3/releases/jenkins_pipeline_build_${var.stack_githash_long}/pic-sure-hpds.tar.gz"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/releases/jenkins_pipeline_build_${var.stack_githash_long}/pic-sure-hpds.tar.gz"
     },
     {
       "Action": [
@@ -167,7 +167,7 @@ resource "aws_iam_role_policy" "hpds-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::avillach-datastage-pic-sure-jenkins-dev-builds-3/configs/jenkins_pipeline_build_${var.stack_githash_long}/hpds-log4j.properties"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/jenkins_pipeline_build_${var.stack_githash_long}/hpds-log4j.properties"
     }
   ]
 }
