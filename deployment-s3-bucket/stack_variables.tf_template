@@ -1,0 +1,104 @@
+variable "internal-dns-zone-id" {
+  type = string
+  default = "__INTERNAL_DNS_ZONE_ID__"
+}
+
+variable "edge-subnet-us-east-1a-cidr" {
+  type = string
+  default = "__SUBNET_CIDR__"
+}
+variable "edge-subnet-us-east-1b-cidr" {
+  type = string
+  default = "__SUBNET_CIDR__"
+}
+
+variable "app-subnet-us-east-1a-cidr" {
+  type = string
+  default = "__SUBNET_CIDR__"
+}
+variable "app-subnet-us-east-1b-cidr" {
+  type = string
+  default = "__SUBNET_CIDR__"
+}
+
+variable "db-subnet-us-east-1a-cidr" {
+  type = string
+  default = "__SUBNET_CIDR__"
+}
+variable "db-subnet-us-east-1b-cidr" {
+  type = string
+  default = "__SUBNET_CIDR__"
+}
+
+variable "edge-subnet-us-east-1a-id" {
+  type = string
+  default = "__SUBNET_ID__"
+}
+variable "edge-subnet-us-east-1b-id" {
+  type = string
+  default = "__SUBNET_ID__"
+}
+
+variable "app-subnet-us-east-1a-id" {
+  type = string
+  default = "__SUBNET_ID__"
+}
+variable "app-subnet-us-east-1b-id" {
+  type = string
+  default = "__SUBNET_ID__"
+}
+
+variable "db-subnet-us-east-1a-id" {
+  type = string
+  default = "__SUBNET_ID__"
+}
+variable "db-subnet-us-east-1b-id" {
+  type = string
+  default = "__SUBNET_ID__"
+}
+
+variable "db-subnet-group-name" {
+  type = string
+  default = "__NAME_DEFINED_FOR_DB_SUBNET_GROUP__"
+}
+
+variable "target-vpc" {
+  type = string
+  default = "__VPC_FOR_THIS_STACK__"
+}
+
+variable "picsure_client_secret" {
+  type = string
+  default = "__PIC_SURE_CLIENT_SECRET__"
+}
+variable "picsure_token_introspection_token" {
+  type = string
+  default = "__PIC_SURE_TOKEN_INTROSPECTION_TOKEN__"
+}
+
+variable "fence_client_secret" {
+  type = string
+  default = "__FENCE_CLIENT_SECRET__"
+}
+
+variable "fence_client_id" {
+  type = string
+  default = "__FENCE_CLIENT_ID__"
+} 
+
+variable "stack_s3_bucket"{
+  type = string
+  default = "__S3_BUCKET_FOR_RELEASE_MANAGEMENT__"
+}
+
+variable "dataset_s3_object_key" {
+  type = string
+  default = "__S3_OBJECT_KEY_FOR_DATA_TO_BE_MOVED_TO_RELEASE_SPEC__"
+}
+
+variable "wildfly-base-url" {
+  type = string
+  default = "http://wildfly.local:8080"
+}
+
+

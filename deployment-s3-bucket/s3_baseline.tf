@@ -40,6 +40,17 @@ resource "aws_s3_bucket_object" "tfstate-baseline-b" {
   key    = "/deployment_state_metadata/b/terraform.tfstate"
   content = file("terraform.tfstate_baseline")
 }
+resource "aws_s3_bucket_object" "tfstate-baseline-a" {
+  bucket = var.stack_s3_bucket
+  key    = "/deployment_state_metadata/a/stack_variables.tf"
+  content = file("stack_variables_a.tf")
+}
+
+resource "aws_s3_bucket_object" "tfstate-baseline-b" {
+  bucket = var.stack_s3_bucket
+  key    = "/deployment_state_metadata/b/stack_variables.tf"
+  content = file("stack_variables_b.tf")
+}
 
 resource "aws_s3_bucket_object" "tfstate-baseline-b" {
   bucket = var.stack_s3_bucket
