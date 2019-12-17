@@ -8,7 +8,7 @@ resource "aws_security_group" "inbound-from-public-internet" {
     to_port = 80
     protocol = "tcp"
     cidr_blocks = [
-      "0.0.0.0/32"
+      "0.0.0.0/0"
     ]
   }
   ingress {
@@ -16,7 +16,7 @@ resource "aws_security_group" "inbound-from-public-internet" {
     to_port = 443
     protocol = "tcp"
     cidr_blocks = [
-      "0.0.0.0/32"
+      "0.0.0.0/0"
     ]
   }
 
