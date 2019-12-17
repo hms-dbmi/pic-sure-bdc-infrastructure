@@ -86,7 +86,7 @@ data "template_file" "picsureui_settings" {
 resource "aws_s3_bucket_object" "picsureui_settings-in-s3" {
   bucket = "avillach-datastage-pic-sure-jenkins-dev-builds-3"
   key    = "/configs/jenkins_pipeline_build_${var.stack_githash_long}/picsureui_settings.json"
-  content = data.template_file.picsureui_settings.conf.rendered
+  content = data.template_file.picsureui_settings.rendered
 }
 
 data "template_file" "psamaui_settings" {
@@ -99,7 +99,7 @@ data "template_file" "psamaui_settings" {
 resource "aws_s3_bucket_object" "psamaui_settings-in-s3" {
   bucket = "avillach-datastage-pic-sure-jenkins-dev-builds-3"
   key    = "/configs/jenkins_pipeline_build_${var.stack_githash_long}/psamaui_settings.json"
-  content = data.template_file.psamaui_settings.conf.rendered
+  content = data.template_file.psamaui_settings.rendered
 }
 
 
