@@ -26,7 +26,7 @@ resource "aws_instance" "httpd-ec2" {
     aws_iam_instance_profile.httpd-deployment-s3-profile
   ]
 
-  ami = "ami-08b6e848c06d13bb3"
+  ami = ${var.ami_id}
   instance_type = "m5.large"
 
   associate_public_ip_address = true

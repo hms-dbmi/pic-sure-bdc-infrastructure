@@ -101,4 +101,8 @@ variable "wildfly-base-url" {
   default = "http://wildfly.local:8080"
 }
 
+variable "ami-id" {
+  type = string
+  default = "ami-05091d5b01d0fda35"
+}
 
