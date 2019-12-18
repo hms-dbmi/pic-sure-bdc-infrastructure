@@ -82,7 +82,6 @@ resource "aws_iam_instance_profile" "docker-awscli-base-profile" {
 resource "aws_instance" "docker-awscli-base" {
   ami = "ami-05091d5b01d0fda35"
   instance_type = "m5.large"
-  key_name = "jenkins-provisioning-key"
 
   iam_instance_profile = aws_iam_instance_profile.docker-awscli-base-profile.name
 
@@ -96,7 +95,7 @@ resource "aws_instance" "docker-awscli-base" {
     aws_security_group.outbound-to-internet.id
   ]
 
-  subnet_id = var.edge-subnet-us-east-1a-id
+  subnet_id = var.target-subnet-id
 
   tags = {
     Owner       = "Avillach_Lab"

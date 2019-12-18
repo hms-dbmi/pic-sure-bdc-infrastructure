@@ -5,6 +5,8 @@ terraform.tfstate.backup
 terraform.tfstate
 .terraform
 .project
+httpd-server.chain
 httpd-server.crt
 httpd-server.key
-httpd-server.chain
+stack_variables_a.tf.baseline
+stack_variables_b.tf.baseline
