@@ -5,3 +5,6 @@ terraform.tfstate.backup
 terraform.tfstate
 .terraform
 .project
+httpd-server.crt
+httpd-server.key
+httpd-server.chain
