@@ -37,7 +37,7 @@ resource "aws_instance" "wildfly-ec2" {
     aws_s3_bucket_object.standalone-xml-in-s3
   ]
 
-  ami = var.ami_id
+  ami = var.ami-id
   instance_type = "m5.large"
 
   associate_public_ip_address = true

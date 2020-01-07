@@ -26,7 +26,7 @@ resource "aws_instance" "hpds-ec2" {
     aws_iam_instance_profile.hpds-deployment-s3-profile
   ]
 
-  ami = var.ami_id
+  ami = var.ami-id
   instance_type = "m5.xlarge"
 
   associate_public_ip_address = true
