@@ -53,10 +53,10 @@ resource "aws_s3_bucket_object" "stack-variables-baseline-b" {
 }
 
 resource "aws_s3_bucket_object" "stacks-json" {
-  bucket  = var.stack_s3_bucket
-  key     = "/deployment_state_metadata/stacks.json"
+  bucket                        = var.stack_s3_bucket
+  key                           = "/deployment_state_metadata/stacks.json"
   object_lock_legal_hold_status = "OFF"
-  content = file("stacks.json")
+  content                       = file("stacks.json")
 }
 
 resource "aws_s3_bucket_object" "mysql-connector-jar" {
