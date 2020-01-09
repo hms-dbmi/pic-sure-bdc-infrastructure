@@ -87,9 +87,9 @@ data "template_file" "picsureui_settings" {
   }
 }
 
-resource "local_file" "picsureui_settings.json" {
-    content     = "foo!"
-    filename = data.template_file.picsureui_settings.rendered
+resource "local_file" "picsureui-settings-json" {
+    content     = data.template_file.picsureui_settings.rendered
+    filename = "picsureui-settings.json"
 }
 
 #resource "aws_s3_bucket_object" "picsureui_settings-in-s3" {
