@@ -87,14 +87,19 @@ data "template_file" "picsureui_settings" {
   }
 }
 
-resource "aws_s3_bucket_object" "picsureui_settings-in-s3" {
-  bucket                 = var.stack_s3_bucket
-  key                    = "/configs/jenkins_pipeline_build_${var.stack_githash_long}/picsureui_settings.json"
-  content                = data.template_file.picsureui_settings.rendered
-  server_side_encryption = "aws:kms"
-  kms_key_id             = var.kms_key_id
-  acl = "private"
+resource "local_file" "picsureui_settings.json" {
+    content     = "foo!"
+    filename = data.template_file.picsureui_settings.rendered
 }
+
+#resource "aws_s3_bucket_object" "picsureui_settings-in-s3" {
+#  bucket                 = var.stack_s3_bucket
+#  key                    = "/configs/jenkins_pipeline_build_${var.stack_githash_long}/picsureui_settings.json"
+#  content                = data.template_file.picsureui_settings.rendered
+#  server_side_encryption = "aws:kms"
+#  kms_key_id             = var.kms_key_id
+#  acl = "private"
+#}
 
 data "template_file" "psamaui_settings" {
   template = file("configs/picsureui_settings.json")
