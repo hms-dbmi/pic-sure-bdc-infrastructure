@@ -100,6 +100,7 @@ resource "aws_s3_bucket_object" "standalone-xml-in-s3" {
   content                = data.template_file.wildfly-standalone-xml.rendered
   server_side_encryption = "aws:kms"
   kms_key_id             = var.kms_key_id
+  acl = "private"
 }
 
 data "template_file" "pic-sure-schema-sql" {
@@ -116,4 +117,5 @@ resource "aws_s3_bucket_object" "pic-sure-schema-sql-in-s3" {
   bucket = var.stack_s3_bucket
   key    = "/configs/jenkins_pipeline_build_${var.stack_githash_long}/pic-sure-schema.sql"
   content = data.template_file.pic-sure-schema-sql.rendered
+  acl = "private"
 }

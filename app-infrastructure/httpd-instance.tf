@@ -78,6 +78,7 @@ resource "aws_s3_bucket_object" "httpd-vhosts-in-s3" {
   content                = data.template_file.httpd-vhosts-conf.rendered
   server_side_encryption = "aws:kms"
   kms_key_id             = var.kms_key_id
+  acl = "private"
 }
 
 data "template_file" "picsureui_settings" {
@@ -92,6 +93,7 @@ resource "aws_s3_bucket_object" "picsureui_settings-in-s3" {
   content                = data.template_file.picsureui_settings.rendered
   server_side_encryption = "aws:kms"
   kms_key_id             = var.kms_key_id
+  acl = "private"
 }
 
 data "template_file" "psamaui_settings" {
@@ -107,6 +109,7 @@ resource "aws_s3_bucket_object" "psamaui_settings-in-s3" {
   content                = data.template_file.psamaui_settings.rendered
   server_side_encryption = "aws:kms"
   kms_key_id             = var.kms_key_id
+  acl = "private"
 }
 
 
