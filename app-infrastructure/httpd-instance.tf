@@ -2,7 +2,7 @@
 data "template_file" "httpd-user_data" {
   template = file("scripts/httpd-user_data.sh")
   vars = {
-    stack_githash = var.stack_githash_long
+    stack_githash   = var.stack_githash_long
     fence_client_id = var.fence_client_id
     stack_s3_bucket = var.stack_s3_bucket
   }
@@ -26,7 +26,7 @@ resource "aws_instance" "httpd-ec2" {
     aws_iam_instance_profile.httpd-deployment-s3-profile
   ]
 
-  ami = var.ami-id
+  ami           = var.ami-id
   instance_type = "m5.large"
 
   associate_public_ip_address = true
@@ -35,7 +35,7 @@ resource "aws_instance" "httpd-ec2" {
 
   iam_instance_profile = aws_iam_instance_profile.httpd-deployment-s3-profile.name
 
-  key_name = aws_key_pair.generated_key.key_name
+  key_name  = aws_key_pair.generated_key.key_name
   user_data = data.template_cloudinit_config.httpd-user-data.rendered
 
   vpc_security_group_ids = [
@@ -44,8 +44,8 @@ resource "aws_instance" "httpd-ec2" {
   ]
   root_block_device {
     delete_on_termination = true
-    encrypted = true
-    volume_size = 50
+    encrypted             = true
+    volume_size           = 50
   }
 
   tags = {
@@ -73,9 +73,11 @@ data "template_file" "httpd-vhosts-conf" {
 }
 
 resource "aws_s3_bucket_object" "httpd-vhosts-in-s3" {
-  bucket = var.stack_s3_bucket
-  key    = "/configs/jenkins_pipeline_build_${var.stack_githash_long}/httpd-vhosts.conf"
-  content = data.template_file.httpd-vhosts-conf.rendered
+  bucket                 = var.stack_s3_bucket
+  key                    = "/configs/jenkins_pipeline_build_${var.stack_githash_long}/httpd-vhosts.conf"
+  content                = data.template_file.httpd-vhosts-conf.rendered
+  server_side_encryption = "aws:kms"
+  kms_key_id             = var.kms_key_id
 }
 
 data "template_file" "picsureui_settings" {
@@ -85,9 +87,11 @@ data "template_file" "picsureui_settings" {
 }
 
 resource "aws_s3_bucket_object" "picsureui_settings-in-s3" {
-  bucket = var.stack_s3_bucket
-  key    = "/configs/jenkins_pipeline_build_${var.stack_githash_long}/picsureui_settings.json"
-  content = data.template_file.picsureui_settings.rendered
+  bucket                 = var.stack_s3_bucket
+  key                    = "/configs/jenkins_pipeline_build_${var.stack_githash_long}/picsureui_settings.json"
+  content                = data.template_file.picsureui_settings.rendered
+  server_side_encryption = "aws:kms"
+  kms_key_id             = var.kms_key_id
 }
 
 data "template_file" "psamaui_settings" {
@@ -98,9 +102,11 @@ data "template_file" "psamaui_settings" {
 }
 
 resource "aws_s3_bucket_object" "psamaui_settings-in-s3" {
-  bucket = var.stack_s3_bucket
-  key    = "/configs/jenkins_pipeline_build_${var.stack_githash_long}/psamaui_settings.json"
-  content = data.template_file.psamaui_settings.rendered
+  bucket                 = var.stack_s3_bucket
+  key                    = "/configs/jenkins_pipeline_build_${var.stack_githash_long}/psamaui_settings.json"
+  content                = data.template_file.psamaui_settings.rendered
+  server_side_encryption = "aws:kms"
+  kms_key_id             = var.kms_key_id
 }
 
 
