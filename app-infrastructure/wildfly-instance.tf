@@ -13,7 +13,7 @@ resource "aws_key_pair" "generated_key" {
 data "template_file" "wildfly-user_data" {
   template = file("scripts/wildfly-user_data.sh")
   vars = {
-    stack_githash = var.stack_githash_long
+    stack_githash   = var.stack_githash_long
     stack_s3_bucket = var.stack_s3_bucket
     mysql-instance-address = aws_db_instance.pic-sure-mysql.address
     mysql-instance-password = random_password.picsure-db-password.result
@@ -39,7 +39,7 @@ resource "aws_instance" "wildfly-ec2" {
     aws_s3_bucket_object.standalone-xml-in-s3
   ]
 
-  ami = var.ami-id
+  ami           = var.ami-id
   instance_type = "m5.large"
 
   associate_public_ip_address = true
@@ -48,7 +48,7 @@ resource "aws_instance" "wildfly-ec2" {
 
   iam_instance_profile = aws_iam_instance_profile.wildfly-deployment-s3-profile.name
 
-  key_name = aws_key_pair.generated_key.key_name
+  key_name  = aws_key_pair.generated_key.key_name
   user_data = data.template_cloudinit_config.wildfly-user-data.rendered
 
   vpc_security_group_ids = [
@@ -60,8 +60,8 @@ resource "aws_instance" "wildfly-ec2" {
   ]
   root_block_device {
     delete_on_termination = true
-    encrypted = true
-    volume_size = 50
+    encrypted             = true
+    volume_size           = 50
   }
 
   tags = {
@@ -86,18 +86,20 @@ data "template_file" "wildfly-standalone-xml" {
   ]
   template = file("configs/standalone.xml")
   vars = {
-    picsure-db-password = random_password.picsure-db-password.result
-    picsure_client_secret = var.picsure_client_secret
-    fence_client_secret = var.fence_client_secret
-    fence_client_id = var.fence_client_id
+    picsure-db-password               = random_password.picsure-db-password.result
+    picsure_client_secret             = var.picsure_client_secret
+    fence_client_secret               = var.fence_client_secret
+    fence_client_id                   = var.fence_client_id
     picsure_token_introspection_token = var.picsure_token_introspection_token
   }
 }
 
 resource "aws_s3_bucket_object" "standalone-xml-in-s3" {
-  bucket = var.stack_s3_bucket
-  key    = "/configs/jenkins_pipeline_build_${var.stack_githash_long}/standalone.xml"
-  content = data.template_file.wildfly-standalone-xml.rendered
+  bucket                 = var.stack_s3_bucket
+  key                    = "/configs/jenkins_pipeline_build_${var.stack_githash_long}/standalone.xml"
+  content                = data.template_file.wildfly-standalone-xml.rendered
+  server_side_encryption = "aws:kms"
+  kms_key_id             = var.kms_key_id
 }
 
 data "template_file" "pic-sure-schema-sql" {
