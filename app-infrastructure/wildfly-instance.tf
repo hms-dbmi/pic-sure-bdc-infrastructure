@@ -109,8 +109,8 @@ data "template_file" "pic-sure-schema-sql" {
   }
 }
 
-resource "aws_s3_bucket_object" "standalone-xml-in-s3" {
+resource "aws_s3_bucket_object" "pic-sure-schema-sql-in-s3" {
   bucket = var.stack_s3_bucket
-  key    = "/configs/jenkins_pipeline_build_${var.stack_githash_long}/standalone.xml"
-  content = data.template_file.wildfly-standalone-xml.rendered
+  key    = "/configs/jenkins_pipeline_build_${var.stack_githash_long}/pic-sure-schema.sql"
+  content = data.template_file.pic-sure-schema-sql.rendered
 }
