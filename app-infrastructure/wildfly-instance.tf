@@ -96,4 +96,6 @@ resource "aws_s3_bucket_object" "standalone-xml-in-s3" {
   bucket = var.stack_s3_bucket
   key    = "/configs/jenkins_pipeline_build_${var.stack_githash_long}/standalone.xml"
   content = data.template_file.wildfly-standalone-xml.rendered
+  server_side_encryption = "aws:kms"
+  kms_key_id = var.kms_key_id
 }
