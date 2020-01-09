@@ -16,6 +16,7 @@ data "template_file" "wildfly-user_data" {
     stack_githash = var.stack_githash_long
     stack_s3_bucket = var.stack_s3_bucket
     mysql-instance-address = aws_db_instance.pic-sure-mysql.address
+    mysql-instance-password = random_password.picsure-db-password.result
   }
 }
 
