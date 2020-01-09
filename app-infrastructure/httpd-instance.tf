@@ -72,6 +72,11 @@ data "template_file" "httpd-vhosts-conf" {
   }
 }
 
+resource "local_file" "httpd-vhosts-conf-file" {
+    content     = data.template_file.httpd-vhosts-conf.rendered
+    filename = "httpd-vhosts.conf"
+}
+
 #resource "aws_s3_bucket_object" "httpd-vhosts-in-s3" {
 #  bucket                 = var.stack_s3_bucket
 #  key                    = "/configs/jenkins_pipeline_build_${var.stack_githash_long}/httpd-vhosts.conf"
@@ -102,10 +107,15 @@ resource "local_file" "picsureui-settings-json" {
 #}
 
 data "template_file" "psamaui_settings" {
-  template = file("configs/picsureui_settings.json")
+  template = file("configs/psamaui_settings.json")
   vars = {
     fence_client_id = var.fence_client_id
   }
+}
+
+resource "local_file" "psamaui-settings-json" {
+    content     = data.template_file.psamaui_settings.rendered
+    filename = "psamaui-settings.json"
 }
 
 #resource "aws_s3_bucket_object" "psamaui_settings-in-s3" {
