@@ -15,6 +15,7 @@ data "template_file" "wildfly-user_data" {
   vars = {
     stack_githash = var.stack_githash_long
     stack_s3_bucket = var.stack_s3_bucket
+    mysql-instance-address = aws_db_instance.pic-sure-mysql.address
   }
 }
 
@@ -88,6 +89,22 @@ data "template_file" "wildfly-standalone-xml" {
     picsure_client_secret = var.picsure_client_secret
     fence_client_secret = var.fence_client_secret
     fence_client_id = var.fence_client_id
+    picsure_token_introspection_token = var.picsure_token_introspection_token
+  }
+}
+
+resource "aws_s3_bucket_object" "standalone-xml-in-s3" {
+  bucket = var.stack_s3_bucket
+  key    = "/configs/jenkins_pipeline_build_${var.stack_githash_long}/standalone.xml"
+  content = data.template_file.wildfly-standalone-xml.rendered
+}
+
+data "template_file" "pic-sure-schema-sql" {
+  depends_on = [
+    aws_route53_record.picsure-db
+  ]
+  template = file("configs/pic-sure-schema.sql")
+  vars = {
     picsure_token_introspection_token = var.picsure_token_introspection_token
   }
 }
