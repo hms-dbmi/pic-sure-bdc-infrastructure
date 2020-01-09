@@ -231,7 +231,7 @@ CREATE TABLE `application` (
 
 LOCK TABLES `application` WRITE;
 /*!40000 ALTER TABLE `application` DISABLE KEYS */;
-INSERT INTO `application` VALUES (0x8B5722C962FD48D6B0BF4F67E53EFB2B,'PIC-SURE multiple data access API',0x01,'PICSURE','eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJQU0FNQV9BUFBMSUNBVElPTnw4YjU3MjJjOS02MmZkLTQ4ZDYtYjBiZi00ZjY3ZTUzZWZiMmIiLCJpc3MiOiJiYXIiLCJleHAiOjE2MDc2OTkzMTMsImlhdCI6MTU3NjE2MzMxMywianRpIjoiRm9vIn0.pnIGOoG5LrWcj-ldrcNOTWGPsMxovIDopqhJwBVGjK4','/picsureui');
+INSERT INTO `application` VALUES (0x8B5722C962FD48D6B0BF4F67E53EFB2B,'PIC-SURE multiple data access API',0x01,'PICSURE','${picsure_token_introspection_token}','/picsureui');
 /*!40000 ALTER TABLE `application` ENABLE KEYS */;
 UNLOCK TABLES;
 
