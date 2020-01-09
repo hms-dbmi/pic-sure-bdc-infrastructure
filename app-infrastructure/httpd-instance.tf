@@ -72,14 +72,14 @@ data "template_file" "httpd-vhosts-conf" {
   }
 }
 
-resource "aws_s3_bucket_object" "httpd-vhosts-in-s3" {
-  bucket                 = var.stack_s3_bucket
-  key                    = "/configs/jenkins_pipeline_build_${var.stack_githash_long}/httpd-vhosts.conf"
-  content                = data.template_file.httpd-vhosts-conf.rendered
-  server_side_encryption = "aws:kms"
-  kms_key_id             = var.kms_key_id
-  acl = "private"
-}
+#resource "aws_s3_bucket_object" "httpd-vhosts-in-s3" {
+#  bucket                 = var.stack_s3_bucket
+#  key                    = "/configs/jenkins_pipeline_build_${var.stack_githash_long}/httpd-vhosts.conf"
+#  content                = data.template_file.httpd-vhosts-conf.rendered
+#  server_side_encryption = "aws:kms"
+#  kms_key_id             = var.kms_key_id
+#  acl = "private"
+#}
 
 data "template_file" "picsureui_settings" {
   template = file("configs/picsureui_settings.json")
@@ -108,13 +108,13 @@ data "template_file" "psamaui_settings" {
   }
 }
 
-resource "aws_s3_bucket_object" "psamaui_settings-in-s3" {
-  bucket                 = var.stack_s3_bucket
-  key                    = "/configs/jenkins_pipeline_build_${var.stack_githash_long}/psamaui_settings.json"
-  content                = data.template_file.psamaui_settings.rendered
-  server_side_encryption = "aws:kms"
-  kms_key_id             = var.kms_key_id
-  acl = "private"
-}
+#resource "aws_s3_bucket_object" "psamaui_settings-in-s3" {
+#  bucket                 = var.stack_s3_bucket
+#  key                    = "/configs/jenkins_pipeline_build_${var.stack_githash_long}/psamaui_settings.json"
+#  content                = data.template_file.psamaui_settings.rendered
+#  server_side_encryption = "aws:kms"
+#  kms_key_id             = var.kms_key_id
+#  acl = "private"
+#}
 
 
