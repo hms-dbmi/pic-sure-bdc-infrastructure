@@ -35,8 +35,8 @@ data "template_cloudinit_config" "wildfly-user-data" {
 resource "aws_instance" "wildfly-ec2" {
   depends_on = [
     aws_key_pair.generated_key,
-    aws_iam_instance_profile.wildfly-deployment-s3-profile,
-    aws_s3_bucket_object.standalone-xml-in-s3
+    aws_iam_instance_profile.wildfly-deployment-s3-profile
+   # aws_s3_bucket_object.standalone-xml-in-s3
   ]
 
   ami           = var.ami-id
