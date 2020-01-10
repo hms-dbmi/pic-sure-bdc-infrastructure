@@ -66,9 +66,9 @@ resource "aws_iam_role_policy_attachment" "attach-cloudwatch-server-policy-to-wi
   role       = "wildfly-deployment-s3-role-${var.stack_githash}"
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
 }
-resource "aws_iam_role_policy_attachment" "attach-cloudwatch-admin-policy-to-wildfly-role" {
+resource "aws_iam_role_policy_attachment" "attach-cloudwatch-ssm-policy-to-wildfly-role" {
   role       = "wildfly-deployment-s3-role-${var.stack_githash}"
-  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentAdminPolicy"
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
 
@@ -155,9 +155,9 @@ resource "aws_iam_role_policy_attachment" "attach-cloudwatch-server-policy-to-ht
   role       = "httpd-deployment-s3-role-${var.stack_githash}"
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
 }
-resource "aws_iam_role_policy_attachment" "attach-cloudwatch-admin-policy-to-httpd-role" {
+resource "aws_iam_role_policy_attachment" "attach-cloudwatch-ssm-policy-to-httpd-role" {
   role       = "httpd-deployment-s3-role-${var.stack_githash}"
-  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentAdminPolicy"
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
 
@@ -222,7 +222,7 @@ resource "aws_iam_role_policy_attachment" "attach-cloudwatch-server-policy-to-hp
   role       = "hpds-deployment-s3-role-${var.stack_githash}"
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
 }
-resource "aws_iam_role_policy_attachment" "attach-cloudwatch-admin-policy-to-hpds-role" {
+resource "aws_iam_role_policy_attachment" "attach-cloudwatch-ssm-policy-to-hpds-role" {
   role       = "hpds-deployment-s3-role-${var.stack_githash}"
-  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentAdminPolicy"
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
