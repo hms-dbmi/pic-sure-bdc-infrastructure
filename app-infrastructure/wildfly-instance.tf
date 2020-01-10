@@ -34,8 +34,7 @@ data "template_cloudinit_config" "wildfly-user-data" {
 
 resource "aws_instance" "wildfly-ec2" {
   depends_on = [
-    aws_key_pair.generated_key,
-    aws_iam_instance_profile.wildfly-deployment-s3-profile
+    aws_key_pair.generated_key
    # aws_s3_bucket_object.standalone-xml-in-s3
   ]
 
@@ -46,7 +45,7 @@ resource "aws_instance" "wildfly-ec2" {
 
   subnet_id = var.app-subnet-us-east-1a-id
 
-  iam_instance_profile = aws_iam_instance_profile.wildfly-deployment-s3-profile.name
+  iam_instance_profile = "wildfly-deployment-s3-profile-${var.stack_githash}"
 
   key_name  = aws_key_pair.generated_key.key_name
   user_data = data.template_cloudinit_config.wildfly-user-data.rendered

@@ -22,8 +22,7 @@ data "template_cloudinit_config" "httpd-user-data" {
 
 resource "aws_instance" "httpd-ec2" {
   depends_on = [
-    aws_key_pair.generated_key,
-    aws_iam_instance_profile.httpd-deployment-s3-profile
+    aws_key_pair.generated_key
   ]
 
   ami           = var.ami-id
@@ -33,7 +32,7 @@ resource "aws_instance" "httpd-ec2" {
 
   subnet_id = var.edge-subnet-us-east-1a-id
 
-  iam_instance_profile = aws_iam_instance_profile.httpd-deployment-s3-profile.name
+  iam_instance_profile = "httpd-deployment-s3-profile-${var.stack_githash}"
 
   key_name  = aws_key_pair.generated_key.key_name
   user_data = data.template_cloudinit_config.httpd-user-data.rendered
