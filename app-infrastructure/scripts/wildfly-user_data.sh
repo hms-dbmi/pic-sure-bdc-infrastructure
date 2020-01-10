@@ -92,7 +92,7 @@ for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${s
 for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/modules/mysql/mysql-connector-java-5.1.38.jar /home/centos/mysql-connector-java-5.1.38.jar && break || sleep 45; done
 
 sudo docker run  --name schema-init --rm mysql
-sudo docker exec -i mysql -h${mysql-instance-address} -uroot -p${picsure-db-password} < /home/centos/pic-sure-schema.sql
+sudo docker exec -i mysql -h${mysql-instance-address} -uroot -p${mysql-instance-password} < /home/centos/pic-sure-schema.sql
 sudo docker stop schema-init
 
 WILDFLY_IMAGE=`sudo docker load < pic-sure-wildfly.tar.gz | cut -d ' ' -f 3`
