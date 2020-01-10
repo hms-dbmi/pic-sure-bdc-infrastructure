@@ -1,3 +1,10 @@
+variable "stack_githash" {
+  type = string
+}
+variable "stack_githash_long" {
+  type = string
+}
+
 resource "aws_iam_instance_profile" "wildfly-deployment-s3-profile" {
   name = "wildfly-deployment-s3-profile-${var.stack_githash}"
   role = aws_iam_role.wildfly-deployment-s3-role.name
