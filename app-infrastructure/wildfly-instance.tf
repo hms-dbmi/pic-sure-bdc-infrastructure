@@ -91,6 +91,7 @@ data "template_file" "wildfly-standalone-xml" {
     fence_client_secret               = var.fence_client_secret
     fence_client_id                   = var.fence_client_id
     picsure_token_introspection_token = var.picsure_token_introspection_token
+    mysql-instance-address            = aws_db_instance.pic-sure-mysql.address
   }
 }
 
