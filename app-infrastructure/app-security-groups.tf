@@ -51,7 +51,7 @@ resource "aws_security_group" "inbound-app-from-lma-for-dev-only" {
     to_port = 22
     protocol = "tcp"
     cidr_blocks = [
-      "134.174.0.0/16"
+      "134.174.0.0/16","172.24.0.68/32"
     ]
   }
 
