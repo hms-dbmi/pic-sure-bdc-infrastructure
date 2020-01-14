@@ -70,10 +70,13 @@ echo "
                \"log_group_name\":\"yum.log\",
                \"log_stream_name\":\"{instance_id} yum.log\",
                \"timestamp_format\":\"UTC\"
+            },
+            {
+               \"file_path\":\"/var/log/wildfly-docker-logs/*\",
+               \"log_group_name\":\"wildfly-logs\",
+               \"log_stream_name\":\"{instance_id} ${stack_githash} wildfly-app-logs \",
+               \"timestamp_format\":\"UTC\"
             }
-             
-             
-             
          ]
       }
 		}
