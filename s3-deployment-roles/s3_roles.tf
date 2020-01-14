@@ -96,7 +96,7 @@ resource "aws_iam_role_policy" "httpd-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/releases/jenkins_pipeline_build_${var.stack_githash_long}/pic-sure-hpds-copdgene-ui.tar.gz"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/releases/jenkins_pipeline_build_${var.stack_githash_long}/pic-sure-ui.tar.gz"
     },{
       "Action": [
         "s3:GetObject"
