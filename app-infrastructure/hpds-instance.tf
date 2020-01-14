@@ -41,7 +41,7 @@ resource "aws_instance" "hpds-ec2" {
   vpc_security_group_ids = [
     aws_security_group.inbound-hpds-from-app.id,
     aws_security_group.outbound-to-trend-micro.id,
-    aws_security_group.inbound-app-from-lma-for-dev-only
+    aws_security_group.inbound-app-from-lma-for-dev-only.id
   ]
   root_block_device {
     delete_on_termination = true
