@@ -101,7 +101,7 @@ for i in 1 2 3 4 5; do echo "trying to download driver from s3://${stack_s3_buck
 echo "pulled mysql driver"
 
 sudo docker run  -d --name schema-init -e "MYSQL_RANDOM_ROOT_PASSWORD=yes" --rm mysql 
-sudo docker exec -i schema-init mysql -h${mysql-instance-address} -uroot -p${mysql-instance-password} < /home/centos/pic-sure-schema.sql
+sudo docker exec -i schema-init mysql -hpicsure-db.${target-stack}.datastage.hms.harvard.edu -uroot -p${mysql-instance-password} < /home/centos/pic-sure-schema.sql
 sudo docker stop schema-init
 echo "init'd mysql schemas"
 
