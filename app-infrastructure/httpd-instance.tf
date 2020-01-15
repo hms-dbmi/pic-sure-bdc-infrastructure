@@ -5,6 +5,7 @@ data "template_file" "httpd-user_data" {
     stack_githash   = var.stack_githash_long
     fence_client_id = var.fence_client_id
     stack_s3_bucket = var.stack_s3_bucket
+    target-stack    = var.target-stack
   }
 }
 
@@ -70,6 +71,7 @@ data "template_file" "httpd-vhosts-conf" {
   template = file("configs/httpd-vhosts.conf")
   vars = {
     wildfly-base-url = var.wildfly-base-url
+    target-stack = var.target-stack
   }
 }
 

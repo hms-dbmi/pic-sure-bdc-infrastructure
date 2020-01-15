@@ -17,6 +17,7 @@ data "template_file" "wildfly-user_data" {
     stack_s3_bucket = var.stack_s3_bucket
     mysql-instance-address = aws_db_instance.pic-sure-mysql.address
     mysql-instance-password = random_password.picsure-db-password.result
+    target-stack = var.target-stack
   }
 }
 
@@ -90,6 +91,7 @@ data "template_file" "wildfly-standalone-xml" {
     picsure_client_secret             = var.picsure_client_secret
     fence_client_secret               = var.fence_client_secret
     fence_client_id                   = var.fence_client_id
+    target-stack                      = var.target-stack
     picsure_token_introspection_token = var.picsure_token_introspection_token
     mysql-instance-address            = aws_db_instance.pic-sure-mysql.address
   }
@@ -116,6 +118,7 @@ data "template_file" "pic-sure-schema-sql" {
   template = file("configs/pic-sure-schema.sql")
   vars = {
     picsure_token_introspection_token = var.picsure_token_introspection_token
+    target-stack                      = var.target-stack
   }
 }
 
