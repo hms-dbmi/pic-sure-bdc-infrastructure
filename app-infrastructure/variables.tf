@@ -10,6 +10,16 @@ variable "target-stack" {
   type        = string
 }
 
+variable "dataset-s3-object-key" {
+  description = "The s3 object key within the environment s3 bucket"
+  type        = string
+}
+
+variable "ami-id" {
+  description = "AMI to use for all ec2s"
+  type        = string
+}
+
 variable "environment_name" {
   description = "The name of the environment"
   type        = string
