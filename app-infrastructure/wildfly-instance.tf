@@ -46,7 +46,7 @@ resource "aws_instance" "wildfly-ec2" {
 
   subnet_id = var.app-subnet-us-east-1a-id
 
-  iam_instance_profile = "wildfly-deployment-s3-profile-${var.stack_githash}"
+  iam_instance_profile = "wildfly-deployment-s3-profile-${var.target-stack}-${var.stack_githash}"
 
   key_name  = aws_key_pair.generated_key.key_name
   user_data = data.template_cloudinit_config.wildfly-user-data.rendered
