@@ -74,7 +74,7 @@ resource "aws_instance" "wildfly-ec2" {
 
 resource "aws_route53_record" "wildfly" {
   zone_id = var.internal-dns-zone-id
-  name    = "wildfly.${target-stack}"
+  name    = "wildfly.${var.target-stack}"
   type    = "A"
   ttl     = "300"
   records = [aws_instance.wildfly-ec2.private_ip]

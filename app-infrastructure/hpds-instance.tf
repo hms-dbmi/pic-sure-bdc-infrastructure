@@ -59,7 +59,7 @@ resource "aws_instance" "hpds-ec2" {
 
 resource "aws_route53_record" "hpds" {
   zone_id = var.internal-dns-zone-id
-  name    = "hpds.${target-stack}"
+  name    = "hpds.${var.target-stack}"
   type    = "A"
   ttl     = "300"
   records = [aws_instance.hpds-ec2.private_ip]
