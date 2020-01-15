@@ -5,6 +5,11 @@ variable "stack_githash_long" {
   type = string
 }
 
+variable "target-stack" {
+  description = "The stack identifier"
+  type        = string
+}
+
 variable "environment_name" {
   description = "The name of the environment"
   type        = string
