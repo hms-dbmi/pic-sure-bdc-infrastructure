@@ -10,6 +10,11 @@ variable "target-stack" {
   type        = string
 }
 
+variable "dataset-s3-object-key" {
+  description = "The s3 object key within the environment s3 bucket"
+  type        = string
+}
+
 resource "aws_iam_instance_profile" "wildfly-deployment-s3-profile" {
   name = "wildfly-deployment-s3-profile-${var.target-stack}-${var.stack_githash}"
   role = aws_iam_role.wildfly-deployment-s3-role.name
