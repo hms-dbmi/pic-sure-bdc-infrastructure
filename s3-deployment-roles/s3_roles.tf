@@ -11,7 +11,7 @@ variable "target-stack" {
 }
 
 resource "aws_iam_instance_profile" "wildfly-deployment-s3-profile" {
-  name = "wildfly-deployment-s3-profile-${var.target-stack}-{var.stack_githash}"
+  name = "wildfly-deployment-s3-profile-${var.target-stack}-${var.stack_githash}"
   role = aws_iam_role.wildfly-deployment-s3-role.name
 }
 
