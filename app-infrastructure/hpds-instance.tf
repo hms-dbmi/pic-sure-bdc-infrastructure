@@ -33,7 +33,7 @@ resource "aws_instance" "hpds-ec2" {
 
   subnet_id = var.db-subnet-us-east-1a-id
 
-  iam_instance_profile = "hpds-deployment-profile-${var.target-stack}${var.target-stack}-${var.stack_githash}"
+  iam_instance_profile = "hpds-deployment-profile-${var.target-stack}-${var.stack_githash}"
 
   key_name = aws_key_pair.generated_key.key_name
   user_data = data.template_cloudinit_config.hpds-user-data.rendered
