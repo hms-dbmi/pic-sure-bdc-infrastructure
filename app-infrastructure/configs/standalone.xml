@@ -463,7 +463,7 @@
                 <simple name="java:global/roles_claim" value="privileges"/>
                 <!-- Used in IRCT as well -->
                 <simple name="java:global/verify_user_method" value="tokenIntrospection"/>
-                <simple name="java:global/token_introspection_url" value="http://wildfly.${target-stack}.datastage.hms.harvard.edu:8080/pic-sure-auth-services/auth/token/inspect"/>
+                <simple name="java:global/token_introspection_url" value="http://localhost:8080/pic-sure-auth-services/auth/token/inspect"/>
                 <simple name="java:global/token_introspection_token" value="${picsure_token_introspection_token}"/>
                <!-- psama configuration-->
                 <simple name="java:global/client_secret" value="${picsure_client_secret}"/>
