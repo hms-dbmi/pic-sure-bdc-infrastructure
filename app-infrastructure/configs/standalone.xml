@@ -483,10 +483,10 @@
                 <simple name="java:global/clientSecretIsBase64" value="False"/>
                 <simple name="java:global/userActivationTemplatePath" value="/psama/activation"/>
                 <simple name="java:global/userActivationReplyTo" value="NOT_USED_WITH_FENCE"/>
-                <simple name="java:global/templatePath" value="NOT_USED_WITH_FENCE" />
+                <simple name="java:global/templatePath" value="/usr/local/docker-config/" />
                 <simple name="java:global/tosEnabled" value="False" />
                 <simple name="java:global/auth0host" value="NOT_USED_WITH_FENCE" />
-                <simple name="java:global/emailTemplatePath" value="/usr/local/share/applications/" />
+                <simple name="java:global/emailTemplatePath" value="/usr/local/docker-config/" />
                 <simple name="java:global/accessGrantEmailSubject" value="NOT_USED_WITH_FENCE" />
                 <simple name="java:global/deniedEmailEnabled" value="false" />
                 <simple name="java:global/adminUsers" value="NOT_USED_WITH_FENCE" />
