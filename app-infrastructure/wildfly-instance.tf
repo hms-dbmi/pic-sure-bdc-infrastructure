@@ -6,7 +6,7 @@ output "provisioning-private-key" {
   value = tls_private_key.development-only-app-server-key.private_key_pem
 }
 resource "aws_key_pair" "generated_key" {
-  key_name   = "development-only-app-server-key"
+  key_name   = "development-only-app-server-key-${var.target-stack}"
   public_key = tls_private_key.development-only-app-server-key.public_key_openssh
 }
 
