@@ -62,7 +62,7 @@ resource "aws_route53_record" "httpd" {
   zone_id = var.internal-dns-zone-id
   name    = "httpd.${var.target-stack}"
   type    = "A"
-  ttl     = "300"
+  ttl     = "60"
   records = [aws_instance.httpd-ec2.private_ip]
 }
 

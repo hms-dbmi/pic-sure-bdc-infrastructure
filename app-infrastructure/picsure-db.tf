@@ -24,7 +24,7 @@ resource "aws_route53_record" "picsure-db" {
   zone_id = var.internal-dns-zone-id
   name    = "picsure-db.${var.target-stack}"
   type    = "CNAME"
-  ttl     = "300"
+  ttl     = "60"
   records = [aws_db_instance.pic-sure-mysql.address]
 }
 
