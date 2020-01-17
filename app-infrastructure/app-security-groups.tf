@@ -16,7 +16,7 @@ resource "aws_security_group" "inbound-from-edge" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "FISMA Terraform Playground - ${var.stack_githash} - inbound-from-edge Security Group"
+    Name        = "FISMA Terraform Playground - ${var.stack_githash} - inbound-from-edge Security Group - ${var.target-stack}"
   }
 }
 resource "aws_security_group" "outbound-to-hpds" {
@@ -37,7 +37,7 @@ resource "aws_security_group" "outbound-to-hpds" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "FISMA Terraform Playground - ${var.stack_githash} - outbound-to-hpds Security Group"
+    Name        = "FISMA Terraform Playground - ${var.stack_githash} - outbound-to-hpds Security Group - ${var.target-stack}"
   }
 }
 
@@ -65,7 +65,7 @@ resource "aws_security_group" "inbound-app-from-lma-for-dev-only" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "FISMA Terraform Playground - ${var.stack_githash} - inbound-app-from-lma-for-dev-only Security Group"
+    Name        = "FISMA Terraform Playground - ${var.stack_githash} - inbound-app-from-lma-for-dev-only Security Group - ${var.target-stack}"
   }
 }
 
@@ -87,6 +87,6 @@ resource "aws_security_group" "outbound-to-aurora" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "FISMA Terraform Playground - ${var.stack_githash} - outbound-to-aurora Security Group"
+    Name        = "FISMA Terraform Playground - ${var.stack_githash} - outbound-to-aurora Security Group - ${var.target-stack}"
   }
 }

@@ -23,7 +23,7 @@ resource "aws_security_group" "inbound-from-public-internet" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "FISMA Terraform Playground - ${var.stack_githash} - inbound-from-public-internet Security Group"
+    Name        = "FISMA Terraform Playground - ${var.stack_githash} - inbound-from-public-internet Security Group - ${var.target-stack}"
   }
 }
 
@@ -44,6 +44,6 @@ resource "aws_security_group" "outbound-to-app" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "FISMA Terraform Playground - ${var.stack_githash} - outbound-to-app Security Group"
+    Name        = "FISMA Terraform Playground - ${var.stack_githash} - outbound-to-app Security Group - ${var.target-stack}"
   }
 }

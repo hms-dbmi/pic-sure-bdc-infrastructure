@@ -68,7 +68,7 @@ resource "aws_instance" "wildfly-ec2" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "FISMA Terraform Playground - ${var.stack_githash} - Wildfly"
+    Name        = "FISMA Terraform Playground - ${var.stack_githash} - Wildfly - ${var.target-stack}"
   }
 
 }

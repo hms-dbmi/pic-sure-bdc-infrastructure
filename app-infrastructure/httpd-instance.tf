@@ -53,7 +53,7 @@ resource "aws_instance" "httpd-ec2" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "FISMA Terraform Playground - ${var.stack_githash} - Apache HTTPD"
+    Name        = "FISMA Terraform Playground - ${var.stack_githash} - Apache HTTPD - ${var.target-stack}"
   }
 
 }

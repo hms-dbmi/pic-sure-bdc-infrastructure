@@ -52,7 +52,7 @@ resource "aws_instance" "hpds-ec2" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "FISMA Terraform Playground - ${var.stack_githash} - HPDS"
+    Name        = "FISMA Terraform Playground - ${var.stack_githash} - HPDS - ${var.target-stack}"
   }
 
 }

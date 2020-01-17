@@ -16,7 +16,7 @@ resource "aws_db_instance" "pic-sure-mysql" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "FISMA Terraform Playground - ${var.stack_githash} - PIC-SURE DB Instance"
+    Name        = "FISMA Terraform Playground - ${var.stack_githash} - PIC-SURE DB Instance - ${var.target-stack}"
   }
 }
 
