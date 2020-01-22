@@ -43,13 +43,13 @@ resource "aws_s3_bucket_object" "tfstate-baseline-b" {
 resource "aws_s3_bucket_object" "stack-variables-baseline-a" {
   bucket  = var.stack_s3_bucket
   key     = "/deployment_state_metadata/a/stack_variables.tf"
-  content = file("stack_variables_a.tf.baseline")
+  content = file("stack_variables.tf_template")
 }
 
 resource "aws_s3_bucket_object" "stack-variables-baseline-b" {
   bucket  = var.stack_s3_bucket
   key     = "/deployment_state_metadata/b/stack_variables.tf"
-  content = file("stack_variables_b.tf.baseline")
+  content = file("stack_variables.tf_template")
 }
 
 resource "aws_s3_bucket_object" "stacks-json" {
