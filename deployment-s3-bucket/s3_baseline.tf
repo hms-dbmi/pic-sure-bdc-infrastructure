@@ -74,17 +74,17 @@ resource "aws_s3_bucket_object" "mysql-module-xml" {
 resource "aws_s3_bucket_object" "server-cert" {
   bucket  = var.stack_s3_bucket
   key     = "/certs/httpd/server.crt"
-  content = file("httpd-server.crt")
+  content = file("server.crt")
 }
 
 resource "aws_s3_bucket_object" "server-key" {
   bucket  = var.stack_s3_bucket
   key     = "/certs/httpd/server.key"
-  content = file("httpd-server.key")
+  content = file("server.key")
 }
 
 resource "aws_s3_bucket_object" "server-chain" {
   bucket  = var.stack_s3_bucket
   key     = "/certs/httpd/server.chain"
-  content = file("httpd-server.chain")
+  content = file("server.chain")
 }
