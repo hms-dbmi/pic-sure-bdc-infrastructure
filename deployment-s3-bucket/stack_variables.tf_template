@@ -1,6 +1,6 @@
 variable "picsure_client_secret" {
   type = string
-  default = "__PIC_SURE_CLIENT_SECRET__"
+  default = "${picsure_client_secret}"
 }
 variable "picsure_token_introspection_token" {
   type = string
