@@ -119,3 +119,7 @@ sudo docker run --name=wildfly \
 -p 8080:8080 -e JAVA_OPTS="$JAVA_OPTS" -d $WILDFLY_IMAGE
 
 sudo docker logs -f wildfly > /var/log/wildfly-docker-logs/wildfly.log &
+
+INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)
+sudo /usr/local/bin/aws --region=us-east-1 ec2 create-tags --resources ${INSTANCE_ID} --tags Key=InitComplete,Value=true
+
