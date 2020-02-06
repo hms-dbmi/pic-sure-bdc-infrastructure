@@ -24,7 +24,6 @@ data "template_cloudinit_config" "wildfly-user-data" {
 
 resource "aws_instance" "wildfly-ec2" {
   depends_on = [
-    aws_key_pair.generated_key,
     local_file.wildfly-standalone-xml-file
    # aws_s3_bucket_object.standalone-xml-in-s3
   ]

@@ -23,7 +23,6 @@ data "template_cloudinit_config" "httpd-user-data" {
 
 resource "aws_instance" "httpd-ec2" {
   depends_on = [
-    aws_key_pair.generated_key,
     local_file.wildfly-standalone-xml-file
   ]
 
