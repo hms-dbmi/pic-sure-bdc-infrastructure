@@ -32,12 +32,11 @@ echo "
 			},
 			\"mem\": {
 				\"measurement\": [
-					\"mem_used_percent\",
-                                        \"mem_available\",
-                                        \"mem_available_percent\",
-                                       \"mem_total\",
-                                        \"mem_used\"
-                                        
+   				\"mem_used_percent\",
+               \"mem_available\",
+               \"mem_available_percent\",
+               \"mem_total\",
+               \"mem_used\"
 				],
 				\"metrics_collection_interval\": 600
 			}
