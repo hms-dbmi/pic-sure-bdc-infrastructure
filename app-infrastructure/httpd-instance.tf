@@ -36,7 +36,6 @@ resource "aws_instance" "httpd-ec2" {
 
   iam_instance_profile = "httpd-deployment-s3-profile-${var.target-stack}-${var.stack_githash}"
 
-  key_name  = aws_key_pair.generated_key.key_name
   user_data = data.template_cloudinit_config.httpd-user-data.rendered
 
   vpc_security_group_ids = [

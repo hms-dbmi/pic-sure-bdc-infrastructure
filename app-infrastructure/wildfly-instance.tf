@@ -1,14 +1,3 @@
-resource "tls_private_key" "development-only-app-server-key" {
-  algorithm = "RSA"
-  rsa_bits  = 4096
-}
-output "provisioning-private-key" {
-  value = tls_private_key.development-only-app-server-key.private_key_pem
-}
-resource "aws_key_pair" "generated_key" {
-  key_name   = "development-only-app-server-key-${var.target-stack}"
-  public_key = tls_private_key.development-only-app-server-key.public_key_openssh
-}
 
 data "template_file" "wildfly-user_data" {
   template = file("scripts/wildfly-user_data.sh")
@@ -49,7 +38,6 @@ resource "aws_instance" "wildfly-ec2" {
 
   iam_instance_profile = "wildfly-deployment-s3-profile-${var.target-stack}-${var.stack_githash}"
 
-  key_name  = aws_key_pair.generated_key.key_name
   user_data = data.template_cloudinit_config.wildfly-user-data.rendered
 
   vpc_security_group_ids = [
