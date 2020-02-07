@@ -223,7 +223,7 @@ resource "aws_iam_role_policy" "hpds-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/data/${var.dataset_s3_object_key}/javabins_rekeyed.tar.gz"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/data/${var.dataset-s3-object-key}/javabins_rekeyed.tar.gz"
     },
     {
       "Action": [
