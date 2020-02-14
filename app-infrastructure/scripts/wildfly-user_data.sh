@@ -118,7 +118,7 @@ else
 fi
 
 platform_detect
-if [[ -z "${linuxPlatform}" ]] || [[ -z "${isRPM}" ]]; then
+if [[ -z "$${linuxPlatform}" ]] || [[ -z "$${isRPM}" ]]; then
     echo Unsupported platform is detected
     logger -t Unsupported platform is detected
     exit 1
@@ -128,7 +128,7 @@ echo Downloading agent package...
 if [[ $isRPM == 1 ]]; then package='agent.rpm'
     else package='agent.deb'
 fi
-curl -H "Agent-Version-Control: on" $MANAGERURL/software/agent/${runningPlatform}${majorVersion}/${archType}/$package?tenantID= -o /tmp/$package $CURLOPTIONS --insecure
+curl -H "Agent-Version-Control: on" $MANAGERURL/software/agent/$${runningPlatform}$${majorVersion}/$${archType}/$package?tenantID= -o /tmp/$package $CURLOPTIONS --insecure
 
 echo Installing agent package...
 rc=1
@@ -143,7 +143,7 @@ else
     logger -t Failed to download the agent package. Please make sure the package is imported in the Deep Security Manager
     exit 1
 fi
-if [[ ${rc} != 0 ]]; then
+if [[ $${rc} != 0 ]]; then
     echo Failed to install the agent package
     logger -t Failed to install the agent package
     exit 1
