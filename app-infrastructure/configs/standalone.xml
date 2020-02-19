@@ -470,7 +470,7 @@
                 <simple name="java:global/client_id" value="NOT_USED_WITH_FENCE"/>
                 <!-- Configure Identity Provider Parameters, with defaults-->
                 <simple name="java:global/idp_provider" value="fence"/>
-                <simple name="java:global/idp_provider_uri" value="https://gen3.datastage.io/" />
+                <simple name="java:global/idp_provider_uri" value="https://gen3.biodatacatalyst.nhlbi.nih.gov/" />
 
                 <simple name="java:global/fence_client_id" value="${fence_client_id}"/>
                 <simple name="java:global/fence_client_secret" value="${fence_client_secret}"/>
