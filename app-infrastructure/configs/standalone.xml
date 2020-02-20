@@ -501,7 +501,6 @@
                 <simple name="java:global/userField" value="sub"/>
                 <simple name="java:global/longTermTokenExpirationTime" value="2592000000"/>
                 <simple name="java:global/tokenExpirationTime" value="1800000"/>
-
             </bindings>
             <remote-naming/>
         </subsystem>
