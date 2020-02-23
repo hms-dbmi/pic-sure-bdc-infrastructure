@@ -80,7 +80,8 @@ resource "aws_iam_instance_profile" "docker-awscli-base-profile" {
 
 
 resource "aws_instance" "docker-awscli-base" {
-  ami = "ami-05091d5b01d0fda35"
+  // AMI ON 90 BDC-dev account
+  ami = "ami-0f644567956fefe71" 
   instance_type = "m5.large"
 
   iam_instance_profile = aws_iam_instance_profile.docker-awscli-base-profile.name
