@@ -28,7 +28,7 @@ resource "aws_instance" "hpds-ec2" {
   ami = var.ami-id
   instance_type = "m5.xlarge"
 
-  associate_public_ip_address = false
+  associate_public_ip_address = true
 
   subnet_id = var.db-subnet-us-east-1a-id
 
