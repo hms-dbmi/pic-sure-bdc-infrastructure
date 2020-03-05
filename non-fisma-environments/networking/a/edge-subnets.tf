@@ -13,7 +13,7 @@ resource "aws_subnet" "edge-subnet-us-east-1a" {
 
 resource "aws_subnet" "edge-subnet-us-east-1b" {
   availability_zone = "us-east-1b"
-  cidr_block = "172.${var.cidr_block_variation}.0.1/24"
+  cidr_block = "172.${var.cidr_block_variation}.1.0/24"
   vpc_id = aws_vpc.datastage-vpc.id
   tags = {
     Owner       = "Avillach_Lab"
