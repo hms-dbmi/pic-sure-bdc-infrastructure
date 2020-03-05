@@ -1,5 +1,5 @@
 resource "aws_vpc" "datastage-vpc" {
-  cidr_block = "172.17.0.0/16"
+  cidr_block = "172.${var.cidr_block_variation}.0.0/16"
   instance_tenancy = "default"
 
   enable_dns_hostnames = true
@@ -8,7 +8,8 @@ resource "aws_vpc" "datastage-vpc" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "FISMA Terraform Playground - ${var.stack_githash} - DataStage VPC"
+    Description = "FISMA Terraform Playground - ${var.stack_githash} - DataStage VPC"
+    Name = "BDC-dev-A-VPC"
   }
 
 }
