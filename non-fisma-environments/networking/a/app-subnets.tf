@@ -5,7 +5,7 @@ resource "aws_subnet" "app-subnet-us-east-1a" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "App-Subnet-AZ1"
+    Name        = "FISMA Terraform Playground - ${var.stack_githash} - Application Subnet us-east-1a"
   }
 }
 
@@ -16,7 +16,7 @@ resource "aws_subnet" "app-subnet-us-east-1b" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "App-Subnet-AZ2"
+    Name        = "FISMA Terraform Playground - ${var.stack_githash} - Application Subnet us-east-1b"
   }
 }
 
