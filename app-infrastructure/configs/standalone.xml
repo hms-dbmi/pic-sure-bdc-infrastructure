@@ -474,7 +474,7 @@
 
                 <simple name="java:global/fence_client_id" value="${fence_client_id}"/>
                 <simple name="java:global/fence_client_secret" value="${fence_client_secret}"/>
-                <simple name="java:global/fence_redirect_url" value="https://picsure.biodatacatalyst.nhlbi.nih.gov/psamaui/login/" />
+                <simple name="java:global/fence_redirect_url" value="https://biodatacatalyst.integration.hms.harvard.edu/psamaui/login/" />
                 <simple name="java:global/fence_standard_access_rules" value="GATE_ONLY_INFO,GATE_ONLY_QUERY,GATE_ONLY_SEARCH,GATE_FENCE_CONSENT_REQUIRED" />
                 <simple name="java:global/fence_consent_group_concept_path" value="\\_Consents\\Short Study Accession with Consent code\\" />
                 <simple name="java:global/fence_harmonized_concept_path" value="DCC_Harmonized_data_set" />
