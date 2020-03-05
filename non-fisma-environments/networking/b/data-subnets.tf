@@ -1,27 +1,5 @@
-resource "aws_subnet" "hpds-subnet-us-east-1a" {
-  availability_zone = "us-east-1a"
-  cidr_block = "172.17.2.0/26"
-  vpc_id = aws_vpc.datastage-vpc.id
-  tags = {
-    Owner       = "Avillach_Lab"
-    Environment = "development"
-    Name        = "FISMA Terraform Playground - ${var.stack_githash} - HPDS Subnet us-east-1a"
-  }
-}
-
-resource "aws_subnet" "hpds-subnet-us-east-1b" {
-  availability_zone = "us-east-1b"
-  cidr_block = "172.17.2.64/26"
-  vpc_id = aws_vpc.datastage-vpc.id
-  tags = {
-    Owner       = "Avillach_Lab"
-    Environment = "development"
-    Name        = "FISMA Terraform Playground - ${var.stack_githash} - HPDS Subnet us-east-1b"
-  }
-}
-
 resource "aws_db_subnet_group" "data-subnet-group" {
-  name       = "main-b"
+  name       = "main-a"
   subnet_ids = [
     aws_subnet.db-subnet-us-east-1a.id, 
     aws_subnet.db-subnet-us-east-1b.id
@@ -29,29 +7,32 @@ resource "aws_db_subnet_group" "data-subnet-group" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "FISMA Terraform Playground - ${var.stack_githash} - DB Subnet Group"
+    Description        = "FISMA Terraform Playground - ${var.stack_githash} - DB Subnet Group"
+    Name = "main-a"
   }
 }
 
 resource "aws_subnet" "db-subnet-us-east-1a" {
   availability_zone = "us-east-1a"
-  cidr_block = "172.17.3.0/26"
+  cidr_block = "172.${var.cidr_block_variation}.30.0/24"
   vpc_id = aws_vpc.datastage-vpc.id
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "FISMA Terraform Playground - ${var.stack_githash} - DB Subnet us-east-1a"
+    Description = "FISMA Terraform Playground - ${var.stack_githash} - DB Subnet us-east-1a"
+    Name = "Database-Subnet-AZ1"
   }
 }
 
 resource "aws_subnet" "db-subnet-us-east-1b" {
   availability_zone = "us-east-1b"
-  cidr_block = "172.17.3.64/26"
+  cidr_block = "172.${var.cidr_block_variation}.31.0/24"
   vpc_id = aws_vpc.datastage-vpc.id
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "FISMA Terraform Playground - ${var.stack_githash} - DB Subnet us-east-1b"
+    Description = "FISMA Terraform Playground - ${var.stack_githash} - DB Subnet us-east-1b"
+    Name = "Database-Subnet-AZ2"
   }
 }
 
