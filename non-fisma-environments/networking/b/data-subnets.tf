@@ -1,5 +1,5 @@
 resource "aws_db_subnet_group" "data-subnet-group" {
-  name       = "main-a"
+  name       = "main-b"
   subnet_ids = [
     aws_subnet.db-subnet-us-east-1a.id, 
     aws_subnet.db-subnet-us-east-1b.id

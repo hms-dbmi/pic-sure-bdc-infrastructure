@@ -1,4 +1,4 @@
-resource "aws_route53_zone" "internal_dns_a" {
+resource "aws_route53_zone" "internal_dns" {
   name = "local"
 
   vpc {
