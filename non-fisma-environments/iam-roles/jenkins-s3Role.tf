@@ -44,13 +44,13 @@ resource "aws_iam_instance_profile" "jenkins-s3-profile" {
 }
 
 resource "aws_iam_role_policy_attachment" "attach-s3full-to-jenkinss3role" {
-  role       = "jenkins-s3-profile"
+  role       = "jenkins-s3-role"
   policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
 
 }
 
 resource "aws_iam_role_policy_attachment" "attach-FullAdmin-to-jenkinss3role" {
-  role       = "jenkins-s3-profile"
+  role       = "jenkins-s3-role"
   policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
 
 }
