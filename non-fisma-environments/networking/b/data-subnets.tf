@@ -8,7 +8,7 @@ resource "aws_db_subnet_group" "data-subnet-group" {
     Owner       = "Avillach_Lab"
     Environment = "development"
     Description        = "FISMA Terraform Playground - ${var.stack_githash} - DB Subnet Group"
-    Name = "main-a"
+    Name = "main-b"
   }
 }
 
