@@ -478,6 +478,7 @@
                 <simple name="java:global/fence_standard_access_rules" value="GATE_ONLY_INFO,GATE_ONLY_QUERY,GATE_ONLY_SEARCH,GATE_FENCE_CONSENT_REQUIRED" />
                 <simple name="java:global/fence_consent_group_concept_path" value="\\_Consents\\Short Study Accession with Consent code\\" />
                 <simple name="java:global/fence_harmonized_concept_path" value="DCC_Harmonized_data_set" />
+                <simple name="java:global/defaultApplicationUUID" value="8b5722c9-62fd-48d6-b0bf-4f67e53efb2b" />
 
                 <simple name="java:global/systemName" value="PIC-SURE BioDataCatalyst"/>
                 <simple name="java:global/clientSecretIsBase64" value="False"/>
@@ -500,7 +501,7 @@
                 <simple name="java:global/KeyTimeOutInMinutes" value="720"/>
                 <simple name="java:global/userField" value="sub"/>
                 <simple name="java:global/longTermTokenExpirationTime" value="2592000000"/>
-                <simple name="java:global/tokenExpirationTime" value="1800000"/>
+                <simple name="java:global/tokenExpirationTime" value="3600000"/>
             </bindings>
             <remote-naming/>
         </subsystem>
