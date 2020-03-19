@@ -1,6 +1,6 @@
 {
   "servicesPath" : "/psama",
-  "logoPath":"/static/images/logo.png",
+  "logoPath":"/images/logo.png",
   "basePath" : "/psama",
   "uiPath": "",
   "helpLink": "https://biodatacatalyst.nhlbi.nih.gov/contact\" target=\"_blank\"",
