@@ -1028,7 +1028,7 @@ DELETE FROM role WHERE name LIKE 'FENCE_%';
       'PRIV_FENCE_phs000200_c0', 
       (SELECT uuid FROM application WHERE name ='PICSURE'), 
       '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000200.c0"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
-      '["","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+      '["\\\\DCC Harmonized data set\\\\", "\\\\_"]'
     );
             SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
         INSERT INTO `access_rule` VALUES (
@@ -1100,7 +1100,7 @@ DELETE FROM role WHERE name LIKE 'FENCE_%';
       'PRIV_FENCE_phs000200_c1', 
       (SELECT uuid FROM application WHERE name ='PICSURE'), 
       '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000200.c1"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
-      '["","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+      '["\\\\DCC Harmonized data set\\\\", "\\\\_"]'
     );
             SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
         INSERT INTO `access_rule` VALUES (
@@ -1172,7 +1172,7 @@ DELETE FROM role WHERE name LIKE 'FENCE_%';
       'PRIV_FENCE_phs000200_c2', 
       (SELECT uuid FROM application WHERE name ='PICSURE'), 
       '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000200.c2"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
-      '["","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+      '["\\\\DCC Harmonized data set\\\\", "\\\\_"]'
     );
             SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
         INSERT INTO `access_rule` VALUES (
@@ -1820,7 +1820,7 @@ DELETE FROM role WHERE name LIKE 'FENCE_%';
       'PRIV_FENCE_phs000285_c1', 
       (SELECT uuid FROM application WHERE name ='PICSURE'), 
       '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000285.c1"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
-      '["","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+      '["\\\\DCC Harmonized data set\\\\", "\\\\_"]'
     );
             SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
         INSERT INTO `access_rule` VALUES (
@@ -1892,7 +1892,7 @@ DELETE FROM role WHERE name LIKE 'FENCE_%';
       'PRIV_FENCE_phs000285_c2', 
       (SELECT uuid FROM application WHERE name ='PICSURE'), 
       '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000285.c2"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
-      '["","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+      '["\\\\DCC Harmonized data set\\\\", "\\\\_"]'
     );
             SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
         INSERT INTO `access_rule` VALUES (
@@ -2684,7 +2684,7 @@ DELETE FROM role WHERE name LIKE 'FENCE_%';
       'PRIV_FENCE_phs000289_c0', 
       (SELECT uuid FROM application WHERE name ='PICSURE'), 
       '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000289.c0"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
-      '["","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+      '["\\\\DCC Harmonized data set\\\\", "\\\\_"]'
     );
             SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
         INSERT INTO `access_rule` VALUES (
@@ -2756,7 +2756,7 @@ DELETE FROM role WHERE name LIKE 'FENCE_%';
       'PRIV_FENCE_phs000289_c1', 
       (SELECT uuid FROM application WHERE name ='PICSURE'), 
       '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000289.c1"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
-      '["","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+      '["\\\\DCC Harmonized data set\\\\", "\\\\_"]'
     );
             SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
         INSERT INTO `access_rule` VALUES (
@@ -3116,7 +3116,7 @@ DELETE FROM role WHERE name LIKE 'FENCE_%';
       'PRIV_FENCE_phs000810_c1', 
       (SELECT uuid FROM application WHERE name ='PICSURE'), 
       '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000810.c1"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
-      '["","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+      '["\\\\DCC Harmonized data set\\\\", "\\\\_"]'
     );
             SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
         INSERT INTO `access_rule` VALUES (
@@ -3188,7 +3188,7 @@ DELETE FROM role WHERE name LIKE 'FENCE_%';
       'PRIV_FENCE_phs000810_c2', 
       (SELECT uuid FROM application WHERE name ='PICSURE'), 
       '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000810.c2"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
-      '["","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+      '["\\\\DCC Harmonized data set\\\\", "\\\\_"]'
     );
             SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
         INSERT INTO `access_rule` VALUES (
@@ -3260,7 +3260,7 @@ DELETE FROM role WHERE name LIKE 'FENCE_%';
       'PRIV_FENCE_phs000820_c1', 
       (SELECT uuid FROM application WHERE name ='PICSURE'), 
       '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000820.c1"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
-      '["","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+      '["\\\\DCC Harmonized data set\\\\", "\\\\_"]'
     );
             SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
         INSERT INTO `access_rule` VALUES (
@@ -3332,7 +3332,7 @@ DELETE FROM role WHERE name LIKE 'FENCE_%';
       'PRIV_FENCE_phs000914_c0', 
       (SELECT uuid FROM application WHERE name ='PICSURE'), 
       '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000914.c0"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
-      '["","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+      '["\\\\DCC Harmonized data set\\\\", "\\\\_"]'
     );
             SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
         INSERT INTO `access_rule` VALUES (
@@ -3404,7 +3404,7 @@ DELETE FROM role WHERE name LIKE 'FENCE_%';
       'PRIV_FENCE_phs000914_c1', 
       (SELECT uuid FROM application WHERE name ='PICSURE'), 
       '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000914.c1"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
-      '["","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+      '["\\\\DCC Harmonized data set\\\\", "\\\\_"]'
     );
             SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
         INSERT INTO `access_rule` VALUES (
@@ -4484,7 +4484,7 @@ DELETE FROM role WHERE name LIKE 'FENCE_%';
       'PRIV_FENCE_phs001074_c0', 
       (SELECT uuid FROM application WHERE name ='PICSURE'), 
       '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs001074.c0"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
-      '["","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+      '["\\\\DCC Harmonized data set\\\\", "\\\\_"]'
     );
             SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
         INSERT INTO `access_rule` VALUES (
@@ -4556,7 +4556,7 @@ DELETE FROM role WHERE name LIKE 'FENCE_%';
       'PRIV_FENCE_phs001074_c2', 
       (SELECT uuid FROM application WHERE name ='PICSURE'), 
       '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs001074.c2"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
-      '["","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+      '["\\\\DCC Harmonized data set\\\\", "\\\\_"]'
     );
             SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
         INSERT INTO `access_rule` VALUES (
@@ -4772,7 +4772,7 @@ DELETE FROM role WHERE name LIKE 'FENCE_%';
       'PRIV_FENCE_phs001180_c0', 
       (SELECT uuid FROM application WHERE name ='PICSURE'), 
       '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs001180.c0"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
-      '["","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+      '["\\\\DCC Harmonized data set\\\\", "\\\\_"]'
     );
             SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
         INSERT INTO `access_rule` VALUES (
@@ -4844,7 +4844,7 @@ DELETE FROM role WHERE name LIKE 'FENCE_%';
       'PRIV_FENCE_phs001180_c2', 
       (SELECT uuid FROM application WHERE name ='PICSURE'), 
       '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs001180.c2"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
-      '["","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+      '["\\\\DCC Harmonized data set\\\\", "\\\\_"]'
     );
             SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
         INSERT INTO `access_rule` VALUES (
