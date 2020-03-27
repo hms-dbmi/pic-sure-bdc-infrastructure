@@ -29,7 +29,7 @@ resource "aws_instance" "wildfly-ec2" {
   ]
 
   ami           = var.ami-id
-  instance_type = "m5.large"
+  instance_type = "c5.xlarge"
 
   associate_public_ip_address = true
 

@@ -469,3 +469,5444 @@ UNLOCK TABLES;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2020-01-09 15:33:01
+
+--
+-- This file will remove all roles/privileges/access_rules and re-create them
+--
+
+DELETE FROM accessRule_privilege;
+DELETE FROM accessRule_gate;
+DELETE FROM access_rule;
+DELETE FROM role_privilege;
+DELETE FROM privilege WHERE name LIKE 'PRIV_FENCE_%';
+DELETE FROM user_role WHERE role_id IN (SELECT uuid FROM role WHERE name LIKE 'FENCE_%');
+DELETE FROM role WHERE name LIKE 'FENCE_%';
+  
+  SET @uuidAR_INFO_COLUMN_LISTING_ALLOWED = REPLACE(UUID(),'-','');
+  INSERT INTO access_rule VALUES (
+    unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED),
+    'AR_INFO_COLUMN_LISTING',
+    'allow query to info_column_listing',
+    '$.query.query.expectedResultType',
+    4,
+    'INFO_COLUMN_LISTING',
+    0,
+    1,
+    NULL,
+    0,
+    0
+  );
+
+
+  SET @uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED = REPLACE(UUID(),'-','');
+  INSERT INTO access_rule VALUES (
+    unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED),
+    'GATE_DONOT_ALLOW_INFO_COLUMN_LISTING',
+    'allow query to info_column_listing',
+    '$.query.query.expectedResultType',
+    4,
+    'INFO_COLUMN_LISTING',
+    0,
+    1,
+    NULL,
+    0,
+    0
+  );
+
+  SET @uuidAR_NO_QUERY_ACCESS = REPLACE(UUID(),'-','');
+  INSERT INTO access_rule VALUES (
+    unhex(@uuidAR_NO_QUERY_ACCESS),
+    'AR_NO_QUERY_ACCESS',
+    'Restrict to any query endpoints',
+    '$.[\'Target Service\']',
+    1,
+    '/query ',
+    0,
+    0,
+    NULL,
+    0,
+    0
+  );
+
+  SET @uuidAR_ONLY_INFO = REPLACE(UUID(),'-','');
+  INSERT INTO access_rule VALUES (
+    unhex(@uuidAR_ONLY_INFO),
+    'AR_ONLY_INFO',
+    'Can only do /query, /info and /search',
+    '$.[\'Target Service\']',
+    6,
+    '/info',
+    0,
+    0,
+    NULL,
+    0,
+    0
+  );
+
+  SET @uuidAR_ONLY_SEARCH = REPLACE(UUID(),'-','');
+  INSERT INTO access_rule VALUES (
+    unhex(@uuidAR_ONLY_SEARCH),
+    'AR_ONLY_SEARCH',
+    'Can only do /query, /info and /search',
+    ' $.[\'Target Service\']',
+    6,
+    '/search',
+    0,
+    0,
+    NULL,
+    0,
+    0
+  );
+
+  SET @uuidAR_ONLY_QUERY = REPLACE(UUID(),'-','');
+  INSERT INTO access_rule VALUES (
+    unhex(@uuidAR_ONLY_QUERY),
+    'AR_ONLY_QUERY',
+    'Can only do /query, /info and /search',
+    ' $.[\'Target Service\']',
+    6,
+    '/query',
+    0,
+    0,
+    NULL,
+    0,
+    0
+  );
+
+
+
+  SET @uuidRole = REPLACE(UUID(),'-','');
+  INSERT INTO role VALUES ( 
+      unhex(@uuidRole), 
+     'FENCE_topmed', 
+     'Special role to include all privileges' 
+  );
+    
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs000007_c0',
+      'For study Framingham Cohort'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study Framingham Cohort', 
+      'PRIV_FENCE_phs000007_c0', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000007.c0"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\Framingham Cohort\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs000007_c0', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs000007.c0", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs000007_c1',
+      'For study Framingham Cohort'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study Framingham Cohort', 
+      'PRIV_FENCE_phs000007_c1', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000007.c1"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\Framingham Cohort\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs000007_c1', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs000007.c1", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs000007_c2',
+      'For study Framingham Cohort'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study Framingham Cohort', 
+      'PRIV_FENCE_phs000007_c2', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000007.c2"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\Framingham Cohort\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs000007_c2', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs000007.c2", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs000179_c0',
+      'For study Genetic Epidemiology of COPD (COPDGene)'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study Genetic Epidemiology of COPD (COPDGene)', 
+      'PRIV_FENCE_phs000179_c0', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000179.c0"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\Genetic Epidemiology of COPD (COPDGene)\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs000179_c0', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs000179.c0", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs000179_c1',
+      'For study Genetic Epidemiology of COPD (COPDGene)'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study Genetic Epidemiology of COPD (COPDGene)', 
+      'PRIV_FENCE_phs000179_c1', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000179.c1"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\Genetic Epidemiology of COPD (COPDGene)\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs000179_c1', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs000179.c1", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs000179_c2',
+      'For study Genetic Epidemiology of COPD (COPDGene)'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study Genetic Epidemiology of COPD (COPDGene)', 
+      'PRIV_FENCE_phs000179_c2', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000179.c2"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\Genetic Epidemiology of COPD (COPDGene)\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs000179_c2', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs000179.c2", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs000200_c0',
+      'For study '
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study ', 
+      'PRIV_FENCE_phs000200_c0', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000200.c0"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs000200_c0', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs000200.c0", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs000200_c1',
+      'For study '
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study ', 
+      'PRIV_FENCE_phs000200_c1', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000200.c1"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs000200_c1', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs000200.c1", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs000200_c2',
+      'For study '
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study ', 
+      'PRIV_FENCE_phs000200_c2', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000200.c2"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs000200_c2', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs000200.c2", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs000209_c0',
+      'For study Multi-Ethnic Study of Atherosclerosis (MESA) Cohort'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study Multi-Ethnic Study of Atherosclerosis (MESA) Cohort', 
+      'PRIV_FENCE_phs000209_c0', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000209.c0"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\Multi-Ethnic Study of Atherosclerosis (MESA) Cohort\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs000209_c0', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs000209.c0", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs000209_c1',
+      'For study Multi-Ethnic Study of Atherosclerosis (MESA) Cohort'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study Multi-Ethnic Study of Atherosclerosis (MESA) Cohort', 
+      'PRIV_FENCE_phs000209_c1', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000209.c1"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\Multi-Ethnic Study of Atherosclerosis (MESA) Cohort\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs000209_c1', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs000209.c1", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs000209_c2',
+      'For study Multi-Ethnic Study of Atherosclerosis (MESA) Cohort'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study Multi-Ethnic Study of Atherosclerosis (MESA) Cohort', 
+      'PRIV_FENCE_phs000209_c2', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000209.c2"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\Multi-Ethnic Study of Atherosclerosis (MESA) Cohort\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs000209_c2', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs000209.c2", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs000280_c0',
+      'For study Atherosclerosis Risk in Communities (ARIC) Cohort'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study Atherosclerosis Risk in Communities (ARIC) Cohort', 
+      'PRIV_FENCE_phs000280_c0', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000280.c0"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\Atherosclerosis Risk in Communities (ARIC) Cohort\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs000280_c0', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs000280.c0", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs000280_c1',
+      'For study Atherosclerosis Risk in Communities (ARIC) Cohort'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study Atherosclerosis Risk in Communities (ARIC) Cohort', 
+      'PRIV_FENCE_phs000280_c1', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000280.c1"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\Atherosclerosis Risk in Communities (ARIC) Cohort\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs000280_c1', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs000280.c1", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs000280_c2',
+      'For study Atherosclerosis Risk in Communities (ARIC) Cohort'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study Atherosclerosis Risk in Communities (ARIC) Cohort', 
+      'PRIV_FENCE_phs000280_c2', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000280.c2"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\Atherosclerosis Risk in Communities (ARIC) Cohort\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs000280_c2', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs000280.c2", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs000284_c0',
+      'For study NHLBI Cleveland Family Study (CFS) Candidate Gene Association Resource (CARe)'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study NHLBI Cleveland Family Study (CFS) Candidate Gene Association Resource (CARe)', 
+      'PRIV_FENCE_phs000284_c0', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000284.c0"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\NHLBI Cleveland Family Study (CFS) Candidate Gene Association Resource (CARe)\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs000284_c0', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs000284.c0", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs000284_c1',
+      'For study NHLBI Cleveland Family Study (CFS) Candidate Gene Association Resource (CARe)'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study NHLBI Cleveland Family Study (CFS) Candidate Gene Association Resource (CARe)', 
+      'PRIV_FENCE_phs000284_c1', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000284.c1"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\NHLBI Cleveland Family Study (CFS) Candidate Gene Association Resource (CARe)\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs000284_c1', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs000284.c1", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs000285_c1',
+      'For study '
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study ', 
+      'PRIV_FENCE_phs000285_c1', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000285.c1"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs000285_c1', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs000285.c1", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs000285_c2',
+      'For study '
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study ', 
+      'PRIV_FENCE_phs000285_c2', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000285.c2"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs000285_c2', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs000285.c2", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs000286_c0',
+      'For study The Jackson Heart Study (JHS)'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study The Jackson Heart Study (JHS)', 
+      'PRIV_FENCE_phs000286_c0', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000286.c0"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\The Jackson Heart Study (JHS)\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs000286_c0', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs000286.c0", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs000286_c1',
+      'For study The Jackson Heart Study (JHS)'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study The Jackson Heart Study (JHS)', 
+      'PRIV_FENCE_phs000286_c1', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000286.c1"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\The Jackson Heart Study (JHS)\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs000286_c1', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs000286.c1", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs000286_c2',
+      'For study The Jackson Heart Study (JHS)'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study The Jackson Heart Study (JHS)', 
+      'PRIV_FENCE_phs000286_c2', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000286.c2"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\The Jackson Heart Study (JHS)\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs000286_c2', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs000286.c2", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs000286_c3',
+      'For study The Jackson Heart Study (JHS)'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study The Jackson Heart Study (JHS)', 
+      'PRIV_FENCE_phs000286_c3', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000286.c3"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\The Jackson Heart Study (JHS)\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs000286_c3', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs000286.c3", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs000286_c4',
+      'For study The Jackson Heart Study (JHS)'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study The Jackson Heart Study (JHS)', 
+      'PRIV_FENCE_phs000286_c4', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000286.c4"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\The Jackson Heart Study (JHS)\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs000286_c4', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs000286.c4", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs000287_c0',
+      'For study Cardiovascular Health Study (CHS) Cohort'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study Cardiovascular Health Study (CHS) Cohort', 
+      'PRIV_FENCE_phs000287_c0', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000287.c0"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\Cardiovascular Health Study (CHS) Cohort\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs000287_c0', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs000287.c0", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs000287_c1',
+      'For study Cardiovascular Health Study (CHS) Cohort'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study Cardiovascular Health Study (CHS) Cohort', 
+      'PRIV_FENCE_phs000287_c1', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000287.c1"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\Cardiovascular Health Study (CHS) Cohort\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs000287_c1', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs000287.c1", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs000287_c2',
+      'For study Cardiovascular Health Study (CHS) Cohort'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study Cardiovascular Health Study (CHS) Cohort', 
+      'PRIV_FENCE_phs000287_c2', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000287.c2"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\Cardiovascular Health Study (CHS) Cohort\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs000287_c2', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs000287.c2", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs000287_c3',
+      'For study Cardiovascular Health Study (CHS) Cohort'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study Cardiovascular Health Study (CHS) Cohort', 
+      'PRIV_FENCE_phs000287_c3', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000287.c3"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\Cardiovascular Health Study (CHS) Cohort\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs000287_c3', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs000287.c3", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs000287_c4',
+      'For study Cardiovascular Health Study (CHS) Cohort'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study Cardiovascular Health Study (CHS) Cohort', 
+      'PRIV_FENCE_phs000287_c4', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000287.c4"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\Cardiovascular Health Study (CHS) Cohort\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs000287_c4', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs000287.c4", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs000289_c0',
+      'For study '
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study ', 
+      'PRIV_FENCE_phs000289_c0', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000289.c0"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs000289_c0', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs000289.c0", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs000289_c1',
+      'For study '
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study ', 
+      'PRIV_FENCE_phs000289_c1', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000289.c1"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs000289_c1', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs000289.c1", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs000741_c0',
+      'For study Genetics of Lipid Lowering Drugs and Diet Network (GOLDN) Lipidomics Study'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study Genetics of Lipid Lowering Drugs and Diet Network (GOLDN) Lipidomics Study', 
+      'PRIV_FENCE_phs000741_c0', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000741.c0"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\Genetics of Lipid Lowering Drugs and Diet Network (GOLDN) Lipidomics Study\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs000741_c0', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs000741.c0", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs000741_c1',
+      'For study Genetics of Lipid Lowering Drugs and Diet Network (GOLDN) Lipidomics Study'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study Genetics of Lipid Lowering Drugs and Diet Network (GOLDN) Lipidomics Study', 
+      'PRIV_FENCE_phs000741_c1', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000741.c1"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\Genetics of Lipid Lowering Drugs and Diet Network (GOLDN) Lipidomics Study\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs000741_c1', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs000741.c1", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs000784_c0',
+      'For study Genetic Epidemiology Network of Salt Sensitivity (GenSalt)'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study Genetic Epidemiology Network of Salt Sensitivity (GenSalt)', 
+      'PRIV_FENCE_phs000784_c0', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000784.c0"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\Genetic Epidemiology Network of Salt Sensitivity (GenSalt)\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs000784_c0', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs000784.c0", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs000784_c1',
+      'For study Genetic Epidemiology Network of Salt Sensitivity (GenSalt)'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study Genetic Epidemiology Network of Salt Sensitivity (GenSalt)', 
+      'PRIV_FENCE_phs000784_c1', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000784.c1"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\Genetic Epidemiology Network of Salt Sensitivity (GenSalt)\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs000784_c1', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs000784.c1", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs000810_c1',
+      'For study '
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study ', 
+      'PRIV_FENCE_phs000810_c1', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000810.c1"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs000810_c1', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs000810.c1", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs000810_c2',
+      'For study '
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study ', 
+      'PRIV_FENCE_phs000810_c2', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000810.c2"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs000810_c2', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs000810.c2", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs000820_c1',
+      'For study '
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study ', 
+      'PRIV_FENCE_phs000820_c1', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000820.c1"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs000820_c1', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs000820.c1", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs000914_c0',
+      'For study '
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study ', 
+      'PRIV_FENCE_phs000914_c0', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000914.c0"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs000914_c0', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs000914.c0", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs000914_c1',
+      'For study '
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study ', 
+      'PRIV_FENCE_phs000914_c1', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000914.c1"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs000914_c1', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs000914.c1", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs000921_c2',
+      'For study NHLBI TOPMed: Study of African Americans, Asthma, Genes and Environment (SAGE) Study'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study NHLBI TOPMed: Study of African Americans, Asthma, Genes and Environment (SAGE) Study', 
+      'PRIV_FENCE_phs000921_c2', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000921.c2"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\NHLBI TOPMed: Study of African Americans, Asthma, Genes and Environment (SAGE) Study\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs000921_c2', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs000921.c2", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs000946_c1',
+      'For study NHLBI TOPMed: Boston Early-Onset COPD Study in the TOPMed Program'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study NHLBI TOPMed: Boston Early-Onset COPD Study in the TOPMed Program', 
+      'PRIV_FENCE_phs000946_c1', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000946.c1"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\NHLBI TOPMed: Boston Early-Onset COPD Study in the TOPMed Program\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs000946_c1', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs000946.c1", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs000956_c0',
+      'For study NHLBI TOPMed: Genetics of Cardiometabolic Health in the Amish'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study NHLBI TOPMed: Genetics of Cardiometabolic Health in the Amish', 
+      'PRIV_FENCE_phs000956_c0', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000956.c0"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\NHLBI TOPMed: Genetics of Cardiometabolic Health in the Amish\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs000956_c0', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs000956.c0", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs000956_c2',
+      'For study NHLBI TOPMed: Genetics of Cardiometabolic Health in the Amish'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study NHLBI TOPMed: Genetics of Cardiometabolic Health in the Amish', 
+      'PRIV_FENCE_phs000956_c2', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000956.c2"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\NHLBI TOPMed: Genetics of Cardiometabolic Health in the Amish\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs000956_c2', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs000956.c2", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs000988_c0',
+      'For study NHLBI TOPMed: The Genetic Epidemiology of Asthma in Costa Rica'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study NHLBI TOPMed: The Genetic Epidemiology of Asthma in Costa Rica', 
+      'PRIV_FENCE_phs000988_c0', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000988.c0"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\NHLBI TOPMed: The Genetic Epidemiology of Asthma in Costa Rica\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs000988_c0', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs000988.c0", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs000988_c1',
+      'For study NHLBI TOPMed: The Genetic Epidemiology of Asthma in Costa Rica'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study NHLBI TOPMed: The Genetic Epidemiology of Asthma in Costa Rica', 
+      'PRIV_FENCE_phs000988_c1', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000988.c1"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\NHLBI TOPMed: The Genetic Epidemiology of Asthma in Costa Rica\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs000988_c1', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs000988.c1", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs000997_c1',
+      'For study NHLBI TOPMed: The Vanderbilt AF Ablation Registry'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study NHLBI TOPMed: The Vanderbilt AF Ablation Registry', 
+      'PRIV_FENCE_phs000997_c1', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000997.c1"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\NHLBI TOPMed: The Vanderbilt AF Ablation Registry\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs000997_c1', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs000997.c1", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs001001_c1',
+      'For study MGH Atrial Fibrillation Study'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study MGH Atrial Fibrillation Study', 
+      'PRIV_FENCE_phs001001_c1', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs001001.c1"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\MGH Atrial Fibrillation Study\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs001001_c1', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs001001.c1", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs001001_c2',
+      'For study MGH Atrial Fibrillation Study'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study MGH Atrial Fibrillation Study', 
+      'PRIV_FENCE_phs001001_c2', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs001001.c2"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\MGH Atrial Fibrillation Study\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs001001_c2', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs001001.c2", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs001013_c1',
+      'For study Heart and Vascular Health Study (HVH)'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study Heart and Vascular Health Study (HVH)', 
+      'PRIV_FENCE_phs001013_c1', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs001013.c1"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\Heart and Vascular Health Study (HVH)\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs001013_c1', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs001013.c1", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs001013_c2',
+      'For study Heart and Vascular Health Study (HVH)'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study Heart and Vascular Health Study (HVH)', 
+      'PRIV_FENCE_phs001013_c2', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs001013.c2"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\Heart and Vascular Health Study (HVH)\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs001013_c2', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs001013.c2", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs001024_c1',
+      'For study NHLBI TOPMed: Partners HealthCare Biobank'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study NHLBI TOPMed: Partners HealthCare Biobank', 
+      'PRIV_FENCE_phs001024_c1', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs001024.c1"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\NHLBI TOPMed: Partners HealthCare Biobank\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs001024_c1', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs001024.c1", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs001032_c1',
+      'For study NHLBI TOPMed: The Vanderbilt Atrial Fibrillation Registry'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study NHLBI TOPMed: The Vanderbilt Atrial Fibrillation Registry', 
+      'PRIV_FENCE_phs001032_c1', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs001032.c1"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\NHLBI TOPMed: The Vanderbilt Atrial Fibrillation Registry\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs001032_c1', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs001032.c1", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs001040_c1',
+      'For study NHLBI TOPMed: Novel Risk Factors for the Development of Atrial Fibrillation in Women'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study NHLBI TOPMed: Novel Risk Factors for the Development of Atrial Fibrillation in Women', 
+      'PRIV_FENCE_phs001040_c1', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs001040.c1"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\NHLBI TOPMed: Novel Risk Factors for the Development of Atrial Fibrillation in Women\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs001040_c1', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs001040.c1", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs001074_c0',
+      'For study '
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study ', 
+      'PRIV_FENCE_phs001074_c0', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs001074.c0"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs001074_c0', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs001074.c0", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs001074_c2',
+      'For study '
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study ', 
+      'PRIV_FENCE_phs001074_c2', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs001074.c2"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs001074_c2', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs001074.c2", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs001143_c0',
+      'For study NHLBI TOPMed: The Genetics and Epidemiology of Asthma in Barbados'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study NHLBI TOPMed: The Genetics and Epidemiology of Asthma in Barbados', 
+      'PRIV_FENCE_phs001143_c0', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs001143.c0"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\NHLBI TOPMed: The Genetics and Epidemiology of Asthma in Barbados\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs001143_c0', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs001143.c0", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs001143_c1',
+      'For study NHLBI TOPMed: The Genetics and Epidemiology of Asthma in Barbados'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study NHLBI TOPMed: The Genetics and Epidemiology of Asthma in Barbados', 
+      'PRIV_FENCE_phs001143_c1', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs001143.c1"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\NHLBI TOPMed: The Genetics and Epidemiology of Asthma in Barbados\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs001143_c1', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs001143.c1", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs001180_c0',
+      'For study '
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study ', 
+      'PRIV_FENCE_phs001180_c0', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs001180.c0"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs001180_c0', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs001180.c0", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs001180_c2',
+      'For study '
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study ', 
+      'PRIV_FENCE_phs001180_c2', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs001180.c2"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs001180_c2', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs001180.c2", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs001207_c0',
+      'For study NHLBI TOPMed: African American Sarcoidosis Genetics Resource'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study NHLBI TOPMed: African American Sarcoidosis Genetics Resource', 
+      'PRIV_FENCE_phs001207_c0', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs001207.c0"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\NHLBI TOPMed: African American Sarcoidosis Genetics Resource\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs001207_c0', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs001207.c0", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs001207_c1',
+      'For study NHLBI TOPMed: African American Sarcoidosis Genetics Resource'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study NHLBI TOPMed: African American Sarcoidosis Genetics Resource', 
+      'PRIV_FENCE_phs001207_c1', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs001207.c1"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\NHLBI TOPMed: African American Sarcoidosis Genetics Resource\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs001207_c1', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs001207.c1", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs001215_c0',
+      'For study NHLBI TOPMed: San Antonio Family Heart Study (SAFHS)'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study NHLBI TOPMed: San Antonio Family Heart Study (SAFHS)', 
+      'PRIV_FENCE_phs001215_c0', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs001215.c0"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\NHLBI TOPMed: San Antonio Family Heart Study (SAFHS)\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs001215_c0', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs001215.c0", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs001215_c1',
+      'For study NHLBI TOPMed: San Antonio Family Heart Study (SAFHS)'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study NHLBI TOPMed: San Antonio Family Heart Study (SAFHS)', 
+      'PRIV_FENCE_phs001215_c1', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs001215.c1"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\NHLBI TOPMed: San Antonio Family Heart Study (SAFHS)\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs001215_c1', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs001215.c1", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs001238_c0',
+      'For study Genetic Epidemiology Network of Arteriopathy (GENOA)'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study Genetic Epidemiology Network of Arteriopathy (GENOA)', 
+      'PRIV_FENCE_phs001238_c0', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs001238.c0"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\Genetic Epidemiology Network of Arteriopathy (GENOA)\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs001238_c0', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs001238.c0", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs001238_c1',
+      'For study Genetic Epidemiology Network of Arteriopathy (GENOA)'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study Genetic Epidemiology Network of Arteriopathy (GENOA)', 
+      'PRIV_FENCE_phs001238_c1', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs001238.c1"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\Genetic Epidemiology Network of Arteriopathy (GENOA)\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs001238_c1', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs001238.c1", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs001293_c0',
+      'For study NHLBI TOPMed: HyperGEN - Genetics of Left Ventricular (LV) Hypertrophy'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study NHLBI TOPMed: HyperGEN - Genetics of Left Ventricular (LV) Hypertrophy', 
+      'PRIV_FENCE_phs001293_c0', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs001293.c0"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\NHLBI TOPMed: HyperGEN - Genetics of Left Ventricular (LV) Hypertrophy\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs001293_c0', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs001293.c0", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs001293_c1',
+      'For study NHLBI TOPMed: HyperGEN - Genetics of Left Ventricular (LV) Hypertrophy'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study NHLBI TOPMed: HyperGEN - Genetics of Left Ventricular (LV) Hypertrophy', 
+      'PRIV_FENCE_phs001293_c1', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs001293.c1"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\NHLBI TOPMed: HyperGEN - Genetics of Left Ventricular (LV) Hypertrophy\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs001293_c1', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs001293.c1", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs001293_c2',
+      'For study NHLBI TOPMed: HyperGEN - Genetics of Left Ventricular (LV) Hypertrophy'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study NHLBI TOPMed: HyperGEN - Genetics of Left Ventricular (LV) Hypertrophy', 
+      'PRIV_FENCE_phs001293_c2', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs001293.c2"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\NHLBI TOPMed: HyperGEN - Genetics of Left Ventricular (LV) Hypertrophy\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs001293_c2', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs001293.c2", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs001387_c0',
+      'For study NHLBI TOPMed: Rare Variants for Hypertension in Taiwan Chinese (THRV)'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study NHLBI TOPMed: Rare Variants for Hypertension in Taiwan Chinese (THRV)', 
+      'PRIV_FENCE_phs001387_c0', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs001387.c0"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\NHLBI TOPMed: Rare Variants for Hypertension in Taiwan Chinese (THRV)\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs001387_c0', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs001387.c0", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs001387_c3',
+      'For study NHLBI TOPMed: Rare Variants for Hypertension in Taiwan Chinese (THRV)'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study NHLBI TOPMed: Rare Variants for Hypertension in Taiwan Chinese (THRV)', 
+      'PRIV_FENCE_phs001387_c3', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs001387.c3"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\NHLBI TOPMed: Rare Variants for Hypertension in Taiwan Chinese (THRV)\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs001387_c3', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs001387.c3", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs001412_c0',
+      'For study NHLBI TOPMed: Diabetes Heart Study (DHS) African American Coronary Artery Calcification (AA CAC)'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study NHLBI TOPMed: Diabetes Heart Study (DHS) African American Coronary Artery Calcification (AA CAC)', 
+      'PRIV_FENCE_phs001412_c0', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs001412.c0"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\NHLBI TOPMed: Diabetes Heart Study (DHS) African American Coronary Artery Calcification (AA CAC)\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs001412_c0', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs001412.c0", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs001412_c1',
+      'For study NHLBI TOPMed: Diabetes Heart Study (DHS) African American Coronary Artery Calcification (AA CAC)'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study NHLBI TOPMed: Diabetes Heart Study (DHS) African American Coronary Artery Calcification (AA CAC)', 
+      'PRIV_FENCE_phs001412_c1', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs001412.c1"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\NHLBI TOPMed: Diabetes Heart Study (DHS) African American Coronary Artery Calcification (AA CAC)\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs001412_c1', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs001412.c1", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+        
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs001412_c2',
+      'For study NHLBI TOPMed: Diabetes Heart Study (DHS) African American Coronary Artery Calcification (AA CAC)'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For study NHLBI TOPMed: Diabetes Heart Study (DHS) African American Coronary Artery Calcification (AA CAC)', 
+      'PRIV_FENCE_phs001412_c2', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs001412.c2"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '["\\\\NHLBI TOPMed: Diabetes Heart Study (DHS) African American Coronary Artery Calcification (AA CAC)\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs001412_c2', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs001412.c2", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
+    
+

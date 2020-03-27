@@ -73,7 +73,7 @@ echo "
             {
                \"file_path\":\"/var/log/wildfly-docker-logs/*\",
                \"log_group_name\":\"wildfly-logs\",
-               \"log_stream_name\":\"{instance_id} ${stack_githash} wildfly-app-logs \",
+               \"log_stream_name\":\"{instance_id} ${stack_githash} wildfly-app-logs\",
                \"timestamp_format\":\"UTC\"
             }
          ]
@@ -109,14 +109,14 @@ sudo docker stop schema-init
 echo "init'd mysql schemas"
 
 WILDFLY_IMAGE=`sudo docker load < pic-sure-wildfly.tar.gz | cut -d ' ' -f 3`
-JAVA_OPTS="-Xms1024m -Xmx2g -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=256m -Djava.net.preferIPv4Stack=true"
+JAVA_OPTS="-Xms2g -Xmx12g -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=256m -Djava.net.preferIPv4Stack=true"
 sudo docker run --name=wildfly \
--v /var/log/wildfly-docker-logs/:/opt/jboss/wildfly/standalone/log \
+-v /var/log/wildfly-docker-logs/:/opt/jboss/wildfly/standalone/log/ \
 -v /home/centos/standalone.xml:/opt/jboss/wildfly/standalone/configuration/standalone.xml \
 -v /home/centos/fence_mapping.json:/usr/local/docker-config/fence_mapping.json \
 -v /home/centos/mysql_module.xml:/opt/jboss/wildfly/modules/system/layers/base/com/sql/mysql/main/module.xml  \
 -v /home/centos/mysql-connector-java-5.1.38.jar:/opt/jboss/wildfly/modules/system/layers/base/com/sql/mysql/main/mysql-connector-java-5.1.38.jar \
--v /var/log/wildfly-docker-os-logs/:/var/log \
+-v /var/log/wildfly-docker-os-logs/:/var/log/ \
 -p 8080:8080 -e JAVA_OPTS="$JAVA_OPTS" -d $WILDFLY_IMAGE
 
 sudo docker logs -f wildfly > /var/log/wildfly-docker-logs/wildfly.log &

@@ -1,8 +1,11 @@
 {
   "servicesPath" : "/psama",
+  "logoPath":"/images/logo.png",
+  "helpLink": "https://biodatacatalyst.nhlbi.nih.gov/contact\" target=\"_blank\"",
+  "pdfLink": "https://tinyurl.com/PIC-SURE-User-Guide\" target=\"_blank\"",
   "basePath" : "/psama",
   "uiPath": "",
-  "helpLink": "",
+  "helpLink": "https://biodatacatalyst.nhlbi.nih.gov/contact\" target=\"_blank\"",
   "customizeAuth0Login": true,
   "idp_provider":"fence",
   "idp_provider_uri":"https://gen3.biodatacatalyst.nhlbi.nih.gov",
