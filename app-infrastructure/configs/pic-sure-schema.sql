@@ -504,7 +504,7 @@ DELETE FROM role WHERE name LIKE 'FENCE_%';
     'GATE_DONOT_ALLOW_INFO_COLUMN_LISTING',
     'allow query to info_column_listing',
     '$.query.query.expectedResultType',
-    4,
+    3,
     'INFO_COLUMN_LISTING',
     0,
     1,
@@ -5909,4 +5909,5 @@ DELETE FROM role WHERE name LIKE 'FENCE_%';
     INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
     INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
     
-
+delete from accessRule_privilege where accessRule_id = (select uuid from access_rule where name = 'AR_ONLY_QUERY');
+ 
