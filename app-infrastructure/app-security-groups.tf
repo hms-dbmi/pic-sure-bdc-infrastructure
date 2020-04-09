@@ -41,7 +41,7 @@ resource "aws_security_group" "outbound-to-hpds" {
   }
 }
 
-resource "aws_security_group" "inbound-app-from-lma-for-dev-only" {
+resource "aws_security_group" "inbound-app-ssh-from-nessus" {
   name = "allow_inbound_from_lma_subnet_to_app_server_${var.stack_githash}"
   description = "Allow inbound traffic from LMA on port 22"
   vpc_id = var.target-vpc
@@ -51,21 +51,14 @@ resource "aws_security_group" "inbound-app-from-lma-for-dev-only" {
     to_port = 22
     protocol = "tcp"
     cidr_blocks = [
-      "134.174.0.0/16","172.24.0.68/32"
+      "172.25.255.73/32"
     ]
-  }
-
-  egress {
-    from_port = 0
-    to_port = 0
-    protocol = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
   }
 
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "FISMA Terraform Playground - ${var.stack_githash} - inbound-app-from-lma-for-dev-only Security Group - ${var.target-stack}"
+    Name        = "FISMA Terraform Playground - ${var.stack_githash} - inbound-app-ssh-from-nessus - ${var.target-stack}"
   }
 }
 

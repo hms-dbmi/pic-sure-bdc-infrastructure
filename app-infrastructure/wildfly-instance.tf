@@ -43,8 +43,8 @@ resource "aws_instance" "wildfly-ec2" {
     aws_security_group.inbound-from-edge.id,
     aws_security_group.outbound-to-hpds.id,
     aws_security_group.outbound-to-aurora.id,
-    aws_security_group.inbound-app-from-lma-for-dev-only.id,
-    aws_security_group.outbound-to-trend-micro.id
+    aws_security_group.outbound-to-trend-micro.id,
+    aws_security_group.inbound-app-ssh-from-nessus.id
   ]
   root_block_device {
     delete_on_termination = true

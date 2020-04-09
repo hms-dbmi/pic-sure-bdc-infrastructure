@@ -40,7 +40,7 @@ resource "aws_instance" "httpd-ec2" {
   vpc_security_group_ids = [
     aws_security_group.inbound-from-public-internet.id,
     aws_security_group.outbound-to-app.id,
-    aws_security_group.inbound-app-from-lma-for-dev-only.id
+    aws_security_group.inbound-edge-ssh-from-nessus.id
   ]
   root_block_device {
     delete_on_termination = true
