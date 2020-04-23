@@ -28,7 +28,7 @@ resource "aws_security_group" "inbound-from-public-internet" {
 }
 
 resource "aws_security_group" "inbound-edge-ssh-from-nessus" {
-  name = "allow_inbound_from_lma_subnet_to_app_server_${var.stack_githash}"
+  name = "allow_inbound_from_lma_subnet_to_edge_server_${var.stack_githash}"
   description = "Allow inbound traffic from LMA on port 22"
   vpc_id = var.target-vpc
 

@@ -176,12 +176,14 @@ sudo docker stop schema-init
 echo "init'd mysql schemas"
 
 WILDFLY_IMAGE=`sudo docker load < pic-sure-wildfly.tar.gz | cut -d ' ' -f 3`
-JAVA_OPTS="-Xms2g -Xmx12g -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=256m -Djava.net.preferIPv4Stack=true"
+JAVA_OPTS="-Xms2g -Xmx26g -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=1024m -Djava.net.preferIPv4Stack=true"
 
 mkdir -p /var/log/wildfly-docker-logs
+mkdir -p /var/log/wildfly-docker-os-logs
 chmod 666 /var/log/wildfly-docker-logs
+chmod 666 /var/log/wildfly-docker-os-logs
 
-sudo docker run --name=wildfly \
+sudo docker run -u root --name=wildfly \
 -v /var/log/wildfly-docker-logs/:/opt/jboss/wildfly/standalone/log/ \
 -v /home/centos/standalone.xml:/opt/jboss/wildfly/standalone/configuration/standalone.xml \
 -v /home/centos/fence_mapping.json:/usr/local/docker-config/fence_mapping.json \
@@ -189,8 +191,6 @@ sudo docker run --name=wildfly \
 -v /home/centos/mysql-connector-java-5.1.38.jar:/opt/jboss/wildfly/modules/system/layers/base/com/sql/mysql/main/mysql-connector-java-5.1.38.jar \
 -v /var/log/wildfly-docker-os-logs/:/var/log/ \
 -p 8080:8080 -e JAVA_OPTS="$JAVA_OPTS" -d $WILDFLY_IMAGE
-
-sudo docker logs -f wildfly > /var/log/wildfly-docker-logs/wildfly.log &
 
 INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)
 sudo /usr/local/bin/aws --region=us-east-1 ec2 create-tags --resources $${INSTANCE_ID} --tags Key=InitComplete,Value=true
