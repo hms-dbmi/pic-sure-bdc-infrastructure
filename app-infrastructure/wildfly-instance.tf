@@ -40,6 +40,7 @@ resource "aws_instance" "wildfly-ec2" {
   user_data = data.template_cloudinit_config.wildfly-user-data.rendered
 
   vpc_security_group_ids = [
+    aws_security_group.outbound-to-internet,
     aws_security_group.inbound-from-edge.id,
     aws_security_group.outbound-to-hpds.id,
     aws_security_group.outbound-to-aurora.id,
