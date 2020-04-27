@@ -38,7 +38,7 @@ resource "aws_instance" "httpd-ec2" {
   user_data = data.template_cloudinit_config.httpd-user-data.rendered
 
   vpc_security_group_ids = [
-    aws_security_group.outbound-to-internet,
+    aws_security_group.outbound-to-internet.id,
     aws_security_group.inbound-from-public-internet.id,
     aws_security_group.outbound-to-app.id,
     aws_security_group.inbound-edge-ssh-from-nessus.id
