@@ -9,41 +9,41 @@ sudo touch /opt/aws/amazon-cloudwatch-agent/etc/custom_config.json
 echo "
 
 {
-	\"metrics\": {
-		
-		\"metrics_collected\": {
-			\"cpu\": {
-				\"measurement\": [
-					\"cpu_usage_idle\",
-					\"cpu_usage_user\",
-					\"cpu_usage_system\"
-				],
-				\"metrics_collection_interval\": 300,
-				\"totalcpu\": false
-			},
-			\"disk\": {
-				\"measurement\": [
-					\"used_percent\"
-				],
-				\"metrics_collection_interval\": 600,
-				\"resources\": [
-					\"*\"
-				]
-			},
-			\"mem\": {
-				\"measurement\": [
-					\"mem_used_percent\",
+  \"metrics\": {
+    
+    \"metrics_collected\": {
+      \"cpu\": {
+        \"measurement\": [
+          \"cpu_usage_idle\",
+          \"cpu_usage_user\",
+          \"cpu_usage_system\"
+        ],
+        \"metrics_collection_interval\": 300,
+        \"totalcpu\": false
+      },
+      \"disk\": {
+        \"measurement\": [
+          \"used_percent\"
+        ],
+        \"metrics_collection_interval\": 600,
+        \"resources\": [
+          \"*\"
+        ]
+      },
+      \"mem\": {
+        \"measurement\": [
+          \"mem_used_percent\",
                                         \"mem_available\",
                                         \"mem_available_percent\",
                                        \"mem_total\",
                                         \"mem_used\"
                                         
-				],
-				\"metrics_collection_interval\": 600
-			}
-		}
-	},
-	\"logs\":{
+        ],
+        \"metrics_collection_interval\": 600
+      }
+    }
+  },
+  \"logs\":{
    \"logs_collected\":{
       \"files\":{
          \"collect_list\":[
@@ -59,13 +59,13 @@ echo "
                \"log_stream_name\":\"{instance_id} messages\",
                \"timestamp_format\":\"UTC\"
             },
-						{
+            {
                \"file_path\":\"/var/log/audit/audit.log\",
                \"log_group_name\":\"audit.log\",
                \"log_stream_name\":\"{instance_id} audit.log\",
                \"timestamp_format\":\"UTC\"
             },
-						{
+            {
                \"file_path\":\"/var/log/yum.log\",
                \"log_group_name\":\"yum.log\",
                \"log_stream_name\":\"{instance_id} yum.log\",
@@ -79,8 +79,8 @@ echo "
             }
          ]
       }
-		}
-	}
+    }
+  }
 
 
 }
@@ -90,15 +90,85 @@ sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-c
 
 #!/bin/bash
 
+ACTIVATIONURL='dsm://dsm01.dbmi-datastage.local:4120/'
+MANAGERURL='https://dsm01.dbmi-datastage.local:443'
+CURLOPTIONS='--silent --tlsv1.2'
+linuxPlatform='';
+isRPM='';
+
+if [[ $(/usr/bin/id -u) -ne 0 ]]; then
+    echo You are not running as the root user.  Please try again with root privileges.;
+    logger -t You are not running as the root user.  Please try again with root privileges.;
+    exit 1;
+fi;
+
+if ! type curl >/dev/null 2>&1; then
+    echo "Please install CURL before running this script."
+    logger -t Please install CURL before running this script
+    exit 1
+fi
+
+curl $MANAGERURL/software/deploymentscript/platform/linuxdetectscriptv1/ -o /tmp/PlatformDetection $CURLOPTIONS --insecure
+
+if [ -s /tmp/PlatformDetection ]; then
+    . /tmp/PlatformDetection
+else
+    echo "Failed to download the agent installation support script."
+    logger -t Failed to download the Deep Security Agent installation support script
+    exit 1
+fi
+
+platform_detect
+if [[ -z "$${linuxPlatform}" ]] || [[ -z "$${isRPM}" ]]; then
+    echo Unsupported platform is detected
+    logger -t Unsupported platform is detected
+    exit 1
+fi
+
+echo Downloading agent package...
+if [[ $isRPM == 1 ]]; then package='agent.rpm'
+    else package='agent.deb'
+fi
+curl -H "Agent-Version-Control: on" $MANAGERURL/software/agent/$${runningPlatform}$${majorVersion}/$${archType}/$package?tenantID= -o /tmp/$package $CURLOPTIONS --insecure
+
+echo Installing agent package...
+rc=1
+if [[ $isRPM == 1 && -s /tmp/agent.rpm ]]; then
+    rpm -ihv /tmp/agent.rpm
+    rc=$?
+elif [[ -s /tmp/agent.deb ]]; then
+    dpkg -i /tmp/agent.deb
+    rc=$?
+else
+    echo Failed to download the agent package. Please make sure the package is imported in the Deep Security Manager
+    logger -t Failed to download the agent package. Please make sure the package is imported in the Deep Security Manager
+    exit 1
+fi
+if [[ $${rc} != 0 ]]; then
+    echo Failed to install the agent package
+    logger -t Failed to install the agent package
+    exit 1
+fi
+
+echo Install the agent package successfully
+
+sleep 15
+/opt/ds_agent/dsa_control -r
+/opt/ds_agent/dsa_control -a $ACTIVATIONURL "policyid:11"
+# /opt/ds_agent/dsa_control -a dsm://dsm01.dbmi-datastage.local:4120/ "policyid:11"
+
 for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-hpds.tar.gz . && break || sleep 45; done
 mkdir -p /opt/local/hpds/all
 for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/data/${dataset_s3_object_key}/javabins_rekeyed.tar.gz /opt/local/hpds/javabins_rekeyed.tar.gz  && break || sleep 45; done
+for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/genomic_javabins.tar.gz /opt/local/hpds/all/genomic_javabins.tar.gz  && break || sleep 45; done
 cd /opt/local/hpds
 tar -xvzf javabins_rekeyed.tar.gz
+cd /opt/local/hpds/all
+tar -xvzf genomic_javabins.tar.gz
 cd ~
 
 HPDS_IMAGE=`sudo docker load < /pic-sure-hpds.tar.gz | cut -d ' ' -f 3`
-sudo docker run --name=hpds -v /opt/local/hpds:/opt/local/hpds -p 8080:8080 --entrypoint=java -d $HPDS_IMAGE -XX:+UseParallelGC -XX:SurvivorRatio=250 -Xms1g -Xmx10g -server -jar hpds.jar -httpPort 8080 -DCACHE_SIZE=1000 -DSMALL_TASK_THREADS=1 -DLARGE_TASK_THREADS=1 -DSMALL_JOB_LIMIT=100 -DID_BATCH_SIZE=2000 "-DALL_IDS_CONCEPT=NONE"  "-DID_CUBE_NAME=NONE"
+sudo docker run --name=hpds -v /opt/local/hpds:/opt/local/hpds -p 8080:8080 --entrypoint=java -d $HPDS_IMAGE -XX:+UseParallelGC -XX:SurvivorRatio=250 -Xms1g -Xmx26g -server -jar hpds.jar -httpPort 8080 -DCACHE_SIZE=5000 -DSMALL_TASK_THREADS=1 -DLARGE_TASK_THREADS=1 -DSMALL_JOB_LIMIT=100 -DID_BATCH_SIZE=7500 "-DALL_IDS_CONCEPT=NONE"  "-DID_CUBE_NAME=NONE"
 sudo mkdir -p /var/log/hpds-docker-logs
 sudo docker logs -f hpds > /var/log/hpds-docker-logs/hpds.log &
 

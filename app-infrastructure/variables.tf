@@ -15,6 +15,11 @@ variable "dataset-s3-object-key" {
   type        = string
 }
 
+variable "genomic-dataset-s3-object-key" {
+  description = "The genomic s3 object key within the environment s3 bucket"
+  type        = string
+}
+
 variable "ami-id" {
   description = "AMI to use for all ec2s"
   type        = string
