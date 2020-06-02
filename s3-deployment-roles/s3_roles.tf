@@ -15,6 +15,11 @@ variable "dataset-s3-object-key" {
   type        = string
 }
 
+variable "genomic-dataset-s3-object-key" {
+  description = "The s3 object key within the environment s3 bucket"
+  type        = string
+}
+
 resource "aws_iam_instance_profile" "wildfly-deployment-s3-profile" {
   name = "wildfly-deployment-s3-profile-${var.target-stack}-${var.stack_githash}"
   role = aws_iam_role.wildfly-deployment-s3-role.name
@@ -224,6 +229,13 @@ resource "aws_iam_role_policy" "hpds-deployment-s3-policy" {
       ],
       "Effect": "Allow",
       "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/data/${var.dataset-s3-object-key}/javabins_rekeyed.tar.gz"
+    },
+    {
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/data/${var.genomic-dataset-s3-object-key}/genomic_javabins.tar.gz"
     },
     {
       "Action": [
