@@ -88,10 +88,6 @@ echo "
 " > /opt/aws/amazon-cloudwatch-agent/etc/custom_config.json
 sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/etc/custom_config.json  -s
 
-<<<<<<< HEAD
-=======
-#!/bin/bash
->>>>>>> parent of 7667906... adding pull from s3 for genomic dataset
 
 for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-hpds.tar.gz . && break || sleep 45; done
 mkdir -p /opt/local/hpds/all
