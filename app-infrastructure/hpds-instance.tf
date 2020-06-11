@@ -4,7 +4,6 @@ data "template_file" "hpds-user_data" {
   vars = {
     stack_githash = var.stack_githash_long
     dataset_s3_object_key = var.dataset-s3-object-key
-    genomic_dataset_s3_object_key = var.genomic-dataset-s3-object-key
     stack_s3_bucket = var.stack_s3_bucket
   }
 }
@@ -27,7 +26,7 @@ resource "aws_instance" "hpds-ec2" {
   ]
 
   ami = var.ami-id
-  instance_type = "m5.4xlarge"
+  instance_type = "m5.2xlarge"
 
   associate_public_ip_address = true
 

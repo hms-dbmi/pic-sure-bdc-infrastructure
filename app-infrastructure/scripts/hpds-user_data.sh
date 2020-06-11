@@ -9,41 +9,41 @@ sudo touch /opt/aws/amazon-cloudwatch-agent/etc/custom_config.json
 echo "
 
 {
-  \"metrics\": {
-    
-    \"metrics_collected\": {
-      \"cpu\": {
-        \"measurement\": [
-          \"cpu_usage_idle\",
-          \"cpu_usage_user\",
-          \"cpu_usage_system\"
-        ],
-        \"metrics_collection_interval\": 300,
-        \"totalcpu\": false
-      },
-      \"disk\": {
-        \"measurement\": [
-          \"used_percent\"
-        ],
-        \"metrics_collection_interval\": 600,
-        \"resources\": [
-          \"*\"
-        ]
-      },
-      \"mem\": {
-        \"measurement\": [
-          \"mem_used_percent\",
+	\"metrics\": {
+		
+		\"metrics_collected\": {
+			\"cpu\": {
+				\"measurement\": [
+					\"cpu_usage_idle\",
+					\"cpu_usage_user\",
+					\"cpu_usage_system\"
+				],
+				\"metrics_collection_interval\": 300,
+				\"totalcpu\": false
+			},
+			\"disk\": {
+				\"measurement\": [
+					\"used_percent\"
+				],
+				\"metrics_collection_interval\": 600,
+				\"resources\": [
+					\"*\"
+				]
+			},
+			\"mem\": {
+				\"measurement\": [
+					\"mem_used_percent\",
                                         \"mem_available\",
                                         \"mem_available_percent\",
                                        \"mem_total\",
                                         \"mem_used\"
                                         
-        ],
-        \"metrics_collection_interval\": 600
-      }
-    }
-  },
-  \"logs\":{
+				],
+				\"metrics_collection_interval\": 600
+			}
+		}
+	},
+	\"logs\":{
    \"logs_collected\":{
       \"files\":{
          \"collect_list\":[
@@ -59,13 +59,13 @@ echo "
                \"log_stream_name\":\"{instance_id} messages\",
                \"timestamp_format\":\"UTC\"
             },
-            {
+						{
                \"file_path\":\"/var/log/audit/audit.log\",
                \"log_group_name\":\"audit.log\",
                \"log_stream_name\":\"{instance_id} audit.log\",
                \"timestamp_format\":\"UTC\"
             },
-            {
+						{
                \"file_path\":\"/var/log/yum.log\",
                \"log_group_name\":\"yum.log\",
                \"log_stream_name\":\"{instance_id} yum.log\",
@@ -79,8 +79,8 @@ echo "
             }
          ]
       }
-    }
-  }
+		}
+	}
 
 
 }
@@ -88,19 +88,20 @@ echo "
 " > /opt/aws/amazon-cloudwatch-agent/etc/custom_config.json
 sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/etc/custom_config.json  -s
 
+<<<<<<< HEAD
+=======
+#!/bin/bash
+>>>>>>> parent of 7667906... adding pull from s3 for genomic dataset
 
 for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-hpds.tar.gz . && break || sleep 45; done
 mkdir -p /opt/local/hpds/all
 for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/data/${dataset_s3_object_key}/javabins_rekeyed.tar.gz /opt/local/hpds/javabins_rekeyed.tar.gz  && break || sleep 45; done
-for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/genomic_javabins.tar.gz /opt/local/hpds/all/genomic_javabins.tar.gz  && break || sleep 45; done
 cd /opt/local/hpds
 tar -xvzf javabins_rekeyed.tar.gz
-cd /opt/local/hpds/all
-tar -xvzf genomic_javabins.tar.gz
 cd ~
 
 HPDS_IMAGE=`sudo docker load < /pic-sure-hpds.tar.gz | cut -d ' ' -f 3`
-sudo docker run --name=hpds -v /opt/local/hpds:/opt/local/hpds -p 8080:8080 --entrypoint=java -d $HPDS_IMAGE -XX:+UseParallelGC -XX:SurvivorRatio=250 -Xms1g -Xmx26g -server -jar hpds.jar -httpPort 8080 -DCACHE_SIZE=5000 -DSMALL_TASK_THREADS=1 -DLARGE_TASK_THREADS=1 -DSMALL_JOB_LIMIT=100 -DID_BATCH_SIZE=7500 "-DALL_IDS_CONCEPT=NONE"  "-DID_CUBE_NAME=NONE"
+sudo docker run --name=hpds -v /opt/local/hpds:/opt/local/hpds -p 8080:8080 --entrypoint=java -d $HPDS_IMAGE -XX:+UseParallelGC -XX:SurvivorRatio=250 -Xms1g -Xmx10g -server -jar hpds.jar -httpPort 8080 -DCACHE_SIZE=1000 -DSMALL_TASK_THREADS=1 -DLARGE_TASK_THREADS=1 -DSMALL_JOB_LIMIT=100 -DID_BATCH_SIZE=2000 "-DALL_IDS_CONCEPT=NONE"  "-DID_CUBE_NAME=NONE"
 sudo mkdir -p /var/log/hpds-docker-logs
 sudo docker logs -f hpds > /var/log/hpds-docker-logs/hpds.log &
 
