@@ -61,9 +61,6 @@ resource "aws_instance" "wildfly-ec2" {
 }
 
 data "template_file" "wildfly-standalone-xml" {
-  depends_on = [
-    aws_route53_record.picsure-db
-  ]
   template = file("configs/standalone.xml")
   vars = {
     picsure-db-password               = random_password.picsure-db-password.result
@@ -91,9 +88,6 @@ resource "local_file" "wildfly-standalone-xml-file" {
 #}
 
 data "template_file" "pic-sure-schema-sql" {
-  depends_on = [
-    aws_route53_record.picsure-db
-  ]
   template = file("configs/pic-sure-schema.sql")
   vars = {
     picsure_token_introspection_token = var.picsure_token_introspection_token
