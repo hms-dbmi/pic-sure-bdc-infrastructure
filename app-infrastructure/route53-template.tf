@@ -9,7 +9,7 @@ data "template_file" "route53-ip-vars" {
   }
 }
 
-resource "local_file" "wildfly-standalone-xml-file" {
+resource "local_file" "route53-ip-vars-file" {
     content     = data.template_file.route53-ip-vars.rendered
     filename = "../route-53/ip-vars.tf"
 }
