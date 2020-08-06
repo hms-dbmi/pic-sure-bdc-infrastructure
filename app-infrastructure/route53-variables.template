@@ -1,0 +1,24 @@
+
+variable "hpds-ec2-private_ip" {
+  description = "The HPDS IP"
+  type        = string
+  default = "${hpds-ec2-private_ip}"
+}
+
+variable "httpd-ec2-private_ip" {
+  description = "The HPDS IP"
+  type        = string
+  default = "${httpd-ec2-private_ip}"
+}
+
+variable "wildfly-ec2-private_ip" {
+  description = "The HPDS IP"
+  type        = string
+  default = "${wildfly-ec2-private_ip}"
+}
+
+variable "pic-sure-mysql-address" {
+  description = "The HPDS IP"
+  type        = string
+  default = "${pic-sure-mysql-address}"
+}

@@ -60,14 +60,6 @@ resource "aws_instance" "wildfly-ec2" {
 
 }
 
-resource "aws_route53_record" "wildfly" {
-  zone_id = var.internal-dns-zone-id
-  name    = "wildfly.${var.target-stack}"
-  type    = "A"
-  ttl     = "60"
-  records = [aws_instance.wildfly-ec2.private_ip]
-}
-
 data "template_file" "wildfly-standalone-xml" {
   depends_on = [
     aws_route53_record.picsure-db
