@@ -103,6 +103,8 @@ echo "pulled mysql driver"
 for i in 1 2 3 4 5; do echo "trying to download fence mapping from s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/configs/fence_mapping.json" && sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/configs/fence_mapping.json /home/centos/fence_mapping.json && break || sleep 45; done
 echo "pulled fence mapping"
 
+for i in 1 2 3 4 5; do echo "confirming hpds resolvable" && sudo curl -X POST --data "{}" -o curlOut.txt -H "Content-Type: application/json" -v $(grep hpds pic-sure-schema.sql | cut -d "'" -f2)/info && break || sleep 45; done
+
 sudo docker run  -d --name schema-init -e "MYSQL_RANDOM_ROOT_PASSWORD=yes" --rm mysql 
 sudo docker exec -i schema-init mysql -hpicsure-db.${target-stack}.datastage.hms.harvard.edu -uroot -p${mysql-instance-password} < /home/centos/pic-sure-schema.sql
 sudo docker stop schema-init
