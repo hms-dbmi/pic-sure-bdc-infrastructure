@@ -11,4 +11,4 @@ httpd-server.key
 stack_variables_a.tf.baseline
 stack_variables_b.tf.baseline
 .DS_Store
-route-53/ip-vars.tf
+ip-vars.properties
