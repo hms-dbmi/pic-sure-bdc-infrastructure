@@ -23,11 +23,6 @@ data "template_cloudinit_config" "wildfly-user-data" {
 }
 
 resource "aws_instance" "wildfly-ec2" {
-  depends_on = [
-    local_file.wildfly-standalone-xml-file
-   # aws_s3_bucket_object.standalone-xml-in-s3
-  ]
-
   ami           = var.ami-id
   instance_type = "m5.large"
 

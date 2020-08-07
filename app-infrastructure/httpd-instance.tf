@@ -22,10 +22,6 @@ data "template_cloudinit_config" "httpd-user-data" {
 }
 
 resource "aws_instance" "httpd-ec2" {
-  depends_on = [
-    local_file.wildfly-standalone-xml-file
-  ]
-
   ami           = var.ami-id
   instance_type = "m5.large"
 

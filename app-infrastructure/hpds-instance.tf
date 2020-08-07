@@ -21,9 +21,6 @@ data "template_cloudinit_config" "hpds-user-data" {
 }
 
 resource "aws_instance" "hpds-ec2" {
-  depends_on = [
-    local_file.wildfly-standalone-xml-file
-  ]
 
   ami = var.ami-id
   instance_type = "m5.2xlarge"
