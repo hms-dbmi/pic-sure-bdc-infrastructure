@@ -25,6 +25,8 @@ resource "aws_instance" "httpd-ec2" {
   ami           = var.ami-id
   instance_type = "m5.large"
 
+  key_name = "biodata_nessus"
+
   associate_public_ip_address = false
 
   subnet_id = var.edge-subnet-us-east-1a-id
