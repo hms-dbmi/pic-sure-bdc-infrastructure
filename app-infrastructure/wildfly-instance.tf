@@ -23,11 +23,6 @@ data "template_cloudinit_config" "wildfly-user-data" {
 }
 
 resource "aws_instance" "wildfly-ec2" {
-  depends_on = [
-    local_file.wildfly-standalone-xml-file
-   # aws_s3_bucket_object.standalone-xml-in-s3
-  ]
-
   ami           = var.ami-id
   instance_type = "m5.2xlarge"
 
@@ -61,18 +56,7 @@ resource "aws_instance" "wildfly-ec2" {
 
 }
 
-resource "aws_route53_record" "wildfly" {
-  zone_id = var.internal-dns-zone-id
-  name    = "wildfly.${var.target-stack}"
-  type    = "A"
-  ttl     = "60"
-  records = [aws_instance.wildfly-ec2.private_ip]
-}
-
 data "template_file" "wildfly-standalone-xml" {
-  depends_on = [
-    aws_route53_record.picsure-db
-  ]
   template = file("configs/standalone.xml")
   vars = {
     picsure-db-password               = random_password.picsure-db-password.result
@@ -90,19 +74,7 @@ resource "local_file" "wildfly-standalone-xml-file" {
     filename = "standalone.xml"
 }
 
-#resource "aws_s3_bucket_object" "standalone-xml-in-s3" {
-#  bucket                 = var.stack_s3_bucket
-#  key                    = "/configs/jenkins_pipeline_build_${var.stack_githash_long}/standalone.xml"
-#  content                = data.template_file.wildfly-standalone-xml.rendered
-#  server_side_encryption = "aws:kms"
-#  kms_key_id             = var.kms_key_id
-#  acl = "private"
-#}
-
 data "template_file" "pic-sure-schema-sql" {
-  depends_on = [
-    aws_route53_record.picsure-db
-  ]
   template = file("configs/pic-sure-schema.sql")
   vars = {
     picsure_token_introspection_token = var.picsure_token_introspection_token
@@ -115,11 +87,3 @@ resource "local_file" "pic-sure-schema-sql-file" {
     filename = "pic-sure-schema.sql"
 }
 
-#resource "aws_s3_bucket_object" "pic-sure-schema-sql-in-s3" {
-#  bucket = var.stack_s3_bucket
-#  key    = "/configs/jenkins_pipeline_build_${var.stack_githash_long}/pic-sure-schema.sql"
-#  content = data.template_file.pic-sure-schema-sql.rendered
-#  server_side_encryption = "aws:kms"
-#  kms_key_id             = var.kms_key_id
-#  acl = "private"
-#}

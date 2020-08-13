@@ -22,10 +22,6 @@ data "template_cloudinit_config" "httpd-user-data" {
 }
 
 resource "aws_instance" "httpd-ec2" {
-  depends_on = [
-    local_file.wildfly-standalone-xml-file
-  ]
-
   ami           = var.ami-id
   instance_type = "m5.large"
 
@@ -56,15 +52,6 @@ resource "aws_instance" "httpd-ec2" {
   }
 
 }
-
-resource "aws_route53_record" "httpd" {
-  zone_id = var.internal-dns-zone-id
-  name    = "httpd.${var.target-stack}"
-  type    = "A"
-  ttl     = "60"
-  records = [aws_instance.httpd-ec2.private_ip]
-}
-
 
 data "template_file" "httpd-vhosts-conf" {
   template = file("configs/httpd-vhosts.conf")

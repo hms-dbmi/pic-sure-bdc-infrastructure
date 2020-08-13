@@ -1,0 +1,4 @@
+hpds-ec2-private_ip=${hpds-ec2-private_ip}
+httpd-ec2-private_ip=${httpd-ec2-private_ip}
+wildfly-ec2-private_ip=${wildfly-ec2-private_ip}
+pic-sure-mysql-address=${pic-sure-mysql-address}

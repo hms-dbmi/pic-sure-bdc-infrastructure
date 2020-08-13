@@ -21,10 +21,6 @@ data "template_cloudinit_config" "hpds-user-data" {
 }
 
 resource "aws_instance" "hpds-ec2" {
-  depends_on = [
-    local_file.wildfly-standalone-xml-file
-  ]
-
   ami = var.ami-id
   instance_type = "m5.2xlarge"
 
@@ -56,10 +52,3 @@ resource "aws_instance" "hpds-ec2" {
 
 }
 
-resource "aws_route53_record" "hpds" {
-  zone_id = var.internal-dns-zone-id
-  name    = "hpds.${var.target-stack}"
-  type    = "A"
-  ttl     = "60"
-  records = [aws_instance.hpds-ec2.private_ip]
-}
