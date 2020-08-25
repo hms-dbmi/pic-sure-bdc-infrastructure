@@ -79,9 +79,19 @@ resource "aws_iam_instance_profile" "docker-awscli-base-profile" {
 }
 
 
+data "aws_ami" "cis_benchmark" {
+  owners = ["aws-marketplace"]
+  most_recent = true
+  filter {
+    name = "name"
+    values = ["*CIS*Centos*7*Benchmark*"]
+  }
+
+
+}
+
 resource "aws_instance" "docker-awscli-base" {
-  // AMI ON 90 BDC-dev account
-  ami = "ami-0f644567956fefe71" 
+  ami = data.aws_ami.cis_benchmark.image_id
   instance_type = "m5.large"
 
   iam_instance_profile = aws_iam_instance_profile.docker-awscli-base-profile.name
