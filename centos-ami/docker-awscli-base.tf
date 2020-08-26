@@ -100,7 +100,7 @@ resource "aws_instance" "docker-awscli-base" {
 
   root_block_device {
     delete_on_termination = true
-    encrypted = true
+    encrypted = false
     volume_size = 50
   }
 
