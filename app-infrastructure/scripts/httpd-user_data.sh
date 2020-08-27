@@ -170,7 +170,7 @@ for i in 1 2 3 4 5; do echo "confirming wildfly resolvable" && sudo curl --conne
 
 for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/domain-join.sh /root/domain-join.sh && break || sleep 45; done
 cd /root
-./domain-join.sh
+sudo bash domain-join.sh
 
 HTTPD_IMAGE=`sudo docker load < pic-sure-ui.tar.gz | cut -d ' ' -f 3`
 sudo docker run --name=httpd -v /var/log/httpd-docker-logs/:/usr/local/apache2/logs/ -v /usr/local/docker-config/picsureui_settings.json:/usr/local/apache2/htdocs/picsureui/settings/settings.json -v /usr/local/docker-config/psamaui_settings.json:/usr/local/apache2/htdocs/psamaui/settings/settings.json -v /usr/local/docker-config/cert:/usr/local/apache2/cert/ -v /usr/local/docker-config/httpd-vhosts.conf:/usr/local/apache2/conf/extra/httpd-vhosts.conf -p 80:80 -p 443:443 -d $HTTPD_IMAGE
