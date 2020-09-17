@@ -3476,7 +3476,7 @@ DELETE FROM role WHERE name LIKE 'FENCE_%';
       'PRIV_FENCE_phs000921_c2', 
       (SELECT uuid FROM application WHERE name ='PICSURE'), 
       '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000921.c2"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
-      '["\\\\NHLBI TOPMed: Study of African Americans, Asthma, Genes and Environment (SAGE) Study\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_","Variant_consequence_calculated","Variant_class"."Gene_with_variant","Variant_severity","Variant_frequency_in_gnomAD","Variant_frequency_as_text"]'
+      '["\\\\NHLBI TOPMed: Study of African Americans, Asthma, Genes and Environment (SAGE) Study\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_","Variant_consequence_calculated","Variant_class","Gene_with_variant","Variant_severity","Variant_frequency_in_gnomAD","Variant_frequency_as_text"]'
     );
             SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
         INSERT INTO `access_rule` VALUES (
@@ -3548,7 +3548,7 @@ DELETE FROM role WHERE name LIKE 'FENCE_%';
       'PRIV_FENCE_phs000946_c1', 
       (SELECT uuid FROM application WHERE name ='PICSURE'), 
       '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000946.c1"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
-      '["\\\\NHLBI TOPMed: Boston Early-Onset COPD Study in the TOPMed Program\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_", "Variant_consequence_calculated","Variant_class"."Gene_with_variant","Variant_severity","Variant_frequency_in_gnomAD","Variant_frequency_as_text"]'
+      '["\\\\NHLBI TOPMed: Boston Early-Onset COPD Study in the TOPMed Program\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_", "Variant_consequence_calculated","Variant_class","Gene_with_variant","Variant_severity","Variant_frequency_in_gnomAD","Variant_frequency_as_text"]'
     );
             SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
         INSERT INTO `access_rule` VALUES (
@@ -3620,7 +3620,7 @@ DELETE FROM role WHERE name LIKE 'FENCE_%';
       'PRIV_FENCE_phs000956_c0', 
       (SELECT uuid FROM application WHERE name ='PICSURE'), 
       '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000956.c0"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
-      '["\\\\NHLBI TOPMed: Genetics of Cardiometabolic Health in the Amish\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_", "Variant_consequence_calculated","Variant_class"."Gene_with_variant","Variant_severity","Variant_frequency_in_gnomAD","Variant_frequency_as_text"]'
+      '["\\\\NHLBI TOPMed: Genetics of Cardiometabolic Health in the Amish\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_", "Variant_consequence_calculated","Variant_class","Gene_with_variant","Variant_severity","Variant_frequency_in_gnomAD","Variant_frequency_as_text"]'
     );
             SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
         INSERT INTO `access_rule` VALUES (
@@ -3692,7 +3692,7 @@ DELETE FROM role WHERE name LIKE 'FENCE_%';
       'PRIV_FENCE_phs000956_c2', 
       (SELECT uuid FROM application WHERE name ='PICSURE'), 
       '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000956.c2"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
-      '["\\\\NHLBI TOPMed: Genetics of Cardiometabolic Health in the Amish\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_", "Variant_consequence_calculated","Variant_class"."Gene_with_variant","Variant_severity","Variant_frequency_in_gnomAD","Variant_frequency_as_text"]'
+      '["\\\\NHLBI TOPMed: Genetics of Cardiometabolic Health in the Amish\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_", "Variant_consequence_calculated","Variant_class","Gene_with_variant","Variant_severity","Variant_frequency_in_gnomAD","Variant_frequency_as_text"]'
     );
             SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
         INSERT INTO `access_rule` VALUES (
@@ -3764,7 +3764,7 @@ DELETE FROM role WHERE name LIKE 'FENCE_%';
       'PRIV_FENCE_phs000988_c0', 
       (SELECT uuid FROM application WHERE name ='PICSURE'), 
       '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000988.c0"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
-      '["\\\\NHLBI TOPMed: The Genetic Epidemiology of Asthma in Costa Rica\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_", "Variant_consequence_calculated","Variant_class"."Gene_with_variant","Variant_severity","Variant_frequency_in_gnomAD","Variant_frequency_as_text"]'
+      '["\\\\NHLBI TOPMed: The Genetic Epidemiology of Asthma in Costa Rica\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_", "Variant_consequence_calculated","Variant_class","Gene_with_variant","Variant_severity","Variant_frequency_in_gnomAD","Variant_frequency_as_text"]'
     );
             SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
         INSERT INTO `access_rule` VALUES (
@@ -3836,7 +3836,7 @@ DELETE FROM role WHERE name LIKE 'FENCE_%';
       'PRIV_FENCE_phs000988_c1', 
       (SELECT uuid FROM application WHERE name ='PICSURE'), 
       '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000988.c1"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
-      '["\\\\NHLBI TOPMed: The Genetic Epidemiology of Asthma in Costa Rica\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_", "Variant_consequence_calculated","Variant_class"."Gene_with_variant","Variant_severity","Variant_frequency_in_gnomAD","Variant_frequency_as_text"]'
+      '["\\\\NHLBI TOPMed: The Genetic Epidemiology of Asthma in Costa Rica\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_", "Variant_consequence_calculated","Variant_class","Gene_with_variant","Variant_severity","Variant_frequency_in_gnomAD","Variant_frequency_as_text"]'
     );
             SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
         INSERT INTO `access_rule` VALUES (
@@ -3908,7 +3908,7 @@ DELETE FROM role WHERE name LIKE 'FENCE_%';
       'PRIV_FENCE_phs000997_c1', 
       (SELECT uuid FROM application WHERE name ='PICSURE'), 
       '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs000997.c1"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
-      '["\\\\NHLBI TOPMed: The Vanderbilt AF Ablation Registry\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_", "Variant_consequence_calculated","Variant_class"."Gene_with_variant","Variant_severity","Variant_frequency_in_gnomAD","Variant_frequency_as_text"]'
+      '["\\\\NHLBI TOPMed: The Vanderbilt AF Ablation Registry\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_", "Variant_consequence_calculated","Variant_class","Gene_with_variant","Variant_severity","Variant_frequency_in_gnomAD","Variant_frequency_as_text"]'
     );
             SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
         INSERT INTO `access_rule` VALUES (
@@ -4268,7 +4268,7 @@ DELETE FROM role WHERE name LIKE 'FENCE_%';
       'PRIV_FENCE_phs001024_c1', 
       (SELECT uuid FROM application WHERE name ='PICSURE'), 
       '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs001024.c1"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
-      '["\\\\NHLBI TOPMed: Partners HealthCare Biobank\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_", "Variant_consequence_calculated","Variant_class"."Gene_with_variant","Variant_severity","Variant_frequency_in_gnomAD","Variant_frequency_as_text"]'
+      '["\\\\NHLBI TOPMed: Partners HealthCare Biobank\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_", "Variant_consequence_calculated","Variant_class","Gene_with_variant","Variant_severity","Variant_frequency_in_gnomAD","Variant_frequency_as_text"]'
     );
             SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
         INSERT INTO `access_rule` VALUES (
@@ -4340,7 +4340,7 @@ DELETE FROM role WHERE name LIKE 'FENCE_%';
       'PRIV_FENCE_phs001032_c1', 
       (SELECT uuid FROM application WHERE name ='PICSURE'), 
       '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs001032.c1"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
-      '["\\\\NHLBI TOPMed: The Vanderbilt Atrial Fibrillation Registry\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_", "Variant_consequence_calculated","Variant_class"."Gene_with_variant","Variant_severity","Variant_frequency_in_gnomAD","Variant_frequency_as_text"]'
+      '["\\\\NHLBI TOPMed: The Vanderbilt Atrial Fibrillation Registry\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_", "Variant_consequence_calculated","Variant_class","Gene_with_variant","Variant_severity","Variant_frequency_in_gnomAD","Variant_frequency_as_text"]'
     );
             SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
         INSERT INTO `access_rule` VALUES (
@@ -4628,7 +4628,7 @@ DELETE FROM role WHERE name LIKE 'FENCE_%';
       'PRIV_FENCE_phs001143_c0', 
       (SELECT uuid FROM application WHERE name ='PICSURE'), 
       '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs001143.c0"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
-      '["\\\\NHLBI TOPMed: The Genetics and Epidemiology of Asthma in Barbados\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_", "Variant_consequence_calculated","Variant_class"."Gene_with_variant","Variant_severity","Variant_frequency_in_gnomAD","Variant_frequency_as_text"]'
+      '["\\\\NHLBI TOPMed: The Genetics and Epidemiology of Asthma in Barbados\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_", "Variant_consequence_calculated","Variant_class","Gene_with_variant","Variant_severity","Variant_frequency_in_gnomAD","Variant_frequency_as_text"]'
     );
             SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
         INSERT INTO `access_rule` VALUES (
@@ -4700,7 +4700,7 @@ DELETE FROM role WHERE name LIKE 'FENCE_%';
       'PRIV_FENCE_phs001143_c1', 
       (SELECT uuid FROM application WHERE name ='PICSURE'), 
       '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs001143.c1"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
-      '["\\\\NHLBI TOPMed: The Genetics and Epidemiology of Asthma in Barbados\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_", "Variant_consequence_calculated","Variant_class"."Gene_with_variant","Variant_severity","Variant_frequency_in_gnomAD","Variant_frequency_as_text"]'
+      '["\\\\NHLBI TOPMed: The Genetics and Epidemiology of Asthma in Barbados\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_", "Variant_consequence_calculated","Variant_class","Gene_with_variant","Variant_severity","Variant_frequency_in_gnomAD","Variant_frequency_as_text"]'
     );
             SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
         INSERT INTO `access_rule` VALUES (
@@ -4916,7 +4916,7 @@ DELETE FROM role WHERE name LIKE 'FENCE_%';
       'PRIV_FENCE_phs001207_c0', 
       (SELECT uuid FROM application WHERE name ='PICSURE'), 
       '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs001207.c0"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
-      '["\\\\NHLBI TOPMed: African American Sarcoidosis Genetics Resource\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_", "Variant_consequence_calculated","Variant_class"."Gene_with_variant","Variant_severity","Variant_frequency_in_gnomAD","Variant_frequency_as_text"]'
+      '["\\\\NHLBI TOPMed: African American Sarcoidosis Genetics Resource\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_", "Variant_consequence_calculated","Variant_class","Gene_with_variant","Variant_severity","Variant_frequency_in_gnomAD","Variant_frequency_as_text"]'
     );
             SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
         INSERT INTO `access_rule` VALUES (
@@ -4988,7 +4988,7 @@ DELETE FROM role WHERE name LIKE 'FENCE_%';
       'PRIV_FENCE_phs001207_c1', 
       (SELECT uuid FROM application WHERE name ='PICSURE'), 
       '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs001207.c1"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
-      '["\\\\NHLBI TOPMed: African American Sarcoidosis Genetics Resource\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_", "Variant_consequence_calculated","Variant_class"."Gene_with_variant","Variant_severity","Variant_frequency_in_gnomAD","Variant_frequency_as_text"]'
+      '["\\\\NHLBI TOPMed: African American Sarcoidosis Genetics Resource\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_", "Variant_consequence_calculated","Variant_class","Gene_with_variant","Variant_severity","Variant_frequency_in_gnomAD","Variant_frequency_as_text"]'
     );
             SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
         INSERT INTO `access_rule` VALUES (
@@ -5060,7 +5060,7 @@ DELETE FROM role WHERE name LIKE 'FENCE_%';
       'PRIV_FENCE_phs001215_c0', 
       (SELECT uuid FROM application WHERE name ='PICSURE'), 
       '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs001215.c0"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
-      '["\\\\NHLBI TOPMed: San Antonio Family Heart Study (SAFHS)\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_", "Variant_consequence_calculated","Variant_class"."Gene_with_variant","Variant_severity","Variant_frequency_in_gnomAD","Variant_frequency_as_text"]'
+      '["\\\\NHLBI TOPMed: San Antonio Family Heart Study (SAFHS)\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_", "Variant_consequence_calculated","Variant_class","Gene_with_variant","Variant_severity","Variant_frequency_in_gnomAD","Variant_frequency_as_text"]'
     );
             SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
         INSERT INTO `access_rule` VALUES (
@@ -5132,7 +5132,7 @@ DELETE FROM role WHERE name LIKE 'FENCE_%';
       'PRIV_FENCE_phs001215_c1', 
       (SELECT uuid FROM application WHERE name ='PICSURE'), 
       '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs001215.c1"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
-      '["\\\\NHLBI TOPMed: San Antonio Family Heart Study (SAFHS)\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_", "Variant_consequence_calculated","Variant_class"."Gene_with_variant","Variant_severity","Variant_frequency_in_gnomAD","Variant_frequency_as_text"]'
+      '["\\\\NHLBI TOPMed: San Antonio Family Heart Study (SAFHS)\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_", "Variant_consequence_calculated","Variant_class","Gene_with_variant","Variant_severity","Variant_frequency_in_gnomAD","Variant_frequency_as_text"]'
     );
             SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
         INSERT INTO `access_rule` VALUES (
@@ -5348,7 +5348,7 @@ DELETE FROM role WHERE name LIKE 'FENCE_%';
       'PRIV_FENCE_phs001293_c0', 
       (SELECT uuid FROM application WHERE name ='PICSURE'), 
       '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs001293.c0"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
-      '["\\\\NHLBI TOPMed: HyperGEN - Genetics of Left Ventricular (LV) Hypertrophy\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_", "Variant_consequence_calculated","Variant_class"."Gene_with_variant","Variant_severity","Variant_frequency_in_gnomAD","Variant_frequency_as_text"]'
+      '["\\\\NHLBI TOPMed: HyperGEN - Genetics of Left Ventricular (LV) Hypertrophy\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_", "Variant_consequence_calculated","Variant_class","Gene_with_variant","Variant_severity","Variant_frequency_in_gnomAD","Variant_frequency_as_text"]'
     );
             SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
         INSERT INTO `access_rule` VALUES (
@@ -5420,7 +5420,7 @@ DELETE FROM role WHERE name LIKE 'FENCE_%';
       'PRIV_FENCE_phs001293_c1', 
       (SELECT uuid FROM application WHERE name ='PICSURE'), 
       '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs001293.c1"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
-      '["\\\\NHLBI TOPMed: HyperGEN - Genetics of Left Ventricular (LV) Hypertrophy\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_", "Variant_consequence_calculated","Variant_class"."Gene_with_variant","Variant_severity","Variant_frequency_in_gnomAD","Variant_frequency_as_text"]'
+      '["\\\\NHLBI TOPMed: HyperGEN - Genetics of Left Ventricular (LV) Hypertrophy\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_", "Variant_consequence_calculated","Variant_class","Gene_with_variant","Variant_severity","Variant_frequency_in_gnomAD","Variant_frequency_as_text"]'
     );
             SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
         INSERT INTO `access_rule` VALUES (
@@ -5492,7 +5492,7 @@ DELETE FROM role WHERE name LIKE 'FENCE_%';
       'PRIV_FENCE_phs001293_c2', 
       (SELECT uuid FROM application WHERE name ='PICSURE'), 
       '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs001293.c2"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
-      '["\\\\NHLBI TOPMed: HyperGEN - Genetics of Left Ventricular (LV) Hypertrophy\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_", "Variant_consequence_calculated","Variant_class"."Gene_with_variant","Variant_severity","Variant_frequency_in_gnomAD","Variant_frequency_as_text"]'
+      '["\\\\NHLBI TOPMed: HyperGEN - Genetics of Left Ventricular (LV) Hypertrophy\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_", "Variant_consequence_calculated","Variant_class","Gene_with_variant","Variant_severity","Variant_frequency_in_gnomAD","Variant_frequency_as_text"]'
     );
             SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
         INSERT INTO `access_rule` VALUES (
@@ -5564,7 +5564,7 @@ DELETE FROM role WHERE name LIKE 'FENCE_%';
       'PRIV_FENCE_phs001387_c0', 
       (SELECT uuid FROM application WHERE name ='PICSURE'), 
       '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs001387.c0"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
-      '["\\\\NHLBI TOPMed: Rare Variants for Hypertension in Taiwan Chinese (THRV)\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_", "Variant_consequence_calculated","Variant_class"."Gene_with_variant","Variant_severity","Variant_frequency_in_gnomAD","Variant_frequency_as_text"]'
+      '["\\\\NHLBI TOPMed: Rare Variants for Hypertension in Taiwan Chinese (THRV)\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_", "Variant_consequence_calculated","Variant_class","Gene_with_variant","Variant_severity","Variant_frequency_in_gnomAD","Variant_frequency_as_text"]'
     );
             SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
         INSERT INTO `access_rule` VALUES (
@@ -5636,7 +5636,7 @@ DELETE FROM role WHERE name LIKE 'FENCE_%';
       'PRIV_FENCE_phs001387_c3', 
       (SELECT uuid FROM application WHERE name ='PICSURE'), 
       '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs001387.c3"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
-      '["\\\\NHLBI TOPMed: Rare Variants for Hypertension in Taiwan Chinese (THRV)\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_", "Variant_consequence_calculated","Variant_class"."Gene_with_variant","Variant_severity","Variant_frequency_in_gnomAD","Variant_frequency_as_text"]'
+      '["\\\\NHLBI TOPMed: Rare Variants for Hypertension in Taiwan Chinese (THRV)\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_", "Variant_consequence_calculated","Variant_class","Gene_with_variant","Variant_severity","Variant_frequency_in_gnomAD","Variant_frequency_as_text"]'
     );
             SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
         INSERT INTO `access_rule` VALUES (
@@ -5708,7 +5708,7 @@ DELETE FROM role WHERE name LIKE 'FENCE_%';
       'PRIV_FENCE_phs001412_c0', 
       (SELECT uuid FROM application WHERE name ='PICSURE'), 
       '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs001412.c0"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
-      '["\\\\NHLBI TOPMed: Diabetes Heart Study (DHS) African American Coronary Artery Calcification (AA CAC)\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_", "Variant_consequence_calculated","Variant_class"."Gene_with_variant","Variant_severity","Variant_frequency_in_gnomAD","Variant_frequency_as_text"]'
+      '["\\\\NHLBI TOPMed: Diabetes Heart Study (DHS) African American Coronary Artery Calcification (AA CAC)\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_", "Variant_consequence_calculated","Variant_class","Gene_with_variant","Variant_severity","Variant_frequency_in_gnomAD","Variant_frequency_as_text"]'
     );
             SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
         INSERT INTO `access_rule` VALUES (
@@ -5780,7 +5780,7 @@ DELETE FROM role WHERE name LIKE 'FENCE_%';
       'PRIV_FENCE_phs001412_c1', 
       (SELECT uuid FROM application WHERE name ='PICSURE'), 
       '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs001412.c1"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
-      '["\\\\NHLBI TOPMed: Diabetes Heart Study (DHS) African American Coronary Artery Calcification (AA CAC)\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_", "Variant_consequence_calculated","Variant_class"."Gene_with_variant","Variant_severity","Variant_frequency_in_gnomAD","Variant_frequency_as_text"]'
+      '["\\\\NHLBI TOPMed: Diabetes Heart Study (DHS) African American Coronary Artery Calcification (AA CAC)\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_", "Variant_consequence_calculated","Variant_class","Gene_with_variant","Variant_severity","Variant_frequency_in_gnomAD","Variant_frequency_as_text"]'
     );
             SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
         INSERT INTO `access_rule` VALUES (
@@ -5852,7 +5852,7 @@ DELETE FROM role WHERE name LIKE 'FENCE_%';
       'PRIV_FENCE_phs001412_c2', 
       (SELECT uuid FROM application WHERE name ='PICSURE'), 
       '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs001412.c2"]},"numericFilters":{},"requiredFields":["\\\\_Study Accession with Patient ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
-      '["\\\\NHLBI TOPMed: Diabetes Heart Study (DHS) African American Coronary Artery Calcification (AA CAC)\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_", "Variant_consequence_calculated","Variant_class"."Gene_with_variant","Variant_severity","Variant_frequency_in_gnomAD","Variant_frequency_as_text"]'
+      '["\\\\NHLBI TOPMed: Diabetes Heart Study (DHS) African American Coronary Artery Calcification (AA CAC)\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_", "Variant_consequence_calculated","Variant_class","Gene_with_variant","Variant_severity","Variant_frequency_in_gnomAD","Variant_frequency_as_text"]'
     );
             SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
         INSERT INTO `access_rule` VALUES (
