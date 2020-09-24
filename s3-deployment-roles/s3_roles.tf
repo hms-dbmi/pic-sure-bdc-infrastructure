@@ -262,6 +262,13 @@ resource "aws_iam_role_policy" "hpds-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/data/${var.genomic-dataset-s3-object-key}/genomic_javabins.tar.gz"
+    },
+    {
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
       "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/jenkins_pipeline_build_${var.stack_githash_long}/hpds-log4j.properties"
     },
     {

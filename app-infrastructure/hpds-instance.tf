@@ -43,7 +43,7 @@ resource "aws_instance" "hpds-ec2" {
   root_block_device {
     delete_on_termination = true
     encrypted = true
-    volume_size = 500
+    volume_size = 1000
   }
 
   tags = {

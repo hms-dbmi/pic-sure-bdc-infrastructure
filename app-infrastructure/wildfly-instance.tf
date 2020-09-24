@@ -47,7 +47,7 @@ resource "aws_instance" "wildfly-ec2" {
   root_block_device {
     delete_on_termination = true
     encrypted             = true
-    volume_size           = 50
+    volume_size           = 150
   }
 
   tags = {

@@ -155,8 +155,11 @@ sleep 15
 for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-hpds.tar.gz . && break || sleep 45; done
 mkdir -p /opt/local/hpds/all
 for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/data/${dataset_s3_object_key}/javabins_rekeyed.tar.gz /opt/local/hpds/javabins_rekeyed.tar.gz  && break || sleep 45; done
+for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/genomic_javabins.tar.gz /opt/local/hpds/all/genomic_javabins.tar.gz  && break || sleep 45; done
 cd /opt/local/hpds
 tar -xvzf javabins_rekeyed.tar.gz
+cd /opt/local/hpds/all
+tar -xvzf genomic_javabins.tar.gz
 cd ~
 
 for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/domain-join.sh /root/domain-join.sh && break || sleep 45; done
