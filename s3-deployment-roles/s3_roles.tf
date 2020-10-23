@@ -76,6 +76,13 @@ resource "aws_iam_role_policy" "wildfly-deployment-s3-policy" {
     },
     {
       "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/splunk_config/splunkforwarder-8.0.4-767223ac207f-Linux-x86_64.tar"
+    },
+    {
+      "Action": [
         "ec2:CreateTags"
       ],
       "Effect": "Allow",
@@ -197,6 +204,13 @@ resource "aws_iam_role_policy" "httpd-deployment-s3-policy" {
     },
     {
       "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/splunk_config/splunkforwarder-8.0.4-767223ac207f-Linux-x86_64.tar"
+    },
+    {
+      "Action": [
         "ec2:CreateTags"
       ],
       "Effect": "Allow",
@@ -282,6 +296,13 @@ resource "aws_iam_role_policy" "hpds-deployment-s3-policy" {
       ],
       "Effect": "Allow",
       "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/domain-join.sh"
+    },
+    {
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/splunk_config/splunkforwarder-8.0.4-767223ac207f-Linux-x86_64.tar"
     },
     {
       "Action": [
