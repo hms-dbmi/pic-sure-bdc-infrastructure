@@ -65,11 +65,6 @@ echo "
                \"file_path\":\"/var/log/yum.log\",
                \"log_group_name\":\"yum.log\",
                \"log_stream_name\":\"{instance_id} yum.log\"
-            },
-            {
-               \"file_path\":\"/var/log/wildfly-docker-logs/*\",
-               \"log_group_name\":\"wildfly-logs\",
-               \"log_stream_name\":\"{instance_id} ${stack_githash} wildfly-app-logs\"
             }
          ]
       }
@@ -152,6 +147,43 @@ sleep 15
 # /opt/ds_agent/dsa_control -a dsm://dsm01.dbmi-datastage.local:4120/ "policyid:11"
 
 echo "started cloudwatch agent"
+
+echo "starting Splunk configuration"
+
+useradd -r -m splunk
+
+for i in 1 2 3 4 5; do echo "trying to download Splunk local forwarder from s3://${stack_s3_bucket}/splunk_config/splunkforwarder-8.0.4-767223ac207f-Linux-x86_64.tar" && sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/splunk_config/splunkforwarder-8.0.4-767223ac207f-Linux-x86_64.tar /opt/ && break || sleep 60; done
+echo "pulled Splunk tar file, extracting"
+
+cd /opt
+sudo tar -xf splunkforwarder-8.0.4-767223ac207f-Linux-x86_64.tar
+chown -R splunk: splunkforwarder
+
+echo "Configuring inputs and outputs"
+
+echo "
+[default]
+host = $(curl http://169.254.169.254/latest/meta-data/instance-id)
+[monitor:///var/log/wildfly-docker-logs]
+sourcetype = hms_app_log
+source = wildfly_logs
+index=aws_main_prod
+" > /opt/splunkforwarder/etc/system/local/inputs.conf
+
+echo "
+[tcpout]
+defaultGroup = default-server
+
+[tcpout:default-server]
+server = 172.25.255.11:9997
+" > /opt/splunkforwarder/etc/system/local/outputs.conf
+
+echo "Starting Splunk"
+sudo -u splunk /opt/splunk/bin/splunk start --accept-license --answer-yes --no-prompt
+
+echo "Enabling start of Splunk on boot"
+sudo /opt/splunk/bin/splunk enable boot-start -systemd-managed 1 -user splunk
+
 for i in 1 2 3 4 5; do echo "trying to download docker image from s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-wildfly.tar.gz" && sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-wildfly.tar.gz . && break || sleep 60; done
 echo "pulled wildfly docker image"
 for i in 1 2 3 4 5; do echo "trying to download standalone.xml from s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/standalone.xml" && sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/standalone.xml /home/centos/standalone.xml && break || sleep 60; done
