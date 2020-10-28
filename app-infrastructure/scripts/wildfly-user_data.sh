@@ -157,7 +157,15 @@ echo "pulled Splunk tar file, extracting"
 
 cd /opt
 sudo tar -xf splunkforwarder-8.0.4-767223ac207f-Linux-x86_64.tar
-chown -R splunk: splunkforwarder
+
+echo "changing splunk permissions"
+chown -R splunk:splunk splunkforwarder
+echo "starting splunk UF as splunk user"
+sudo -u splunk /opt/splunkforwarder/bin/splunk start --accept-license --answer-yes --no-prompt
+echo "stopping service again to enable boot-start"
+sudo -u splunk /opt/splunkforwarder/bin/splunk stop
+echo "enabling boot-start"
+sudo /opt/splunkforwarder/bin/splunk enable boot-start -systemd-managed 1 -user splunk
 
 echo "Configuring inputs and outputs"
 
@@ -170,19 +178,14 @@ source = wildfly_logs
 index=aws_main_prod
 " > /opt/splunkforwarder/etc/system/local/inputs.conf
 
-echo "
-[tcpout]
-defaultGroup = default-server
+echo "updating permissions for app logs using ACL"
+mkdir -p /var/log/wildfly-docker-logs
+sudo setfacl -R -m g:splunk:rx /var/log/wildfly-docker-logs
 
-[tcpout:default-server]
-server = 172.25.255.11:9997
-" > /opt/splunkforwarder/etc/system/local/outputs.conf
+echo "starting splunk as a service"
+sudo systemctl start SplunkForwarder
 
-echo "Starting Splunk"
-sudo -u splunk /opt/splunk/bin/splunk start --accept-license --answer-yes --no-prompt
-
-echo "Enabling start of Splunk on boot"
-sudo /opt/splunk/bin/splunk enable boot-start -systemd-managed 1 -user splunk
+echo "completed Splunk configuration"
 
 for i in 1 2 3 4 5; do echo "trying to download docker image from s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-wildfly.tar.gz" && sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-wildfly.tar.gz . && break || sleep 60; done
 echo "pulled wildfly docker image"
