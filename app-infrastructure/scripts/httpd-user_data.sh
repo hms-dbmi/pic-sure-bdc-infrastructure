@@ -66,11 +66,6 @@ echo "
                \"file_path\":\"/var/log/yum.log\",
                \"log_group_name\":\"yum.log\",
                \"log_stream_name\":\"{instance_id} yum.log\"
-            },
-            {
-               \"file_path\":\"/var/log/httpd-docker-logs/*\",
-               \"log_group_name\":\"httpd-logs\",
-               \"log_stream_name\":\"{instance_id} ${stack_githash} httpd-app-logs\"
             }
          ]
       }
@@ -155,6 +150,46 @@ sleep 15
 
 mkdir -p /usr/local/docker-config/cert
 mkdir -p /var/log/httpd-docker-logs/ssl_mutex
+
+echo "starting Splunk configuration"
+
+useradd -r -m splunk
+
+for i in 1 2 3 4 5; do echo "trying to download Splunk local forwarder from s3://${stack_s3_bucket}/splunk_config/splunkforwarder-8.0.4-767223ac207f-Linux-x86_64.tar" && sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/splunk_config/splunkforwarder-8.0.4-767223ac207f-Linux-x86_64.tar /opt/ && break || sleep 60; done
+echo "pulled Splunk tar file, extracting"
+
+cd /opt
+sudo tar -xf splunkforwarder-8.0.4-767223ac207f-Linux-x86_64.tar
+
+echo "changing splunk permissions"
+chown -R splunk:splunk splunkforwarder
+echo "starting splunk UF as splunk user"
+sudo -u splunk /opt/splunkforwarder/bin/splunk start --accept-license --answer-yes --no-prompt
+echo "stopping service again to enable boot-start"
+sudo -u splunk /opt/splunkforwarder/bin/splunk stop
+echo "enabling boot-start"
+sudo /opt/splunkforwarder/bin/splunk enable boot-start -systemd-managed 1 -user splunk
+
+echo "Configuring inputs and outputs"
+
+echo "
+[default]
+host = $(curl http://169.254.169.254/latest/meta-data/instance-id)
+[monitor:///var/log/httpd-docker-logs]
+sourcetype = hms_app_log
+source = httpd_logs
+index=aws_main_prod
+" > /opt/splunkforwarder/etc/system/local/inputs.conf
+
+echo "updating permissions for app logs using ACL"
+mkdir -p /var/log/httpd-docker-logs
+sudo setfacl -R -m g:splunk:rx /var/log/httpd-docker-logs
+
+echo "starting splunk as a service"
+sudo systemctl start SplunkForwarder
+
+echo "completed Splunk configuration"
+
 for i in 1 2 3 4 5 6 7 8 9; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-ui.tar.gz . && break || sleep 45; done
 for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/httpd-vhosts.conf /usr/local/docker-config/httpd-vhosts.conf && break || sleep 15; done
 for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/certs/httpd/server.chain /usr/local/docker-config/cert/server.chain && break || sleep 15; done
