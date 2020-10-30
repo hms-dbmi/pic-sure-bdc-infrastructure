@@ -215,8 +215,8 @@ JAVA_OPTS="-Xms2g -Xmx26g -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=1024m -Djav
 
 mkdir -p /var/log/wildfly-docker-logs
 mkdir -p /var/log/wildfly-docker-os-logs
-chmod 666 /var/log/wildfly-docker-logs
-chmod 666 /var/log/wildfly-docker-os-logs
+chmod 776 /var/log/wildfly-docker-logs
+chmod 776 /var/log/wildfly-docker-os-logs
 
 sudo docker run -u root --name=wildfly \
 -v /var/log/wildfly-docker-logs/:/opt/jboss/wildfly/standalone/log/ \
