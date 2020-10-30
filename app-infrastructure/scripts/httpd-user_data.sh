@@ -176,7 +176,7 @@ echo "
 [default]
 host = $(curl http://169.254.169.254/latest/meta-data/instance-id)
 [monitor:///var/log/httpd-docker-logs]
-sourcetype = hms_app_log
+sourcetype = hms_app_logs
 source = httpd_logs
 index=aws_main_prod
 " > /opt/splunkforwarder/etc/system/local/inputs.conf
