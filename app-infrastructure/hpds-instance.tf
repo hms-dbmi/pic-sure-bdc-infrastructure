@@ -23,7 +23,7 @@ data "template_cloudinit_config" "hpds-user-data" {
 
 resource "aws_instance" "hpds-ec2" {
   ami = var.ami-id
-  instance_type = "m5.2xlarge"
+  instance_type = "m5.4xlarge"
 
   key_name = "biodata_nessus"
 
