@@ -5,6 +5,7 @@ data "template_file" "httpd-user_data" {
     stack_githash   = var.stack_githash_long
     fence_client_id = var.fence_client_id
     stack_s3_bucket = var.stack_s3_bucket
+    dataset_s3_object_key = var.dataset-s3-object-key
     target-stack    = var.target-stack
   }
 }
