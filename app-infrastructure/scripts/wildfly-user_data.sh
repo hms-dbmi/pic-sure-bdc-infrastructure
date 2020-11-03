@@ -100,7 +100,7 @@ for i in 1 2 3 4 5; do echo "trying to download mysql_module from s3://${stack_s
 echo "pulled mysql_module"
 for i in 1 2 3 4 5; do echo "trying to download driver from s3://${stack_s3_bucket}/modules/mysql/mysql-connector-java-5.1.38.jar" && sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/modules/mysql/mysql-connector-java-5.1.38.jar /home/centos/mysql-connector-java-5.1.38.jar && break || sleep 45; done
 echo "pulled mysql driver"
-for i in 1 2 3 4 5; do echo "trying to download fence mapping from s3://${stack_s3_bucket}/data/${dataset_s3_object_key}/fence_mapping.json" && sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/configs/fence_mapping.json /home/centos/fence_mapping.json && break || sleep 45; done
+for i in 1 2 3 4 5; do echo "trying to download fence mapping from s3://${stack_s3_bucket}/data/${dataset_s3_object_key}/fence_mapping.json" && sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/data/${dataset_s3_object_key}/fence_mapping.json /home/centos/fence_mapping.json && break || sleep 45; done
 echo "pulled fence mapping"
 
 for i in 1 2 3 4 5; do echo "confirming hpds resolvable" && sudo curl --connect-timeout 1 $(grep hpds /home/centos/pic-sure-schema.sql | cut -d "'" -f2) || if [ $? = 6 ]; then (exit 1); fi && break || sleep 60; done
