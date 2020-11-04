@@ -219,6 +219,7 @@ chmod 776 /var/log/wildfly-docker-logs
 chmod 776 /var/log/wildfly-docker-os-logs
 
 sudo docker run -u root --name=wildfly \
+--restart unless-stopped \
 -v /var/log/wildfly-docker-logs/:/opt/jboss/wildfly/standalone/log/ \
 -v /home/centos/standalone.xml:/opt/jboss/wildfly/standalone/configuration/standalone.xml \
 -v /home/centos/fence_mapping.json:/usr/local/docker-config/fence_mapping.json \
