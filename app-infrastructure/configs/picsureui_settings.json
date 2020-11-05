@@ -59,6 +59,7 @@
 		"NHLBI_TOPMed_San_Antonio_Family_Heart_Study_WGS_phs001215_" : "SAFS",
 		"NHLBI_TOPMed_Study_of_African_Americans_Asthma_Genes_and_Environment_SAGE_Study_phs000921_" : "SAGE",
 		"NHLBI_TOPMed_African_American_Sarcoidosis_Genetics_Resource_phs001207_" : "SARCOIDOSIS",
+		"NHLBI_GO_ESP_Lung_Cohorts_Exome_Sequencing_Project_Asthma_Genetic_variants_affecting_susceptibility_and_severity_phs000422_" : "SARP",
 		"NHLBI_TOPMed_The_Vanderbilt_AF_Ablation_Registry_phs000997_" : "VAFAR",
 		"NHLBI_TOPMed_The_Vanderbilt_Atrial_Fibrillation_Registry_phs001032_" : "VUAF",
 		"NHLBI_TOPMed_Novel_Risk_Factors_for_the_Development_of_Atrial_Fibrillation_in_Women_phs001040_" : "WGHS",
