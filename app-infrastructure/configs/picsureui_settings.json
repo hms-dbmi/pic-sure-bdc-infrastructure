@@ -14,7 +14,7 @@
   "pdfLink": "https://tinyurl.com/PIC-SURE-User-Guide\" target=\"_blank\"",
   "advancedSearchLink": "/transmart/login/callback_processor",
   "logoPath":"/static/images/logo.png",
-  "harmonizedPath": "\\DCC_Harmonized_data_set",
+  "harmonizedPath": "\\DCC Harmonized data set",
   "harmonizedConsentPath": "\\_harmonized_consent\\",
   "topmedConsentPath": "\\_topmed_consents\\",
   "categoryAliases": {
