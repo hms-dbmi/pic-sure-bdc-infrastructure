@@ -110,6 +110,8 @@ sudo docker exec -i schema-init mysql -hpicsure-db.${target-stack}.datastage.hms
 sudo docker stop schema-init
 echo "init'd mysql schemas"
 
+sudo chmod -R a+w /var/log/wildfly-docker*
+
 WILDFLY_IMAGE=`sudo docker load < pic-sure-wildfly.tar.gz | cut -d ' ' -f 3`
 JAVA_OPTS="-Xms2g -Xmx6g -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=256m -Djava.net.preferIPv4Stack=true"
 sudo docker run --name=wildfly \
