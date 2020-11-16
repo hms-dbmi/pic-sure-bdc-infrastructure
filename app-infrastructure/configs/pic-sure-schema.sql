@@ -498,5 +498,62 @@ DELETE FROM role;
     0
   );
 
+SET @uuidAR_NO_SEARCH = REPLACE(UUID(),'-','');
+  INSERT INTO access_rule VALUES (
+    unhex(@uuidAR_NO_SEARCH),
+    'AR_NO_SEARCH',
+    'reject queries for /search',
+    ' $.[\'Target Service\']',
+    1,
+    '/search',
+    0,
+    0,
+    NULL,
+    0,
+    0
+  );
+
+
+
+---
+--- Add fence NO ACCESS rule to allow log in so users can see data access dashboard
+--- users cannot query or search
+---
+
+
+SET @uuidPriv = REPLACE(UUID(),'-','');
+INSERT INTO privilege (uuid, name, description, application_id)
+	VALUES ( unhex(@uuidPriv),
+		'FENCE_PRIV_NO_ACCESS',
+		'Do not allow access to queries or searches',
+		(SELECT uuid FROM application WHERE name = 'PICSURE')
+	);
+
+INSERT INTO accessRule_privilege (privilege_id, accessRule_id)
+	VALUES (
+		unhex(@uuidPriv),
+		unhex(@uuidAR_NO_QUERY_ACCESS)
+	);
+
+INSERT INTO accessRule_privilege (privilege_id, accessRule_id)
+	VALUES (
+		unhex(@uuidPriv),
+		unhex(@uuidAR_NO_SEARCH)
+	);
+	
+
+ SET @uuidRole = REPLACE(UUID(),'-','');
+  INSERT INTO role VALUES ( 
+      unhex(@uuidRole), 
+     'FENCE_ROLE_NO_ACCESS', 
+     'deny all API access.  This role will allow users to log in far enough to see the data access dashboard' 
+  );
+
+INSERT INTO role_privilege (role_id, privilege_id)
+	VALUES (
+		unhex(@uuidRole),
+		unhex(@uuidPriv)
+	);
+
 
  
