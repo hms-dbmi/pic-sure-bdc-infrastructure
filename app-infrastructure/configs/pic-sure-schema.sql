@@ -515,10 +515,10 @@ SET @uuidAR_NO_SEARCH = REPLACE(UUID(),'-','');
 
 
 
----
---- Add fence NO ACCESS rule to allow log in so users can see data access dashboard
---- users cannot query or search
----
+--
+-- Add fence NO ACCESS rule to allow log in so users can see data access dashboard
+-- users cannot query or search
+--
 
 
 SET @uuidPriv = REPLACE(UUID(),'-','');
