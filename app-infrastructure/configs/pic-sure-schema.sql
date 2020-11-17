@@ -565,11 +565,12 @@ INSERT INTO accessRule_gate (gate_id, accessRule_id)
 
 
 SET @uuidPriv = REPLACE(UUID(),'-','');
-INSERT INTO privilege (uuid, name, description, application_id)
+INSERT INTO privilege (uuid, name, description, application_id, queryScope)
 	VALUES ( unhex(@uuidPriv),
 		'FENCE_PRIV_NO_ACCESS',
 		'Do not allow access to queries or searches',
-		(SELECT uuid FROM application WHERE name = 'PICSURE')
+		(SELECT uuid FROM application WHERE name = 'PICSURE'),
+		'[]'
 	);
 
 INSERT INTO accessRule_privilege (privilege_id, accessRule_id)
