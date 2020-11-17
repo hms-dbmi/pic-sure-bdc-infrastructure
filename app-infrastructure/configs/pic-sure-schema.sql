@@ -468,6 +468,28 @@ DELETE FROM role;
     0
   );
 
+ SET @uuidGATE_QUERY = REPLACE(UUID(),'-','');
+  INSERT INTO access_rule VALUES (
+    unhex(@uuidGATE_QUERY),
+    'AR_NO_QUERY_ACCESS',
+    'Restrict to any query endpoints',
+    '$.[\'Target Service\']',
+    6,
+    '/query ',
+    0,
+    0,
+    NULL,
+    0,
+    0
+  );
+
+INSERT INTO accessRule_gate (gate_id, accessRule_id)
+	VALUES (
+		unhex(@uuidGATE_QUERY),
+		unhex(@uuidAR_NO_QUERY_ACCESS)
+	);
+
+
   SET @uuidAR_ONLY_INFO = REPLACE(UUID(),'-','');
   INSERT INTO access_rule VALUES (
     unhex(@uuidAR_ONLY_INFO),
@@ -512,6 +534,27 @@ SET @uuidAR_NO_SEARCH = REPLACE(UUID(),'-','');
     0,
     0
   );
+
+SET @uuid_GATE_SEARCH = REPLACE(UUID(),'-','');
+  INSERT INTO access_rule VALUES (
+    unhex(@uuid_GATE_SEARCH),
+    'GATE_SEARCH',
+    'reject queries for /search',
+    ' $.[\'Target Service\']',
+    6,
+    '/search',
+    0,
+    0,
+    NULL,
+    0,
+    0
+  );
+
+INSERT INTO accessRule_gate (gate_id, accessRule_id)
+	VALUES (
+		unhex(@uuid_GATE_SEARCH),
+		unhex(@uuidAR_NO_SEARCH)
+	);
 
 
 
