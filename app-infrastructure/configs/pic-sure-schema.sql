@@ -140,14 +140,6 @@ CREATE TABLE `accessRule_gate` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Dumping data for table `accessRule_gate`
---
-
-LOCK TABLES `accessRule_gate` WRITE;
-/*!40000 ALTER TABLE `accessRule_gate` DISABLE KEYS */;
-/*!40000 ALTER TABLE `accessRule_gate` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `accessRule_privilege`
@@ -166,14 +158,7 @@ CREATE TABLE `accessRule_privilege` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Dumping data for table `accessRule_privilege`
---
 
-LOCK TABLES `accessRule_privilege` WRITE;
-/*!40000 ALTER TABLE `accessRule_privilege` DISABLE KEYS */;
-/*!40000 ALTER TABLE `accessRule_privilege` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `access_rule`
@@ -200,14 +185,20 @@ CREATE TABLE `access_rule` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Dumping data for table `access_rule`
---
 
-LOCK TABLES `access_rule` WRITE;
-/*!40000 ALTER TABLE `access_rule` DISABLE KEYS */;
-/*!40000 ALTER TABLE `access_rule` ENABLE KEYS */;
-UNLOCK TABLES;
+
+--
+-- Table structure for table `accessRule_subRule`
+--
+CREATE TABLE `accessRule_subRule` (
+  `accessRule_id` binary(16) NOT NULL,
+  `subRule_id` binary(16) NOT NULL,
+  PRIMARY KEY (`accessRule_id`,`subRule_id`),
+  KEY  (`subRule_id`),
+  CONSTRAINT  FOREIGN KEY (`subRule_id`) REFERENCES `access_rule` (`uuid`),
+  CONSTRAINT  FOREIGN KEY (`accessRule_id`) REFERENCES `access_rule` (`uuid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
 
 --
 -- Table structure for table `application`
@@ -407,20 +398,12 @@ CREATE TABLE `user_role` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-01-09 15:33:01
 
 --
--- This file will remove all roles/privileges/access_rules.  it creates a few very basic
+-- This file will create a few very basic
 -- rules that can be referenced as 'fence_standard_access_rules' in the wildfly config
 --
 
-DELETE FROM accessRule_privilege;
-DELETE FROM accessRule_gate;
-DELETE FROM access_rule;
-DELETE FROM role_privilege;
-DELETE FROM privilege;
-DELETE FROM user_role;
-DELETE FROM role;
   
   SET @uuidAR_INFO_COLUMN_LISTING_ALLOWED = REPLACE(UUID(),'-','');
   INSERT INTO access_rule VALUES (
@@ -442,7 +425,7 @@ DELETE FROM role;
   INSERT INTO access_rule VALUES (
     unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED),
     'GATE_DONOT_ALLOW_INFO_COLUMN_LISTING',
-    'allow query to info_column_listing',
+    'reject info_column_listing query',
     '$.query.query.expectedResultType',
     3,
     'INFO_COLUMN_LISTING',
@@ -471,8 +454,8 @@ DELETE FROM role;
  SET @uuidGATE_QUERY = REPLACE(UUID(),'-','');
   INSERT INTO access_rule VALUES (
     unhex(@uuidGATE_QUERY),
-    'AR_NO_QUERY_ACCESS',
-    'Restrict to any query endpoints',
+    'GATE_QUERY',
+    'triggers if user submits a query',
     '$.[\'Target Service\']',
     6,
     '/query ',
