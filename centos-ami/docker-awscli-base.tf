@@ -84,7 +84,7 @@ data "aws_ami" "cis_benchmark" {
   most_recent = true
   filter {
     name = "name"
-    values = ["*CIS*Centos*7*Benchmark*"]
+    values = ["*CIS*CentOS*7*Benchmark*"]
   }
 
 
