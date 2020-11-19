@@ -79,8 +79,8 @@ sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-c
 
 #!/bin/bash
 
-ACTIVATIONURL='dsm://dsm01.dbmi-datastage.local:4120/'
-MANAGERURL='https://dsm01.dbmi-datastage.local:443'
+ACTIVATIONURL='dsm://dsm.datastage.hms.harvard.edu:4120/'
+MANAGERURL='https://dsm.datastage.hms.harvard.edu:443'
 CURLOPTIONS='--silent --tlsv1.2'
 linuxPlatform='';
 isRPM='';
