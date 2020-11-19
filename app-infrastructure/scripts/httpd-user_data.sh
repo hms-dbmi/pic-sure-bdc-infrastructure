@@ -145,7 +145,7 @@ echo Install the agent package successfully
 
 sleep 15
 /opt/ds_agent/dsa_control -r
-/opt/ds_agent/dsa_control -a $ACTIVATIONURL "policyid:11"
+/opt/ds_agent/dsa_control -a $ACTIVATIONURL "policyid:14"
 # /opt/ds_agent/dsa_control -a dsm://dsm01.dbmi-datastage.local:4120/ "policyid:11"
 
 mkdir -p /usr/local/docker-config/cert
