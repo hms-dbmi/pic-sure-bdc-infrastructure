@@ -5499,6 +5499,76 @@ SET @uuidRole = REPLACE(UUID(),'-','');
 
 
 
+    SET @uuidRole = REPLACE(UUID(),'-','');
+    INSERT INTO role VALUES (
+      unhex(@uuidRole),
+      'FENCE_phs002299_c1',
+      'For ORCHID Study'
+    );
+    
+    SET @uuidPriv = REPLACE(UUID(),'-','');
+    INSERT INTO privilege VALUES ( 
+      unhex(@uuidPriv),
+      'For ORCHID Study', 
+      'PRIV_FENCE_phs002299_c1', 
+      (SELECT uuid FROM application WHERE name ='PICSURE'), 
+      '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs002299.c1"]},"numericFilters":{},"fields":["\\\\_Parent Study Accession with Subject ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
+      '[" \\\\COVID19-ORCHID ( phs002299 )\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+    );
+            SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
+        INSERT INTO `access_rule` VALUES (
+          unhex(@uuidACCESSRULE), 
+          'AR_FENCE_phs002299_c1', 
+          'AccessRule for only ', 
+          "$..categoryFilters.['\\\\_Consents\\\\Short Study Accession with Consent Code\\\\']", 
+          4,
+          "phs002299.c1", 
+          0, 
+          1, 
+          NULL, 
+          0, 
+          0
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidACCESSRULE)
+        );
+  
+        --  INSERT INTO accessRule_gate VALUES (
+        --    unhex(@uuidACCESSRULE),
+        --    (SELECT uuid FROM access_rule WHERE name = 'GATE_EXPECTED_RESULT_TYPE')
+        --  );
+  
+        INSERT INTO accessRule_gate VALUES (
+          unhex(@uuidACCESSRULE),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_NOT_ALLOWED)
+        );
+  
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED)
+        );
+
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_QUERY')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_INFO')
+        );
+    
+        INSERT INTO accessRule_privilege VALUES (
+          unhex(@uuidPriv),
+          (SELECT uuid FROM access_rule WHERE name = 'AR_ONLY_SEARCH')
+        );
+    
+
+          
+    INSERT INTO role_privilege VALUES ( unhex(@uuidRole), unhex(@uuidPriv) );
+    INSERT INTO role_privilege VALUES ( (SELECT uuid FROM role WHERE name = 'FENCE_topmed'), unhex(@uuidPriv));
 
 
 
