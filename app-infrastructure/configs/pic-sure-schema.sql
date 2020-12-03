@@ -5513,7 +5513,7 @@ SET @uuidRole = REPLACE(UUID(),'-','');
       'PRIV_FENCE_phs002299_c1', 
       (SELECT uuid FROM application WHERE name ='PICSURE'), 
       '{"categoryFilters": {"\\\\_Consents\\\\Short Study Accession with Consent Code\\\\":["phs002299.c1"]},"numericFilters":{},"fields":["\\\\_Parent Study Accession with Subject ID\\\\"],"variantInfoFilters":[{"categoryVariantInfoFilters":{},"numericVariantInfoFilters":{}}],"expectedResultType": "COUNT"}',
-      '[" \\\\COVID19-ORCHID ( phs002299 )\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
+      '["\\\\COVID19-ORCHID ( phs002299 )\\\\","\\\\DCC Harmonized data set\\\\", "\\\\_"]'
     );
             SET @uuidACCESSRULE = REPLACE(UUID(),'-','');
         INSERT INTO `access_rule` VALUES (
