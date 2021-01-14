@@ -1,27 +1,26 @@
 
-data "template_file" "hpds-user_data" {
-  template = file("scripts/hpds-user_data.sh")
+data "template_file" "open_hpds-user_data" {
+  template = file("scripts/open_hpds-user_data.sh")
   vars = {
     stack_githash = var.stack_githash_long
     dataset_s3_object_key = var.dataset-s3-object-key
-    genomic_dataset_s3_object_key = var.genomic-dataset-s3-object-key
     stack_s3_bucket = var.stack_s3_bucket
   }
 }
 
-data "template_cloudinit_config" "hpds-user-data" {
+data "template_cloudinit_config" "open_hpds-user-data" {
   gzip          = true
   base64_encode = true
 
   # user_data
   part {
     content_type = "text/x-shellscript"
-    content      = data.template_file.hpds-user_data.rendered
+    content      = data.template_file.open_hpds-user_data.rendered
   }
 
 }
 
-resource "aws_instance" "hpds-ec2" {
+resource "aws_instance" "open-hpds-ec2" {
 
   ami = var.ami-id
   instance_type = "m5.2xlarge"
@@ -32,7 +31,7 @@ resource "aws_instance" "hpds-ec2" {
 
   iam_instance_profile = "hpds-deployment-s3-profile-${var.target-stack}-${var.stack_githash}"
 
-  user_data = data.template_cloudinit_config.hpds-user-data.rendered
+  user_data = data.template_cloudinit_config.open_hpds-user-data.rendered
 
   vpc_security_group_ids = [
     aws_security_group.inbound-hpds-from-app.id,
@@ -48,7 +47,7 @@ resource "aws_instance" "hpds-ec2" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "FISMA Terraform Playground - ${var.stack_githash} - HPDS - ${var.target-stack}"
+    Name        = "FISMA Terraform Playground - ${var.stack_githash} - OPEN HPDS - ${var.target-stack}"
   }
 
 }
