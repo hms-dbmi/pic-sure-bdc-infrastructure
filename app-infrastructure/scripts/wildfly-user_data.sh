@@ -110,7 +110,10 @@ sudo docker exec -i schema-init mysql -hpicsure-db.${target-stack}.datastage.hms
 sudo docker stop schema-init
 echo "init'd mysql schemas"
 
-sudo chmod -R a+w /var/log/wildfly-docker*
+
+#Allow wildfly to write logs
+sudo chmod a+w /var/log/wildfly-docker*
+
 
 WILDFLY_IMAGE=`sudo docker load < pic-sure-wildfly.tar.gz | cut -d ' ' -f 3`
 JAVA_OPTS="-Xms2g -Xmx6g -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=256m -Djava.net.preferIPv4Stack=true"
@@ -123,7 +126,6 @@ sudo docker run --name=wildfly \
 -v /var/log/wildfly-docker-os-logs/:/var/log/ \
 -p 8080:8080 -e JAVA_OPTS="$JAVA_OPTS" -d $WILDFLY_IMAGE
 
-sudo docker logs -f wildfly > /var/log/wildfly-docker-logs/wildfly.log &
 
 INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)
 sudo /usr/local/bin/aws --region=us-east-1 ec2 create-tags --resources $${INSTANCE_ID} --tags Key=InitComplete,Value=true
