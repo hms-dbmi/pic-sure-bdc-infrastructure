@@ -11,6 +11,6 @@ data "template_file" "route53-ip-vars" {
 }
 
 resource "local_file" "route53-ip-vars-file" {
-    content     = data.template_file.route53-ip-vars.rendered
+    content = data.template_file.route53-ip-vars.rendered
     filename = "ip-vars.properties"
 }
