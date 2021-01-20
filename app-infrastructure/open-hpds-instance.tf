@@ -9,7 +9,7 @@ data "template_file" "open_hpds-user_data" {
 }
 
 data "template_file" "aggregate-resource-properties" {
-  template = file("scripts/aggregate-resource.properties")
+  template = file("configs/aggregate-resource.properties")
   vars = {
     target-stack = var.target-stack
   }
