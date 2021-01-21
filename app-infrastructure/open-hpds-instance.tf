@@ -3,7 +3,7 @@ data "template_file" "open_hpds-user_data" {
   template = file("scripts/open_hpds-user_data.sh")
   vars = {
     stack_githash = var.stack_githash_long
-    dataset_s3_object_key = var.dataset-s3-object-key
+    destigmatized_dataset_s3_object_key = var.destigmatized-dataset-s3-object-key
     stack_s3_bucket = var.stack_s3_bucket
   }
 }
@@ -59,7 +59,7 @@ resource "aws_instance" "open-hpds-ec2" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "FISMA Terraform Playground - ${var.stack_githash} - OPEN HPDS - ${var.target-stack}"
+    Name        = "FISMA Terraform Playground - ${var.stack_githash} - Open HPDS - ${var.target-stack}"
   }
 
 }
