@@ -15,6 +15,11 @@ variable "dataset-s3-object-key" {
   type        = string
 }
 
+variable "destigmatized-dataset-s3-object-key" {
+  description = "The s3 object key within the environment s3 bucket"
+  type        = string
+}
+
 variable "genomic-dataset-s3-object-key" {
   description = "The s3 object key within the environment s3 bucket"
   type        = string
@@ -240,6 +245,13 @@ resource "aws_iam_role_policy" "hpds-deployment-s3-policy" {
       ],
       "Effect": "Allow",
       "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/releases/jenkins_pipeline_build_${var.stack_githash_long}/pic-sure-hpds.tar.gz"
+    },
+    {
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/data/${var.destigmatized-dataset-s3-object-key}/destigmatized_javabins_rekeyed.tar.gz.tar.gz"
     },
     {
       "Action": [
