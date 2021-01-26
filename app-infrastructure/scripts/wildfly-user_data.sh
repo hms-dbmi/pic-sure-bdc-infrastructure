@@ -103,7 +103,7 @@ echo "pulled mysql driver"
 for i in 1 2 3 4 5; do echo "trying to download fence mapping from s3://${stack_s3_bucket}/data/${dataset_s3_object_key}/fence_mapping.json" && sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/data/${dataset_s3_object_key}/fence_mapping.json /home/centos/fence_mapping.json && break || sleep 45; done
 echo "pulled fence mapping"
 
-for i in 1 2 3 4 5; do echo "trying to download driver from s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/aggregate-resource.properties" && sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://$stack_s3_bucket/configs/jenkins_pipeline_build_${stack_githash}/aggregate-resource.properties /home/centos/aggregate-resource.properties && break || sleep 45; done
+for i in 1 2 3 4 5; do echo "trying to download driver from s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/aggregate-resource.properties" && sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/aggregate-resource.properties /home/centos/aggregate-resource.properties && break || sleep 45; done
 echo "pulled aggregate resource config"
 
 
