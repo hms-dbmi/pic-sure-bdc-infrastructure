@@ -78,7 +78,6 @@ echo "
 " > /opt/aws/amazon-cloudwatch-agent/etc/custom_config.json
 sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/etc/custom_config.json  -s
 
-
 #!/bin/bash
 
 ACTIVATIONURL='dsm://dsm.datastage.hms.harvard.edu:4120/'
@@ -148,9 +147,6 @@ sleep 15
 /opt/ds_agent/dsa_control -a $ACTIVATIONURL "policyid:14"
 # /opt/ds_agent/dsa_control -a dsm://dsm01.dbmi-datastage.local:4120/ "policyid:11"
 
-mkdir -p /usr/local/docker-config/cert
-mkdir -p /var/log/httpd-docker-logs/ssl_mutex
-
 echo "starting Splunk configuration"
 
 useradd -r -m splunk
@@ -175,42 +171,37 @@ echo "Configuring inputs and outputs"
 echo "
 [default]
 host = $(curl http://169.254.169.254/latest/meta-data/instance-id)
-[monitor:///var/log/httpd-docker-logs]
+[monitor:///var/log/hpds-docker-logs]
 sourcetype = hms_app_logs
-source = httpd_logs
+source = hpds_logs
 index=aws_main_prod
 " > /opt/splunkforwarder/etc/system/local/inputs.conf
 
 echo "updating permissions for app logs using ACL"
-mkdir -p /var/log/httpd-docker-logs
-sudo setfacl -R -m g:splunk:rx /var/log/httpd-docker-logs
+mkdir -p /var/log/hpds-docker-logs
+sudo setfacl -R -m g:splunk:rx /var/log/hpds-docker-logs
 
 echo "starting splunk as a service"
 sudo systemctl start SplunkForwarder
 
 echo "completed Splunk configuration"
 
-for i in 1 2 3 4 5 6 7 8 9; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-ui.tar.gz /home/centos/pic-sure-ui.tar.gz && break || sleep 45; done
-for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/httpd-vhosts.conf /usr/local/docker-config/httpd-vhosts.conf && break || sleep 15; done
-for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/certs/httpd/server.chain /usr/local/docker-config/cert/server.chain && break || sleep 15; done
-for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/certs/httpd/server.crt /usr/local/docker-config/cert/server.crt && break || sleep 15; done
-for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/certs/httpd/server.key /usr/local/docker-config/cert/server.key && break || sleep 15; done
-for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/certs/httpd/preprod_server.chain /usr/local/docker-config/cert/preprod_server.chain && break || sleep 15; done
-for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/certs/httpd/preprod_server.crt /usr/local/docker-config/cert/preprod_server.crt && break || sleep 15; done
-for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/certs/httpd/preprod_server.key /usr/local/docker-config/cert/preprod_server.key && break || sleep 15; done
-for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/psamaui_settings.json /usr/local/docker-config/psamaui_settings.json && break || sleep 15; done
-for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/picsureui_settings.json /usr/local/docker-config/picsureui_settings.json && break || sleep 15; done
-for i in 1 2 3 4 5; do echo "trying to download fence mapping from s3://${stack_s3_bucket}/data/${dataset_s3_object_key}/fence_mapping.json" && sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/data/${dataset_s3_object_key}/fence_mapping.json /home/centos/fence_mapping.json && break || sleep 45; done
+for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-hpds.tar.gz /home/centos/pic-sure-hpds.tar.gz && break || sleep 45; done
 
+for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/data/${destigmatized_dataset_s3_object_key}/destigmatized_javabins_rekeyed.tar.gz /opt/local/hpds/destigmatized_javabins_rekeyed.tar.gz  && break || sleep 45; done
+cd /opt/local/hpds
+tar -xvzf javabins_rekeyed.tar.gz
+cd ~
 
-for i in 1 2 3 4 5; do echo "confirming wildfly resolvable" && sudo curl --connect-timeout 1 $(grep -A30 preprod /usr/local/docker-config/httpd-vhosts.conf | grep wildfly | grep api | cut -d "\"" -f 2 | sed 's/pic-sure-api-2.*//') || if [ $? = 6 ]; then (exit 1); fi && break || sleep 60; done
 
 for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/domain-join.sh /root/domain-join.sh && break || sleep 45; done
 sudo bash /root/domain-join.sh
 
-HTTPD_IMAGE=`sudo docker load < /home/centos/pic-sure-ui.tar.gz | cut -d ' ' -f 3`
-sudo docker run --restart unless-stopped --name=httpd -v /var/log/httpd-docker-logs/:/usr/local/apache2/logs/ -v /usr/local/docker-config/picsureui_settings.json:/usr/local/apache2/htdocs/picsureui/settings/settings.json -v /usr/local/docker-config/psamaui_settings.json:/usr/local/apache2/htdocs/picsureui/psamaui/settings/settings.json -v /home/centos/fence_mapping.json:/usr/local/apache2/htdocs/picsureui/studyAccess/studies-data.json -v /usr/local/docker-config/cert:/usr/local/apache2/cert/ -v /usr/local/docker-config/httpd-vhosts.conf:/usr/local/apache2/conf/extra/httpd-vhosts.conf -p 80:80 -p 443:443 -d $HTTPD_IMAGE
-sudo docker logs -f httpd > /var/log/httpd-docker-logs/httpd.log &
+
+HPDS_IMAGE=`sudo docker load < /home/centos/pic-sure-hpds.tar.gz | cut -d ' ' -f 3`
+sudo docker run --restart unless-stopped --name=hpds -v /opt/local/hpds:/opt/local/hpds -p 8080:8080 --entrypoint=java -d $HPDS_IMAGE -XX:+UseParallelGC -XX:SurvivorRatio=250 -Xms10g -Xmx40g -server -jar hpds.jar -httpPort 8080 -DCACHE_SIZE=2500 -DSMALL_TASK_THREADS=1 -DLARGE_TASK_THREADS=1 -DSMALL_JOB_LIMIT=100 -DID_BATCH_SIZE=5000 "-DALL_IDS_CONCEPT=NONE"  "-DID_CUBE_NAME=NONE"
+
+sudo docker logs -f hpds > /var/log/hpds-docker-logs/hpds.log &
 
 INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)
 sudo /usr/local/bin/aws --region=us-east-1 ec2 create-tags --resources $${INSTANCE_ID} --tags Key=InitComplete,Value=true

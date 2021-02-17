@@ -189,7 +189,7 @@ echo "completed Splunk configuration"
 for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-hpds.tar.gz /home/centos/pic-sure-hpds.tar.gz && break || sleep 45; done
 mkdir -p /opt/local/hpds/all
 for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/data/${dataset_s3_object_key}/javabins_rekeyed.tar.gz /opt/local/hpds/javabins_rekeyed.tar.gz  && break || sleep 45; done
-for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/genomic_javabins.tar.gz /opt/local/hpds/all/genomic_javabins.tar.gz  && break || sleep 45; done
+for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp --recursive s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/ /opt/local/hpds/all/  && break || sleep 45; done
 cd /opt/local/hpds
 tar -xvzf javabins_rekeyed.tar.gz
 cd /opt/local/hpds/all
@@ -199,9 +199,11 @@ cd ~
 for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/domain-join.sh /root/domain-join.sh && break || sleep 45; done
 sudo bash /root/domain-join.sh
 
-HPDS_IMAGE=`sudo docker load < /home/centos/pic-sure-hpds.tar.gz | cut -d ' ' -f 3`
-sudo docker run --restart unless-stopped --name=hpds -v /opt/local/hpds:/opt/local/hpds -p 8080:8080 --entrypoint=java -d $HPDS_IMAGE -XX:+UseParallelGC -XX:SurvivorRatio=250 -Xms10g -Xmx52g -server -jar hpds.jar -httpPort 8080 -DCACHE_SIZE=2500 -DSMALL_TASK_THREADS=1 -DLARGE_TASK_THREADS=1 -DSMALL_JOB_LIMIT=100 -DID_BATCH_SIZE=5000 "-DALL_IDS_CONCEPT=NONE"  "-DID_CUBE_NAME=NONE"
 sudo mkdir -p /var/log/hpds-docker-logs
+
+HPDS_IMAGE=`sudo docker load < /home/centos/pic-sure-hpds.tar.gz | cut -d ' ' -f 3`
+sudo docker run --restart unless-stopped --name=hpds -v /opt/local/hpds:/opt/local/hpds -p 8080:8080 --entrypoint=java -d $HPDS_IMAGE -XX:+UseParallelGC -XX:SurvivorRatio=250 -Xms10g -Xmx110g -server -jar hpds.jar -httpPort 8080 -DCACHE_SIZE=2500 -DSMALL_TASK_THREADS=1 -DLARGE_TASK_THREADS=1 -DSMALL_JOB_LIMIT=100 -DID_BATCH_SIZE=5000 "-DALL_IDS_CONCEPT=NONE"  "-DID_CUBE_NAME=NONE"
+
 sudo docker logs -f hpds > /var/log/hpds-docker-logs/hpds.log &
 
 INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)

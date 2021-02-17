@@ -197,8 +197,10 @@ for i in 1 2 3 4 5; do echo "trying to download mysql_module from s3://${stack_s
 echo "pulled mysql_module"
 for i in 1 2 3 4 5; do echo "trying to download driver from s3://${stack_s3_bucket}/modules/mysql/mysql-connector-java-5.1.38.jar" && sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/modules/mysql/mysql-connector-java-5.1.38.jar /home/centos/mysql-connector-java-5.1.38.jar && break || sleep 45; done
 echo "pulled mysql driver"
-for i in 1 2 3 4 5; do echo "trying to download fence mapping from s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/configs/fence_mapping.json" && sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/configs/fence_mapping.json /home/centos/fence_mapping.json && break || sleep 45; done
+for i in 1 2 3 4 5; do echo "trying to download fence mapping from s3://${stack_s3_bucket}/data/${dataset_s3_object_key}/fence_mapping.json" && sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/data/${dataset_s3_object_key}/fence_mapping.json /home/centos/fence_mapping.json && break || sleep 45; done
 echo "pulled fence mapping"
+for i in 1 2 3 4 5; do echo "trying to download driver from s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/aggregate-resource.properties" && sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/aggregate-resource.properties /home/centos/aggregate-resource.properties && break || sleep 45; done
+echo "pulled aggregate resource config"
 
 for i in 1 2 3 4 5; do echo "confirming hpds resolvable" && sudo curl --connect-timeout 1 $(grep hpds /home/centos/pic-sure-schema.sql | cut -d "'" -f2) || if [ $? = 6 ]; then (exit 1); fi && break || sleep 60; done
 
@@ -223,6 +225,7 @@ sudo docker run -u root --name=wildfly \
 -v /var/log/wildfly-docker-logs/:/opt/jboss/wildfly/standalone/log/ \
 -v /home/centos/standalone.xml:/opt/jboss/wildfly/standalone/configuration/standalone.xml \
 -v /home/centos/fence_mapping.json:/usr/local/docker-config/fence_mapping.json \
+-v /home/centos/aggregate-resource.properties:/opt/jboss/wildfly/standalone/configuration/aggregate-data-sharing/pic-sure-aggregate-resource/resource.properties \
 -v /home/centos/mysql_module.xml:/opt/jboss/wildfly/modules/system/layers/base/com/sql/mysql/main/module.xml  \
 -v /home/centos/mysql-connector-java-5.1.38.jar:/opt/jboss/wildfly/modules/system/layers/base/com/sql/mysql/main/mysql-connector-java-5.1.38.jar \
 -v /var/log/wildfly-docker-os-logs/:/var/log/ \
