@@ -59,6 +59,7 @@ data "template_file" "httpd-vhosts-conf" {
   vars = {
     wildfly-base-url = "http://${aws_instance.wildfly-ec2.private_ip}:8080"
     target-stack = var.target-stack
+    release-id = "20210217"
   }
 }
 
