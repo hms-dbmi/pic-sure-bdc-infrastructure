@@ -57,7 +57,7 @@
 		"NHLBI_TOPMed_NHGRI_CCDG_Massachusetts_General_Hospital_MGH_Atrial_Fibrillation_Study_phs001062_" : "MGHAF",
 		"COVID19_ORCHID_phs002299_" : "ORCHID",
 		"NHLBI_TOPMed_Partners_HealthCare_Biobank_phs001024_" : "PARTNERS",
-		"NHLBI_TOPMed_San_Antonio_Family_Heart_Study_WGS_phs001215_" : "SAFS",
+		"NHLBI_TOPMed_San_Antonio_Family_Heart_Study_SAFHS_phs001215_" : "SAFHS",
 		"NHLBI_TOPMed_Study_of_African_Americans_Asthma_Genes_and_Environment_SAGE_Study_phs000921_" : "SAGE",
 		"NHLBI_TOPMed_African_American_Sarcoidosis_Genetics_Resource_phs001207_" : "SARCOIDOSIS",
 		"NHLBI_GO_ESP_Lung_Cohorts_Exome_Sequencing_Project_Asthma_Genetic_variants_affecting_susceptibility_and_severity_phs000422_" : "SARP",
