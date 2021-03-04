@@ -100,8 +100,12 @@ for i in 1 2 3 4 5; do echo "trying to download mysql_module from s3://${stack_s
 echo "pulled mysql_module"
 for i in 1 2 3 4 5; do echo "trying to download driver from s3://${stack_s3_bucket}/modules/mysql/mysql-connector-java-5.1.38.jar" && sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/modules/mysql/mysql-connector-java-5.1.38.jar /home/centos/mysql-connector-java-5.1.38.jar && break || sleep 45; done
 echo "pulled mysql driver"
-for i in 1 2 3 4 5; do echo "trying to download fence mapping from s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/configs/fence_mapping.json" && sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/configs/fence_mapping.json /home/centos/fence_mapping.json && break || sleep 45; done
+for i in 1 2 3 4 5; do echo "trying to download fence mapping from s3://${stack_s3_bucket}/data/${dataset_s3_object_key}/fence_mapping.json" && sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/data/${dataset_s3_object_key}/fence_mapping.json /home/centos/fence_mapping.json && break || sleep 45; done
 echo "pulled fence mapping"
+
+for i in 1 2 3 4 5; do echo "trying to download driver from s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/aggregate-resource.properties" && sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/aggregate-resource.properties /home/centos/aggregate-resource.properties && break || sleep 45; done
+echo "pulled aggregate resource config"
+
 
 for i in 1 2 3 4 5; do echo "confirming hpds resolvable" && sudo curl --connect-timeout 1 $(grep hpds /home/centos/pic-sure-schema.sql | cut -d "'" -f2) || if [ $? = 6 ]; then (exit 1); fi && break || sleep 60; done
 
@@ -110,18 +114,24 @@ sudo docker exec -i schema-init mysql -hpicsure-db.${target-stack}.datastage.hms
 sudo docker stop schema-init
 echo "init'd mysql schemas"
 
+
+#Allow wildfly to write logs
+mkdir /var/log/wildfly-docker-logs/
+sudo chmod a+w /var/log/wildfly-docker*
+
+
 WILDFLY_IMAGE=`sudo docker load < pic-sure-wildfly.tar.gz | cut -d ' ' -f 3`
 JAVA_OPTS="-Xms2g -Xmx6g -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=256m -Djava.net.preferIPv4Stack=true"
 sudo docker run --name=wildfly \
 -v /var/log/wildfly-docker-logs/:/opt/jboss/wildfly/standalone/log/ \
 -v /home/centos/standalone.xml:/opt/jboss/wildfly/standalone/configuration/standalone.xml \
 -v /home/centos/fence_mapping.json:/usr/local/docker-config/fence_mapping.json \
+-v /home/centos/aggregate-resource.properties:/opt/jboss/wildfly/standalone/configuration/aggregate-data-sharing/pic-sure-aggregate-resource/resource.properties \
 -v /home/centos/mysql_module.xml:/opt/jboss/wildfly/modules/system/layers/base/com/sql/mysql/main/module.xml  \
 -v /home/centos/mysql-connector-java-5.1.38.jar:/opt/jboss/wildfly/modules/system/layers/base/com/sql/mysql/main/mysql-connector-java-5.1.38.jar \
 -v /var/log/wildfly-docker-os-logs/:/var/log/ \
 -p 8080:8080 -e JAVA_OPTS="$JAVA_OPTS" -d $WILDFLY_IMAGE
 
-sudo docker logs -f wildfly > /var/log/wildfly-docker-logs/wildfly.log &
 
 INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)
 sudo /usr/local/bin/aws --region=us-east-1 ec2 create-tags --resources $${INSTANCE_ID} --tags Key=InitComplete,Value=true

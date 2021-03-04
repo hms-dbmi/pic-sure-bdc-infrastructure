@@ -15,6 +15,11 @@ variable "dataset-s3-object-key" {
   type        = string
 }
 
+variable "destigmatized-dataset-s3-object-key" {
+  description = "The s3 object key within the environment s3 bucket"
+  type        = string
+}
+
 variable "genomic-dataset-s3-object-key" {
   description = "The s3 object key within the environment s3 bucket"
   type        = string
@@ -246,16 +251,37 @@ resource "aws_iam_role_policy" "hpds-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/data/${var.dataset-s3-object-key}/javabins_rekeyed.tar.gz"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/data/${var.destigmatized-dataset-s3-object-key}/destigmatized_javabins_rekeyed.tar.gz.tar.gz"
     },
     {
       "Action": [
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/data/${var.genomic-dataset-s3-object-key}/genomic_javabins.tar.gz"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/data/${var.dataset-s3-object-key}/javabins_rekeyed.tar.gz"
     },
-    {
+   {
+       "Action": [
+      "s3:GetObject"
+       ],
+       "Effect": "Allow",
+       "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/data/${var.genomic-dataset-s3-object-key}/all/*"
+   },
+   {
+       "Action": [
+      "s3:ListBucket"
+       ],
+       "Effect": "Allow",
+       "Resource": "arn:aws:s3:::${var.stack_s3_bucket}",
+       "Condition": {
+      "StringLike": {
+          "s3:prefix": [
+         "data/${var.genomic-dataset-s3-object-key}/all*"
+          ]
+      }
+       }
+   },
+   {
       "Action": [
         "s3:GetObject"
       ],

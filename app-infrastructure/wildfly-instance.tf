@@ -4,6 +4,7 @@ data "template_file" "wildfly-user_data" {
   vars = {
     stack_githash   = var.stack_githash_long
     stack_s3_bucket = var.stack_s3_bucket
+    dataset_s3_object_key = var.dataset-s3-object-key
     mysql-instance-address = aws_db_instance.pic-sure-mysql.address
     mysql-instance-password = random_password.picsure-db-password.result
     target-stack = var.target-stack
