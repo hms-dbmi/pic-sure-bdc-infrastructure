@@ -83,6 +83,7 @@ CREATE TABLE `resource` (
 LOCK TABLES `resource` WRITE;
 /*!40000 ALTER TABLE `resource` DISABLE KEYS */;
 INSERT INTO `resource` VALUES (0x02E23F52F3544E8B992CD37C8B9BA140,NULL,'http://auth-hpds.${target-stack}.datastage.hms.harvard.edu:8080/PIC-SURE/','Authorized Access HPDS resource','auth-hpds',NULL);
+INSERT INTO `resource` VALUES (0x70c837be5ffc11ebae930242ac130002,NULL,'http://localhost:8080/pic-sure-aggregate-resource/pic-sure/aggregate-data-sharing','Open Access (aggregate) resource','open-hpds',NULL);
 
 /*!40000 ALTER TABLE `resource` ENABLE KEYS */;
 UNLOCK TABLES;
