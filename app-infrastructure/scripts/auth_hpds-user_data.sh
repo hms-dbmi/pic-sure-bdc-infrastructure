@@ -189,7 +189,46 @@ echo "completed Splunk configuration"
 for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-hpds.tar.gz /home/centos/pic-sure-hpds.tar.gz && break || sleep 45; done
 mkdir -p /opt/local/hpds/all
 for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/data/${dataset_s3_object_key}/javabins_rekeyed.tar.gz /opt/local/hpds/javabins_rekeyed.tar.gz  && break || sleep 45; done
-for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp --recursive s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/ /opt/local/hpds/all/  && break || sleep 45; done
+s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/chr0masks.bin /opt/local/hpds/all/
+s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/chr1masks.bin /opt/local/hpds/all/
+s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/chr2masks.bin /opt/local/hpds/all/
+s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/chr3masks.bin /opt/local/hpds/all/
+s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/chr4masks.bin /opt/local/hpds/all/
+s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/chr5masks.bin /opt/local/hpds/all/
+s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/chr6masks.bin /opt/local/hpds/all/
+s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/chr7masks.bin /opt/local/hpds/all/
+s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/chr8masks.bin /opt/local/hpds/all/
+s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/chr9masks.bin /opt/local/hpds/all/
+s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/chr10masks.bin /opt/local/hpds/all/
+s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/chr11masks.bin /opt/local/hpds/all/
+s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/chr12masks.bin /opt/local/hpds/all/
+s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/chr13masks.bin /opt/local/hpds/all/
+s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/chr14masks.bin /opt/local/hpds/all/
+s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/chr15masks.bin /opt/local/hpds/all/
+s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/chr16masks.bin /opt/local/hpds/all/
+s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/chr17masks.bin /opt/local/hpds/all/
+s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/chr18masks.bin /opt/local/hpds/all/
+s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/chr19masks.bin /opt/local/hpds/all/
+s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/chr20masks.bin /opt/local/hpds/all/
+s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/chr21masks.bin /opt/local/hpds/all/
+s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/chr22masks.bin /opt/local/hpds/all/
+s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/BucketIndexBySample.javabin /opt/local/hpds/all/
+s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/Gene_with_variant_infoStore.javabin /opt/local/hpds/all/
+s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/Variant_class_infoStore.javabin /opt/local/hpds/all/
+s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/Variant_consequence_calculated_infoStore.javabin /opt/local/hpds/all/
+s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/Variant_frequency_as_text_infoStore.javabin /opt/local/hpds/all/
+s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/Variant_frequency_in_gnomAD_infoStore.javabin /opt/local/hpds/all/
+s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/Variant_severity_infoStore.javabin /opt/local/hpds/all/
+s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/BucketIndexBySampleStorage.javabin /opt/local/hpds/all/
+s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/Gene_with_variant_infoStoreStorage.javabin /opt/local/hpds/all/
+s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/Variant_class_infoStoreStorage.javabin /opt/local/hpds/all/
+s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/Variant_consequence_calculated_infoStoreStorage.javabin /opt/local/hpds/all/
+s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/Variant_frequency_as_text_infoStoreStorage.javabin /opt/local/hpds/all/
+s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/Variant_frequency_in_gnomAD_infoStoreStorage.javabin /opt/local/hpds/all/
+s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/Variant_severity_infoStoreStorage.javabin /opt/local/hpds/all/
+s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/variantIndex.javabin /opt/local/hpds/all/
+s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/variantStore.javabin /opt/local/hpds/all/
+
 cd /opt/local/hpds
 tar -xvzf javabins_rekeyed.tar.gz
 cd /opt/local/hpds/all
