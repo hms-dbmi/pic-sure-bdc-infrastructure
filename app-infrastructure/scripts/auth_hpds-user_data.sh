@@ -231,8 +231,6 @@ aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/vari
 
 cd /opt/local/hpds
 tar -xvzf javabins_rekeyed.tar.gz
-cd /opt/local/hpds/all
-tar -xvzf genomic_javabins.tar.gz
 cd ~
 
 for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/domain-join.sh /root/domain-join.sh && break || sleep 45; done
