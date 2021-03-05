@@ -227,6 +227,7 @@ aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/Vari
 aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/Variant_frequency_in_gnomAD_infoStoreStorage.javabin /opt/local/hpds/all/
 aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/Variant_severity_infoStoreStorage.javabin /opt/local/hpds/all/
 aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/variantIndex.javabin /opt/local/hpds/all/
+aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/variantIndex_decompressed.javabin /opt/local/hpds/all/
 aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/variantStore.javabin /opt/local/hpds/all/
 
 cd /opt/local/hpds
