@@ -30,7 +30,7 @@ resource "aws_instance" "open-hpds-ec2" {
 
   subnet_id = var.db-subnet-us-east-1a-id
 
-  iam_instance_profile = "hpds-deployment-s3-profile-${var.target-stack}-${var.stack_githash}"
+  iam_instance_profile = "oepn-hpds-deployment-s3-profile-${var.target-stack}-${var.stack_githash}"
 
   user_data = data.template_cloudinit_config.open_hpds-user-data.rendered
 
