@@ -543,7 +543,7 @@ INSERT INTO accessRule_gate (gate_id, accessRule_id)
 
 --
 -- Add a rule and privilege to allow all queries for open hpds resource.  This must match the ID of the resource
--- specified earlier in this file.
+-- specified earlier in this file. (type 9 is ALL_EQUALS_IGNORE_CASE)
 --
 
 SET @uuidAR_OPEN_QUERIES = REPLACE(UUID(),'-','');
@@ -552,7 +552,7 @@ SET @uuidAR_OPEN_QUERIES = REPLACE(UUID(),'-','');
     'AR_ALLOW_OPEN_ACCESS',
     'allow access to open hpds resource',
     '$.query.resourceUUID',
-    4,
+    9,
     '70c837be-5ffc-11eb-ae93-0242ac130002',
     0,
     0,
