@@ -523,7 +523,7 @@ SET @uuid_GATE_SEARCH = REPLACE(UUID(),'-','');
   INSERT INTO access_rule VALUES (
     unhex(@uuid_GATE_SEARCH),
     'GATE_SEARCH',
-    'reject queries for /search',
+    'Triggers on search requests',
     ' $.[\'Target Service\']',
     6,
     '/search',
@@ -540,6 +540,55 @@ INSERT INTO accessRule_gate (gate_id, accessRule_id)
 		unhex(@uuidAR_NO_SEARCH)
 	);
 
+
+--
+-- Add a rule and privilege to allow all queries for open hpds resource.  This must match the ID of the resource
+-- specified earlier in this file. (type 9 is ALL_EQUALS_IGNORE_CASE)
+--
+
+SET @uuidAR_OPEN_QUERIES = REPLACE(UUID(),'-','');
+  INSERT INTO access_rule VALUES (
+    unhex(@uuidAR_OPEN_QUERIES),
+    'AR_ALLOW_OPEN_ACCESS',
+    'allow access to open hpds resource',
+    '$.query.resourceUUID',
+    9,
+    '70c837be-5ffc-11eb-ae93-0242ac130002',
+    0,
+    0,
+    NULL,
+    0,
+    0
+  );
+
+
+SET @uuidPriv = REPLACE(UUID(),'-','');
+INSERT INTO privilege (uuid, name, description, application_id, queryScope)
+	VALUES ( unhex(@uuidPriv),
+		'FENCE_PRIV_OPEN_ACCESS',
+		'Allow access to queries for OPEN PICSURE',
+		(SELECT uuid FROM application WHERE name = 'PICSURE'),
+		'[]'
+	);
+
+INSERT INTO accessRule_privilege (privilege_id, accessRule_id)
+	VALUES (
+		unhex(@uuidPriv),
+		unhex(@uuidAR_OPEN_QUERIES)
+	);
+
+ SET @uuidRole = REPLACE(UUID(),'-','');
+  INSERT INTO role VALUES ( 
+      unhex(@uuidRole), 
+     'FENCE_ROLE_OPEN_ACCESS', 
+     'This role will allow users to log in and query OPEN PICSURE' 
+  );
+
+INSERT INTO role_privilege (role_id, privilege_id)
+	VALUES (
+		unhex(@uuidRole),
+		unhex(@uuidPriv)
+	);
 
 
 --
