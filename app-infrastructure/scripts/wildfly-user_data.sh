@@ -106,9 +106,6 @@ echo "pulled fence mapping"
 for i in 1 2 3 4 5; do echo "trying to download driver from s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/aggregate-resource.properties" && sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/aggregate-resource.properties /home/centos/aggregate-resource.properties && break || sleep 45; done
 echo "pulled aggregate resource config"
 
-
-for i in 1 2 3 4 5; do echo "confirming hpds resolvable" && sudo curl --connect-timeout 1 $(grep hpds /home/centos/pic-sure-schema.sql | cut -d "'" -f2) || if [ $? = 6 ]; then (exit 1); fi && break || sleep 60; done
-
 sudo docker run  -d --name schema-init -e "MYSQL_RANDOM_ROOT_PASSWORD=yes" --rm mysql 
 sudo docker exec -i schema-init mysql -hpicsure-db.${target-stack}.datastage.hms.harvard.edu -uroot -p${mysql-instance-password} < /home/centos/pic-sure-schema.sql
 sudo docker stop schema-init
