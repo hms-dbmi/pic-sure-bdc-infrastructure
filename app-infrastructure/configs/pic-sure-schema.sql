@@ -589,3 +589,23 @@ INSERT INTO role_privilege (role_id, privilege_id)
 		unhex(@uuidRole),
 		unhex(@uuidPriv)
 	);
+
+
+INSERT INTO access_rule VALUES (
+  unhex(REPLACE(UUID(),'-','')),
+  "AR_OPEN_ONLY_SEARCH", 
+  "Open PIC-SURE Search", 
+  "$.['Target Service']", 
+  6,
+  "/search/70c837be-5ffc-11eb-ae93-0242ac130002",
+  0,
+  0,
+  NULL,
+  0,
+  0
+);
+
+INSERT INTO accessRule_privilege VALUES (
+  (SELECT uuid FROM privilege WHERE name = 'FENCE_PRIV_OPEN_ACCESS'), 
+  (SELECT uuid FROM access_rule WHERE name = 'AR_OPEN_ONLY_SEARCH')
+);

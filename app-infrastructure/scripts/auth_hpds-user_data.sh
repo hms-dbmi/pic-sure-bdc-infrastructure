@@ -127,8 +127,8 @@ aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/Vari
 aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/Variant_consequence_calculated_infoStoreStorage.javabin /opt/local/hpds/all/
 aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/Variant_frequency_as_text_infoStoreStorage.javabin /opt/local/hpds/all/
 aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/Variant_severity_infoStoreStorage.javabin /opt/local/hpds/all/
-aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/variantIndex.javabin /opt/local/hpds/all/
-aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/variantIndex_decompressed.javabin /opt/local/hpds/all/
+aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/variantIndex_fbbis.javabin /opt/local/hpds/all/
+aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/variantIndex_fbbis_storage.javabin /opt/local/hpds/all/
 aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/variantStore.javabin /opt/local/hpds/all/
 
 for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/data/${dataset_s3_object_key}/javabins_rekeyed.tar.gz /opt/local/hpds/javabins_rekeyed.tar.gz  && break || sleep 45; done
