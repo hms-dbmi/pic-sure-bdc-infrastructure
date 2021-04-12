@@ -266,14 +266,14 @@ resource "aws_iam_role_policy_attachment" "attach-cloudwatch-ssm-policy-to-httpd
 }
 
 
-resource "aws_iam_instance_profile" "hpds-deployment-s3-profile" {
-  name = "hpds-deployment-s3-profile-${var.target-stack}-${var.stack_githash}"
-  role = aws_iam_role.hpds-deployment-s3-role.name
+resource "aws_iam_instance_profile" "auth-hpds-deployment-s3-profile" {
+  name = "auth-hpds-deployment-s3-profile-${var.target-stack}-${var.stack_githash}"
+  role = aws_iam_role.auth-hpds-deployment-s3-role.name
 }
 
-resource "aws_iam_role_policy" "hpds-deployment-s3-policy" {
-  name = "hpds-deployment-s3-policy-${var.target-stack}-${var.stack_githash}"
-  role = aws_iam_role.hpds-deployment-s3-role.id
+resource "aws_iam_role_policy" "auth-hpds-deployment-s3-policy" {
+  name = "auth-hpds-deployment-s3-policy-${var.target-stack}-${var.stack_githash}"
+  role = aws_iam_role.auth-hpds-deployment-s3-role.id
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -284,13 +284,6 @@ resource "aws_iam_role_policy" "hpds-deployment-s3-policy" {
       ],
       "Effect": "Allow",
       "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/releases/jenkins_pipeline_build_${var.stack_githash_long}/pic-sure-hpds.tar.gz"
-    },
-    {
-      "Action": [
-        "s3:GetObject"
-      ],
-      "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/data/${var.destigmatized-dataset-s3-object-key}/destigmatized_javabins_rekeyed.tar.gz"
     },
     {
       "Action": [
@@ -313,13 +306,13 @@ resource "aws_iam_role_policy" "hpds-deployment-s3-policy" {
        "Effect": "Allow",
        "Resource": "arn:aws:s3:::${var.stack_s3_bucket}",
        "Condition": {
-      "StringLike": {
-          "s3:prefix": [
-         "data/${var.genomic-dataset-s3-object-key}/all*"
-          ]
-      }
+           "StringLike": {
+               "s3:prefix": [
+                   "data/${var.genomic-dataset-s3-object-key}/all*"
+               ]
+           }
        }
-   },
+    },
     {
       "Action": [
         "s3:GetObject"
@@ -353,8 +346,8 @@ resource "aws_iam_role_policy" "hpds-deployment-s3-policy" {
 EOF
 }
 
-resource "aws_iam_role" "hpds-deployment-s3-role" {
-  name               = "hpds-deployment-s3-role-${var.target-stack}-${var.stack_githash}"
+resource "aws_iam_role" "auth-hpds-deployment-s3-role" {
+  name               = "auth-hpds-deployment-s3-role-${var.target-stack}-${var.stack_githash}"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -372,11 +365,99 @@ resource "aws_iam_role" "hpds-deployment-s3-role" {
 EOF
 }
 
-resource "aws_iam_role_policy_attachment" "attach-cloudwatch-server-policy-to-hpds-role" {
-  role       = aws_iam_role.hpds-deployment-s3-role.name
+resource "aws_iam_role_policy_attachment" "attach-cloudwatch-server-policy-to-auth-hpds-role" {
+  role       = aws_iam_role.auth-hpds-deployment-s3-role.name
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
 }
-resource "aws_iam_role_policy_attachment" "attach-cloudwatch-ssm-policy-to-hpds-role" {
-  role       = aws_iam_role.hpds-deployment-s3-role.name
+resource "aws_iam_role_policy_attachment" "attach-cloudwatch-ssm-policy-to-auth-hpds-role" {
+  role       = aws_iam_role.auth-hpds-deployment-s3-role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+
+resource "aws_iam_instance_profile" "open-hpds-deployment-s3-profile" {
+  name = "open-hpds-deployment-s3-profile-${var.target-stack}-${var.stack_githash}"
+  role = aws_iam_role.open-hpds-deployment-s3-role.name
+}
+
+resource "aws_iam_role_policy" "open-hpds-deployment-s3-policy" {
+  name = "open-hpds-deployment-s3-policy-${var.target-stack}-${var.stack_githash}"
+  role = aws_iam_role.open-hpds-deployment-s3-role.id
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/releases/jenkins_pipeline_build_${var.stack_githash_long}/pic-sure-hpds.tar.gz"
+    },
+    {
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/data/${var.destigmatized-dataset-s3-object-key}/destigmatized_javabins_rekeyed.tar.gz"
+    },
+    {
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/jenkins_pipeline_build_${var.stack_githash_long}/hpds-log4j.properties"
+    },
+    {
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/domain-join.sh"
+    },
+    {
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/splunk_config/splunkforwarder-8.0.4-767223ac207f-Linux-x86_64.tar"
+    },
+    {
+      "Action": [
+        "ec2:CreateTags"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:ec2:*:*:instance/*"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role" "open-hpds-deployment-s3-role" {
+  name               = "open-hpds-deployment-s3-role-${var.target-stack}-${var.stack_githash}"
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "attach-cloudwatch-server-policy-to-open-hpds-role" {
+  role       = aws_iam_role.open-hpds-deployment-s3-role.name
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+}
+resource "aws_iam_role_policy_attachment" "attach-cloudwatch-ssm-policy-to-open-hpds-role" {
+  role       = aws_iam_role.open-hpds-deployment-s3-role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
