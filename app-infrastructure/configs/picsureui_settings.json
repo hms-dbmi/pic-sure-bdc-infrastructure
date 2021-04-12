@@ -9,12 +9,13 @@
   ],
   "queryExportType":"EXPORT_ASYNC",
   "picSureResourceId":"02e23f52-f354-4e8b-992c-d37c8b9ba140",
+  "openAccessResourceId":"70c837be-5ffc-11eb-ae93-0242ac130002",
   "applicationIdForBaseQuery":"8b5722c9-62fd-48d6-b0bf-4f67e53efb2b",
   "helpLink": "https://biodatacatalyst.nhlbi.nih.gov/contact\" target=\"_blank\"",
   "pdfLink": "https://tinyurl.com/PIC-SURE-User-Guide\" target=\"_blank\"",
   "advancedSearchLink": "/transmart/login/callback_processor",
   "logoPath":"/static/images/logo.png",
-   "harmonizedPath": "\\DCC Harmonized data set",
+  "harmonizedPath": "\\DCC Harmonized data set",
   "harmonizedConsentPath": "\\_harmonized_consent\\",
   "topmedConsentPath": "\\_topmed_consents\\",
   "categoryAliases": {
@@ -70,7 +71,7 @@
 		"Women_s_Health_Initiative_Clinical_Trial_and_Observational_Study_phs000200_" : "WHI",
 		"NHLBI_TOPMed_Women_s_Health_Initiative_WHI_phs001237_" : "WHI"
 	},
-  "categorySearchResultList" : [
+	"categorySearchResultList" : [
             "DCC_Harmonized_data_set",
             "Coronary_Artery_Risk_Development_in_Young_Adults_CARDIA",
             "Framingham_Cohort",
