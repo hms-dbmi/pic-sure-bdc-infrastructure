@@ -483,7 +483,6 @@
 		<simple name="java:global/fence_topmed_consent_group_concept_path" value="\_topmed_consents\" />
 		<simple name="java:global/fence_parent_consent_group_concept_path" value="\_consents\" />
 		<simple name="java:global/variantAnnotationColumns" value="Variant_consequence_calculated,Variant_class,Gene_with_variant,Variant_severity,Variant_frequency_in_gnomAD,Variant_frequency_as_text" />
-		<simple name="java:global/fence_no_access_role_name" value="FENCE_ROLE_NO_ACCESS" />
 
                 <simple name="java:global/defaultApplicationUUID" value="8b5722c9-62fd-48d6-b0bf-4f67e53efb2b" />
 
