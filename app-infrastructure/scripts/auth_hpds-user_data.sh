@@ -217,17 +217,15 @@ aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/Gene
 aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/Variant_class_infoStore.javabin /opt/local/hpds/all/
 aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/Variant_consequence_calculated_infoStore.javabin /opt/local/hpds/all/
 aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/Variant_frequency_as_text_infoStore.javabin /opt/local/hpds/all/
-aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/Variant_frequency_in_gnomAD_infoStore.javabin /opt/local/hpds/all/
 aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/Variant_severity_infoStore.javabin /opt/local/hpds/all/
 aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/BucketIndexBySampleStorage.javabin /opt/local/hpds/all/
 aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/Gene_with_variant_infoStoreStorage.javabin /opt/local/hpds/all/
 aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/Variant_class_infoStoreStorage.javabin /opt/local/hpds/all/
 aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/Variant_consequence_calculated_infoStoreStorage.javabin /opt/local/hpds/all/
 aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/Variant_frequency_as_text_infoStoreStorage.javabin /opt/local/hpds/all/
-aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/Variant_frequency_in_gnomAD_infoStoreStorage.javabin /opt/local/hpds/all/
 aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/Variant_severity_infoStoreStorage.javabin /opt/local/hpds/all/
-aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/variantIndex.javabin /opt/local/hpds/all/
-aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/variantIndex_decompressed.javabin /opt/local/hpds/all/
+aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/variantIndex_fbbis.javabin /opt/local/hpds/all/
+aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/variantIndex_fbbis_storage.javabin /opt/local/hpds/all/
 aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/variantStore.javabin /opt/local/hpds/all/
 
 cd /opt/local/hpds
