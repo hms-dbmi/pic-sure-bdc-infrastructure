@@ -524,7 +524,7 @@ SET @uuid_GATE_SEARCH = REPLACE(UUID(),'-','');
   INSERT INTO access_rule VALUES (
     unhex(@uuid_GATE_SEARCH),
     'GATE_SEARCH',
-    'reject queries for /search',
+    'Triggers on search requests',
     ' $.[\'Target Service\']',
     6,
     '/search',
@@ -542,18 +542,31 @@ INSERT INTO accessRule_gate (gate_id, accessRule_id)
 	);
 
 
+-- Add a rule and privilege to allow all queries for open hpds resource.  This must match the ID of the resource
+-- specified earlier in this file. (type 9 is ALL_EQUALS_IGNORE_CASE)
+--
 
---
--- Add fence NO ACCESS rule to allow log in so users can see data access dashboard
--- users cannot query or search
---
+SET @uuidAR_OPEN_QUERIES = REPLACE(UUID(),'-','');
+  INSERT INTO access_rule VALUES (
+    unhex(@uuidAR_OPEN_QUERIES),
+    'AR_ALLOW_OPEN_ACCESS',
+    'allow access to open hpds resource',
+    '$.query.resourceUUID',
+    9,
+    '70c837be-5ffc-11eb-ae93-0242ac130002',
+    0,
+    0,
+    NULL,
+    0,
+    0
+  );
 
 
 SET @uuidPriv = REPLACE(UUID(),'-','');
 INSERT INTO privilege (uuid, name, description, application_id, queryScope)
 	VALUES ( unhex(@uuidPriv),
-		'FENCE_PRIV_NO_ACCESS',
-		'Do not allow access to queries or searches',
+		'FENCE_PRIV_OPEN_ACCESS',
+		'Allow access to queries for OPEN PICSURE',
 		(SELECT uuid FROM application WHERE name = 'PICSURE'),
 		'[]'
 	);
@@ -561,21 +574,14 @@ INSERT INTO privilege (uuid, name, description, application_id, queryScope)
 INSERT INTO accessRule_privilege (privilege_id, accessRule_id)
 	VALUES (
 		unhex(@uuidPriv),
-		unhex(@uuidAR_NO_QUERY_ACCESS)
+		unhex(@uuidAR_OPEN_QUERIES)
 	);
-
-INSERT INTO accessRule_privilege (privilege_id, accessRule_id)
-	VALUES (
-		unhex(@uuidPriv),
-		unhex(@uuidAR_NO_SEARCH)
-	);
-	
 
  SET @uuidRole = REPLACE(UUID(),'-','');
   INSERT INTO role VALUES ( 
       unhex(@uuidRole), 
-     'FENCE_ROLE_NO_ACCESS', 
-     'deny all API access.  This role will allow users to log in far enough to see the data access dashboard' 
+     'FENCE_ROLE_OPEN_ACCESS', 
+     'This role will allow users to log in and query OPEN PICSURE' 
   );
 
 INSERT INTO role_privilege (role_id, privilege_id)
@@ -585,4 +591,21 @@ INSERT INTO role_privilege (role_id, privilege_id)
 	);
 
 
- 
+INSERT INTO access_rule VALUES (
+  unhex(REPLACE(UUID(),'-','')),
+  "AR_OPEN_ONLY_SEARCH", 
+  "Open PIC-SURE Search", 
+  "$.['Target Service']", 
+  6,
+  "/search/70c837be-5ffc-11eb-ae93-0242ac130002",
+  0,
+  0,
+  NULL,
+  0,
+  0
+);
+
+INSERT INTO accessRule_privilege VALUES (
+  (SELECT uuid FROM privilege WHERE name = 'FENCE_PRIV_OPEN_ACCESS'), 
+  (SELECT uuid FROM access_rule WHERE name = 'AR_OPEN_ONLY_SEARCH')
+);
