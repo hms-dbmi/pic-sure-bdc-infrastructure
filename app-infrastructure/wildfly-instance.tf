@@ -90,3 +90,16 @@ resource "local_file" "pic-sure-schema-sql-file" {
     filename = "pic-sure-schema.sql"
 }
 
+
+data "template_file" "aggregate-resource-properties" {
+  template = file("configs/aggregate-resource.properties")
+  vars = {
+    target-stack                      = var.target-stack
+  }
+}
+
+resource "local_file" "aggregate-resource-properties-file" {
+    content     = data.template_file.aggregate-resource-properties.rendered
+    filename = "aggregate-resource.properties"
+}
+
