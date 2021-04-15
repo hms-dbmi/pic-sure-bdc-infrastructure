@@ -202,8 +202,6 @@ echo "pulled fence mapping"
 for i in 1 2 3 4 5; do echo "trying to download driver from s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/aggregate-resource.properties" && sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/aggregate-resource.properties /home/centos/aggregate-resource.properties && break || sleep 45; done
 echo "pulled aggregate resource config"
 
-for i in 1 2 3 4 5; do echo "confirming hpds resolvable" && sudo curl --connect-timeout 1 $(grep hpds /home/centos/pic-sure-schema.sql | cut -d "'" -f2) || if [ $? = 6 ]; then (exit 1); fi && break || sleep 60; done
-
 for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/domain-join.sh /root/domain-join.sh && break || sleep 45; done
 sudo bash /root/domain-join.sh
 
