@@ -69,7 +69,8 @@
 		"NHLBI_TOPMed_The_Vanderbilt_Atrial_Fibrillation_Registry_VU_AF_phs001032_" : "VUAF",
 		"NHLBI_TOPMed_Novel_Risk_Factors_for_the_Development_of_Atrial_Fibrillation_in_Women_phs001040_" : "WGHS",
 		"Women_s_Health_Initiative_Clinical_Trial_and_Observational_Study_phs000200_" : "WHI",
-		"NHLBI_TOPMed_Women_s_Health_Initiative_WHI_phs001237_" : "WHI"
+		"NHLBI_TOPMed_Women_s_Health_Initiative_WHI_phs001237_" : "WHI",
+		"Hematopoietic_Cell_Transplant_for_Sickle_Cell_Disease_HCT_for_SCD_phs002385_": "HCT_for_SCD"
 	},
 	"categorySearchResultList" : [
             "DCC_Harmonized_data_set",
