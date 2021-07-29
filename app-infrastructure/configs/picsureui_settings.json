@@ -73,7 +73,8 @@
 		"Hematopoietic_Cell_Transplant_for_Sickle_Cell_Disease_HCT_for_SCD_phs002385_": "HCT_for_SCD",
 	  	"Hispanic_Community_Health_Study_Study_of_Latinos_HCHS_SOL_phs000810_": "HCHS_SOL",
 	  	"Evaluation_of_COPD_Longitudinally_to_Identify_Predictive_Surrogate_Endpoints_ECLIPSE_phs001252_": "ECLIPSE",
-	  	"The_Pediatric_Cardiac_Genetics_Consortium_PCGC_Study_phs001194_": "PCGC"
+	  	"The_Pediatric_Cardiac_Genetics_Consortium_PCGC_Study_phs001194_": "PCGC",
+	  	"catheterization_genetics_cathgen_phs000703_": "CATHGEN"
 	},
         "categorySearchResultList" : [
             "DCC_Harmonized_data_set",
