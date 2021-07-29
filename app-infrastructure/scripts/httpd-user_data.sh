@@ -10,7 +10,7 @@ echo "
 
 {
 	\"metrics\": {
-		
+
 		\"metrics_collected\": {
 			\"cpu\": {
 				\"measurement\": [
@@ -37,7 +37,7 @@ echo "
                                         \"mem_available_percent\",
                                        \"mem_total\",
                                         \"mem_used\"
-                                        
+
 				],
 				\"metrics_collection_interval\": 600
 			}
@@ -213,5 +213,6 @@ sudo docker run --restart unless-stopped --name=httpd -v /var/log/httpd-docker-l
 sudo docker logs -f httpd > /var/log/httpd-docker-logs/httpd.log &
 
 INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)
+sudo hostnamectl set-hostname ${INSTANCE_ID}
 sudo /usr/local/bin/aws --region=us-east-1 ec2 create-tags --resources $${INSTANCE_ID} --tags Key=InitComplete,Value=true
 

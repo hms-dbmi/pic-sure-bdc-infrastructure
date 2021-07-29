@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 echo "user-data progress starting update"
-sudo yum -y update 
+sudo yum -y update
 echo "user-data progress finished update installing epel-release"
 sudo yum-config-manager  --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 echo "user-data progress added docker-ce repo starting docker install"
@@ -18,4 +18,5 @@ sudo pip3 install --no-input awscli --upgrade
 sudo chmod +x /usr/local/bin/aws
 
 INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)
+sudo hostnamectl set-hostname ${INSTANCE_ID}
 sudo /usr/local/bin/aws --region=us-east-1 ec2 create-tags --resources ${INSTANCE_ID} --tags Key=InitComplete,Value=true
