@@ -70,7 +70,12 @@
 		"NHLBI_TOPMed_Novel_Risk_Factors_for_the_Development_of_Atrial_Fibrillation_in_Women_phs001040_" : "WGHS",
 		"Women_s_Health_Initiative_Clinical_Trial_and_Observational_Study_phs000200_" : "WHI",
 		"NHLBI_TOPMed_Women_s_Health_Initiative_WHI_phs001237_" : "WHI",
-		"Hematopoietic_Cell_Transplant_for_Sickle_Cell_Disease_HCT_for_SCD_phs002385_": "HCT_for_SCD"
+		"Hematopoietic_Cell_Transplant_for_Sickle_Cell_Disease_HCT_for_SCD_phs002385_": "HCT_for_SCD",
+	  	"Hispanic_Community_Health_Study_Study_of_Latinos_HCHS_SOL_phs000810_": "HCHS_SOL",
+	  	"Evaluation_of_COPD_Longitudinally_to_Identify_Predictive_Surrogate_Endpoints_ECLIPSE_phs001252_": "ECLIPSE",
+	  	"The_Pediatric_Cardiac_Genetics_Consortium_PCGC_Study_phs001194_": "PCGC",
+	  	"catheterization_genetics_cathgen_phs000703_": "CATHGEN",
+	        "Coronary_Artery_Risk_Development_in_Young_Adults_CARDIA_phs000285_": "CARDIA"
 	},
 	"categorySearchResultList" : [
             "DCC_Harmonized_data_set",
