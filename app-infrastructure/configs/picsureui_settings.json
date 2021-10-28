@@ -11,8 +11,10 @@
   "picSureResourceId":"02e23f52-f354-4e8b-992c-d37c8b9ba140",
   "openAccessResourceId":"70c837be-5ffc-11eb-ae93-0242ac130002",
   "applicationIdForBaseQuery":"8b5722c9-62fd-48d6-b0bf-4f67e53efb2b",
-  "helpLink": "https://biodatacatalyst.nhlbi.nih.gov/contact\" target=\"_blank\"",
-  "pdfLink": "https://tinyurl.com/PIC-SURE-User-Guide\" target=\"_blank\"",
+  "helpLink": "https://biodatacatalyst.nhlbi.nih.gov/contact\" aria-label='Contact Us, this link will open a new browser tab' target='_blank'",
+  "pdfLink": "https://tinyurl.com/PIC-SURE-User-Guide\" aria-label='User Guide, this link will open a new browser tab' target='_blank'",
+  "videoLink": "https://www.youtube.com/playlist?list=PLJ6YccH8TEufZ5L-ctxzFF7vuZRLVacKw\" aria-label='Video Demonstration, this link will open a new browser tab' target='_blank'",
+  "jupyterExampleLink": "https://github.com/hms-dbmi/Access-to-Data-using-PIC-SURE-API/tree/master/NHLBI_BioData_Catalyst\" aria-label='Jupyter Example Notebooks, this link will open a new browser tab' target='_blank'",
   "advancedSearchLink": "/transmart/login/callback_processor",
   "logoPath":"/static/images/logo.png",
   "harmonizedPath": "\\DCC Harmonized data set",
@@ -74,7 +76,7 @@
 	  	"Hispanic_Community_Health_Study_Study_of_Latinos_HCHS_SOL_phs000810_": "HCHS_SOL",
 	  	"Evaluation_of_COPD_Longitudinally_to_Identify_Predictive_Surrogate_Endpoints_ECLIPSE_phs001252_": "ECLIPSE",
 	  	"The_Pediatric_Cardiac_Genetics_Consortium_PCGC_Study_phs001194_": "PCGC",
-	  	"catheterization_genetics_cathgen_phs000703_": "CATHGEN",
+	  	"CATHeterization_GENetics_CATHGEN_phs000703_": "CATHGEN",
 	        "Coronary_Artery_Risk_Development_in_Young_Adults_CARDIA_phs000285_": "CARDIA"
 	},
 	"categorySearchResultList" : [
