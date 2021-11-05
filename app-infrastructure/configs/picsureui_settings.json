@@ -77,7 +77,8 @@
 	  	"Evaluation_of_COPD_Longitudinally_to_Identify_Predictive_Surrogate_Endpoints_ECLIPSE_phs001252_": "ECLIPSE",
 	  	"The_Pediatric_Cardiac_Genetics_Consortium_PCGC_Study_phs001194_": "PCGC",
 	  	"CATHeterization_GENetics_CATHGEN_phs000703_": "CATHGEN",
-	        "Coronary_Artery_Risk_Development_in_Young_Adults_CARDIA_phs000285_": "CARDIA"
+	        "Coronary_Artery_Risk_Development_in_Young_Adults_CARDIA_phs000285_": "CARDIA",
+	        "PETAL_Repository_of_Electronic_Data_COVID-19_Observational_Study_RED CORAL_phs002363_": "RED_CORAL"
 	},
         "categorySearchResultList" : [
             "DCC_Harmonized_data_set",
