@@ -23,7 +23,7 @@
   "categoryAliases": {
 		"DCC_Harmonized_data_set" : "HarmonizedVariables",
 		"NHLBI_TOPMed_Genetics_of_Cardiometabolic_Health_in_the_Amish_phs000956_" : "AMISH",
-		"NHLBI_Atherosclerosis_Risk_in_Communities_ARIC_Candidate_Gene_Association_Resource_CARe_phs000280_" : "ARIC",
+		"Atherosclerosis_Risk_in_Communities_ARIC_Cohort_phs000280_" : "ARIC",
 		"NHLBI_TOPMed_NHGRI_CCDG_Atherosclerosis_Risk_in_Communities_ARIC_phs001211_" : "ARIC",
 		"NHLBI_TOPMed_The_Genetics_and_Epidemiology_of_Asthma_in_Barbados_phs001143_" : "BAGS",
 		"The_Cleveland_Clinic_Foundation_s_Lone_Atrial_Fibrillation_GWAS_Study_phs000820_" : "CCAF",
