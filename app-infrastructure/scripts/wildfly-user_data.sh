@@ -10,7 +10,7 @@ echo "
 
 {
 	\"metrics\": {
-		
+
 		\"metrics_collected\": {
 			\"cpu\": {
 				\"measurement\": [
@@ -175,7 +175,7 @@ host = $(curl http://169.254.169.254/latest/meta-data/instance-id)
 [monitor:///var/log/wildfly-docker-logs]
 sourcetype = hms_app_logs
 source = wildfly_logs
-index=aws_main_prod
+index=hms_aws_bdcprod
 " > /opt/splunkforwarder/etc/system/local/inputs.conf
 
 echo "updating permissions for app logs using ACL"
@@ -205,7 +205,7 @@ echo "pulled aggregate resource config"
 for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/domain-join.sh /root/domain-join.sh && break || sleep 45; done
 sudo bash /root/domain-join.sh
 
-sudo docker run  -d --name schema-init -e "MYSQL_RANDOM_ROOT_PASSWORD=yes" --rm mysql 
+sudo docker run  -d --name schema-init -e "MYSQL_RANDOM_ROOT_PASSWORD=yes" --rm mysql
 sudo docker exec -i schema-init mysql -hpicsure-db.${target-stack}.datastage.hms.harvard.edu -uroot -p${mysql-instance-password} < /home/centos/pic-sure-schema.sql
 sudo docker stop schema-init
 echo "init'd mysql schemas"
