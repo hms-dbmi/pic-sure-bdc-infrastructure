@@ -78,7 +78,11 @@
 	  	"The_Pediatric_Cardiac_Genetics_Consortium_PCGC_Study_phs001194_": "PCGC",
 	  	"CATHeterization_GENetics_CATHGEN_phs000703_": "CATHGEN",
 	        "Coronary_Artery_Risk_Development_in_Young_Adults_CARDIA_phs000285_": "CARDIA",
-	        "PETAL_Repository_of_Electronic_Data_COVID_19_Observational_Study_RED_CORAL_phs002363_": "RED_CORAL"
+                "PETAL_Repository_of_Electronic_Data_COVID_19_Observational_Study_RED_CORAL_phs002363_": "RED_CORAL",
+                "Cooperative_Study_of_Sickle_Cell_Disease_CSSCD_phs002362_": "CSSCD",
+                "Optimizing_Primary_Stroke_Prevention_in_Children_with_Sickle_Cell_Anemia_STOP_II_phs002386_": "STOP-II",
+                "Treatment_of_Pulmonary_Hypertension_and_Sickle_Cell_Disease_with_Sildenafil_Therapy_Walk_PHaSST_phs002383_": "Walk-PHaSST",
+                "Multicenter_Study_of_Hydroxyurea_MSH_phs002348_": "MSH"
 	},
         "categorySearchResultList" : [
             "DCC_Harmonized_data_set",
