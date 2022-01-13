@@ -10,7 +10,7 @@ echo "
 
 {
 	\"metrics\": {
-		
+
 		\"metrics_collected\": {
 			\"cpu\": {
 				\"measurement\": [
@@ -37,7 +37,7 @@ echo "
                                         \"mem_available_percent\",
                                        \"mem_total\",
                                         \"mem_used\"
-                                        
+
 				],
 				\"metrics_collection_interval\": 600
 			}
@@ -174,7 +174,7 @@ host = $(curl http://169.254.169.254/latest/meta-data/instance-id)
 [monitor:///var/log/hpds-docker-logs]
 sourcetype = hms_app_logs
 source = hpds_logs
-index=aws_main_prod
+index=hms_aws_bdcprod
 " > /opt/splunkforwarder/etc/system/local/inputs.conf
 
 echo "updating permissions for app logs using ACL"
