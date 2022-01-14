@@ -72,6 +72,8 @@ CREATE TABLE `resource` (
   `description` varchar(8192) COLLATE utf8_bin DEFAULT NULL,
   `name` varchar(255) COLLATE utf8_bin DEFAULT NULL,
   `token` varchar(8192) COLLATE utf8_bin DEFAULT NULL,
+  `hidden` BOOL default NULL,
+  `metadata` TEXT default NULL,
   PRIMARY KEY (`uuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
