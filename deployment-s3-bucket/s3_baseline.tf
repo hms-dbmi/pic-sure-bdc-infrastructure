@@ -54,7 +54,6 @@ data "template_file" "stack_variables_template" {
   }
 }
 
-
 resource "aws_s3_bucket_object" "stack-variables-baseline-a" {
   bucket  = var.stack_s3_bucket
   key     = "/deployment_state_metadata/a/stack_variables.tf"
