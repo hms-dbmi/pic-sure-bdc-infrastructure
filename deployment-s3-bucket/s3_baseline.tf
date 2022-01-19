@@ -54,6 +54,7 @@ data "template_file" "stack_variables_template" {
   }
 }
 
+
 resource "aws_s3_bucket_object" "stack-variables-baseline-a" {
   bucket  = var.stack_s3_bucket
   key     = "/deployment_state_metadata/a/stack_variables.tf"
@@ -64,6 +65,18 @@ resource "aws_s3_bucket_object" "stack-variables-baseline-b" {
   bucket  = var.stack_s3_bucket
   key     = "/deployment_state_metadata/b/stack_variables.tf"
   content = data.template_file.stack_variables_template.rendered
+}
+
+resource "aws_s3_bucket_object" "subnet-variables-baseline-a" {
+  bucket  = var.stack_s3_bucket
+  key     = "/deployment_state_metadata/a/subnet_variables.tf"
+  content = file("subnet_variables_a.tf_template")
+}
+
+resource "aws_s3_bucket_object" "subnet-variables-baseline-b" {
+  bucket  = var.stack_s3_bucket
+  key     = "/deployment_state_metadata/b/subnet_variables.tf"
+  content = file("subnet_variables_b.tf_template")
 }
 
 resource "aws_s3_bucket_object" "stacks-json" {
