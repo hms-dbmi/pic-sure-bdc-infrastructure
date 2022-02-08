@@ -52,6 +52,7 @@ resource "aws_instance" "wildfly-ec2" {
     Owner       = "Avillach_Lab"
     Environment = "development"
     Name        = "FISMA Terraform Playground - ${var.stack_githash} - Wildfly - ${var.target-stack}"
+    automaticPatches = "1"
   }
 
 }

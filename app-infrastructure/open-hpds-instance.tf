@@ -49,6 +49,7 @@ resource "aws_instance" "open-hpds-ec2" {
     Owner       = "Avillach_Lab"
     Environment = "development"
     Name        = "FISMA Terraform Playground - ${var.stack_githash} - Open HPDS - ${var.target-stack}"
+    automaticPatches = "1"
   }
 
 }

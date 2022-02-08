@@ -49,6 +49,7 @@ resource "aws_instance" "httpd-ec2" {
     Owner       = "Avillach_Lab"
     Environment = "development"
     Name        = "FISMA Terraform Playground - ${var.stack_githash} - Apache HTTPD - ${var.target-stack}"
+    automaticPatches = "1"
   }
 
 }
