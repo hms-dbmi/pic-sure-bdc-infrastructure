@@ -209,7 +209,7 @@ resource "aws_iam_role_policy" "httpd-deployment-s3-policy" {
 }
 EOF
 }
-
+//TODO check if assumerole actually necessary
 resource "aws_iam_role" "httpd-deployment-s3-role" {
   name               = "httpd-deployment-s3-role-${var.target-stack}-${var.stack_githash}"
   assume_role_policy = <<EOF
@@ -227,6 +227,8 @@ resource "aws_iam_role" "httpd-deployment-s3-role" {
   ]
 }
 EOF
+
+
 }
 
 resource "aws_iam_role_policy_attachment" "attach-cloudwatch-server-policy-to-httpd-role" {
@@ -411,5 +413,67 @@ resource "aws_iam_role_policy_attachment" "attach-cloudwatch-server-policy-to-op
 }
 resource "aws_iam_role_policy_attachment" "attach-cloudwatch-ssm-policy-to-open-hpds-role" {
   role       = aws_iam_role.open-hpds-deployment-s3-role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+
+//Start of new role
+resource "aws_iam_instance_profile" "dictionary-deployment-s3-profile" {
+  name = "dictionary-deployment-s3-profile-${var.target-stack}-${var.stack_githash}"
+  role = aws_iam_role.dictionary-deployment-s3-role.name
+}
+
+resource "aws_iam_role_policy" "dictionary-deployment-s3-policy" {
+  name = "dictionary-deployment-s3-policy-${var.target-stack}-${var.stack_githash}"
+  role = aws_iam_role.dictionary-deployment-s3-role.id
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+  //TODO update with actual necessary resources
+    {
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/releases/jenkins_pipeline_build_${var.stack_githash_long}/pic-sure-hpds.tar.gz"
+    },
+    {
+      "Action": [
+        "ec2:CreateTags"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:ec2:*:*:instance/*"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role" "dictionary-deployment-s3-role" {
+  name               = "dictionary-deployment-s3-role-${var.target-stack}-${var.stack_githash}"
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "attach-cloudwatch-server-policy-to-dictionary-role" {
+  role       = aws_iam_role.dictionary-deployment-s3-role.name
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+}
+resource "aws_iam_role_policy_attachment" "attach-cloudwatch-ssm-policy-to-dictionary-role" {
+  role       = aws_iam_role.dictionary-deployment-s3-role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
