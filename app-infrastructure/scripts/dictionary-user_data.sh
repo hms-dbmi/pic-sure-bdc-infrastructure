@@ -86,32 +86,19 @@ echo "
 }
 
 " > /opt/aws/amazon-cloudwatch-agent/etc/custom_config.json
-#TODO determine if this needs to change for log stream name etc, get from third party
 sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/etc/custom_config.json  -s
-#TODO if allowed, mount this log file to splunk instead of cloudwatch
+
 
 sudo mkdir -p /var/log/dictionary-docker-logs
-mkdir -p /usr/local/docker-config/cert
-mkdir -p /var/log/dictionary-docker-logs/ssl_mutex
-for i in 1 2 3 4 5 6 7 8 9; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-ui.tar.gz . && break || sleep 45; done
-for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/dictionary-vhosts.conf /usr/local/docker-config/dictionary-vhosts.conf && break || sleep 15; done
-for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/certs/dictionary/server.chain /usr/local/docker-config/cert/server.chain && break || sleep 15; done
-for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/certs/dictionary/server.crt /usr/local/docker-config/cert/server.crt && break || sleep 15; done
-for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/certs/dictionary/server.key /usr/local/docker-config/cert/server.key && break || sleep 15; done
-for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/certs/dictionary/preprod_server.chain /usr/local/docker-config/cert/preprod_server.chain && break || sleep 15; done
-for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/certs/dictionary/preprod_server.crt /usr/local/docker-config/cert/preprod_server.crt && break || sleep 15; done
-for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/certs/dictionary/preprod_server.key /usr/local/docker-config/cert/preprod_server.key && break || sleep 15; done
-for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/psamaui_settings.json /usr/local/docker-config/psamaui_settings.json && break || sleep 15; done
-for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/picsureui_settings.json /usr/local/docker-config/picsureui_settings.json && break || sleep 15; done
-for i in 1 2 3 4 5; do echo "trying to download fence mapping from s3://${stack_s3_bucket}/data/${dataset_s3_object_key}/fence_mapping.json" && sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/data/${dataset_s3_object_key}/fence_mapping.json /home/centos/fence_mapping.json && break || sleep 45; done
-echo "pulled fence mapping"
+for i in 1 2 3 4 5 6 7 8 9; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-hpds-dictionary-resource.tar.gz . && break || sleep 45; done
+for i in 1 2 3 4 5 6 7 8 9; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/data/${stack_githash}/dictionary.javabin.tar.gz . && break || sleep 45; done
 
-for i in 1 2 3 4 5; do echo "confirming wildfly resolvable" && sudo curl --connect-timeout 1 $(grep -A30 preprod /usr/local/docker-config/dictionary-vhosts.conf | grep wildfly | grep api | cut -d "\"" -f 2 | sed 's/pic-sure-api-2.*//') || if [ $? = 6 ]; then (exit 1); fi && break || sleep 60; done
 
-#TODO replace the tar.gz here
-DICTIONARY_IMAGE=`sudo docker load < pic-sure-ui.tar.gz | cut -d ' ' -f 3`
-sudo docker run --name=dictionary -v /var/log/dictionary-docker-logs/:/usr/local/apache2/logs/ -v /usr/local/docker-config/picsureui_settings.json:/usr/local/apache2/htdocs/picsureui/settings/settings.json -v /usr/local/docker-config/psamaui_settings.json:/usr/local/apache2/htdocs/picsureui/psamaui/settings/settings.json -v /home/centos/fence_mapping.json:/usr/local/apache2/htdocs/picsureui/studyAccess/studies-data.json -v /usr/local/docker-config/cert:/usr/local/apache2/cert/ -v /usr/local/docker-config/dictionary-vhosts.conf:/usr/local/apache2/conf/extra/dictionary-vhosts.conf -p 80:80 -p 443:443 -d $DICTIONARY_IMAGE
-sudo docker logs -f dictionary > /var/log/dictionary-docker-logs/dictionary.log &
+
+DICTIONARY_IMAGE=`sudo docker load < pic-sure-hpds-dictionary-resource.tar.gz | cut -d ' ' -f 3`
+sudo docker run --name=dictionary -v /var/log/dictionary-docker-logs/:/usr/local/tomcat/logs/ -p 8080:8080 -d $DICTIONARY_IMAGE
+#TODO No logs specific to dictionary found - closest docker log is catalina.2022-02-17.log and that seems to be dynamic
+#sudo docker logs -f dictionary > /var/log/dictionary-docker-logs/.log &
 
 INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)
 sudo /usr/local/bin/aws --region=us-east-1 ec2 create-tags --resources $${INSTANCE_ID} --tags Key=InitComplete,Value=true

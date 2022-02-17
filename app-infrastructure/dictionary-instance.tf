@@ -3,8 +3,6 @@ data "template_file" "dictionary-user_data" {
   template = file("scripts/dictionary-user_data.sh")
   vars = {
     stack_githash = var.stack_githash_long
-    //TODO object key likely to change - may be multiple
-    destigmatized_dataset_s3_object_key = var.destigmatized-dataset-s3-object-key
     stack_s3_bucket = var.stack_s3_bucket
   }
 }
