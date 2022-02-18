@@ -417,7 +417,6 @@ resource "aws_iam_role_policy_attachment" "attach-cloudwatch-ssm-policy-to-open-
 }
 
 
-//Start of new role
 resource "aws_iam_instance_profile" "dictionary-deployment-s3-profile" {
   name = "dictionary-deployment-s3-profile-${var.target-stack}-${var.stack_githash}"
   role = aws_iam_role.dictionary-deployment-s3-role.name

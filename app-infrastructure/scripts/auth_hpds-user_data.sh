@@ -10,7 +10,7 @@ echo "
 
 {
 	\"metrics\": {
-
+		
 		\"metrics_collected\": {
 			\"cpu\": {
 				\"measurement\": [
@@ -37,7 +37,7 @@ echo "
                                         \"mem_available_percent\",
                                        \"mem_total\",
                                         \"mem_used\"
-
+                                        
 				],
 				\"metrics_collection_interval\": 600
 			}
@@ -134,6 +134,7 @@ aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/vari
 for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/data/${dataset_s3_object_key}/javabins_rekeyed.tar.gz /opt/local/hpds/javabins_rekeyed.tar.gz  && break || sleep 45; done
 cd /opt/local/hpds/
 tar zxvf javabins_rekeyed.tar.gz
+
 cd ~
 
 sudo mkdir -p /var/log/hpds-docker-logs
@@ -145,3 +146,4 @@ sudo docker logs -f hpds > /var/log/hpds-docker-logs/hpds.log &
 
 INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)
 sudo /usr/local/bin/aws --region=us-east-1 ec2 create-tags --resources $${INSTANCE_ID} --tags Key=InitComplete,Value=true
+
