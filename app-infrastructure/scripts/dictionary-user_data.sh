@@ -97,8 +97,6 @@ for i in 1 2 3 4 5 6 7 8 9; do sudo /usr/local/bin/aws --region us-east-1 s3 cp 
 
 DICTIONARY_IMAGE=`sudo docker load < pic-sure-hpds-dictionary-resource.tar.gz | cut -d ' ' -f 3`
 sudo docker run --name=dictionary -v /var/log/dictionary-docker-logs/:/usr/local/tomcat/logs/ -p 8080:8080 -d $DICTIONARY_IMAGE
-#TODO No logs specific to dictionary found - closest docker log is catalina.2022-02-17.log and that seems to be dynamic
-#sudo docker logs -f dictionary > /var/log/dictionary-docker-logs/.log &
 
 INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)
 sudo /usr/local/bin/aws --region=us-east-1 ec2 create-tags --resources $${INSTANCE_ID} --tags Key=InitComplete,Value=true
