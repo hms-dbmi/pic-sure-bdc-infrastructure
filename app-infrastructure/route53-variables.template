@@ -2,4 +2,5 @@ auth-hpds-ec2-private_ip=${auth-hpds-ec2-private_ip}
 open-hpds-ec2-private_ip=${open-hpds-ec2-private_ip}
 httpd-ec2-private_ip=${httpd-ec2-private_ip}
 wildfly-ec2-private_ip=${wildfly-ec2-private_ip}
+dictionary-ec2-private_ip=${dictionary-ec2-private_ip}
 pic-sure-mysql-address=${pic-sure-mysql-address}

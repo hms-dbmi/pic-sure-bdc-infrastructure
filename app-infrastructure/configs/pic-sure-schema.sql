@@ -86,6 +86,7 @@ LOCK TABLES `resource` WRITE;
 /*!40000 ALTER TABLE `resource` DISABLE KEYS */;
 INSERT INTO `resource` VALUES (0x02E23F52F3544E8B992CD37C8B9BA140,NULL,'http://auth-hpds.${target-stack}.datastage.hms.harvard.edu:8080/PIC-SURE/','Authorized Access HPDS resource','auth-hpds',NULL, NULL, NULL);
 INSERT INTO `resource` VALUES (0x70c837be5ffc11ebae930242ac130002,NULL,'http://localhost:8080/pic-sure-aggregate-resource/pic-sure/aggregate-data-sharing','Open Access (aggregate) resource','open-hpds',NULL, NULL, NULL);
+INSERT INTO `resource` VALUES (0x85443db9961d4b7e85b12a7cae764644,NULL,'http://dictionary.${target-stack}.datastage.hms.harvard.edu:8080/dictionary/pic-sure','Dictionary','dictionary',NULL, NULL, NULL);
 /*!40000 ALTER TABLE `resource` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -407,7 +408,7 @@ CREATE TABLE `user_role` (
 -- rules that can be referenced as 'fence_standard_access_rules' in the wildfly config
 --
 
-  
+
   SET @uuidAR_INFO_COLUMN_LISTING_ALLOWED = REPLACE(UUID(),'-','');
   INSERT INTO access_rule VALUES (
     unhex(@uuidAR_INFO_COLUMN_LISTING_ALLOWED),
@@ -580,10 +581,10 @@ INSERT INTO accessRule_privilege (privilege_id, accessRule_id)
 	);
 
  SET @uuidRole = REPLACE(UUID(),'-','');
-  INSERT INTO role VALUES ( 
-      unhex(@uuidRole), 
-     'FENCE_ROLE_OPEN_ACCESS', 
-     'This role will allow users to log in and query OPEN PICSURE' 
+  INSERT INTO role VALUES (
+      unhex(@uuidRole),
+     'FENCE_ROLE_OPEN_ACCESS',
+     'This role will allow users to log in and query OPEN PICSURE'
   );
 
 INSERT INTO role_privilege (role_id, privilege_id)
@@ -595,9 +596,9 @@ INSERT INTO role_privilege (role_id, privilege_id)
 
 INSERT INTO access_rule VALUES (
   unhex(REPLACE(UUID(),'-','')),
-  "AR_OPEN_ONLY_SEARCH", 
-  "Open PIC-SURE Search", 
-  "$.['Target Service']", 
+  "AR_OPEN_ONLY_SEARCH",
+  "Open PIC-SURE Search",
+  "$.['Target Service']",
   6,
   "/search/70c837be-5ffc-11eb-ae93-0242ac130002",
   0,
@@ -608,6 +609,6 @@ INSERT INTO access_rule VALUES (
 );
 
 INSERT INTO accessRule_privilege VALUES (
-  (SELECT uuid FROM privilege WHERE name = 'FENCE_PRIV_OPEN_ACCESS'), 
+  (SELECT uuid FROM privilege WHERE name = 'FENCE_PRIV_OPEN_ACCESS'),
   (SELECT uuid FROM access_rule WHERE name = 'AR_OPEN_ONLY_SEARCH')
 );
