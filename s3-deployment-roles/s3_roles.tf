@@ -429,14 +429,7 @@ resource "aws_iam_role_policy" "dictionary-deployment-s3-policy" {
 {
   "Version": "2012-10-17",
   "Statement": [
-    
-    {
-      "Action": [
-        "s3:GetObject"
-      ],
-      "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/data/${var.stack_githash_long}/dictionary.javabin.tar.gz"
-    },
+
     {
       "Action": [
         "s3:GetObject"
