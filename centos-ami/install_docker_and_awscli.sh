@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# cloud-init user script to run always
+sudo sed -i 's/ - scripts-user/ - \[scripts-user, always\]/g' /etc/cloud/cloud.cfg
+
 echo "user-data progress starting update"
 sudo yum -y update 
 echo "user-data progress finished update installing epel-release"
