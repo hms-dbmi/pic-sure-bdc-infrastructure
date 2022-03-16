@@ -612,3 +612,23 @@ INSERT INTO accessRule_privilege VALUES (
   (SELECT uuid FROM privilege WHERE name = 'FENCE_PRIV_OPEN_ACCESS'),
   (SELECT uuid FROM access_rule WHERE name = 'AR_OPEN_ONLY_SEARCH')
 );
+
+
+--
+-- Add a rule and privilege to allow any and all requests to the dictionary resource.  
+--
+
+INSERT INTO access_rule VALUES (uuid(),'AR_ALLOW_DICTIONARY_ACCESS','allow access to dictionary resource','$.query.resourceUUID',9,'36363664-6231-6134-2d38-6538652d3131',0, 0, NULL,0,0);
+
+INSERT INTO privilege (uuid, name, description, application_id, queryScope) VALUES ( uuid(), 'FENCE_PRIV_DICTIONARY', 'Allow access to queries for OPEN PICSURE', (SELECT uuid FROM application WHERE name = 'PICSURE'), '[]' );
+
+INSERT INTO accessRule_privilege (privilege_id, accessRule_id) VALUES ((select uuid from privilege where name='FENCE_PRIV_DICTIONARY'), (select uuid from access_rule where name='AR_ALLOW_DICTIONARY_ACCESS'));
+
+INSERT INTO role_privilege (role_id, privilege_id) VALUES ( (select uuid from role where name='FENCE_ROLE_OPEN_ACCESS'), (select uuid from privilege where name='FENCE_PRIV_DICTIONARY'));
+
+INSERT INTO access_rule VALUES (  unhex(REPLACE(UUID(),'-','')), "AR_DICTIONARY_ONLY_SEARCH",  "Dictionary Search",  "$.['Target Service']",  6, "/search/36363664-6231-6134-2d38-6538652d3131", 0,  0,  NULL,  0, 0 );
+
+INSERT INTO accessRule_privilege VALUES (
+  (SELECT uuid FROM privilege WHERE name = 'FENCE_PRIV_DICTIONARY'), 
+  (SELECT uuid FROM access_rule WHERE name = 'AR_DICTIONARY_ONLY_SEARCH')
+);
