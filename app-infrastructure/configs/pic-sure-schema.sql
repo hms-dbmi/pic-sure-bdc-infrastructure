@@ -620,7 +620,7 @@ INSERT INTO accessRule_privilege VALUES (
 
 INSERT INTO access_rule VALUES (uuid(),'AR_ALLOW_DICTIONARY_ACCESS','allow access to dictionary resource','$.query.resourceUUID',9,'36363664-6231-6134-2d38-6538652d3131',0, 0, NULL,0,0);
 
-INSERT INTO privilege (uuid, name, description, application_id, queryScope) VALUES ( uuid(), 'FENCE_PRIV_DICTIONARY', 'Allow access to queries for OPEN PICSURE', (SELECT uuid FROM application WHERE name = 'PICSURE'), '[]' );
+INSERT INTO privilege (uuid, name, description, application_id, queryScope) VALUES ( uuid(), 'FENCE_PRIV_DICTIONARY', 'Allow access to queries for Dictionary Resource', (SELECT uuid FROM application WHERE name = 'PICSURE'), '[]' );
 
 INSERT INTO accessRule_privilege (privilege_id, accessRule_id) VALUES ((select uuid from privilege where name='FENCE_PRIV_DICTIONARY'), (select uuid from access_rule where name='AR_ALLOW_DICTIONARY_ACCESS'));
 
