@@ -230,14 +230,14 @@ resource "aws_iam_role_policy" "httpd-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/splunk_config/nessus_config/setup.sh"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/nessus_config/setup.sh"
     },
     {
       "Action": [
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/splunk_config/nessus_config/NessusAgent-10.1.2-es7.x86_64.rpm"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/nessus_config/NessusAgent-10.1.2-es7.x86_64.rpm"
     },
     {
       "Action": [
