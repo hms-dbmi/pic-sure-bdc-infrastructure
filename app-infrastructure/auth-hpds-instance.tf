@@ -6,6 +6,7 @@ data "template_file" "auth_hpds-user_data" {
     dataset_s3_object_key = var.dataset-s3-object-key
     genomic_dataset_s3_object_key = var.genomic-dataset-s3-object-key
     stack_s3_bucket = var.stack_s3_bucket
+    target-stack    = var.target-stack
   }
 }
 
