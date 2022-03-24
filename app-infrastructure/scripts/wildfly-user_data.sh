@@ -187,6 +187,10 @@ sudo systemctl start SplunkForwarder
 
 echo "completed Splunk configuration"
 
+## Download and Install Nessus
+for i in {1..5}; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/nessus_config/setup.sh /opt/nessus_setup.sh && break || sleep 45; done 
+sh /opt/nessus_setup.sh "${stack_s3_bucket}" "${target_stack^}"
+
 for i in 1 2 3 4 5; do echo "trying to download docker image from s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-wildfly.tar.gz" && sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-wildfly.tar.gz /home/centos/pic-sure-wildfly.tar.gz && break || sleep 60; done
 echo "pulled wildfly docker image"
 for i in 1 2 3 4 5; do echo "trying to download standalone.xml from s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/standalone.xml" && sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/standalone.xml /home/centos/standalone.xml && break || sleep 60; done
