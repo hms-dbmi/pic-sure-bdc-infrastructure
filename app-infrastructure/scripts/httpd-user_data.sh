@@ -190,6 +190,10 @@ sudo systemctl start SplunkForwarder
 
 echo "completed Splunk configuration"
 
+## Download and Install Nessus
+for i in {1..5}; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/nessus_config/setup.sh /opt/nessus_setup.sh && break || sleep 45; done 
+sh /opt/nessus_setup.sh "${stack_s3_bucket}" "${target_stack^}"
+
 for i in 1 2 3 4 5 6 7 8 9; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-ui.tar.gz /home/centos/pic-sure-ui.tar.gz && break || sleep 45; done
 for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/httpd-vhosts.conf /usr/local/docker-config/httpd-vhosts.conf && break || sleep 15; done
 for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/certs/httpd/server.chain /usr/local/docker-config/cert/server.chain && break || sleep 15; done
