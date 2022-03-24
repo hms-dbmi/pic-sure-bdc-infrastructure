@@ -94,6 +94,20 @@ resource "aws_iam_role_policy" "wildfly-deployment-s3-policy" {
     },
     {
       "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/nessus_config/setup.sh"
+    },
+    {
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/nessus_config/NessusAgent-10.1.2-es7.x86_64.rpm"
+    },
+    {
+      "Action": [
         "ec2:CreateTags"
       ],
       "Effect": "Allow",
@@ -350,6 +364,20 @@ resource "aws_iam_role_policy" "auth-hpds-deployment-s3-policy" {
     },
     {
       "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/nessus_config/setup.sh"
+    },
+    {
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/nessus_config/NessusAgent-10.1.2-es7.x86_64.rpm"
+    },
+    {
+      "Action": [
         "ec2:CreateTags"
       ],
       "Effect": "Allow",
@@ -435,6 +463,20 @@ resource "aws_iam_role_policy" "open-hpds-deployment-s3-policy" {
       ],
       "Effect": "Allow",
       "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/splunk_config/splunkforwarder-8.2.2-87344edfcdb4-Linux-x86_64.tgz"
+    },
+    {
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/nessus_config/setup.sh"
+    },
+    {
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/nessus_config/NessusAgent-10.1.2-es7.x86_64.rpm"
     },
     {
       "Action": [
