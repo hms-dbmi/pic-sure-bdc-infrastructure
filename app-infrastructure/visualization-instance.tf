@@ -31,7 +31,7 @@ resource "aws_instance" "visualization-ec2" {
 
   subnet_id = var.db-subnet-us-east-1a-id
 
-  iam_instance_profile = aws_iam_role.visualization-deployment-s3-role.name
+  iam_instance_profile = "visualization-deployment-s3-role-${var.target-stack}-${var.stack_githash}"
 
   user_data = data.template_cloudinit_config.visualization-user-data.rendered
 
