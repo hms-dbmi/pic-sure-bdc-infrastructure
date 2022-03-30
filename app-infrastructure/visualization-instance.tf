@@ -4,6 +4,7 @@ data "template_file" "visualization-user_data" {
   vars = {
     stack_githash = var.stack_githash_long
     stack_s3_bucket = var.stack_s3_bucket
+    target-stack = var.target-stack
   }
 }
 
