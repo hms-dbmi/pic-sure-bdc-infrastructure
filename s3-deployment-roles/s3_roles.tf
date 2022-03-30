@@ -479,7 +479,7 @@ resource "aws_iam_role_policy_attachment" "attach-cloudwatch-ssm-policy-to-dicti
 
 
 resource "aws_iam_instance_profile" "visualization-deployment-s3-profile" {
-  name = "visualization-deployment-s3-profile-${var.target-stack}-${var.stack_githash}"
+  name = aws_iam_role.visualization-deployment-s3-role.name
   role = aws_iam_role.visualization-deployment-s3-role.name
 }
 
