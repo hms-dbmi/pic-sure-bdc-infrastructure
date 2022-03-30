@@ -487,7 +487,7 @@ resource "aws_iam_role_policy" "visualization-deployment-s3-policy" {
   name = "visualization-deployment-s3-policy-${var.target-stack}-${var.stack_githash}"
   role = aws_iam_role.visualization-deployment-s3-role.id
   policy = <<EOF
-  {
+{
   "Version": "2012-10-17",
   "Statement": [
     {
