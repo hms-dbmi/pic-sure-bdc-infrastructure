@@ -89,9 +89,9 @@ for i in 1 2 3 4 5 6 7 8 9; do sudo /usr/local/bin/aws --region us-east-1 s3 cp 
 sudo mkdir -p /usr/local/docker-config
 sudo echo "search.url=http://open-hpds.${target-stack}.datastage.hms.harvard.edu:8080/PIC-SURE/search/70c837be-5ffc-11eb-ae93-0242ac130002"  > /usr/local/docker-config/application.properties
 sudo echo "picSure.url=http://auth-hpds.${target-stack}.datastage.hms.harvard.edu:8080/PIC-SURE/query/sync" >> /usr/local/docker-config/application.properties
-sudo echo "UUID=ca0ad4a9-130a-3a8a-ae00-e35b07f1108b"
+sudo echo "UUID=ca0ad4a9-130a-3a8a-ae00-e35b07f1108b" >> /usr/local/docker-config/application.properties
 
-VISUALIZATION_IMAGE=`sudo docker load < pic-sure-hpds-visualization-resource.tar.gz | cut -d ' ' -f 3'`
+VISUALIZATION_IMAGE=`sudo docker load < pic-sure-hpds-visualization-resource.tar.gz | cut -d ' ' -f 3`
 sudo docker run --name=visualization -v /var/log/visualization-docker-logs:/usr/local/tomcat/logs -v /usr/local/docker-config/application.properties:/usr/local/docker-config/application.properties -p 8080:8080 -d $VISUALIZATION_IMAGE
 
 INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)
