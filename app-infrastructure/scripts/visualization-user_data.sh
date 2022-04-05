@@ -87,8 +87,9 @@ sudo mkdir -p /var/log/visualization-docker-logs
 for i in 1 2 3 4 5 6 7 8 9; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-hpds-visualization-resource.tar.gz . && break || sleep 45; done
 
 sudo mkdir -p /usr/local/docker-config
-sudo echo "search.url=http://open-hpds.${target-stack}.datastage.hms.harvard.edu:8080/PIC-SURE/search/70c837be-5ffc-11eb-ae93-0242ac130002"  > /usr/local/docker-config/application.properties
-sudo echo "picSure.url=http://auth-hpds.${target-stack}.datastage.hms.harvard.edu:8080/PIC-SURE/query/sync" >> /usr/local/docker-config/application.properties
+
+sudo echo "search.url=http://wildfly.${target-stack}.datastage.hms.harvard.edu:8080/pic-sure-api-2/PICSURE/search/02e23f52-f354-4e8b-992c-d37c8b9ba140"  > /usr/local/docker-config/application.properties
+sudo echo "picSure.url=http://wildfly.${target-stack}.datastage.hms.harvard.edu:8080/pic-sure-api-2/PICSURE/query/sync" >> /usr/local/docker-config/application.properties
 sudo echo "UUID=ca0ad4a9-130a-3a8a-ae00-e35b07f1108b" >> /usr/local/docker-config/application.properties
 
 VISUALIZATION_IMAGE=`sudo docker load < pic-sure-hpds-visualization-resource.tar.gz | cut -d ' ' -f 3`
