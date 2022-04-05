@@ -36,9 +36,7 @@ resource "aws_instance" "visualization-ec2" {
   user_data = data.template_cloudinit_config.visualization-user-data.rendered
 
   vpc_security_group_ids = [
-    aws_security_group.inbound-hpds-from-app.id,
-    aws_security_group.outbound-to-trend-micro.id,
-    aws_security_group.inbound-app-from-lma-for-dev-only.id
+    aws_security_group.interal_app_traffic.id
   ]
   root_block_device {
     delete_on_termination = true
