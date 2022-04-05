@@ -91,6 +91,7 @@ sudo mkdir -p /usr/local/docker-config
 sudo echo "search.url=http://wildfly.${target-stack}.datastage.hms.harvard.edu:8080/pic-sure-api-2/PICSURE/search/02e23f52-f354-4e8b-992c-d37c8b9ba140"  > /usr/local/docker-config/application.properties
 sudo echo "picSure.url=http://wildfly.${target-stack}.datastage.hms.harvard.edu:8080/pic-sure-api-2/PICSURE/query/sync" >> /usr/local/docker-config/application.properties
 sudo echo "UUID=ca0ad4a9-130a-3a8a-ae00-e35b07f1108b" >> /usr/local/docker-config/application.properties
+sudo echo "picSure.uuid=02e23f52-f354-4e8b-992c-d37c8b9ba140" >> /usr/local/docker-config/application.properties
 
 VISUALIZATION_IMAGE=`sudo docker load < pic-sure-hpds-visualization-resource.tar.gz | cut -d ' ' -f 3`
 sudo docker run --name=visualization -v /var/log/visualization-docker-logs:/usr/local/tomcat/logs -v /usr/local/docker-config/application.properties:/usr/local/docker-config/application.properties -p 8080:8080 -d $VISUALIZATION_IMAGE
