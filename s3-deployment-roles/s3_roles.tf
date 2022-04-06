@@ -25,6 +25,11 @@ variable "genomic-dataset-s3-object-key" {
   type        = string
 }
 
+variable "source_dictionary_s3_object_key" {
+  description = "The s3 object key for the data dictionary"
+  type        = string
+}
+
 resource "aws_iam_instance_profile" "wildfly-deployment-s3-profile" {
   name = "wildfly-deployment-s3-profile-${var.target-stack}-${var.stack_githash}"
   role = aws_iam_role.wildfly-deployment-s3-role.name
