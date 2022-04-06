@@ -441,7 +441,7 @@ resource "aws_iam_role_policy" "dictionary-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/${source_dictionary_s3_object_key}"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/${var.source_dictionary_s3_object_key}"
     },{
       "Action": [
         "ec2:CreateTags"
