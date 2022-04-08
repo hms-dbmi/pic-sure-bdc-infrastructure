@@ -25,7 +25,7 @@ data "template_cloudinit_config" "wildfly-user-data" {
 
 resource "aws_instance" "wildfly-ec2" {
   ami           = var.ami-id
-  instance_type = "m5.large"
+  instance_type = "m5.2xlarge"
 
   associate_public_ip_address = true
 
@@ -46,7 +46,7 @@ resource "aws_instance" "wildfly-ec2" {
   root_block_device {
     delete_on_termination = true
     encrypted             = true
-    volume_size           = 50
+    volume_size           = 100
   }
 
   tags = {
