@@ -90,3 +90,22 @@ resource "aws_security_group" "outbound-to-aurora" {
     Name        = "FISMA Terraform Playground - ${var.stack_githash} - outbound-to-aurora Security Group - ${var.target-stack}"
   }
 }
+
+resource "aws_security_group" "interal_app_traffic" {
+  name = "allow_interal_app_traffic_${var.stack_githash}"
+  description = "Allow internal app traffic on port 8080"
+  vpc_id = var.target-vpc
+
+  ingress {
+    from_port = 8080
+    to_port = 8080
+    protocol = "tcp"
+    self = true
+  }
+
+  tags = {
+    Owner       = "Avillach_Lab"
+    Environment = "development"
+    Name        = "FISMA Terraform Playground - ${var.stack_githash} - internal app traffic Security Group - ${var.target-stack}"
+  }
+}
