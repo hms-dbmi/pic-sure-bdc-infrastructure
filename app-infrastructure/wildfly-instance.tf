@@ -25,7 +25,7 @@ data "template_cloudinit_config" "wildfly-user-data" {
 
 resource "aws_instance" "wildfly-ec2" {
   ami           = var.ami-id
-  instance_type = "m5.large"
+  instance_type = "m5.2xlarge"
 
   associate_public_ip_address = true
 
@@ -40,12 +40,13 @@ resource "aws_instance" "wildfly-ec2" {
     aws_security_group.outbound-to-hpds.id,
     aws_security_group.outbound-to-aurora.id,
     aws_security_group.inbound-app-from-lma-for-dev-only.id,
-    aws_security_group.outbound-to-trend-micro.id
+    aws_security_group.outbound-to-trend-micro.id,
+    aws_security_group.interal_app_traffic.id
   ]
   root_block_device {
     delete_on_termination = true
     encrypted             = true
-    volume_size           = 50
+    volume_size           = 100
   }
 
   tags = {

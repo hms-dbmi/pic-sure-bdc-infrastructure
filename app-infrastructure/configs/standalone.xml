@@ -118,7 +118,7 @@
               <level name="WARN"/>
             </logger>
             <logger category="edu.harvard">
-                <level name="DEBUG"/>
+                <level name="INFO"/>
             </logger>
 
             <root-logger>
