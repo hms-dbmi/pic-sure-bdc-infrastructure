@@ -91,7 +91,7 @@ sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-c
 sudo mkdir -p /var/log/dictionary-docker-logs
 for i in 1 2 3 4 5 6 7 8 9; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-hpds-dictionary-resource.tar.gz . && break || sleep 45; done
 sudo mkdir -p /usr/local/docker-config/search/
-for i in 1 2 3 4 5 6 7 8 9; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/${source_dictionary_s3_object_key} /usr/local/docker-config/search/dictionary.javabin.tar.gz && break || sleep 45; done
+for i in 1 2 3 4 5 6 7 8 9; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/data/${stack_githash}/dictionary.javabin.tar.gz /usr/local/docker-config/search/dictionary.javabin.tar.gz && break || sleep 45; done
 sudo tar -xvzf /usr/local/docker-config/search/dictionary.javabin.tar.gz -C /usr/local/docker-config/search/
 
 DICTIONARY_IMAGE=`sudo docker load < pic-sure-hpds-dictionary-resource.tar.gz | cut -d ' ' -f 3`
