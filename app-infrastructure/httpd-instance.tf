@@ -2,11 +2,11 @@
 data "template_file" "httpd-user_data" {
   template = file("scripts/httpd-user_data.sh")
   vars = {
-    stack_githash   = var.stack_githash_long
-    fence_client_id = var.fence_client_id
-    stack_s3_bucket = var.stack_s3_bucket
+    stack_githash         = var.stack_githash_long
+    fence_client_id       = var.fence_client_id
+    stack_s3_bucket       = var.stack_s3_bucket
     dataset_s3_object_key = var.dataset-s3-object-key
-    target-stack    = var.target-stack
+    target-stack          = var.target-stack
   }
 }
 
@@ -60,14 +60,14 @@ data "template_file" "httpd-vhosts-conf" {
   template = file("configs/httpd-vhosts.conf")
   vars = {
     wildfly-base-url = "http://${aws_instance.wildfly-ec2.private_ip}:8080"
-    target-stack = var.target-stack
-    release-id = var.stack_githash_long
+    target-stack     = var.target-stack
+    release-id       = var.stack_githash_long
   }
 }
 
 resource "local_file" "httpd-vhosts-conf-file" {
-    content     = data.template_file.httpd-vhosts-conf.rendered
-    filename = "httpd-vhosts.conf"
+  content  = data.template_file.httpd-vhosts-conf.rendered
+  filename = "httpd-vhosts.conf"
 }
 
 #resource "aws_s3_bucket_object" "httpd-vhosts-in-s3" {
@@ -86,8 +86,8 @@ data "template_file" "picsureui_settings" {
 }
 
 resource "local_file" "picsureui-settings-json" {
-    content     = data.template_file.picsureui_settings.rendered
-    filename = "picsureui-settings.json"
+  content  = data.template_file.picsureui_settings.rendered
+  filename = "picsureui-settings.json"
 }
 
 #resource "aws_s3_bucket_object" "picsureui_settings-in-s3" {
@@ -107,8 +107,8 @@ data "template_file" "psamaui_settings" {
 }
 
 resource "local_file" "psamaui-settings-json" {
-    content     = data.template_file.psamaui_settings.rendered
-    filename = "psamaui-settings.json"
+  content  = data.template_file.psamaui_settings.rendered
+  filename = "psamaui-settings.json"
 }
 
 #resource "aws_s3_bucket_object" "psamaui_settings-in-s3" {

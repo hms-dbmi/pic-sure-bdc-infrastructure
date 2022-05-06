@@ -45,5 +45,5 @@ variable "rds_master_username" {
 variable "rds_master_password" {
   description = "Master Password"
   type        = string
-  default     = "picsure!98765"  
-} 
+  default     = "picsure!98765"
+}

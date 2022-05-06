@@ -1,5 +1,5 @@
 resource "aws_vpc" "datastage-vpc" {
-  cidr_block = "172.17.0.0/16"
+  cidr_block       = "172.17.0.0/16"
   instance_tenancy = "default"
 
   enable_dns_hostnames = true
@@ -36,5 +36,5 @@ resource "aws_internet_gateway" "inet-gw" {
     Owner       = "Avillach_Lab"
     Environment = "development"
     Name        = "FISMA Terraform Playground - ${var.stack_githash} - DataSTAGE Internet Gateway"
-  }  
+  }
 }

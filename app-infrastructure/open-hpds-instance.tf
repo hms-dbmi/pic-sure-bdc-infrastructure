@@ -2,10 +2,10 @@
 data "template_file" "open_hpds-user_data" {
   template = file("scripts/open_hpds-user_data.sh")
   vars = {
-    stack_githash = var.stack_githash_long
+    stack_githash                       = var.stack_githash_long
     destigmatized_dataset_s3_object_key = var.destigmatized-dataset-s3-object-key
-    stack_s3_bucket = var.stack_s3_bucket
-    target-stack    = var.target-stack
+    stack_s3_bucket                     = var.stack_s3_bucket
+    target-stack                        = var.target-stack
   }
 }
 
@@ -22,7 +22,7 @@ data "template_cloudinit_config" "open_hpds-user-data" {
 }
 
 resource "aws_instance" "open-hpds-ec2" {
-  ami = var.ami-id
+  ami           = var.ami-id
   instance_type = "m5.2xlarge"
 
   key_name = "biodata_nessus"
@@ -43,8 +43,8 @@ resource "aws_instance" "open-hpds-ec2" {
   ]
   root_block_device {
     delete_on_termination = true
-    encrypted = true
-    volume_size = 1000
+    encrypted             = true
+    volume_size           = 1000
   }
 
   tags = {

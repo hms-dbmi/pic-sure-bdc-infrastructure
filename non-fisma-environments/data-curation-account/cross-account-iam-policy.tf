@@ -4,8 +4,8 @@ resource "aws_iam_instance_profile" "curated-datasets-s3-profile" {
 }
 
 resource "aws_iam_role_policy" "curated-datasets-s3-policy" {
-  name = "curated-datasets-s3-policy"
-  role = aws_iam_role.curated-datasets-s3-role.id
+  name   = "curated-datasets-s3-policy"
+  role   = aws_iam_role.curated-datasets-s3-role.id
   policy = <<EOF
 {
   "Version": "2012-10-17",

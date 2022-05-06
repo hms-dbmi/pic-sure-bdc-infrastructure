@@ -2,11 +2,11 @@
 data "template_file" "auth_hpds-user_data" {
   template = file("scripts/auth_hpds-user_data.sh")
   vars = {
-    stack_githash = var.stack_githash_long
-    dataset_s3_object_key = var.dataset-s3-object-key
+    stack_githash                 = var.stack_githash_long
+    dataset_s3_object_key         = var.dataset-s3-object-key
     genomic_dataset_s3_object_key = var.genomic-dataset-s3-object-key
-    stack_s3_bucket = var.stack_s3_bucket
-    target-stack    = var.target-stack
+    stack_s3_bucket               = var.stack_s3_bucket
+    target-stack                  = var.target-stack
   }
 }
 
@@ -23,7 +23,7 @@ data "template_cloudinit_config" "auth_hpds-user-data" {
 }
 
 resource "aws_instance" "auth-hpds-ec2" {
-  ami = var.ami-id
+  ami           = var.ami-id
   instance_type = "m5.8xlarge"
 
   key_name = "biodata_nessus"
@@ -44,8 +44,8 @@ resource "aws_instance" "auth-hpds-ec2" {
   ]
   root_block_device {
     delete_on_termination = true
-    encrypted = true
-    volume_size = 1000
+    encrypted             = true
+    volume_size           = 1000
   }
 
   tags = {

@@ -1,25 +1,25 @@
 provider "aws" {
-  region     = "us-east-1" 
-  profile    = "avillachlab-secure-infrastructure"
-  version 	 = "3.74"
+  region  = "us-east-1"
+  profile = "avillachlab-secure-infrastructure"
+  version = "3.74"
 }
 
 resource "aws_security_group" "outbound-to-internet" {
-  name = "outbound-to-internet"
+  name        = "outbound-to-internet"
   description = "Allow outbound traffic"
-  vpc_id = var.target-vpc
+  vpc_id      = var.target-vpc
 
   egress {
-    from_port = 0
-    to_port = 0
-    protocol = "-1"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
     from_port = 22
-    to_port = 22
-    protocol = "tcp"
+    to_port   = 22
+    protocol  = "tcp"
     cidr_blocks = [
       "134.174.0.0/16"
     ]
@@ -32,8 +32,8 @@ resource "aws_security_group" "outbound-to-internet" {
   }
 }
 resource "aws_iam_role_policy" "docker-awscli-base-policy" {
-  name = "docker-awscli-base-policy"
-  role = aws_iam_role.docker-awscli-base-role.id
+  name   = "docker-awscli-base-policy"
+  role   = aws_iam_role.docker-awscli-base-role.id
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -81,10 +81,10 @@ resource "aws_iam_instance_profile" "docker-awscli-base-profile" {
 
 
 data "aws_ami" "cis_benchmark" {
-  owners = ["aws-marketplace"]
+  owners      = ["aws-marketplace"]
   most_recent = true
   filter {
-    name = "name"
+    name   = "name"
     values = ["CIS CentOS Linux 7 Benchmark v*"]
   }
 
@@ -101,8 +101,8 @@ resource "aws_instance" "docker-awscli-base" {
 
   root_block_device {
     delete_on_termination = true
-    encrypted = false
-    volume_size = 50
+    encrypted             = false
+    volume_size           = 50
   }
 
   vpc_security_group_ids = [

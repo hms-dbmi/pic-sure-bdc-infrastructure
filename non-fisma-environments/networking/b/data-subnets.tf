@@ -1,7 +1,7 @@
 resource "aws_subnet" "hpds-subnet-us-east-1a" {
   availability_zone = "us-east-1a"
-  cidr_block = "172.17.2.0/26"
-  vpc_id = aws_vpc.datastage-vpc.id
+  cidr_block        = "172.17.2.0/26"
+  vpc_id            = aws_vpc.datastage-vpc.id
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
@@ -11,8 +11,8 @@ resource "aws_subnet" "hpds-subnet-us-east-1a" {
 
 resource "aws_subnet" "hpds-subnet-us-east-1b" {
   availability_zone = "us-east-1b"
-  cidr_block = "172.17.2.64/26"
-  vpc_id = aws_vpc.datastage-vpc.id
+  cidr_block        = "172.17.2.64/26"
+  vpc_id            = aws_vpc.datastage-vpc.id
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
@@ -21,9 +21,9 @@ resource "aws_subnet" "hpds-subnet-us-east-1b" {
 }
 
 resource "aws_db_subnet_group" "data-subnet-group" {
-  name       = "main-b"
+  name = "main-b"
   subnet_ids = [
-    aws_subnet.db-subnet-us-east-1a.id, 
+    aws_subnet.db-subnet-us-east-1a.id,
     aws_subnet.db-subnet-us-east-1b.id
   ]
   tags = {
@@ -35,8 +35,8 @@ resource "aws_db_subnet_group" "data-subnet-group" {
 
 resource "aws_subnet" "db-subnet-us-east-1a" {
   availability_zone = "us-east-1a"
-  cidr_block = "172.17.3.0/26"
-  vpc_id = aws_vpc.datastage-vpc.id
+  cidr_block        = "172.17.3.0/26"
+  vpc_id            = aws_vpc.datastage-vpc.id
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
@@ -46,8 +46,8 @@ resource "aws_subnet" "db-subnet-us-east-1a" {
 
 resource "aws_subnet" "db-subnet-us-east-1b" {
   availability_zone = "us-east-1b"
-  cidr_block = "172.17.3.64/26"
-  vpc_id = aws_vpc.datastage-vpc.id
+  cidr_block        = "172.17.3.64/26"
+  vpc_id            = aws_vpc.datastage-vpc.id
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"

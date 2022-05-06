@@ -42,7 +42,7 @@ resource "aws_s3_bucket_object" "tfstate-baseline-b" {
 }
 
 resource "random_password" "picsure-client-secret" {
-  length = 32
+  length  = 32
   special = false
 }
 
@@ -50,7 +50,7 @@ data "template_file" "stack_variables_template" {
   template = file("stack_variables.tf_template")
   vars = {
     picsure_client_secret = random_password.picsure-client-secret.result
-    stack_s3_bucket = var.stack_s3_bucket
+    stack_s3_bucket       = var.stack_s3_bucket
   }
 }
 
