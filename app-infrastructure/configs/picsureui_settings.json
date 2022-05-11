@@ -20,8 +20,9 @@
   "harmonizedPath": "\\DCC Harmonized data set",
   "harmonizedConsentPath": "\\_harmonized_consent\\",
   "topmedConsentPath": "\\_topmed_consents\\",
+  "consentsPath": "\\_consents",
   "categoryAliases": {
-		"DCC_Harmonized_data_set" : "HarmonizedVariables",
+		"dcc harmonized data set" : "DCC Harmonized data set",
 		"phs000956" : "AMISH",
 		"phs000280" : "ARIC",
 		"phs001211" : "ARIC",
