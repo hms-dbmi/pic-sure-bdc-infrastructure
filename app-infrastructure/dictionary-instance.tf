@@ -25,7 +25,7 @@ resource "aws_instance" "dictionary-ec2" {
 
   ami = var.ami-id
   //TODO double check this value at runtime to check that performance not impacted
-  instance_type = "m5.large"
+  instance_type = "m5.xlarge"
 
   associate_public_ip_address = true
 
