@@ -92,7 +92,9 @@ data "aws_ami" "cis_benchmark" {
 }
 
 resource "aws_instance" "docker-awscli-base" {
+
   ami = data.aws_ami.cis_benchmark.image_id
+
   instance_type = "m5.large"
 
   iam_instance_profile = aws_iam_instance_profile.docker-awscli-base-profile.name

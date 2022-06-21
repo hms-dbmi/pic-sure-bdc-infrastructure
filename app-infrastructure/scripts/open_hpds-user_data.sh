@@ -10,7 +10,7 @@ echo "
 
 {
 	\"metrics\": {
-		
+
 		\"metrics_collected\": {
 			\"cpu\": {
 				\"measurement\": [
@@ -37,7 +37,7 @@ echo "
                                         \"mem_available_percent\",
                                        \"mem_total\",
                                         \"mem_used\"
-                                        
+
 				],
 				\"metrics_collection_interval\": 600
 			}

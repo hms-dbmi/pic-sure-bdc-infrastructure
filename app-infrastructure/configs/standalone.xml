@@ -475,7 +475,7 @@
                 <simple name="java:global/fence_client_id" value="${fence_client_id}"/>
                 <simple name="java:global/fence_client_secret" value="${fence_client_secret}"/>
                 <simple name="java:global/fence_redirect_url" value="https://biodatacatalyst.integration.hms.harvard.edu/psamaui/login/" />
-                <simple name="java:global/fence_standard_access_rules" value="AR_ONLY_INFO,AR_ONLY_SEARCH,AR_INFO_COLUMN_LISTING" />
+ 		<simple name="java:global/fence_standard_access_rules" value="AR_ONLY_INFO,AR_ONLY_SEARCH,AR_INFO_COLUMN_LISTING" />
 		
                 <simple name="java:global/fence_allowed_query_types" value="COUNT,CROSS_COUNT,CATEGORICAL_CROSS_COUNT,CONTINUOUS_CROSS_COUNT,DATAFRAME" />
                 <simple name="java:global/fence_harmonized_concept_path" value="\DCC Harmonized data set\" />
@@ -483,7 +483,7 @@
 		<simple name="java:global/fence_topmed_consent_group_concept_path" value="\_topmed_consents\" />
 		<simple name="java:global/fence_parent_consent_group_concept_path" value="\_consents\" />
 		<simple name="java:global/variantAnnotationColumns" value="Variant_consequence_calculated,Variant_class,Gene_with_variant,Variant_severity,Variant_frequency_in_gnomAD,Variant_frequency_as_text" />
-        
+
                 <simple name="java:global/defaultApplicationUUID" value="8b5722c9-62fd-48d6-b0bf-4f67e53efb2b" />
 
                 <simple name="java:global/systemName" value="PIC-SURE BioDataCatalyst"/>

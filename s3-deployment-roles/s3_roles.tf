@@ -279,7 +279,7 @@ resource "aws_iam_role_policy" "auth-hpds-deployment-s3-policy" {
       "Effect": "Allow",
       "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/data/${var.dataset-s3-object-key}/javabins_rekeyed.tar.gz"
     },
-   {
+    {
        "Action": [
       "s3:GetObject"
        ],
@@ -293,14 +293,14 @@ resource "aws_iam_role_policy" "auth-hpds-deployment-s3-policy" {
        "Effect": "Allow",
        "Resource": "arn:aws:s3:::${var.stack_s3_bucket}",
        "Condition": {
-      "StringLike": {
-          "s3:prefix": [
-         "data/${var.genomic-dataset-s3-object-key}/all*"
-          ]
-      }
+           "StringLike": {
+               "s3:prefix": [
+                   "data/${var.genomic-dataset-s3-object-key}/all*"
+               ]
+           }
        }
-   },
-   {
+    },
+    {
       "Action": [
         "s3:GetObject"
       ],

@@ -10,7 +10,7 @@ echo "
 
 {
 	\"metrics\": {
-		
+
 		\"metrics_collected\": {
 			\"cpu\": {
 				\"measurement\": [

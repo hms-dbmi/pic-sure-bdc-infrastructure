@@ -1,4 +1,3 @@
-
 data "template_file" "route53-ip-vars" {
   template = file("route53-variables.template")
   vars = {
