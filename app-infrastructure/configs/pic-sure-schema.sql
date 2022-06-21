@@ -72,6 +72,8 @@ CREATE TABLE `resource` (
   `description` varchar(8192) COLLATE utf8_bin DEFAULT NULL,
   `name` varchar(255) COLLATE utf8_bin DEFAULT NULL,
   `token` varchar(8192) COLLATE utf8_bin DEFAULT NULL,
+  `hidden` BOOL default NULL,
+  `metadata` TEXT default NULL,
   PRIMARY KEY (`uuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -82,9 +84,10 @@ CREATE TABLE `resource` (
 
 LOCK TABLES `resource` WRITE;
 /*!40000 ALTER TABLE `resource` DISABLE KEYS */;
-INSERT INTO `resource` VALUES (0x02E23F52F3544E8B992CD37C8B9BA140,NULL,'http://auth-hpds.${target-stack}.datastage.hms.harvard.edu:8080/PIC-SURE/','Authorized Access HPDS resource','auth-hpds',NULL);
-INSERT INTO `resource` VALUES (0x70c837be5ffc11ebae930242ac130002,NULL,'http://localhost:8080/pic-sure-aggregate-resource/pic-sure/aggregate-data-sharing','Open Access (aggregate) resource','open-hpds',NULL);
-
+INSERT INTO `resource` VALUES (0x02E23F52F3544E8B992CD37C8B9BA140,NULL,'http://auth-hpds.${target-stack}.datastage.hms.harvard.edu:8080/PIC-SURE/','Authorized Access HPDS resource','auth-hpds',NULL, NULL, NULL);
+INSERT INTO `resource` VALUES (0x70c837be5ffc11ebae930242ac130002,NULL,'http://localhost:8080/pic-sure-aggregate-resource/pic-sure/aggregate-data-sharing','Open Access (aggregate) resource','open-hpds',NULL, NULL, NULL);
+INSERT INTO `resource` VALUES (0x36363664623161342d386538652d3131,NULL,'http://dictionary.${target-stack}.datastage.hms.harvard.edu:8080/dictionary/pic-sure','Dictionary','dictionary',NULL, NULL, NULL);
+INSERT INTO `resource` VALUES (0xCA0AD4A9130A3A8AAE00E35B07F1108B,NULL,'http://visualization.${target-stack}.datastage.hms.harvard.edu:8080/visualization/pic-sure','Visualization','visualization',NULL, NULL, NULL);
 /*!40000 ALTER TABLE `resource` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -608,4 +611,24 @@ INSERT INTO access_rule VALUES (
 INSERT INTO accessRule_privilege VALUES (
   (SELECT uuid FROM privilege WHERE name = 'FENCE_PRIV_OPEN_ACCESS'), 
   (SELECT uuid FROM access_rule WHERE name = 'AR_OPEN_ONLY_SEARCH')
+);
+
+
+--
+-- Add a rule and privilege to allow any and all requests to the dictionary resource.  
+--
+
+INSERT INTO access_rule VALUES (uuid(),'AR_ALLOW_DICTIONARY_ACCESS','allow access to dictionary resource','$.query.resourceUUID',9,'36363664-6231-6134-2d38-6538652d3131',0, 0, NULL,0,0);
+
+INSERT INTO privilege (uuid, name, description, application_id, queryScope) VALUES ( uuid(), 'FENCE_PRIV_DICTIONARY', 'Allow access to queries for Dictionary Resource', (SELECT uuid FROM application WHERE name = 'PICSURE'), '[]' );
+
+INSERT INTO accessRule_privilege (privilege_id, accessRule_id) VALUES ((select uuid from privilege where name='FENCE_PRIV_DICTIONARY'), (select uuid from access_rule where name='AR_ALLOW_DICTIONARY_ACCESS'));
+
+INSERT INTO role_privilege (role_id, privilege_id) VALUES ( (select uuid from role where name='FENCE_ROLE_OPEN_ACCESS'), (select uuid from privilege where name='FENCE_PRIV_DICTIONARY'));
+
+INSERT INTO access_rule VALUES (  unhex(REPLACE(UUID(),'-','')), "AR_DICTIONARY_ONLY_SEARCH",  "Dictionary Search",  "$.['Target Service']",  6, "/search/36363664-6231-6134-2d38-6538652d3131", 0,  0,  NULL,  0, 0 );
+
+INSERT INTO accessRule_privilege VALUES (
+  (SELECT uuid FROM privilege WHERE name = 'FENCE_PRIV_DICTIONARY'), 
+  (SELECT uuid FROM access_rule WHERE name = 'AR_DICTIONARY_ONLY_SEARCH')
 );

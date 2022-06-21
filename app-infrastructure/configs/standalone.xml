@@ -477,7 +477,7 @@
                 <simple name="java:global/fence_redirect_url" value="https://picsure.biodatacatalyst.nhlbi.nih.gov/psamaui/login/" />
 
  		<simple name="java:global/fence_standard_access_rules" value="AR_ONLY_INFO,AR_ONLY_SEARCH,AR_INFO_COLUMN_LISTING" />
-                <simple name="java:global/fence_allowed_query_types" value="COUNT,CROSS_COUNT,DATAFRAME" />
+                <simple name="java:global/fence_allowed_query_types" value="COUNT,CROSS_COUNT,CATEGORICAL_CROSS_COUNT,CONTINUOUS_CROSS_COUNT,DATAFRAME" />
                 <simple name="java:global/fence_harmonized_concept_path" value="\DCC Harmonized data set\" />
 		<simple name="java:global/fence_harmonized_consent_group_concept_path" value="\_harmonized_consent\" />
 		<simple name="java:global/fence_topmed_consent_group_concept_path" value="\_topmed_consents\" />
