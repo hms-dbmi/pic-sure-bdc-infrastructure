@@ -549,6 +549,26 @@ resource "aws_iam_role_policy" "dictionary-deployment-s3-policy" {
       ],
       "Effect": "Allow",
       "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/${var.source_dictionary_s3_object_key}"
+    }, {
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/splunk_config/splunkforwarder-8.2.2-87344edfcdb4-Linux-x86_64.tgz"
+    },
+    {
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/nessus_config/setup.sh"
+    },
+    {
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/nessus_config/NessusAgent-10.1.2-es7.x86_64.rpm"
     },{
       "Action": [
         "ec2:CreateTags"
@@ -608,6 +628,26 @@ resource "aws_iam_role_policy" "visualization-deployment-s3-policy" {
       ],
       "Effect": "Allow",
       "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/releases/jenkins_pipeline_build_${var.stack_githash_long}/pic-sure-hpds-visualization-resource.tar.gz"
+    }, {
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/splunk_config/splunkforwarder-8.2.2-87344edfcdb4-Linux-x86_64.tgz"
+    },
+    {
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/nessus_config/setup.sh"
+    },
+    {
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/nessus_config/NessusAgent-10.1.2-es7.x86_64.rpm"
     },
     {
       "Action": [
