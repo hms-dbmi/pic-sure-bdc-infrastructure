@@ -90,12 +90,12 @@ sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-c
 
 sudo mkdir -p /var/log/dictionary-docker-logs
 for i in 1 2 3 4 5 6 7 8 9; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-hpds-dictionary-resource.tar.gz . && break || sleep 45; done
-sudo mkdir -p /usr/local/docker-config/search/
-for i in 1 2 3 4 5 6 7 8 9; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/data/${stack_githash}/dictionary.javabin.tar.gz /usr/local/docker-config/search/dictionary.javabin.tar.gz && break || sleep 45; done
-sudo tar -xvzf /usr/local/docker-config/search/dictionary.javabin.tar.gz -C /usr/local/docker-config/search/
+#sudo mkdir -p /usr/local/docker-config/search/
+#for i in 1 2 3 4 5 6 7 8 9; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/data/${stack_githash}/dictionary.javabin.tar.gz /usr/local/docker-config/search/dictionary.javabin.tar.gz && break || sleep 45; done
+#sudo tar -xvzf /usr/local/docker-config/search/dictionary.javabin.tar.gz -C /usr/local/docker-config/search/
 
 DICTIONARY_IMAGE=`sudo docker load < pic-sure-hpds-dictionary-resource.tar.gz | cut -d ' ' -f 3`
-sudo docker run --name=dictionary -v /var/log/dictionary-docker-logs/:/usr/local/tomcat/logs/ -v /usr/local/docker-config/search/dictionary.javabin:/usr/local/docker-config/search/dictionary.javabin -e CATALINA_OPTS=" -Xms1g -Xmx12g " -p 8080:8080 -d $DICTIONARY_IMAGE
+sudo docker run --name=dictionary -v /var/log/dictionary-docker-logs/:/usr/local/tomcat/logs/ -e CATALINA_OPTS=" -Xms1g -Xmx12g " -p 8080:8080 -d $DICTIONARY_IMAGE
 
 INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)
 sudo /usr/local/bin/aws --region=us-east-1 ec2 create-tags --resources $${INSTANCE_ID} --tags Key=InitComplete,Value=true
