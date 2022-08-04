@@ -553,7 +553,7 @@ resource "aws_iam_instance_profile" "genomic-etl-deployment-s3-profile" {
   role = aws_iam_role.genomic-etl-deployment-s3-role.name
 }
 
-resource "aws_iam_role_policy" "visualization-deployment-s3-policy" {
+resource "aws_iam_role_policy" "genomic-etl-deployment-s3-policy" {
   name = "genomic-etl-deployment-s3-profile-${var.target-stack}-${var.stack_githash}"
   role = aws_iam_role.genomic-etl-deployment-s3-role.id
   policy = <<EOF
