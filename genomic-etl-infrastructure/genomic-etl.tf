@@ -3,7 +3,6 @@ data "template_file" "genomic-user_data" {
   template = file("scripts/genomic-etl.sh")
   vars = {
     stack_githash   = var.stack_githash_long
-    fence_client_id = var.fence_client_id
     stack_s3_bucket = var.stack_s3_bucket
     target-stack    = var.target-stack
   }
@@ -25,7 +24,7 @@ resource "aws_instance" "genomic-etl-ec2" {
   ami           = var.ami-id
   instance_type = "m5.large"
 
-  associate_public_ip_address = false
+  associate_public_ip_address = true
 
   subnet_id = var.edge-subnet-us-east-1a-id
 
