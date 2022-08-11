@@ -48,13 +48,6 @@ resource "aws_iam_role" "genomic-etl-deployment-s3-role" {
       },
       "Effect": "Allow",
       "Sid": ""
-    },
-    {
-      "Action": [
-        "ec2:CreateTags"
-      ],
-      "Effect": "Allow",
-      "Resource": "arn:aws:ec2:*:*:instance/*"
     }
   ]
 }
