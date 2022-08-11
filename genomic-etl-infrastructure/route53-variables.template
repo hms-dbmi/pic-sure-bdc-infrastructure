@@ -1,0 +1,1 @@
+genomic-etl-private_ip =${genomic-etl-ec2.private_ip}
