@@ -74,7 +74,7 @@ echo "
             {
                \"file_path\":\"/var/log/genomic-docker-logs/*\",
                \"log_group_name\":\"genomic-logs\",
-               \"log_stream_name\":\"{instance_id} ${stack_githash} genomic-app-logs\",
+               \"log_stream_name\":\"{instance_id} ${deployment_githash} genomic-app-logs\",
                \"timestamp_format\":\"UTC\"
             }
          ]

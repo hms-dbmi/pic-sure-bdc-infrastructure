@@ -1,13 +1,8 @@
-variable "stack_githash" {
+variable "deployment_githash" {
   type = string
 }
-variable "stack_githash_long" {
+variable "deployment_githash_long" {
   type = string
-}
-
-variable "target-stack" {
-  description = "The stack identifier"
-  type        = string
 }
 
 variable "ami-id" {
@@ -18,5 +13,5 @@ variable "ami-id" {
 variable "environment_name" {
   description = "The name of the environment"
   type        = string
-  default     = "picsure"
+  default     = "genomic etl"
 }

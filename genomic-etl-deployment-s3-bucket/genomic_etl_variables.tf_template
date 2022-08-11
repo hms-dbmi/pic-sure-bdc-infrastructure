@@ -1,0 +1,6 @@
+variable "deployment_s3_bucket"{
+  type = string
+  default = "${deployment_s3_bucket}"
+}
+
+

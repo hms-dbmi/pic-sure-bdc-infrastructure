@@ -1,0 +1,12 @@
+variable "genomic-etl-subnet-us-east-id" {
+  type = string
+  default = "__SUBNET_ID__"
+}
+variable "internal-dns-zone-id" {
+  type = string
+  default = "__INTERNAL_DNS_ZONE_ID__"
+}
+variable "target-vpc" {
+  type = string
+  default = "__VPC_FOR_THIS_DEPLOYMENT__"
+}

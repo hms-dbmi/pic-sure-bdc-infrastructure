@@ -2,9 +2,8 @@
 data "template_file" "genomic-user_data" {
   template = file("scripts/genomic-etl.sh")
   vars = {
-    stack_githash   = var.stack_githash_long
-    stack_s3_bucket = var.stack_s3_bucket
-    target-stack    = var.target-stack
+    deployment_githash   = var.deployment_githash_long
+    deployment_s3_bucket = var.deployment_s3_bucket
   }
 }
 
@@ -28,13 +27,12 @@ resource "aws_instance" "genomic-etl-ec2" {
 
   subnet_id = var.app-subnet-us-east-1a-id
 
-  iam_instance_profile = "genomic-etl-deployment-s3-profile-${var.target-stack}-${var.stack_githash}"
+  iam_instance_profile = "genomic-etl-deployment-s3-profile-${var.deployment_githash}"
 
   user_data = data.template_cloudinit_config.genomic-user-data.rendered
 
   vpc_security_group_ids = [
-    aws_security_group.inbound-from-public-internet.id,
-    aws_security_group.outbound-to-app.id,
+    aws_security_group.outbound-to-ssm.id,
     aws_security_group.inbound-app-from-lma-for-dev-only.id
   ]
   root_block_device {
@@ -46,7 +44,7 @@ resource "aws_instance" "genomic-etl-ec2" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "FISMA Terraform Playground - ${var.stack_githash} - Genomic ETL - ${var.target-stack}"
+    Name        = "FISMA Terraform Playground - ${var.deployment_githash} - Genomic ETL"
     automaticPatches = "1"
   }
 

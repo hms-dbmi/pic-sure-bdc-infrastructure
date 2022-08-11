@@ -1,13 +1,8 @@
-variable "stack_githash" {
+variable "deployment_githash" {
   type = string
 }
-variable "stack_githash_long" {
+variable "deployment_githash_long" {
   type = string
-}
-
-variable "target-stack" {
-  description = "The stack identifier"
-  type        = string
 }
 
 
@@ -17,7 +12,7 @@ resource "aws_iam_instance_profile" "genomic-etl-deployment-s3-profile" {
 }
 
 resource "aws_iam_role_policy" "genomic-etl-deployment-s3-policy" {
-  name = "genomic-etl-deployment-s3-profile-${var.target-stack}-${var.stack_githash}"
+  name = "genomic-etl-deployment-s3-profile-${var.deployment_githash}"
   role = aws_iam_role.genomic-etl-deployment-s3-role.id
   policy = <<EOF
 {
@@ -36,7 +31,7 @@ EOF
 }
 
 resource "aws_iam_role" "genomic-etl-deployment-s3-role" {
-  name               = "genomic-etl-deployment-s3-profile-${var.target-stack}-${var.stack_githash}"
+  name               = "genomic-etl-deployment-s3-profile-${var.deployment_githash}"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
