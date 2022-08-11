@@ -1,8 +1,8 @@
 
 data "template_file" "route53-ip-vars" {
   template = file("route53-variables.template")
-  vars = {
-   genomic-etl-ec2-private_ip         = aws_instance.genomic-etl-ec2.private_ip
+   vars = {
+    genomic-etl-ec2-private_ip            = aws_instance.genomic-etl-ec2.private_ip
   }
 }
 
