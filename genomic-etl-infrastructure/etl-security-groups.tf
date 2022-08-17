@@ -8,7 +8,7 @@ resource "aws_security_group" "outbound-to-ssm" {
     to_port = 443
     protocol = "tcp"
     cidr_blocks = [
-      var.genomic-etl-subnet-us-east-1a-cidr
+      var.genomic-etl-subnet-us-east-cidr
     ]
   }
 
