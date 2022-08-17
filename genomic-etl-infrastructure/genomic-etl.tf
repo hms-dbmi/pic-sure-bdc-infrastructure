@@ -33,7 +33,7 @@ resource "aws_instance" "genomic-etl-ec2" {
 
   vpc_security_group_ids = [
     aws_security_group.outbound-to-ssm.id,
-    aws_security_group.inbound-app-from-lma-for-dev-only.id
+    aws_security_group.inbound-from-public-internet.id
   ]
   root_block_device {
     delete_on_termination = true

@@ -11,6 +11,14 @@ resource "aws_security_group" "outbound-to-ssm" {
       var.genomic-etl-subnet-us-east-cidr
     ]
   }
+    ingress {
+    from_port = 443
+    to_port = 443
+    protocol = "tcp"
+    cidr_blocks = [
+      172.34.0.0/16
+    ]
+  }
 
   tags = {
     Owner       = "Avillach_Lab"
@@ -19,31 +27,32 @@ resource "aws_security_group" "outbound-to-ssm" {
   }
 }
 
-resource "aws_security_group" "inbound-app-from-lma-for-dev-only" {
-  name = "allow_inbound_from_lma_subnet_to_app_server_${var.deployment_githash}"
-  description = "Allow inbound traffic from LMA on port 22"
+resource "aws_security_group" "inbound-from-public-internet" {
+  name = "allow_inbound_from_public_internet_to_genomic_etl_${var.deployment_githash}"
+  description = "Allow inbound traffic from public internet to genomic servers for installation purposes"
   vpc_id = var.target-vpc
 
   ingress {
-    from_port = 22
-    to_port = 22
+    from_port = 80
+    to_port = 80
     protocol = "tcp"
     cidr_blocks = [
-      "134.174.0.0/16","172.24.0.68/32"
+      "0.0.0.0/0"
     ]
   }
-
-  egress {
-    from_port = 0
-    to_port = 0
-    protocol = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+  ingress {
+    from_port = 443
+    to_port = 443
+    protocol = "tcp"
+    cidr_blocks = [
+      "0.0.0.0/0"
+    ]
   }
 
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "FISMA Terraform Playground - ${var.deployment_githash} - inbound-app-from-lma-for-dev-only Security Group"
+    Name        = "FISMA Terraform Playground - ${var.deployment_githash} - inbound-from-public-internet Security Group - ${var.target-stack}"
   }
 }
 

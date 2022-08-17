@@ -12,5 +12,5 @@ variable "internal-dns-zone-id" {
 }
 variable "target-vpc" {
   type = string
-  default = "__VPC_FOR_THIS_DEPLOYMENT__"
+  default = "__VPC_FOR_THIS_STACK__"
 }
