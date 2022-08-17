@@ -16,7 +16,7 @@ resource "aws_security_group" "outbound-to-ssm" {
     to_port = 443
     protocol = "tcp"
     cidr_blocks = [
-      172.34.0.0/16
+      "172.34.0.0/16"
     ]
   }
 
