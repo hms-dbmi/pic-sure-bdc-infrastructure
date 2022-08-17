@@ -25,7 +25,7 @@ resource "aws_instance" "genomic-etl-ec2" {
 
   associate_public_ip_address = false
 
-  subnet_id = var.app-subnet-us-east-1a-id
+  subnet_id = var.genomic-etl-subnet-us-east-id
 
   iam_instance_profile = "genomic-etl-deployment-s3-profile-${var.deployment_githash}"
 
