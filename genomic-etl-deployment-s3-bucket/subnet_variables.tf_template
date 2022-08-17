@@ -2,6 +2,10 @@ variable "genomic-etl-subnet-us-east-id" {
   type = string
   default = "__SUBNET_ID__"
 }
+variable "genomic-etl-subnet-us-east-cidr" {
+  type = string
+  default = "__SUBNET_CIDR__"
+}
 variable "internal-dns-zone-id" {
   type = string
   default = "__INTERNAL_DNS_ZONE_ID__"
