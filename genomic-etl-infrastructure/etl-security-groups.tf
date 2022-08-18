@@ -26,4 +26,3 @@ resource "aws_security_group" "traffic-to-ssm" {
     Name        = "FISMA Terraform Playground - ${var.deployment_githash} - traffic-to-ssm Security Group"
   }
 }
-}
