@@ -1,6 +1,6 @@
-resource "aws_security_group" "outbound-to-ssm" {
-  name = "allow_outbound_from_genomic_etl_to_ssm_${var.deployment_githash}"
-  description = "Allow outbound traffic to ssm without a public ip"
+resource "aws_security_group" "traffic-to-ssm" {
+  name = "allow_traffic_from_genomic_etl_to_ssm_${var.deployment_githash}"
+  description = "Allow traffic to ssm without a public ip"
   vpc_id = var.target-vpc
 
   egress {
@@ -11,7 +11,7 @@ resource "aws_security_group" "outbound-to-ssm" {
       var.genomic-etl-subnet-us-east-cidr
     ]
   }
-    ingress {
+  ingress {
     from_port = 443
     to_port = 443
     protocol = "tcp"
@@ -23,7 +23,7 @@ resource "aws_security_group" "outbound-to-ssm" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "FISMA Terraform Playground - ${var.deployment_githash} - outbound-to-hpds Security Group"
+    Name        = "FISMA Terraform Playground - ${var.deployment_githash} - traffic-to-ssm Security Group"
   }
 }
 
