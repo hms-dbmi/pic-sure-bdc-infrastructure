@@ -16,7 +16,7 @@ resource "aws_security_group" "traffic-to-ssm" {
     to_port = 443
     protocol = "tcp"
     cidr_blocks = [
-      "172.34.0.0/16"
+      var.genomic-etl-subnet-us-east-cidr
     ]
   }
 
@@ -53,24 +53,5 @@ resource "aws_security_group" "inbound-from-public-internet" {
     Owner       = "Avillach_Lab"
     Environment = "development"
     Name        = "FISMA Terraform Playground - ${var.deployment_githash} - inbound-from-public-internet Security Group"
-  }
-}
-
-resource "aws_security_group" "interal_app_traffic" {
-  name = "allow_interal_app_traffic_${var.deployment_githash}"
-  description = "Allow internal app traffic on port 8080"
-  vpc_id = var.target-vpc
-
-  ingress {
-    from_port = 8080
-    to_port = 8080
-    protocol = "tcp"
-    self = true
-  }
-
-  tags = {
-    Owner       = "Avillach_Lab"
-    Environment = "development"
-    Name        = "FISMA Terraform Playground - ${var.deployment_githash} - internal app traffic Security Group"
   }
 }
