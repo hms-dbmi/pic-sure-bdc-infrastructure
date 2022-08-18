@@ -23,7 +23,7 @@ resource "aws_instance" "genomic-etl-ec2" {
   ami           = var.ami-id
   instance_type = "m5.large"
 
-  associate_public_ip_address = false
+  associate_public_ip_address = true
 
   subnet_id = var.genomic-etl-subnet-us-east-id
 
