@@ -10,6 +10,7 @@
   "queryExportType":"EXPORT_ASYNC",
   "picSureResourceId":"02e23f52-f354-4e8b-992c-d37c8b9ba140",
   "openAccessResourceId":"70c837be-5ffc-11eb-ae93-0242ac130002",
+  "visualizationResourceId":"ca0ad4a9-130a-3a8a-ae00-e35b07f1108b",
   "applicationIdForBaseQuery":"8b5722c9-62fd-48d6-b0bf-4f67e53efb2b",
   "helpLink": "https://biodatacatalyst.nhlbi.nih.gov/contact\" aria-label='Contact Us, this link will open a new browser tab' target='_blank'",
   "pdfLink": "https://tinyurl.com/PIC-SURE-User-Guide\" aria-label='User Guide, this link will open a new browser tab' target='_blank'",
@@ -85,13 +86,17 @@
 	    "phs002383": "Walk-PHaSST",
 	    "phs002348": "MSH"
 	},
-        "categorySearchResultList" : [
-            "DCC_Harmonized_data_set",
-            "Coronary_Artery_Risk_Development_in_Young_Adults_CARDIA",
-            "Framingham_Cohort",
-            "Genetic_Epidemiology_of_COPD_COPDGene_",
-            "Multi_Ethnic_Study_of_Atherosclerosis_MESA_Cohort",
-            "The_Jackson_Heart_Study_JHS_",
-            "_Consents"
-             ]
+	"categorySearchResultList" : [
+		"DCC_Harmonized_data_set",
+		"Coronary_Artery_Risk_Development_in_Young_Adults_CARDIA",
+		"Framingham_Cohort",
+		"Genetic_Epidemiology_of_COPD_COPDGene_",
+		"Multi_Ethnic_Study_of_Atherosclerosis_MESA_Cohort",
+		"The_Jackson_Heart_Study_JHS_",
+		"_Consents"
+	],
+	"idp_provider":"fence",
+	"idp_provider_uri":"https://gen3.biodatacatalyst.nhlbi.nih.gov",
+	"fence_client_id":"${fence_client_id}",
+	"fence_redirect_url":"https://biodatacatalyst.integration.hms.harvard.edu/psamaui/login/"
 }
