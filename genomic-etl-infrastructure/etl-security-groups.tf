@@ -16,7 +16,7 @@ resource "aws_security_group" "traffic-to-ssm" {
     to_port = 443
     protocol = "tcp"
     cidr_blocks = [
-      var.genomic-etl-subnet-us-east-cidr
+      "172.34.0.0/16"
     ]
   }
 
