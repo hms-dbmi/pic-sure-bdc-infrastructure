@@ -27,7 +27,7 @@ resource "aws_security_group" "traffic-to-ssm" {
   }
 }
 resource "aws_security_group" "inbound-genomic-from-lma-for-dev-only" {
-  name = "allow_inbound_from_lma_subnet_to_genomic_server_${var.stack_githash}"
+  name = "allow_inbound_from_lma_subnet_to_genomic_server_${var.deployment_githash}"
   description = "Allow inbound traffic from LMA on port 22"
   vpc_id = var.target-vpc
 
