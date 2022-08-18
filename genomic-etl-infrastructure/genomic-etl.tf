@@ -32,8 +32,7 @@ resource "aws_instance" "genomic-etl-ec2" {
   user_data = data.template_cloudinit_config.genomic-user-data.rendered
 
   vpc_security_group_ids = [
-    aws_security_group.traffic-to-ssm.id,
-    aws_security_group.inbound-from-public-internet.id
+    aws_security_group.traffic-to-ssm.id
   ]
   root_block_device {
     delete_on_termination = true
