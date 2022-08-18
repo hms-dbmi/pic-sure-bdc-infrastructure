@@ -26,32 +26,4 @@ resource "aws_security_group" "traffic-to-ssm" {
     Name        = "FISMA Terraform Playground - ${var.deployment_githash} - traffic-to-ssm Security Group"
   }
 }
-
-resource "aws_security_group" "inbound-from-public-internet" {
-  name = "allow_inbound_from_public_internet_to_genomic_etl_${var.deployment_githash}"
-  description = "Allow inbound traffic from public internet to genomic servers for installation purposes"
-  vpc_id = var.target-vpc
-
-  ingress {
-    from_port = 80
-    to_port = 80
-    protocol = "tcp"
-    cidr_blocks = [
-      "0.0.0.0/0"
-    ]
-  }
-  ingress {
-    from_port = 443
-    to_port = 443
-    protocol = "tcp"
-    cidr_blocks = [
-      "0.0.0.0/0"
-    ]
-  }
-
-  tags = {
-    Owner       = "Avillach_Lab"
-    Environment = "development"
-    Name        = "FISMA Terraform Playground - ${var.deployment_githash} - inbound-from-public-internet Security Group"
-  }
 }
