@@ -21,7 +21,7 @@ data "template_cloudinit_config" "genomic-user-data" {
 
 resource "aws_instance" "genomic-etl-ec2" {
   ami           = var.ami-id
-  instance_type = "m5.2xlarge"
+  instance_type = "m5.4xlarge"
 
   associate_public_ip_address = true
 
@@ -39,7 +39,7 @@ resource "aws_instance" "genomic-etl-ec2" {
   root_block_device {
     delete_on_termination = true
     encrypted             = true
-    volume_size           = 50
+    volume_size           = 1000
   }
 
   tags = {
