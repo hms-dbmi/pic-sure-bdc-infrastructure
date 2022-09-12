@@ -116,6 +116,12 @@ resource "aws_instance" "docker-awscli-base" {
     Environment = "development"
     Name        = "FISMA Terraform Playground - Docker AWS CLI AMI"
   }
+  
+  metadata_options {
+  	http_endpoint = "enabled"
+  	http_tokens = "required"
+	instance_metadata_tags = "enabled"  
+  }
 
   user_data = file("install_docker_and_awscli.sh")
 

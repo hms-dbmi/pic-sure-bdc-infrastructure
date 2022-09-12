@@ -49,22 +49,32 @@ echo "
             {
                \"file_path\":\"/var/log/secure\",
                \"log_group_name\":\"secure\",
-               \"log_stream_name\":\"{instance_id} secure\"
+               \"log_stream_name\":\"{instance_id} secure\",
+               \"timestamp_format\":\"UTC\"
             },
             {
                \"file_path\":\"/var/log/messages\",
                \"log_group_name\":\"messages\",
-               \"log_stream_name\":\"{instance_id} messages\"
+               \"log_stream_name\":\"{instance_id} messages\",
+               \"timestamp_format\":\"UTC\"
             },
 						{
                \"file_path\":\"/var/log/audit/audit.log\",
                \"log_group_name\":\"audit.log\",
-               \"log_stream_name\":\"{instance_id} audit.log\"
+               \"log_stream_name\":\"{instance_id} audit.log\",
+               \"timestamp_format\":\"UTC\"
             },
 						{
                \"file_path\":\"/var/log/yum.log\",
                \"log_group_name\":\"yum.log\",
-               \"log_stream_name\":\"{instance_id} yum.log\"
+               \"log_stream_name\":\"{instance_id} yum.log\",
+               \"timestamp_format\":\"UTC\"
+            },
+            {
+               \"file_path\":\"/var/log/wildfly-docker-logs/*\",
+               \"log_group_name\":\"wildfly-logs\",
+               \"log_stream_name\":\"{instance_id} ${stack_githash} wildfly-app-logs\",
+               \"timestamp_format\":\"UTC\"
             }
          ]
       }

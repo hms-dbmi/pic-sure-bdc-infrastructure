@@ -72,9 +72,9 @@ echo "
                \"timestamp_format\":\"UTC\"
             },
             {
-               \"file_path\":\"/var/log/hpds-docker-logs/*\",
-               \"log_group_name\":\"hpds-logs\",
-               \"log_stream_name\":\"{instance_id} ${stack_githash} hpds-app-logs\",
+               \"file_path\":\"/var/log/dictionary-docker-logs/*\",
+               \"log_group_name\":\"dictionary-logs\",
+               \"log_stream_name\":\"{instance_id} ${stack_githash} dictionary-app-logs\",
                \"timestamp_format\":\"UTC\"
             }
          ]
@@ -200,62 +200,15 @@ echo "completed Splunk configuration"
 for i in {1..5}; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/nessus_config/setup.sh /opt/nessus_setup.sh && break || sleep 45; done
 sh /opt/nessus_setup.sh "${stack_s3_bucket}" "BDC_Prod_$(echo ${target-stack}|tr '[a-b]' '[A-B]')"
 
-for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-hpds.tar.gz /home/centos/pic-sure-hpds.tar.gz && break || sleep 45; done
-mkdir -p /opt/local/hpds/all
-for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/data/${dataset_s3_object_key}/javabins_rekeyed.tar.gz /opt/local/hpds/javabins_rekeyed.tar.gz  && break || sleep 45; done
-aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/chr0masks.bin /opt/local/hpds/all/
-aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/chr1masks.bin /opt/local/hpds/all/
-aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/chr2masks.bin /opt/local/hpds/all/
-aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/chr3masks.bin /opt/local/hpds/all/
-aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/chr4masks.bin /opt/local/hpds/all/
-aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/chr5masks.bin /opt/local/hpds/all/
-aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/chr6masks.bin /opt/local/hpds/all/
-aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/chr7masks.bin /opt/local/hpds/all/
-aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/chr8masks.bin /opt/local/hpds/all/
-aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/chr9masks.bin /opt/local/hpds/all/
-aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/chr10masks.bin /opt/local/hpds/all/
-aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/chr11masks.bin /opt/local/hpds/all/
-aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/chr12masks.bin /opt/local/hpds/all/
-aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/chr13masks.bin /opt/local/hpds/all/
-aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/chr14masks.bin /opt/local/hpds/all/
-aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/chr15masks.bin /opt/local/hpds/all/
-aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/chr16masks.bin /opt/local/hpds/all/
-aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/chr17masks.bin /opt/local/hpds/all/
-aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/chr18masks.bin /opt/local/hpds/all/
-aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/chr19masks.bin /opt/local/hpds/all/
-aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/chr20masks.bin /opt/local/hpds/all/
-aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/chr21masks.bin /opt/local/hpds/all/
-aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/chr22masks.bin /opt/local/hpds/all/
-aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/BucketIndexBySample.javabin /opt/local/hpds/all/
-aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/Gene_with_variant_infoStore.javabin /opt/local/hpds/all/
-aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/Variant_class_infoStore.javabin /opt/local/hpds/all/
-aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/Variant_consequence_calculated_infoStore.javabin /opt/local/hpds/all/
-aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/Variant_frequency_as_text_infoStore.javabin /opt/local/hpds/all/
-aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/Variant_severity_infoStore.javabin /opt/local/hpds/all/
-aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/BucketIndexBySampleStorage.javabin /opt/local/hpds/all/
-aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/Gene_with_variant_infoStoreStorage.javabin /opt/local/hpds/all/
-aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/Variant_class_infoStoreStorage.javabin /opt/local/hpds/all/
-aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/Variant_consequence_calculated_infoStoreStorage.javabin /opt/local/hpds/all/
-aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/Variant_frequency_as_text_infoStoreStorage.javabin /opt/local/hpds/all/
-aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/Variant_severity_infoStoreStorage.javabin /opt/local/hpds/all/
-aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/variantIndex_fbbis.javabin /opt/local/hpds/all/
-aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/variantIndex_fbbis_storage.javabin /opt/local/hpds/all/
-aws s3 cp s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/variantStore.javabin /opt/local/hpds/all/
-
-cd /opt/local/hpds
-tar -xvzf javabins_rekeyed.tar.gz
-cd ~
-
 for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/domain-join.sh /root/domain-join.sh && break || sleep 45; done
 sudo bash /root/domain-join.sh
 
-sudo mkdir -p /var/log/hpds-docker-logs
+sudo mkdir -p /var/log/dictionary-docker-logs
+for i in 1 2 3 4 5 6 7 8 9; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-hpds-dictionary-resource.tar.gz /home/centos/pic-sure-hpds-dictionary-resource.tar.gz && break || sleep 45; done
+sudo mkdir -p /usr/local/docker-config/search/
 
-HPDS_IMAGE=`sudo docker load < /home/centos/pic-sure-hpds.tar.gz | cut -d ' ' -f 3`
-sudo docker run --restart unless-stopped --name=hpds -v /opt/local/hpds:/opt/local/hpds -p 8080:8080 --entrypoint=java -d $HPDS_IMAGE -XX:+UseParallelGC -XX:SurvivorRatio=250 -Xms10g -Xmx110g -server -jar hpds.jar -httpPort 8080 -DCACHE_SIZE=2500 -DSMALL_TASK_THREADS=1 -DLARGE_TASK_THREADS=1 -DSMALL_JOB_LIMIT=100 -DID_BATCH_SIZE=5000 "-DALL_IDS_CONCEPT=NONE"  "-DID_CUBE_NAME=NONE"
-
-sudo docker logs -f hpds > /var/log/hpds-docker-logs/hpds.log &
+DICTIONARY_IMAGE=`sudo docker load < /home/centos/pic-sure-hpds-dictionary-resource.tar.gz | cut -d ' ' -f 3`
+sudo docker run --name=dictionary -v /var/log/dictionary-docker-logs/:/usr/local/tomcat/logs/ -e CATALINA_OPTS=" -Xms1g -Xmx12g " -p 8080:8080 -d $DICTIONARY_IMAGE
 
 INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)
 sudo /usr/local/bin/aws --region=us-east-1 ec2 create-tags --resources $${INSTANCE_ID} --tags Key=InitComplete,Value=true
-
