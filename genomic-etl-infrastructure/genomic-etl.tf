@@ -4,7 +4,6 @@ data "template_file" "genomic-user_data" {
   vars = {
     deployment_githash   = var.deployment_githash_long
     deployment_s3_bucket = var.deployment_s3_bucket
-    genomic_file_s3_location = var.genomic_file_s3_location
   }
 }
 
