@@ -1,27 +1,4 @@
 
-resource "aws_s3_bucket_object" "certs-folder" {
-  bucket       = var.deployment_s3_bucket
-  key          = "genomic-etl/certs/"
-  content_type = "application/x-directory"
-}
-
-resource "aws_s3_bucket_object" "configs-folder" {
-  bucket       = var.deployment_s3_bucket
-  key          = "genomic-etl/configs/"
-  content_type = "application/x-directory"
-}
-
-resource "aws_s3_bucket_object" "data-folder" {
-  bucket       = var.deployment_s3_bucket
-  key          = "genomic-etl/data/"
-  content_type = "application/x-directory"
-}
-
-resource "aws_s3_bucket_object" "modules-folder" {
-  bucket       = var.deployment_s3_bucket
-  key          = "genomic-etl/modules/"
-  content_type = "application/x-directory"
-}
 
 resource "aws_s3_bucket_object" "releases-folder" {
   bucket       = var.deployment_s3_bucket

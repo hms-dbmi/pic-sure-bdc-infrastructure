@@ -4,6 +4,7 @@ data "template_file" "genomic-user_data" {
   vars = {
     deployment_githash   = var.deployment_githash_long
     deployment_s3_bucket = var.deployment_s3_bucket
+    genomic_file_s3_location = var.genomic_file_s3_location
   }
 }
 
@@ -21,7 +22,7 @@ data "template_cloudinit_config" "genomic-user-data" {
 
 resource "aws_instance" "genomic-etl-ec2" {
   ami           = var.ami-id
-  instance_type = "m5.4xlarge"
+  instance_type = "m5.12xlarge"
 
   associate_public_ip_address = true
 
@@ -33,8 +34,7 @@ resource "aws_instance" "genomic-etl-ec2" {
 
   vpc_security_group_ids = [
     aws_security_group.traffic-to-ssm.id,
-    aws_security_group.inbound-genomic-from-lma-for-dev-only.id,
-    aws_security_group.inbound-from-public-internet.id
+    aws_security_group.outbound-to-public-internet.id
   ]
   root_block_device {
     delete_on_termination = true

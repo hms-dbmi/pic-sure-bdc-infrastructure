@@ -6,10 +6,6 @@ variable "genomic-etl-subnet-us-east-cidr" {
   type = string
   default = "__SUBNET_CIDR__"
 }
-variable "internal-dns-zone-id" {
-  type = string
-  default = "__INTERNAL_DNS_ZONE_ID__"
-}
 variable "target-vpc" {
   type = string
   default = "__VPC_FOR_THIS_STACK__"
