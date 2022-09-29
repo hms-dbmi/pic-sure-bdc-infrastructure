@@ -57,6 +57,12 @@ resource "aws_instance" "wildfly-ec2" {
     Environment = "development"
     Name        = "FISMA Terraform Playground - ${var.stack_githash} - Wildfly - ${var.target-stack}"
   }
+  
+  metadata_options {
+  	http_endpoint = "enabled"
+  	http_tokens = "required"
+	  instance_metadata_tags = "enabled"  
+  }
 
 }
 
