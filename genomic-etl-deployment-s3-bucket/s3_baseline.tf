@@ -1,8 +1,8 @@
 
 
-resource "aws_s3_bucket_object" "releases-folder" {
+resource "aws_s3_bucket_object" "session-logs-folder" {
   bucket       = var.deployment_s3_bucket
-  key          = "genomic-etl/releases/"
+  key          = "genomic-etl/session_logs/"
   content_type = "application/x-directory"
 }
 
