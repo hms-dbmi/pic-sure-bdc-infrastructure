@@ -36,19 +36,7 @@ resource "aws_iam_role" "genomic-etl-deployment-s3-role" {
 {
   "Version": "2012-10-17",
   "Statement": [
-      {
-            "Effect": "Allow",
-            "Action": [
-                "s3:GetObject",
-                "s3:PutObject",
-                "s3:PutObjectAcl",
-                "s3:GetObjectAcl",
-                "s3:GetObjectTagging",
-                "s3:DeleteObject"
-            ],
-            "Resource": "arn:aws:s3:::avillach-biodatacatalyst-deployments-3drb48r/*"
-        },
-      {
+    {
       "Action": "sts:AssumeRole",
       "Principal": {
         "Service": "ec2.amazonaws.com"

@@ -27,7 +27,7 @@ resource "aws_instance" "genomic-etl-ec2" {
 
   subnet_id = var.genomic-etl-subnet-us-east-id
 
-  iam_instance_profile = "jenkins-s3-role"
+ 
 
   user_data = data.template_cloudinit_config.genomic-user-data.rendered
 
