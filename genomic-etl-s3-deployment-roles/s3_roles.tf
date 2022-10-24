@@ -4,6 +4,9 @@ variable "deployment_githash" {
 variable "deployment_githash_long" {
   type = string
 }
+variable "consent_group_tag"{
+  type = string
+}
 
 
 resource "aws_iam_instance_profile" "genomic-etl-deployment-s3-profile" {
