@@ -4,13 +4,12 @@ data "template_file" "genomic-user_data" {
   vars = {
     output_s3_bucket = var.output_s3_bucket
     input_s3_bucket = var.input_s3_bucket
-    phs_number = var.phs_number
+    study_id = var.study_id
     chrom_number = var.chrom_number
     study_consent_group = var.study_consent_group
+    consent_group_tag = var.consent_group_tag
+    deployment_githash = var.deployment_githash
     
-    
-
-
   }
 }
 
@@ -51,7 +50,7 @@ resource "aws_instance" "genomic-etl-ec2" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "${var.ec2_name}"
+    Name        = "Genomic ETL Annotation Pipeline - ${study_id}${consent_group_tag} Chromosome ${chrom_number}"
     automaticPatches = "1"
   }
 
