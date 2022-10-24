@@ -50,7 +50,7 @@ resource "aws_instance" "genomic-etl-ec2" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "Genomic ETL Annotation Pipeline - ${study_id} ${study_consent_group} Chromosome ${chrom_number}"
+    Name        = "Genomic ETL Annotation Pipeline - ${var.study_id}${var.consent_group_tag} Chromosome ${var.chrom_number}"
     automaticPatches = "1"
   }
 
