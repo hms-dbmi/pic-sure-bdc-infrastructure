@@ -34,7 +34,7 @@ EOF
 }
 
 resource "aws_iam_role" "genomic-etl-deployment-s3-role" {
-  name               = "genomic-etl-deployment-s3-profile-${var.deployment_githash}-${var.study_id}${var.consent_group_tag}-${var.chrom_number} "
+  name               = "genomic-etl-deployment-s3-profile-${var.deployment_githash}-${var.study_id}${var.consent_group_tag}-${var.chrom_number}"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
