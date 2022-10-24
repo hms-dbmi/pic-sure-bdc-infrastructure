@@ -15,3 +15,34 @@ variable "environment_name" {
   type        = string
   default     = "genomic etl"
 }
+
+
+variable "output_s3_bucket"{
+  type = string
+}
+    
+variable "input_s3_bucket"{
+  type = string
+}
+
+    
+variable "study_id"{
+  type = string
+}
+    
+    
+variable "chrom_number"{
+  type = string
+}
+    
+    
+variable "study_consent_group"{
+  type = string
+}
+    
+    
+variable "consent_group_tag"{
+  type = string
+}
+
+
