@@ -4,6 +4,15 @@ variable "deployment_githash" {
 variable "deployment_githash_long" {
   type = string
 }
+variable "study_id" {
+  type = string
+}
+variable "consent_group_tag" {
+  type = string
+}
+variable "chrom_number" {
+  type = string
+}
 
 
 resource "aws_iam_instance_profile" "genomic-etl-deployment-s3-profile" {
@@ -12,7 +21,7 @@ resource "aws_iam_instance_profile" "genomic-etl-deployment-s3-profile" {
 }
 
 resource "aws_iam_role_policy" "genomic-etl-deployment-s3-policy" {
-  name = "genomic-etl-deployment-s3-profile-${var.deployment_githash}"
+  name = "genomic-etl-deployment-s3-profile-${var.deployment_githash}-{study_id}${consent_group_tag}-${chrom_number}"
   role = aws_iam_role.genomic-etl-deployment-s3-role.id
   policy = <<EOF
 {
@@ -31,7 +40,7 @@ EOF
 }
 
 resource "aws_iam_role" "genomic-etl-deployment-s3-role" {
-  name               = "genomic-etl-deployment-s3-profile-${var.deployment_githash}"
+  name               = "genomic-etl-deployment-s3-profile-${var.deployment_githash}$-{study_id}${consent_group_tag}-${chrom_number} "
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",

@@ -33,7 +33,7 @@ resource "aws_instance" "genomic-etl-ec2" {
 
   subnet_id = var.genomic-etl-subnet-us-east-id
 
-  iam_instance_profile = "genomic-etl-deployment-s3-profile-${var.deployment_githash}"
+  iam_instance_profile = "genomic-etl-deployment-s3-profile-${var.deployment_githash}-{study_id}${consent_group_tag}-${chrom_number}"
 
   user_data = data.template_cloudinit_config.genomic-user-data.rendered
 

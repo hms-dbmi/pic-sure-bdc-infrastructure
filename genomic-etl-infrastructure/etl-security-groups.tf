@@ -1,5 +1,5 @@
 resource "aws_security_group" "traffic-to-ssm" {
-  name = "allow_traffic_from_genomic_etl_to_ssm_${var.deployment_githash}"
+  name = "allow_traffic_from_genomic_etl_to_ssm_${var.deployment_githash}_${study_id}${consent_group_tag}-${chrom_number} "
   description = "allows ec2 to communicate with amazon systems manager and allows for sessions manager use"
   vpc_id = var.target-vpc
 
@@ -15,12 +15,12 @@ resource "aws_security_group" "traffic-to-ssm" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "FISMA Terraform Playground - ${var.deployment_githash} - traffic-to-ssm Security Group"
+    Name        = "FISMA Terraform Playground - ${var.deployment_githash_}${study_id}${consent_group_tag}-${chrom_number}  - traffic-to-ssm Security Group"
   }
 }
 
 resource "aws_security_group" "outbound-to-public-internet" {
-  name = "allow_outbound_to_public_internet_to_genomic_etl_${var.deployment_githash}"
+  name = "allow_outbound_to_public_internet_to_genomic_etl_${var.deployment_githash}_${study_id}${consent_group_tag}-${chrom_number} "
   description = "Allow outbound traffic from genomic servers to internet for download/installation purposes"
   vpc_id = var.target-vpc
 
@@ -52,6 +52,6 @@ resource "aws_security_group" "outbound-to-public-internet" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "FISMA Terraform Playground - ${var.deployment_githash} - outbound-to-public-internet Security Group"
+    Name        = "FISMA Terraform Playground - ${var.deployment_githash}_${study_id}${consent_group_tag}-${chrom_number}  - outbound-to-public-internet Security Group"
    }
   }
