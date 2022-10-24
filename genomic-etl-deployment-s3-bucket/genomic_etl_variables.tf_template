@@ -6,6 +6,7 @@ variable "study_id"{
 }
 variable "consent-group_tag"{
   type = string
+  default = ""
 }
 variable "chrom_number"{
   type = string
