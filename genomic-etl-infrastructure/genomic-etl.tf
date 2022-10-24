@@ -2,8 +2,15 @@
 data "template_file" "genomic-user_data" {
   template = file("scripts/genomic-etl.sh")
   vars = {
-    deployment_githash   = var.deployment_githash_long
-    deployment_s3_bucket = var.deployment_s3_bucket
+    output_s3_bucket = var.output_s3_bucket
+    input_s3_bucket = var.input_s3_bucket
+    phs_number = var.phs_number
+    chrom_number = var.chrom_number
+    study_consent_group = var.study_consent_group
+    
+    
+
+
   }
 }
 
@@ -27,7 +34,7 @@ resource "aws_instance" "genomic-etl-ec2" {
 
   subnet_id = var.genomic-etl-subnet-us-east-id
 
- 
+  iam_instance_profile = "genomic-etl-deployment-s3-profile-${var.deployment_githash}"
 
   user_data = data.template_cloudinit_config.genomic-user-data.rendered
 
@@ -44,7 +51,7 @@ resource "aws_instance" "genomic-etl-ec2" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "FISMA Terraform Playground - ${var.deployment_githash} - Genomic ETL"
+    Name        = "${var.ec2_name}"
     automaticPatches = "1"
   }
 

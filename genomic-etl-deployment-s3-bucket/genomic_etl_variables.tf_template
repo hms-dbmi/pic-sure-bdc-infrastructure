@@ -1,6 +1,17 @@
-variable "deployment_s3_bucket"{
+variable "output_s3_bucket"{
   type = string
-  default = "${deployment_s3_bucket}"
+  default = "${stack_s3_bucket}"
 }
-
+variable "study_id"{
+  type = string
+  default = "phs000000"
+}
+variable "consent-group_tag"{
+  type = string
+  default = ""
+}
+variable "chrom_number"{
+  type = string
+  default = "1"
+}
 
