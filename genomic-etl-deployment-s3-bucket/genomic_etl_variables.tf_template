@@ -1,6 +1,6 @@
 variable "output_s3_bucket"{
   type = string
-  default = "${stack_s3_bucket}"
+  default = ""
 }
 variable "study_id"{
   type = string
