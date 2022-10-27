@@ -47,6 +47,10 @@ resource "aws_instance" "genomic-etl-ec2" {
     volume_size           = 1000
   }
 
+  provisioner "local-exec" {
+    command = "sleep 40"
+  }
+
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
