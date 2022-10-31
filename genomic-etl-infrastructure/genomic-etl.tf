@@ -26,6 +26,11 @@ data "template_cloudinit_config" "genomic-user-data" {
 }
 
 resource "aws_instance" "genomic-etl-ec2" {
+  # sleep to ensure all dependent resources are available on aws
+  provisioner "local-exec" {
+    command = "sleep 120"
+  }
+  
   ami           = var.ami-id
   instance_type = "m5.12xlarge"
 
@@ -45,11 +50,6 @@ resource "aws_instance" "genomic-etl-ec2" {
     delete_on_termination = true
     encrypted             = true
     volume_size           = 1000
-  }
-
-  # sleep to ensure the instance profile is properly available
-  provisioner "local-exec" {
-    command = "sleep 120"
   }
 
   timeouts {
