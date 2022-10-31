@@ -51,6 +51,10 @@ resource "aws_instance" "genomic-etl-ec2" {
     command = "sleep 40"
   }
 
+  timeouts {
+    create = "40m"
+  }
+
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
