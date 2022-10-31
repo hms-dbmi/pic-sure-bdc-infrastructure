@@ -47,8 +47,9 @@ resource "aws_instance" "genomic-etl-ec2" {
     volume_size           = 1000
   }
 
+  # sleep to ensure the instance profile is properly available
   provisioner "local-exec" {
-    command = "sleep 40"
+    command = "sleep 120"
   }
 
   timeouts {
