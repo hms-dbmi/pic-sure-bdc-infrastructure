@@ -32,7 +32,7 @@ resource "aws_instance" "genomic-etl-ec2" {
 
   associate_public_ip_address = true
 
-  vpc_id = var.target-vpc
+  subnet_id = var.genomic-etl-subnet-us-east-id
 
   iam_instance_profile = "genomic-etl-deployment-s3-profile-${var.deployment_githash}-${var.study_id}${var.consent_group_tag}-${var.chrom_number}"
 
