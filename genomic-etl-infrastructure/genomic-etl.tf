@@ -48,11 +48,6 @@ resource "aws_instance" "genomic-etl-ec2" {
     volume_size           = 1000
   }
 
-  timeouts {
-    create = "40m"
-  }
-
-
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
