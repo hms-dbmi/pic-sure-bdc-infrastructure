@@ -55,6 +55,11 @@ resource "aws_instance" "genomic-etl-ec2" {
     automaticPatches = "1"
   }
 
+  timeouts {
+    create = "2h"
+    delete = "2h"
+  }
+
 }
 
 
