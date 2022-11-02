@@ -18,3 +18,7 @@ variable "study_name"{
   type = string
   default = "STUDY_NAME"
 }
+variable "s3_role"{
+  type = string
+  default = "S3_ROLE"
+}

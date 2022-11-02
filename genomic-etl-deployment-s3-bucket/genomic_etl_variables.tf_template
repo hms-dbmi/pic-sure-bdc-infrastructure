@@ -14,3 +14,6 @@ variable "chrom_number"{
 variable "study_name"{
   type = string
 }
+variable "s3_role"{
+  type = string
+}
