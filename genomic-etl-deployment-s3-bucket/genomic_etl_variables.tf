@@ -14,4 +14,7 @@ variable "chrom_number"{
   type = string
   default = "CHROMOSOME_NUMBER"
 }
-
+variable "study_name"{
+  type = string
+  default = "STUDY_NAME"
+}

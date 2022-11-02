@@ -11,4 +11,6 @@ variable "consent-group_tag"{
 variable "chrom_number"{
   type = string
 }
-
+variable "study_name"{
+  type = string
+}
