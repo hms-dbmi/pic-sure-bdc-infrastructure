@@ -99,6 +99,7 @@ mkdir -p /var/log/genomic-docker-logs/ssl_mutex
 INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)
 sudo /usr/local/bin/aws --region=us-east-1 ec2 create-tags --resources $${INSTANCE_ID} --tags Key=InitComplete,Value=true
 
+sudo su
 cd /home/centos/ensembl-vep
 
 aws sts assume-role --role-arn ${s3_role} --role-session-name "get-genomic-source-file" > assume-role-output.txt

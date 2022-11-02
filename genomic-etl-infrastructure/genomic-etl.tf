@@ -36,9 +36,11 @@ resource "aws_instance" "genomic-etl-ec2" {
 
   subnet_id = var.genomic-etl-subnet-us-east-id
 
-  iam_instance_profile = "genomic-etl-deployment-s3-profile-${var.deployment_githash}-${var.study_id}${var.consent_group_tag}-${var.chrom_number}"
+  iam_instance_profile = "genomic-etl-deployment-s3-profile"
 
   user_data = data.template_cloudinit_config.genomic-user-data.rendered
+
+  get_user-data = true
 
   vpc_security_group_ids = [
     aws_security_group.traffic-to-ssm.id,
