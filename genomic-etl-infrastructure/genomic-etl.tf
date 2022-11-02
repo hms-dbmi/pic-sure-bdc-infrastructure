@@ -6,9 +6,11 @@ data "template_file" "genomic-user_data" {
     input_s3_bucket = var.input_s3_bucket
     study_id = var.study_id
     chrom_number = var.chrom_number
+    study_name = var.study_name
     study_consent_group = var.study_consent_group
     consent_group_tag = var.consent_group_tag
     deployment_githash = var.deployment_githash
+    arn_role_cnc =  var.arn_role_cnc
     
   }
 }
@@ -56,6 +58,3 @@ resource "aws_instance" "genomic-etl-ec2" {
   }
 
 }
-
-
-
