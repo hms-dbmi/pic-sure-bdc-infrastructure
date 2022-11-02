@@ -10,7 +10,7 @@ data "template_file" "genomic-user_data" {
     study_consent_group = var.study_consent_group
     consent_group_tag = var.consent_group_tag
     deployment_githash = var.deployment_githash
-    arn_role_cnc =  var.arn_role_cnc
+    s3_role =  var.s3_role
     
   }
 }

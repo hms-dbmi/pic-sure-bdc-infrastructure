@@ -101,7 +101,7 @@ sudo /usr/local/bin/aws --region=us-east-1 ec2 create-tags --resources $${INSTAN
 
 cd /home/centos/ensemble-vep
 
-aws sts assume-role --role-arn ${arn_role_cnc} --role-session-name "get-genomic-source-file" > assume-role-output.txt
+aws sts assume-role --role-arn ${s3_role} --role-session-name "get-genomic-source-file" > assume-role-output.txt
 
 export AWS_ACCESS_KEY_ID=`grep AccessKeyId assume-role-output.txt | cut -d ':' -f 2 | sed "s/[ ,\"]//g"`
 export AWS_SECRET_ACCESS_KEY=`grep SecretAccessKey assume-role-output.txt | cut -d ':' -f 2 | sed "s/[ ,\"]//g"`
@@ -156,7 +156,7 @@ nohup bgzip -fki --threads 40 ${study_id}${consent_group_tag}.chr${chrom_number}
 
 wait
 
-aws sts assume-role --role-arn ${arn_role_cnc} --role-session-name "get-genomic-source-file" > assume-role-output.txt
+aws sts assume-role --role-arn ${s3_role} --role-session-name "get-genomic-source-file" > assume-role-output.txt
 
 export AWS_ACCESS_KEY_ID=`grep AccessKeyId assume-role-output.txt | cut -d ':' -f 2 | sed "s/[ ,\"]//g"`
 export AWS_SECRET_ACCESS_KEY=`grep SecretAccessKey assume-role-output.txt | cut -d ':' -f 2 | sed "s/[ ,\"]//g"`
