@@ -99,40 +99,39 @@ mkdir -p /var/log/genomic-docker-logs/ssl_mutex
 INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)
 sudo /usr/local/bin/aws --region=us-east-1 ec2 create-tags --resources $${INSTANCE_ID} --tags Key=InitComplete,Value=true
 
-sudo su
-cd /home/centos/ensembl-vep
+sudo cd /home/centos/ensembl-vep
 
 aws sts assume-role --role-arn ${s3_role} --role-session-name "get-genomic-source-file" > assume-role-output.txt
 
-export AWS_ACCESS_KEY_ID=`grep AccessKeyId assume-role-output.txt | cut -d ':' -f 2 | sed "s/[ ,\"]//g"`
-export AWS_SECRET_ACCESS_KEY=`grep SecretAccessKey assume-role-output.txt | cut -d ':' -f 2 | sed "s/[ ,\"]//g"`
-export AWS_SESSION_TOKEN=`grep SessionToken assume-role-output.txt | cut -d ':' -f 2 | sed "s/[ ,\"]//g"`
+sudo export AWS_ACCESS_KEY_ID=`grep AccessKeyId assume-role-output.txt | cut -d ':' -f 2 | sed "s/[ ,\"]//g"`
+sudo export AWS_SECRET_ACCESS_KEY=`grep SecretAccessKey assume-role-output.txt | cut -d ':' -f 2 | sed "s/[ ,\"]//g"`
+sudo export AWS_SESSION_TOKEN=`grep SessionToken assume-role-output.txt | cut -d ':' -f 2 | sed "s/[ ,\"]//g"`
 
-nohup aws s3 cp s3://${input_s3_bucket}/${study_name}_${study_id}_TOPMed_WGS_freeze.9b.chr${chrom_number}.hg38${consent_group_tag}.vcf.gz . &
-
-wait
-
-unset AWS_ACCESS_KEY_ID
-unset AWS_SECRET_ACCESS_KEY
-unset AWS_SESSION_TOKEN
-
-nohup bcftools view -Oz --threads 40 -f PASS,. ${study_name}_${study_id}_TOPMed_WGS_freeze.9b.chr${chrom_number}.hg38${consent_group_tag}.vcf.gz > ${study_id}${consent_group_tag}.chr${chrom_number}.filtered.vcf.gz &
+sudo nohup aws s3 cp s3://${input_s3_bucket}/${study_name}_${study_id}_TOPMed_WGS_freeze.9b.chr${chrom_number}.hg38${consent_group_tag}.vcf.gz . &
 
 wait
 
-nohup bcftools annotate --threads 40 --rename-chrs chrm_rename.txt ${study_id}${consent_group_tag}.chr${chrom_number}.filtered.vcf.gz | bgzip > ${study_id}${consent_group_tag}.chr${chrom_number}.renamed.vcf.gz &
+sudo unset AWS_ACCESS_KEY_ID
+sudo unset AWS_SECRET_ACCESS_KEY
+sudo unset AWS_SESSION_TOKEN
+
+sudo nohup bcftools view -Oz --threads 40 -f PASS,. ${study_name}_${study_id}_TOPMed_WGS_freeze.9b.chr${chrom_number}.hg38${consent_group_tag}.vcf.gz > ${study_id}${consent_group_tag}.chr${chrom_number}.filtered.vcf.gz &
 
 wait
 
-nohup bcftools norm --threads 40 -m -any -f Homo_sapiens.GRCh38.dna.primary_assembly.fa -o sampleChrm11.normalized.vcf.gz ${study_id}${consent_group_tag}.chr${chrom_number}.renamed.vcf.gz &
+sudo nohup bcftools annotate --threads 40 --rename-chrs chrm_rename.txt ${study_id}${consent_group_tag}.chr${chrom_number}.filtered.vcf.gz | bgzip > ${study_id}${consent_group_tag}.chr${chrom_number}.renamed.vcf.gz &
 
 wait
 
-nohup bgzip -d ${study_id}${consent_group_tag}.chr${chrom_number}.normalized.vcf.gz &                        
+sudo nohup bcftools norm --threads 40 -m -any -f Homo_sapiens.GRCh38.dna.primary_assembly.fa -o sampleChrm11.normalized.vcf.gz ${study_id}${consent_group_tag}.chr${chrom_number}.renamed.vcf.gz &
 
 wait
 
-nohup ./vep \
+sudo nohup bgzip -d ${study_id}${consent_group_tag}.chr${chrom_number}.normalized.vcf.gz &                        
+
+wait
+
+sudo nohup ./vep \
 --cache \
 --merged \
 --fork 4 \
@@ -153,32 +152,32 @@ nohup ./vep \
 
 wait
 
-nohup bgzip -fki --threads 40 ${study_id}${consent_group_tag}.chr${chrom_number}.annotated.vcf &
+sudo nohup bgzip -fki --threads 40 ${study_id}${consent_group_tag}.chr${chrom_number}.annotated.vcf &
 
 wait
 
 aws sts assume-role --role-arn ${s3_role} --role-session-name "get-genomic-source-file" > assume-role-output.txt
 
-export AWS_ACCESS_KEY_ID=`grep AccessKeyId assume-role-output.txt | cut -d ':' -f 2 | sed "s/[ ,\"]//g"`
-export AWS_SECRET_ACCESS_KEY=`grep SecretAccessKey assume-role-output.txt | cut -d ':' -f 2 | sed "s/[ ,\"]//g"`
-export AWS_SESSION_TOKEN=`grep SessionToken assume-role-output.txt | cut -d ':' -f 2 | sed "s/[ ,\"]//g"`
+sudo export AWS_ACCESS_KEY_ID=`grep AccessKeyId assume-role-output.txt | cut -d ':' -f 2 | sed "s/[ ,\"]//g"`
+sudo export AWS_SECRET_ACCESS_KEY=`grep SecretAccessKey assume-role-output.txt | cut -d ':' -f 2 | sed "s/[ ,\"]//g"`
+sudo export AWS_SESSION_TOKEN=`grep SessionToken assume-role-output.txt | cut -d ':' -f 2 | sed "s/[ ,\"]//g"`
 
-nohup aws s3 cp ${study_id}${consent_group_tag}.chr${chrom_number}.annotated.vcf.gz s3://${output_s3_bucket}/genomic-etl/processed_vcfs/ &
-
-wait
-
-nohup aws s3 cp ${study_id}${consent_group_tag}.chr${chrom_number}.annotated.vcf.gzi s3://${output_s3_bucket}/genomic-etl/processed_vcfs/ &
+sudo nohup aws s3 cp ${study_id}${consent_group_tag}.chr${chrom_number}.annotated.vcf.gz s3://${output_s3_bucket}/genomic-etl/processed_vcfs/ &
 
 wait
 
-nohup aws s3 cp ${study_name}_${study_id}_TOPMed_WGS_freeze.9b.chr${chrom_number}.hg38${consent_group_tag}.vcf.gz s3://${output_s3_bucket}/genomic-etl/original_vcfs/${study_id}${consent_group_tag}.chr${chrom_number}.original.vcf.gz &
+sudo nohup aws s3 cp ${study_id}${consent_group_tag}.chr${chrom_number}.annotated.vcf.gzi s3://${output_s3_bucket}/genomic-etl/processed_vcfs/ &
 
 wait
 
-nohup aws s3 cp nohup.out s3://${output_s3_bucket}/genomic-etl/logs/${study_id}${consent_group_tag}.chr${chrom_number}.out &
+sudo nohup aws s3 cp ${study_name}_${study_id}_TOPMed_WGS_freeze.9b.chr${chrom_number}.hg38${consent_group_tag}.vcf.gz s3://${output_s3_bucket}/genomic-etl/original_vcfs/${study_id}${consent_group_tag}.chr${chrom_number}.original.vcf.gz &
 
 wait
 
-unset AWS_ACCESS_KEY_ID
-unset AWS_SECRET_ACCESS_KEY
-unset AWS_SESSION_TOKEN
+sudo nohup aws s3 cp nohup.out s3://${output_s3_bucket}/genomic-etl/logs/${study_id}${consent_group_tag}.chr${chrom_number}.out &
+
+wait
+
+sudo unset AWS_ACCESS_KEY_ID
+sudo unset AWS_SECRET_ACCESS_KEY
+sudo unset AWS_SESSION_TOKEN
