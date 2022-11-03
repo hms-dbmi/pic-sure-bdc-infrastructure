@@ -100,19 +100,14 @@ INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.1
 sudo /usr/local/bin/aws --region=us-east-1 ec2 create-tags --resources $${INSTANCE_ID} --tags Key=InitComplete,Value=true
 
 
-export KENT_SRC=/home/centos/kent-335_base/src
-export MACHTYPE=$(uname -m)
-export CFLAGS="-fPIC"
+export KENT_SRC=`/home/centos/kent-335_base/src`
+export MACHTYPE=`$(uname -m)`
+export CFLAGS=`-fPIC`
 export MYSQLINC=`mysql_config --include | sed -e 's/^-I//g'`
 export MYSQLLIBS=`mysql_config --libs`
-export PERL5LIB=$PERL5LIB:/home/centos/cpanm/lib/perl5
-export PERL5LIB=${PERL5LIB}:/home/centos/bioperl-1.6.924 
-export PERL5LIB=${PERL5LIB}:/home/centos/Bio-DB-HTS/lib:/home/centos/Bio-DB-HTS/blib/arch/auto/Bio/DB/HTS/:/home/centos/Bio-DB-HTS/blib/arch/auto/Bio/DB/HTS/Faidx:/home/centos/bioperl-1.6.924:/home/centos/ensembl/modules:/home/centos/ensembl-compara/modules:/home/centos/ensembl-variation/modules:/home/centos/src/ensembl-funcgen/modules:/home/centos/lib/perl/5.14.4/:/home/centos/ensembl-vep
-export HTSLIB_DIR=/home/centos/htslib/
-export PERL5LIB=$PERL5LIB:/home/centos/Bio-DB-HTS/lib:/home/centos/Bio-DB-HTS/blib/arch/auto/Bio/DB/HTS/:/home/centos/Bio-DB-HTS/blib/arch/auto/Bio/DB/HTS/Faidx
-export PERL5LIB=${PERL5LIB}:/home/centos/cpanm/lib/perl5
-export PATH=/home/centos/htslib:/home/centos/bin:$PATH
-export PATH=/usr/local/bin:$PATH
+export PERL5LIB=`/home/centos/cpanm/lib/perl5:/home/centos/bioperl-1.6.924:/home/centos/Bio-DB-HTS/lib:/home/centos/Bio-DB-HTS/blib/arch/auto/Bio/DB/HTS/:/home/centos/Bio-DB-HTS/blib/arch/auto/Bio/DB/HTS/Faidx:/home/centos/bioperl-1.6.924:/home/centos/ensembl/modules:/home/centos/ensembl-compara/modules:/home/centos/ensembl-variation/modules:/home/centos/src/ensembl-funcgen/modules:/home/centos/lib/perl/5.14.4/:/home/centos/ensembl-vep:/home/centos/Bio-DB-HTS/lib:/home/centos/Bio-DB-HTS/blib/arch/auto/Bio/DB/HTS/:/home/centos/Bio-DB-HTS/blib/arch/auto/Bio/DB/HTS/Faidx:/home/centos/cpanm/lib/perl5`
+export HTSLIB_DIR=`/home/centos/htslib/`
+export PATH=`/home/centos/htslib:/home/centos/bin:/usr/local/bin:/usr/local/sbin:/usr/sbin:/usr/bin`
 
 sudo /usr/local/bin/aws sts assume-role --role-arn ${s3_role} --role-session-name "get-genomic-source-file" > /usr/tmp/assume-role-output.txt
 
