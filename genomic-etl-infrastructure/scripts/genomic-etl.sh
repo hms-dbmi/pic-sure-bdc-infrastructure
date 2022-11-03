@@ -119,7 +119,7 @@ sudo nohup /usr/local/bin/bcftools view -Oz --threads 40 -f PASS,. /home/centos/
 
 wait
 
-sudo nohup /usr/local/bin/bcftools annotate --threads 40 --rename-chrs /home/centos/ensembl-vep/chrm_rename.txt ${study_id}${consent_group_tag}.chr${chrom_number}.filtered.vcf.gz | bgzip > /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.renamed.vcf.gz &
+sudo nohup /usr/local/bin/bcftools annotate --threads 40 --rename-chrs /home/centos/ensembl-vep/chrm_rename.txt ${study_id}${consent_group_tag}.chr${chrom_number}.filtered.vcf.gz | /home/centos/htslib/bgzip > /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.renamed.vcf.gz &
 
 wait
 
