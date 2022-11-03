@@ -123,7 +123,7 @@ sudo nohup /usr/local/bin/bcftools annotate --threads 40 --rename-chrs /home/cen
 
 wait
 
-sudo nohup /usr/local/bin/bcftools norm --threads 40 -m -any -f /home/centos/ensembl-vep/Homo_sapiens.GRCh38.dna.primary_assembly.fa -o /home/centos/ensembl-vep/sampleChrm11.normalized.vcf.gz /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.renamed.vcf.gz &
+sudo nohup /usr/local/bin/bcftools norm --threads 40 -m -any -f /home/centos/ensembl-vep/Homo_sapiens.GRCh38.dna.primary_assembly.fa -o /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.normalized.vcf.gz /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.renamed.vcf.gz &
 
 wait
 
