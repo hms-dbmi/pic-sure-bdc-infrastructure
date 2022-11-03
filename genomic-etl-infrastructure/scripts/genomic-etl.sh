@@ -102,7 +102,6 @@ sudo /usr/local/bin/aws --region=us-east-1 ec2 create-tags --resources $${INSTAN
 
 export PERL5LIB='/home/centos/cpanm/lib/perl5:/home/centos/bioperl-1.6.924:/home/centos/Bio-DB-HTS/lib:/home/centos/Bio-DB-HTS/blib/arch/auto/Bio/DB/HTS/:/home/centos/Bio-DB-HTS/blib/arch/auto/Bio/DB/HTS/Faidx:/home/centos/bioperl-1.6.924:/home/centos/ensembl/modules:/home/centos/ensembl-compara/modules:/home/centos/ensembl-variation/modules:/home/centos/src/ensembl-funcgen/modules:/home/centos/lib/perl/5.14.4/:/home/centos/ensembl-vep:/home/centos/Bio-DB-HTS/lib:/home/centos/Bio-DB-HTS/blib/arch/auto/Bio/DB/HTS/:/home/centos/Bio-DB-HTS/blib/arch/auto/Bio/DB/HTS/Faidx:/home/centos/cpanm/lib/perl5'
 export HTSLIB_DIR='/home/centos/htslib/'
-export PATH='$(PATH):/home/centos/htslib/:/home/centos/bin:/usr/local/bin'
 
 sudo /usr/local/bin/aws sts assume-role --role-arn ${s3_role} --role-session-name "get-genomic-source-file" > /usr/tmp/assume-role-output.txt
 
