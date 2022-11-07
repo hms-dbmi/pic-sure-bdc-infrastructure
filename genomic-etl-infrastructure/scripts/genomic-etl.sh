@@ -173,12 +173,13 @@ export AWS_ACCESS_KEY_ID=`sudo grep AccessKeyId /usr/tmp/assume-role-output.txt 
 export AWS_SECRET_ACCESS_KEY=`sudo grep SecretAccessKey /usr/tmp/assume-role-output.txt | cut -d ':' -f 2 | sed "s/[ ,\"]//g"`
 export AWS_SESSION_TOKEN=`sudo grep SessionToken /usr/tmp/assume-role-output.txt | cut -d ':' -f 2 | sed "s/[ ,\"]//g"`
 
+echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} output stage
 sudo /usr/local/bin/aws s3 cp /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.annotated.vcf.gz s3://${output_s3_bucket}/genomic-etl/processed_vcfs/ &
 sudo /usr/local/bin/aws s3 cp /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.annotated.vcf.gz.gzi s3://${output_s3_bucket}/genomic-etl/processed_vcfs/ &
 sudo /usr/local/bin/aws s3 cp /home/centos/ensembl-vep/${study_name}_${study_id}_TOPMed_WGS_freeze.9b.chr${chrom_number}.hg38${consent_group_tag}.vcf.gz s3://${output_s3_bucket}/genomic-etl/original_vcfs/${study_id}${consent_group_tag}.chr${chrom_number}.original.vcf.gz &
-echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} output stage
 wait
 echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} output stage
+sudo /usr/local/bin/aws --region=us-east-1 ec2 create-tags --resources $${INSTANCE_ID} --tags Key=AnnotationComplete,Value=true
 unset AWS_ACCESS_KEY_ID
 unset AWS_SECRET_ACCESS_KEY
 unset AWS_SESSION_TOKEN
