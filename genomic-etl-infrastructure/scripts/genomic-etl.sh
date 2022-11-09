@@ -99,17 +99,19 @@ mkdir -p /var/log/genomic-docker-logs/ssl_mutex
 INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)
 sudo /usr/local/bin/aws --region=us-east-1 ec2 create-tags --resources $${INSTANCE_ID} --tags Key=InitComplete,Value=true
 
+echo 'Init complete, moving to annotation'
+
 
 export PERL5LIB='/home/centos/cpanm/lib/perl5:/home/centos/bioperl-1.6.924:/home/centos/Bio-DB-HTS/lib:/home/centos/Bio-DB-HTS/blib/arch/auto/Bio/DB/HTS/:/home/centos/Bio-DB-HTS/blib/arch/auto/Bio/DB/HTS/Faidx:/home/centos/bioperl-1.6.924:/home/centos/ensembl/modules:/home/centos/ensembl-compara/modules:/home/centos/ensembl-variation/modules:/home/centos/src/ensembl-funcgen/modules:/home/centos/lib/perl/5.14.4/:/home/centos/ensembl-vep:/home/centos/Bio-DB-HTS/lib:/home/centos/Bio-DB-HTS/blib/arch/auto/Bio/DB/HTS/:/home/centos/Bio-DB-HTS/blib/arch/auto/Bio/DB/HTS/Faidx:/home/centos/cpanm/lib/perl5'
 export HTSLIB_DIR='/home/centos/htslib/'
 
-sudo /usr/local/bin/aws sts assume-role --role-arn arn:aws:iam::600168050588:role/nih-nhlbi-TopMed-EC2Access-S3 --role-session-name "get-genomic-source-file" > /usr/tmp/assume-role-output.txt
+/usr/local/bin/aws sts assume-role --role-arn arn:aws:iam::600168050588:role/nih-nhlbi-TopMed-EC2Access-S3 --role-session-name "get-genomic-source-file" > /usr/tmp/assume-role-output.txt
 
-export AWS_ACCESS_KEY_ID=`sudo grep AccessKeyId /usr/tmp/assume-role-output.txt | cut -d ':' -f 2 | sed "s/[ ,\"]//g"`
-export AWS_SECRET_ACCESS_KEY=`sudo grep SecretAccessKey /usr/tmp/assume-role-output.txt | cut -d ':' -f 2 | sed "s/[ ,\"]//g"`
-export AWS_SESSION_TOKEN=`sudo grep SessionToken /usr/tmp/assume-role-output.txt | cut -d ':' -f 2 | sed "s/[ ,\"]//g"`
+export AWS_ACCESS_KEY_ID=`grep AccessKeyId /usr/tmp/assume-role-output.txt | cut -d ':' -f 2 | sed "s/[ ,\"]//g"`
+export AWS_SECRET_ACCESS_KEY=`grep SecretAccessKey /usr/tmp/assume-role-output.txt | cut -d ':' -f 2 | sed "s/[ ,\"]//g"`
+export AWS_SESSION_TOKEN=`grep SessionToken /usr/tmp/assume-role-output.txt | cut -d ':' -f 2 | sed "s/[ ,\"]//g"`
 
-sudo /usr/local/bin/aws s3 cp s3://${input_s3_bucket}/${study_name}_${study_id}_TOPMed_WGS_freeze.9b.chr${chrom_number}.hg38${consent_group_tag}.vcf.gz /home/centos/ensembl-vep/ &
+/usr/local/bin/aws s3 cp s3://${input_s3_bucket}/${study_name}_${study_id}_TOPMed_WGS_freeze.9b.chr${chrom_number}.hg38${consent_group_tag}.vcf.gz /home/centos/ensembl-vep/ &
 
 wait
 
@@ -118,31 +120,31 @@ unset AWS_SECRET_ACCESS_KEY
 unset AWS_SESSION_TOKEN
 
 echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} import
-sudo /usr/local/bin/bcftools view -Oz --threads 40 -f PASS,. /home/centos/ensembl-vep/${study_name}_${study_id}_TOPMed_WGS_freeze.9b.chr${chrom_number}.hg38${consent_group_tag}.vcf.gz > /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.filtered.vcf.gz &
+/usr/local/bin/bcftools view -Oz --threads 40 -f PASS,. /home/centos/ensembl-vep/${study_name}_${study_id}_TOPMed_WGS_freeze.9b.chr${chrom_number}.hg38${consent_group_tag}.vcf.gz > /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.filtered.vcf.gz &
 echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} filter stage
 
 wait
 
 echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} filter stage
-sudo /usr/local/bin/bcftools annotate --threads 40 --rename-chrs /home/centos/ensembl-vep/chrm_rename.txt /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.filtered.vcf.gz | /home/centos/htslib/bgzip > /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.renamed.vcf.gz &
+/usr/local/bin/bcftools annotate --threads 40 --rename-chrs /home/centos/ensembl-vep/chrm_rename.txt /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.filtered.vcf.gz | /home/centos/htslib/bgzip > /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.renamed.vcf.gz &
 echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} rename stage
 
 wait
 
 echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} rename stage
-sudo /usr/local/bin/bcftools norm --threads 40 -m -any -f /home/centos/ensembl-vep/Homo_sapiens.GRCh38.dna.primary_assembly.fa -o /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.normalized.vcf.gz /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.renamed.vcf.gz &
+/usr/local/bin/bcftools norm --threads 40 -m -any -f /home/centos/ensembl-vep/Homo_sapiens.GRCh38.dna.primary_assembly.fa -o /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.normalized.vcf.gz /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.renamed.vcf.gz &
 echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} normalize stage
 
 wait
 
 echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} normalize stage
-sudo /home/centos/htslib/bgzip -d /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.normalized.vcf.gz &
+/home/centos/htslib/bgzip -d /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.normalized.vcf.gz &
 echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} decompress stage
 
 wait
 
 echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} decompress stage
-sudo /home/centos/ensembl-vep/vep \
+/home/centos/ensembl-vep/vep \
 --cache \
 --merged \
 --fork 4 \
@@ -163,23 +165,23 @@ sudo /home/centos/ensembl-vep/vep \
 echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} vep stage
 wait
 echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} vep stage
-sudo /home/centos/htslib/bgzip -fki --threads 40 /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.annotated.vcf &
+/home/centos/htslib/bgzip -fki --threads 40 /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.annotated.vcf &
 echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} compressing stage
 wait
 echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} compressing stage
-sudo /usr/local/bin/aws sts assume-role --role-arn ${s3_role} --role-session-name "get-genomic-source-file" > /usr/tmp/assume-role-output.txt
+/usr/local/bin/aws sts assume-role --role-arn ${s3_role} --role-session-name "get-genomic-source-file" > /usr/tmp/assume-role-output.txt
 
-export AWS_ACCESS_KEY_ID=`sudo grep AccessKeyId /usr/tmp/assume-role-output.txt | cut -d ':' -f 2 | sed "s/[ ,\"]//g"`
-export AWS_SECRET_ACCESS_KEY=`sudo grep SecretAccessKey /usr/tmp/assume-role-output.txt | cut -d ':' -f 2 | sed "s/[ ,\"]//g"`
-export AWS_SESSION_TOKEN=`sudo grep SessionToken /usr/tmp/assume-role-output.txt | cut -d ':' -f 2 | sed "s/[ ,\"]//g"`
+export AWS_ACCESS_KEY_ID=`grep AccessKeyId /usr/tmp/assume-role-output.txt | cut -d ':' -f 2 | sed "s/[ ,\"]//g"`
+export AWS_SECRET_ACCESS_KEY=`grep SecretAccessKey /usr/tmp/assume-role-output.txt | cut -d ':' -f 2 | sed "s/[ ,\"]//g"`
+export AWS_SESSION_TOKEN=`grep SessionToken /usr/tmp/assume-role-output.txt | cut -d ':' -f 2 | sed "s/[ ,\"]//g"`
 
 echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} output stage
-sudo /usr/local/bin/aws s3 cp /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.annotated.vcf.gz s3://${output_s3_bucket}/genomic-etl/processed_vcfs/ &
-sudo /usr/local/bin/aws s3 cp /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.annotated.vcf.gz.gzi s3://${output_s3_bucket}/genomic-etl/processed_vcf_indexes/ &
-sudo /usr/local/bin/aws s3 cp /home/centos/ensembl-vep/${study_name}_${study_id}_TOPMed_WGS_freeze.9b.chr${chrom_number}.hg38${consent_group_tag}.vcf.gz s3://${output_s3_bucket}/genomic-etl/original_vcfs/${study_id}${consent_group_tag}.chr${chrom_number}.original.vcf.gz &
+/usr/local/bin/aws s3 cp /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.annotated.vcf.gz s3://${output_s3_bucket}/genomic-etl/processed_vcfs/ &
+/usr/local/bin/aws s3 cp /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.annotated.vcf.gz.gzi s3://${output_s3_bucket}/genomic-etl/processed_vcf_indexes/ &
+/usr/local/bin/aws s3 cp /home/centos/ensembl-vep/${study_name}_${study_id}_TOPMed_WGS_freeze.9b.chr${chrom_number}.hg38${consent_group_tag}.vcf.gz s3://${output_s3_bucket}/genomic-etl/original_vcfs/${study_id}${consent_group_tag}.chr${chrom_number}.original.vcf.gz &
 wait
 echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} output stage
-sudo /usr/local/bin/aws --region=us-east-1 ec2 create-tags --resources $${INSTANCE_ID} --tags Key=AnnotationComplete,Value=true
+/usr/local/bin/aws --region=us-east-1 ec2 create-tags --resources $${INSTANCE_ID} --tags Key=AnnotationComplete,Value=true
 unset AWS_ACCESS_KEY_ID
 unset AWS_SECRET_ACCESS_KEY
 unset AWS_SESSION_TOKEN
