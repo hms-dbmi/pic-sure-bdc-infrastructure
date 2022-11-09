@@ -175,7 +175,7 @@ export AWS_SESSION_TOKEN=`sudo grep SessionToken /usr/tmp/assume-role-output.txt
 
 echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} output stage
 sudo /usr/local/bin/aws s3 cp /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.annotated.vcf.gz s3://${output_s3_bucket}/genomic-etl/processed_vcfs/ &
-sudo /usr/local/bin/aws s3 cp /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.annotated.vcf.gz.gzi s3://${output_s3_bucket}/genomic-etl/processed_vcfs/ &
+sudo /usr/local/bin/aws s3 cp /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.annotated.vcf.gz.gzi s3://${output_s3_bucket}/genomic-etl/processed_vcf_indexes/ &
 sudo /usr/local/bin/aws s3 cp /home/centos/ensembl-vep/${study_name}_${study_id}_TOPMed_WGS_freeze.9b.chr${chrom_number}.hg38${consent_group_tag}.vcf.gz s3://${output_s3_bucket}/genomic-etl/original_vcfs/${study_id}${consent_group_tag}.chr${chrom_number}.original.vcf.gz &
 wait
 echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} output stage
