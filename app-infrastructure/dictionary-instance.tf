@@ -55,4 +55,9 @@ resource "aws_instance" "dictionary-ec2" {
     Name        = "FISMA Terraform Playground - ${var.stack_githash} - Dictionary - ${var.target-stack}"
   }
 
+  metadata_options {
+  	http_endpoint = "enabled"
+  	http_tokens = "required"
+	  instance_metadata_tags = "enabled"  
+  }
 }
