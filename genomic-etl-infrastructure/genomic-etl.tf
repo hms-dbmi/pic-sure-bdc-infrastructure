@@ -30,7 +30,7 @@ data "template_cloudinit_config" "genomic-user-data" {
 resource "aws_instance" "genomic-etl-ec2" {
  
   ami           = var.ami-id
-  instance_type = "r6g.8xlarge"
+  instance_type = "r5.4xlarge"
 
   associate_public_ip_address = true
 
