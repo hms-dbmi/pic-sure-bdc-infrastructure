@@ -18,14 +18,14 @@ echo "
 					\"cpu_usage_user\",
 					\"cpu_usage_system\"
 				],
-				\"metrics_collection_interval\": 300,
+				\"metrics_collection_interval\": 100,
 				\"totalcpu\": false
 			},
 			\"disk\": {
 				\"measurement\": [
 					\"used_percent\"
 				],
-				\"metrics_collection_interval\": 600,
+				\"metrics_collection_interval\": 100,
 				\"resources\": [
 					\"*\"
 				]
@@ -39,7 +39,7 @@ echo "
                                         \"mem_used\"
                                         
 				],
-				\"metrics_collection_interval\": 600
+				\"metrics_collection_interval\": 100
 			}
 		}
 	},
@@ -162,6 +162,8 @@ echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} dec
 --check_ref \
 --buffer_size 5000 \
 --flag_pick \
+--use_given_ref \
+--offline \
 --vcf &
 echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} vep stage
 wait
