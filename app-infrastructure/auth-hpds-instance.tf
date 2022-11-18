@@ -24,7 +24,7 @@ data "template_cloudinit_config" "auth_hpds-user-data" {
 resource "aws_instance" "auth-hpds-ec2" {
 
   ami = var.ami-id
-  instance_type = "m5.8xlarge"
+  instance_type = "m5.12xlarge"
 
   associate_public_ip_address = true
 
