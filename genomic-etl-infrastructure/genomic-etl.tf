@@ -88,12 +88,8 @@ resource "aws_spot_fleet_request" "genomic-etl-ec2"{
         Name        = "Genomic ETL Annotation Pipeline - ${var.study_id}${var.consent_group_tag} Chromosome ${var.chrom_number}"
         automaticPatches = "1"
       }
-    
-      dynamic "instance_type" {
-        for_each = launch_specification.typeList
-        content {
-          instance_type = instance_type
-        }
+      for_each = launch_specification.typeList
+      instance_type = each
       }
     }
   }
