@@ -15,27 +15,101 @@ data "template_file" "genomic-user_data" {
 }
 
 locals {
-    subnetList = [
+    instanceList = [
   {
     "subnetId" = (var.genomic-etl-subnet-1a-id)
-    "typeList" = ["r5.2xlarge", "c5.2xlarge", "c5.4xlarge", "m5.2xlarge", "m5.4xlarge"]
+    "type" = "r5.2xlarge"
+  },
+  {
+    "subnetId" = (var.genomic-etl-subnet-1a-id)
+    "type" = "c5.2xlarge"
   },
     {
+    "subnetId" = (var.genomic-etl-subnet-1a-id)
+    "type" =  "c5.4xlarge"
+  },
+    {
+    "subnetId" = (var.genomic-etl-subnet-1a-id)
+    "type" = "m5.2xlarge"
+  },
+    {
+    "subnetId" = (var.genomic-etl-subnet-1a-id)
+    "type" =  "m5.4xlarge"
+  },
+
+    {
     "subnetId" = (var.genomic-etl-subnet-1b-id)
-    "typeList" = ["r5.2xlarge", "c5.2xlarge", "c5.4xlarge", "m5.2xlarge"]
+    "type" = "r5.2xlarge"
+  },
+      {
+    "subnetId" = (var.genomic-etl-subnet-1b-id)
+    "type" = "c5.2xlarge"
+  },
+      {
+    "subnetId" = (var.genomic-etl-subnet-1b-id)
+    "type" = "c5.4xlarge"
+  },
+      {
+    "subnetId" = (var.genomic-etl-subnet-1b-id)
+    "type" = "m5.2xlarge"
   },
     {
     "subnetId" = (var.genomic-etl-subnet-1c-id)
-    "typeList" = ["r5.2xlarge", "c5.2xlarge", "c5.4xlarge", "m5.2xlarge", "m5.4xlarge"]
+    "type" = "r5.2xlarge"
+  },
+      {
+    "subnetId" = (var.genomic-etl-subnet-1c-id)
+    "type" =  "c5.2xlarge"
+  },
+      {
+    "subnetId" = (var.genomic-etl-subnet-1c-id)
+    "type" = "c5.4xlarge"
+  },
+      {
+    "subnetId" = (var.genomic-etl-subnet-1c-id)
+    "type" = "m5.2xlarge"
+  },
+      {
+    "subnetId" = (var.genomic-etl-subnet-1c-id)
+    "type" = "m5.4xlarge"
   },
     {
     "subnetId" = (var.genomic-etl-subnet-1d-id)
-    "typeList" = ["r5.2xlarge", "c5.2xlarge", "m5.2xlarge", "m5.4xlarge"]
+    "type" = "r5.2xlarge"
+  },
+      {
+    "subnetId" = (var.genomic-etl-subnet-1d-id)
+    "type" = "c5.2xlarge"
+  },
+      {
+    "subnetId" = (var.genomic-etl-subnet-1d-id)
+    "type" =  "m5.2xlarge"
+  },
+      {
+    "subnetId" = (var.genomic-etl-subnet-1d-id)
+    "type" =  "m5.4xlarge"
   },
   {
     "subnetId" = (var.genomic-etl-subnet-1f-id)
-    "typeList" = ["r5.2xlarge", "c5.2xlarge", "c5.4xlarge", "m5.2xlarge", "m5.4xlarge"]
-  }]
+    "type" = "r5.2xlarge"
+  },
+    {
+    "subnetId" = (var.genomic-etl-subnet-1f-id)
+    "type" = "c5.2xlarge"
+  },
+    {
+    "subnetId" = (var.genomic-etl-subnet-1f-id)
+    "type" = "c5.4xlarge"
+  },
+    {
+    "subnetId" = (var.genomic-etl-subnet-1f-id)
+    "type" = "m5.2xlarge"
+  },
+    {
+    "subnetId" = (var.genomic-etl-subnet-1f-id)
+    "type" = "m5.4xlarge"
+  }
+]
 }
 
 data "template_cloudinit_config" "genomic-user-data" {
@@ -62,10 +136,11 @@ resource "aws_spot_fleet_request" "genomic-etl-ec2"{
   dynamic "launch_specification" {
     for_each = [for s in local.subnetList :{
         subnet_id = s.subnetId
-        typeList = s.typeList
+        instance_type = s.type
     }]
     content {
       subnet_id = launch_specification.value.subnet_id
+      instance_type = launch_specification.value.instance_type
       ami = var.ami-id
       associate_public_ip_address = true
 
@@ -88,8 +163,6 @@ resource "aws_spot_fleet_request" "genomic-etl-ec2"{
         Name        = "Genomic ETL Annotation Pipeline - ${var.study_id}${var.consent_group_tag} Chromosome ${var.chrom_number}"
         automaticPatches = "1"
       }
-      for_each = launch_specification.typeList
-      instance_type = each
       }
     }
   }
