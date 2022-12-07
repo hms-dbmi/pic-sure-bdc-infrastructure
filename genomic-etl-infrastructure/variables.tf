@@ -28,5 +28,7 @@ variable "study_consent_group"{
 variable "consent_group_tag"{
   type = string
 }
-
+variable "instance_type"{
+  type = string
+}
 
