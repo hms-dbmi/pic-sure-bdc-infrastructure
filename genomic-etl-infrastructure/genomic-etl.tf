@@ -61,8 +61,8 @@ resource "aws_spot_fleet_request" "genomic-etl-ec2"{
 
   dynamic "launch_specification" {
     for_each = [for s in local.subnetList :{
-        subnet_id = s.value["subnetId"]
-        typeList = s.value["typeList"]
+        subnet_id = s.subnetId
+        typeList = s.typeList
     }]
     content {
       subnet_id = launch_specification.value.subnet_id
@@ -90,11 +90,9 @@ resource "aws_spot_fleet_request" "genomic-etl-ec2"{
       }
     
       dynamic "instance_type" {
-        for_each = [for i in launch_specification.value["typeList"] : {
-          instance_type = i
-        }]
+        for_each = launch_specification.typeList
         content {
-          instance_type = instance_type.value
+          instance_type = instance_type
         }
       }
     }
