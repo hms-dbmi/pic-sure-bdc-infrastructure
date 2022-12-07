@@ -134,7 +134,7 @@ resource "aws_spot_fleet_request" "genomic-etl-ec2"{
   terminate_instances_with_expiration = "false"
 
   dynamic "launch_specification" {
-    for_each = [for s in local.subnetList :{
+    for_each = [for s in local.instanceList :{
         subnet_id = s.subnetId
         instance_type = s.type
     }]
@@ -166,4 +166,3 @@ resource "aws_spot_fleet_request" "genomic-etl-ec2"{
       }
     }
   }
-}
