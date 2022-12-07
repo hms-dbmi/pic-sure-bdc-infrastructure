@@ -1,8 +1,40 @@
-variable "genomic-etl-subnet-us-east-id" {
+variable "genomic-etl-subnet-1a-id" {
   type = string
   default = "__SUBNET_ID__"
 }
-variable "genomic-etl-subnet-us-east-cidr" {
+variable "genomic-etl-subnet-1a-cidr" {
+  type = string
+  default = "__SUBNET_CIDR__"
+}
+variable "genomic-etl-subnet-1b-id" {
+  type = string
+  default = "__SUBNET_ID__"
+}
+variable "genomic-etl-subnet-1b-cidr" {
+  type = string
+  default = "__SUBNET_CIDR__"
+}
+variable "genomic-etl-subnet-1c-id" {
+  type = string
+  default = "__SUBNET_ID__"
+}
+variable "genomic-etl-subnet-1c-cidr" {
+  type = string
+  default = "__SUBNET_CIDR__"
+}
+variable "genomic-etl-subnet-1d-id" {
+  type = string
+  default = "__SUBNET_ID__"
+}
+variable "genomic-etl-subnet-1d-cidr" {
+  type = string
+  default = "__SUBNET_CIDR__"
+}
+variable "genomic-etl-subnet-1f-id" {
+  type = string
+  default = "__SUBNET_ID__"
+}
+variable "genomic-etl-subnet-1f-cidr" {
   type = string
   default = "__SUBNET_CIDR__"
 }

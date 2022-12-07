@@ -29,4 +29,6 @@ variable "consent_group_tag"{
   type = string
 }
 
-
+variable "subnet_list"{
+  type = list
+}

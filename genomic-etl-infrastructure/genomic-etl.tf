@@ -11,11 +11,39 @@ data "template_file" "genomic-user_data" {
     consent_group_tag = var.consent_group_tag
     deployment_githash = var.deployment_githash
     s3_role =  var.s3_role
-
   }
 }
 
-variable "subnets" {}
+variable "subnetList"{
+  type = map(
+    object({
+       "subnet-id" = string
+       "typeList" = list(string)
+    }) 
+  )
+  default = [
+  {
+    "subnet-id" = var.genomic-etl-subnet-1a-id
+    "typeList" = ["r5.2xlarge", "c5.2xlarge", "c5.4xlarge", "m5.2xlarge", "m5.4xlarge"]
+  },
+    {
+    "subnet-id" = var.genomic-etl-subnet-1b-id
+    "typeList" = ["r5.2xlarge", "c5.2xlarge", "c5.4xlarge", "m5.2xlarge"]
+  },
+    {
+    "subnet-id" = var.genomic-etl-subnet-1c-id
+    "typeList" = ["r5.2xlarge", "c5.2xlarge", "c5.4xlarge", "m5.2xlarge", "m5.4xlarge"]
+  },
+    {
+    "subnet-id" = var.genomic-etl-subnet-1d-id
+    "typeList" = ["r5.2xlarge", "c5.2xlarge", "m5.2xlarge", "m5.4xlarge"]
+  },
+  {
+    "subnet-id" = var.genomic-etl-subnet-1f-id
+    "typeList" = ["r5.2xlarge", "c5.2xlarge", "c5.4xlarge", "m5.2xlarge", "m5.4xlarge"]
+  }]
+
+}
 
 data "template_cloudinit_config" "genomic-user-data" {
   gzip          = true
@@ -30,8 +58,7 @@ data "template_cloudinit_config" "genomic-user-data" {
 }
 
 resource "spot_fleet_request" "genomic-etl-ec2"{
-  #TODO - permissioning on necessary role
-  iam_fleet_role = ""
+  iam_fleet_role = "arn:aws:iam::900561893673:role/aws-service-role/spotfleet.amazonaws.com/AWSServiceRoleForEC2SpotFleet"
   target_capacity = 1
   valid_until = timeadd(timestamp(), 20160m)
   allocation_strategy = "lowestPrice"
@@ -40,43 +67,41 @@ resource "spot_fleet_request" "genomic-etl-ec2"{
   terminate_instances_with_expiration = "false"
 
   dynamic "launch_specification" {
-    #TODO - update VPC job to add list of available subnets
-    for_each = [for s in var.subnets : {
-      subnet_id = s[1]
+    for_each = [for s in var.subnetList :{
+        subnet_id = s.value["subnet-id"]
+        typeList = s.value["typeList"]
     }]
     content {
       subnet_id = launch_specification.value.subnet_id
-      
+      ami = var.ami-id
+      associate_public_ip_address = true
+
+      iam_instance_profile = "jenkins-s3-profile"
+
+      user_data = data.template_cloudinit_config.genomic-user-data.rendered
+
+      vpc_security_group_ids = [
+          "sg-0dba36beb3a630b47"
+      ]
+      root_block_device {
+        delete_on_termination = true
+        encrypted             = true
+        volume_size           = 1000
+      }
+
+      tags = {
+        Owner       = "Avillach_Lab"
+        Environment = "development"
+        Name        = "Genomic ETL Annotation Pipeline - ${var.study_id}${var.consent_group_tag} Chromosome ${var.chrom_number}"
+        automaticPatches = "1"
+      }
+    
       dynamic "instance_type" {
-        TODO - establish list of instance types to parse through
-        for_each = [for i in var.instanceTypes : {
-          instance_type = i[1]
+        for_each = [for i in launch_specification.value["typeList"] : {
+          instance_type = i
         }]
         content {
-          instance_type = launch_specification.value.instance_type
-          ami = var.ami-id
-          associate_public_ip_address = true
-
-          iam_instance_profile = "jenkins-s3-profile"
-
-          user_data = data.template_cloudinit_config.genomic-user-data.rendered
-
-          vpc_security_group_ids = [
-              aws_security_group.traffic-to-ssm.id,
-              aws_security_group.outbound-to-public-internet.id
-          ]
-          root_block_device {
-            delete_on_termination = true
-            encrypted             = true
-            volume_size           = 1000
-          }
-
-          tags = {
-            Owner       = "Avillach_Lab"
-            Environment = "development"
-            Name        = "Genomic ETL Annotation Pipeline - ${var.study_id}${var.consent_group_tag} Chromosome ${var.chrom_number}"
-            automaticPatches = "1"
-          }
+          instance_type = instance_type.value
         }
       }
     }
