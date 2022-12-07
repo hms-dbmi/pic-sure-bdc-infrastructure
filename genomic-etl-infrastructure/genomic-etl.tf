@@ -14,7 +14,29 @@ data "template_file" "genomic-user_data" {
   }
 }
 
-
+locals {
+    subnetList = [
+  {
+    "subnetId" = (var.genomic-etl-subnet-1a-id)
+    "typeList" = ["r5.2xlarge", "c5.2xlarge", "c5.4xlarge", "m5.2xlarge", "m5.4xlarge"]
+  },
+    {
+    "subnetId" = (var.genomic-etl-subnet-1b-id)
+    "typeList" = ["r5.2xlarge", "c5.2xlarge", "c5.4xlarge", "m5.2xlarge"]
+  },
+    {
+    "subnetId" = (var.genomic-etl-subnet-1c-id)
+    "typeList" = ["r5.2xlarge", "c5.2xlarge", "c5.4xlarge", "m5.2xlarge", "m5.4xlarge"]
+  },
+    {
+    "subnetId" = (var.genomic-etl-subnet-1d-id)
+    "typeList" = ["r5.2xlarge", "c5.2xlarge", "m5.2xlarge", "m5.4xlarge"]
+  },
+  {
+    "subnetId" = (var.genomic-etl-subnet-1f-id)
+    "typeList" = ["r5.2xlarge", "c5.2xlarge", "c5.4xlarge", "m5.2xlarge", "m5.4xlarge"]
+  }]
+}
 
 data "template_cloudinit_config" "genomic-user-data" {
   gzip          = true
@@ -38,7 +60,7 @@ resource "spot_fleet_request" "genomic-etl-ec2"{
   terminate_instances_with_expiration = "false"
 
   dynamic "launch_specification" {
-    for_each = [for s in var.subnetList :{
+    for_each = [for s in local.subnetList :{
         subnet_id = s.value["subnetId"]
         typeList = s.value["typeList"]
     }]
