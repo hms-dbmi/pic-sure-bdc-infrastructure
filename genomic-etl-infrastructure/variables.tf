@@ -36,29 +36,29 @@ variable "subnet_list"{
 variable "subnetList"{
   type = map(
     object({
-       "subnet-id" = string
+       "subnetId" = string
        "typeList" = list(string)
     }) 
   )
   default = [
   {
-    "subnet-id" = var.genomic-etl-subnet-1a-id
+    "subnetId" = (var.genomic-etl-subnet-1a-id)
     "typeList" = ["r5.2xlarge", "c5.2xlarge", "c5.4xlarge", "m5.2xlarge", "m5.4xlarge"]
   },
     {
-    "subnet-id" = var.genomic-etl-subnet-1b-id
+    "subnetId" = (var.genomic-etl-subnet-1b-id)
     "typeList" = ["r5.2xlarge", "c5.2xlarge", "c5.4xlarge", "m5.2xlarge"]
   },
     {
-    "subnet-id" = var.genomic-etl-subnet-1c-id
+    "subnetId" = (var.genomic-etl-subnet-1c-id)
     "typeList" = ["r5.2xlarge", "c5.2xlarge", "c5.4xlarge", "m5.2xlarge", "m5.4xlarge"]
   },
     {
-    "subnet-id" = var.genomic-etl-subnet-1d-id
+    "subnetId" = (var.genomic-etl-subnet-1d-id)
     "typeList" = ["r5.2xlarge", "c5.2xlarge", "m5.2xlarge", "m5.4xlarge"]
   },
   {
-    "subnet-id" = var.genomic-etl-subnet-1f-id
+    "subnetId" = (var.genomic-etl-subnet-1f-id)
     "typeList" = ["r5.2xlarge", "c5.2xlarge", "c5.4xlarge", "m5.2xlarge", "m5.4xlarge"]
   }]
 
