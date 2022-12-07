@@ -32,3 +32,34 @@ variable "consent_group_tag"{
 variable "subnet_list"{
   type = list
 }
+
+variable "subnetList"{
+  type = map(
+    object({
+       "subnet-id" = string
+       "typeList" = list(string)
+    }) 
+  )
+  default = [
+  {
+    "subnet-id" = var.genomic-etl-subnet-1a-id
+    "typeList" = ["r5.2xlarge", "c5.2xlarge", "c5.4xlarge", "m5.2xlarge", "m5.4xlarge"]
+  },
+    {
+    "subnet-id" = var.genomic-etl-subnet-1b-id
+    "typeList" = ["r5.2xlarge", "c5.2xlarge", "c5.4xlarge", "m5.2xlarge"]
+  },
+    {
+    "subnet-id" = var.genomic-etl-subnet-1c-id
+    "typeList" = ["r5.2xlarge", "c5.2xlarge", "c5.4xlarge", "m5.2xlarge", "m5.4xlarge"]
+  },
+    {
+    "subnet-id" = var.genomic-etl-subnet-1d-id
+    "typeList" = ["r5.2xlarge", "c5.2xlarge", "m5.2xlarge", "m5.4xlarge"]
+  },
+  {
+    "subnet-id" = var.genomic-etl-subnet-1f-id
+    "typeList" = ["r5.2xlarge", "c5.2xlarge", "c5.4xlarge", "m5.2xlarge", "m5.4xlarge"]
+  }]
+
+}
