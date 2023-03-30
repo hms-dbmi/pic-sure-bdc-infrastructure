@@ -90,7 +90,7 @@ resource "aws_iam_role_policy" "wildfly-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/splunk_config/splunkforwarder-8.2.2-87344edfcdb4-Linux-x86_64.tgz"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/splunk_config/splunkforwarder-9.0.3-dd0128b1f8cd-Linux-x86_64.tgz"
     },
     {
       "Action": [
@@ -231,7 +231,7 @@ resource "aws_iam_role_policy" "httpd-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/splunk_config/splunkforwarder-8.2.2-87344edfcdb4-Linux-x86_64.tgz"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/splunk_config/splunkforwarder-9.0.3-dd0128b1f8cd-Linux-x86_64.tgz"
     },
     {
       "Action": [
@@ -354,7 +354,7 @@ resource "aws_iam_role_policy" "auth-hpds-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/splunk_config/splunkforwarder-8.2.2-87344edfcdb4-Linux-x86_64.tgz"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/splunk_config/splunkforwarder-9.0.3-dd0128b1f8cd-Linux-x86_64.tgz"
     },
     {
       "Action": [
@@ -456,7 +456,7 @@ resource "aws_iam_role_policy" "open-hpds-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/splunk_config/splunkforwarder-8.2.2-87344edfcdb4-Linux-x86_64.tgz"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/splunk_config/splunkforwarder-9.0.3-dd0128b1f8cd-Linux-x86_64.tgz"
     },
     {
       "Action": [
@@ -537,7 +537,7 @@ resource "aws_iam_role_policy" "dictionary-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/splunk_config/splunkforwarder-8.2.2-87344edfcdb4-Linux-x86_64.tgz"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/splunk_config/splunkforwarder-9.0.3-dd0128b1f8cd-Linux-x86_64.tgz"
     },
     {
       "Action": [
@@ -616,7 +616,7 @@ resource "aws_iam_role_policy" "visualization-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/splunk_config/splunkforwarder-8.2.2-87344edfcdb4-Linux-x86_64.tgz"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/splunk_config/splunkforwarder-9.0.3-dd0128b1f8cd-Linux-x86_64.tgz"
     },
     {
       "Action": [

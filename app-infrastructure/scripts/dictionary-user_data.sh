@@ -161,11 +161,11 @@ echo "starting Splunk configuration"
 
 useradd -r -m splunk
 
-for i in 1 2 3 4 5; do echo "trying to download Splunk local forwarder from s3://${stack_s3_bucket}/splunk_config/splunkforwarder-8.2.2-87344edfcdb4-Linux-x86_64.tgz" && sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/splunk_config/splunkforwarder-8.2.2-87344edfcdb4-Linux-x86_64.tgz /opt/ && break || sleep 60; done
+for i in 1 2 3 4 5; do echo "trying to download Splunk local forwarder from s3://${stack_s3_bucket}/splunk_config/splunkforwarder-9.0.3-dd0128b1f8cd-Linux-x86_64.tgz" && sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/splunk_config/splunkforwarder-9.0.3-dd0128b1f8cd-Linux-x86_64.tgz /opt/ && break || sleep 60; done
 echo "pulled Splunk tar file, extracting"
 
 cd /opt
-sudo tar -xf splunkforwarder-8.2.2-87344edfcdb4-Linux-x86_64.tgz
+sudo tar -xf splunkforwarder-9.0.3-dd0128b1f8cd-Linux-x86_64.tgz
 
 echo "changing splunk permissions"
 chown -R splunk:splunk splunkforwarder
