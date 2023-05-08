@@ -655,3 +655,26 @@ SELECT privilege.uuid, unhex(@uuidGate) from privilege, role_privilege, role
 where privilege.uuid = role_privilege.privilege_id
   AND role_privilege.role_id = role.uuid
   AND role.name = 'FENCE_ROLE_OPEN_ACCESS';
+
+
+SET @infoAccessRuleUUID = REPLACE(uuid(),'-','');
+INSERT INTO access_rule (uuid, name, description, rule, type, value, checkMapKeyOnly, checkMapNode, subAccessRuleParent_uuid, isEvaluateOnlyByGates, isGateAnyRelation)
+VALUES (
+           unhex(@infoAccessRuleUUID),
+           'ALLOW_INFO_VALUES_ACCESS',
+           'Allow access to info values endpoint',
+           '$.path',
+           11,
+           '/info/[.*]/values',
+           false,
+           true,
+           NULL,
+           true,
+           false
+       );
+
+INSERT INTO accessRule_privilege (privilege_id, accessRule_id)
+SELECT privilege.uuid, unhex(@uuidGate) from privilege, role_privilege, role
+where privilege.uuid = role_privilege.privilege_id
+  AND role_privilege.role_id = role.uuid
+  AND role.name = 'FENCE_ROLE_OPEN_ACCESS';
