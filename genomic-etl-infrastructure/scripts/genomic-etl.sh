@@ -104,7 +104,7 @@ echo 'Init complete, moving to annotation'
 
 export PERL5LIB='/home/centos/cpanm/lib/perl5:/home/centos/bioperl-1.6.924:/home/centos/Bio-DB-HTS/lib:/home/centos/Bio-DB-HTS/blib/arch/auto/Bio/DB/HTS/:/home/centos/Bio-DB-HTS/blib/arch/auto/Bio/DB/HTS/Faidx:/home/centos/bioperl-1.6.924:/home/centos/ensembl/modules:/home/centos/ensembl-compara/modules:/home/centos/ensembl-variation/modules:/home/centos/src/ensembl-funcgen/modules:/home/centos/lib/perl/5.14.4/:/home/centos/ensembl-vep:/home/centos/Bio-DB-HTS/lib:/home/centos/Bio-DB-HTS/blib/arch/auto/Bio/DB/HTS/:/home/centos/Bio-DB-HTS/blib/arch/auto/Bio/DB/HTS/Faidx:/home/centos/cpanm/lib/perl5'
 export HTSLIB_DIR='/home/centos/htslib/'
-echo chr${chrom_number} ${chrom_number} > /home/centos/ensembl-vep/chrm_rename.txt
+echo ${chrom_number} chr${chrom_number}  > /home/centos/ensembl-vep/chrm_rename.txt
 
 /usr/local/bin/aws sts assume-role --role-arn arn:aws:iam::600168050588:role/nih-nhlbi-TopMed-EC2Access-S3 --role-session-name "get-genomic-source-file" > /usr/tmp/assume-role-output.txt
 
@@ -133,7 +133,7 @@ echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} rena
 wait
 
 echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} rename stage
-/usr/local/bin/bcftools norm --threads 40 -m -any -f /home/centos/ensembl-vep/Homo_sapiens.GRCh38.dna.primary_assembly.fa -o /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.normalized.vcf.gz /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.renamed.vcf.gz &
+/usr/local/bin/bcftools norm --threads 40 -m -any -f /home/centos/fasta/Homo_sapiens_assembly38.fasta -o /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.normalized.vcf.gz /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.renamed.vcf.gz &
 echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} normalize stage
 
 wait
@@ -159,12 +159,14 @@ echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} dec
 --no_stats \
 --force_overwrite \
 --assembly GRCh38 \
---fields "Allele,Consequence,IMPACT,SYMBOL,Feature_type,Feature,gnomAD_AF,CLIN_SIG,ENSP" \
---fasta /root/.vep/homo_sapiens/107_GRCh38/Homo_sapiens.GRCh38.dna.toplevel.fa.gz \
+--af_gnomadg \
+--symbol \
+--variant_class \
+--fasta /home/centos/fasta/Homo_sapiens_assembly38.fasta \
 --check_ref \
 --buffer_size 5000 \
 --flag_pick \
---use_given_ref \
+--check_ref \
 --offline \
 --vcf &
 echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} vep stage
@@ -174,6 +176,21 @@ echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} vep
 echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} compressing stage
 wait
 echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} compressing stage
+/home/centos/htslib/tabix /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.annotated.vcf.gz &
+echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} tabix stage
+wait
+echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} tabix stage
+
+/bin/python3 /home/centos/python_script/hpds_annotation/transform_csq.v3.python \
+-R /home/centos/fasta/Homo_sapiens_assembly38.fasta \
+--vep-gnomad-af gnomADg_AF \
+/home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.annotated.vcf.gz \
+/home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.annotated.hpds.vcf.gz
+
+echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} python stage
+wait
+echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} python stage
+
 /usr/local/bin/aws sts assume-role --role-arn ${s3_role} --role-session-name "get-genomic-source-file" > /usr/tmp/assume-role-output.txt
 
 export AWS_ACCESS_KEY_ID=`grep AccessKeyId /usr/tmp/assume-role-output.txt | cut -d ':' -f 2 | sed "s/[ ,\"]//g"`
@@ -181,8 +198,8 @@ export AWS_SECRET_ACCESS_KEY=`grep SecretAccessKey /usr/tmp/assume-role-output.t
 export AWS_SESSION_TOKEN=`grep SessionToken /usr/tmp/assume-role-output.txt | cut -d ':' -f 2 | sed "s/[ ,\"]//g"`
 
 echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} output stage
-/usr/local/bin/aws s3 cp /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.annotated.vcf.gz s3://${output_s3_bucket}/genomic-etl/processed_vcfs/ &
-/usr/local/bin/aws s3 cp /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.annotated.vcf.gz.gzi s3://${output_s3_bucket}/genomic-etl/processed_vcf_indexes/ &
+
+/usr/local/bin/aws s3 cp /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.annotated.hpds.vcf.gz s3://${output_s3_bucket}/genomic-etl/hpds_vcfs/ &
 /usr/local/bin/aws s3 cp /home/centos/ensembl-vep/${study_name}_${study_id}_TOPMed_WGS_freeze.9b.chr${chrom_number}.hg38${consent_group_tag}.vcf.gz s3://${output_s3_bucket}/genomic-etl/original_vcfs/${study_id}${consent_group_tag}.chr${chrom_number}.original.vcf.gz &
 wait
 echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} output stage
