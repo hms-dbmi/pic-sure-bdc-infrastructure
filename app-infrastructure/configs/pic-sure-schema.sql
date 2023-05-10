@@ -657,15 +657,15 @@ where privilege.uuid = role_privilege.privilege_id
   AND role.name = 'FENCE_ROLE_OPEN_ACCESS';
 
 
-SET @infoAccessRuleUUID = REPLACE(uuid(),'-','');
+SET @searchValuesAccessRuleUUID = REPLACE(uuid(),'-','');
 INSERT INTO access_rule (uuid, name, description, rule, type, value, checkMapKeyOnly, checkMapNode, subAccessRuleParent_uuid, isEvaluateOnlyByGates, isGateAnyRelation)
 VALUES (
            unhex(@infoAccessRuleUUID),
-           'ALLOW_INFO_VALUES_ACCESS',
-           'Allow access to info values endpoint',
+           'ALLOW_SEARCH_VALUES_ACCESS',
+           'Allow access to search values endpoint',
            '$.path',
            11,
-           '/info/[.*]/values',
+           '/search/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/values',
            false,
            true,
            NULL,
