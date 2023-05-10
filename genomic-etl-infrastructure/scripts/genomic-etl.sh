@@ -181,7 +181,7 @@ echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} tabi
 wait
 echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} tabix stage
 
-/bin/python3 /home/centos/python_script/hpds_annotation/transform_csq.v3.python \
+/bin/python3 /home/centos/python_script/hpds_annotation/transform_csq.v3.py \
 -R /home/centos/fasta/Homo_sapiens_assembly38.fasta \
 --vep-gnomad-af gnomADg_AF \
 /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.annotated.vcf.gz \
