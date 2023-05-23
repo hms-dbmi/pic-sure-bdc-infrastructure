@@ -105,6 +105,8 @@ echo "pulled fence mapping"
 
 for i in 1 2 3 4 5; do echo "trying to download driver from s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/aggregate-resource.properties" && sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/aggregate-resource.properties /home/centos/aggregate-resource.properties && break || sleep 45; done
 echo "pulled aggregate resource config"
+for i in 1 2 3 4 5; do echo "trying to download driver from s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/visualization-resource.properties" && sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/visualization-resource.properties /home/centos/visualization-resource.properties && break || sleep 45; done
+echo "pulled visualization resource config"
 
 sudo docker run  -d --name schema-init -e "MYSQL_RANDOM_ROOT_PASSWORD=yes" --rm mysql 
 sudo docker exec -i schema-init mysql -hpicsure-db.${target-stack}.datastage.hms.harvard.edu -uroot -p${mysql-instance-password} < /home/centos/pic-sure-schema.sql
@@ -123,22 +125,11 @@ sudo docker run --name=wildfly \
 -v /home/centos/standalone.xml:/opt/jboss/wildfly/standalone/configuration/standalone.xml \
 -v /home/centos/fence_mapping.json:/usr/local/docker-config/fence_mapping.json \
 -v /home/centos/aggregate-resource.properties:/opt/jboss/wildfly/standalone/configuration/aggregate-data-sharing/pic-sure-aggregate-resource/resource.properties \
+-v /home/centos/visualization-resource.properties:/opt/jboss/wildfly/standalone/configuration/visualization/pic-sure-visualization-resource/resource.properties \
 -v /home/centos/mysql_module.xml:/opt/jboss/wildfly/modules/system/layers/base/com/sql/mysql/main/module.xml  \
 -v /home/centos/mysql-connector-java-5.1.38.jar:/opt/jboss/wildfly/modules/system/layers/base/com/sql/mysql/main/mysql-connector-java-5.1.38.jar \
 -v /var/log/wildfly-docker-os-logs/:/var/log/ \
 -p 8080:8080 -e JAVA_OPTS="$JAVA_OPTS" -d $WILDFLY_IMAGE
-
-sudo mkdir -p /var/log/visualization-docker-logs
-sudo mkdir -p /usr/local/docker-config
-for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-hpds-visualization-resource.tar.gz /home/centos/pic-sure-hpds-visualization-resource.tar.gz && break || sleep 45; done
-sudo echo "search.url=http://wildfly.${target-stack}.datastage.hms.harvard.edu:8080/pic-sure-api-2/PICSURE/search/02e23f52-f354-4e8b-992c-d37c8b9ba140"  > /usr/local/docker-config/application.properties
-sudo echo "picSure.url=http://wildfly.${target-stack}.datastage.hms.harvard.edu:8080/pic-sure-api-2/PICSURE/query/sync" >> /usr/local/docker-config/application.properties
-sudo echo "UUID=ca0ad4a9-130a-3a8a-ae00-e35b07f1108b" >> /usr/local/docker-config/application.properties
-sudo echo "picSure.uuid=02e23f52-f354-4e8b-992c-d37c8b9ba140" >> /usr/local/docker-config/application.properties
-
-VISUALIZATION_IMAGE=`sudo docker load < /home/centos/pic-sure-hpds-visualization-resource.tar.gz  | cut -d ' ' -f 3`
-sudo docker run --name=visualization --network host -v /var/log/visualization-docker-logs:/usr/local/tomcat/logs -v /usr/local/docker-config/application.properties:/usr/local/docker-config/application.properties -e CATALINA_OPTS=" -Xms1g -Xmx7g " -p 8081:8080 -d $VISUALIZATION_IMAGE
-
 
 INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)
 sudo /usr/local/bin/aws --region=us-east-1 ec2 create-tags --resources $${INSTANCE_ID} --tags Key=InitComplete,Value=true
