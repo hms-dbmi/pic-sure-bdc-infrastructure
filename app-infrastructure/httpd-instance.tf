@@ -7,6 +7,7 @@ data "template_file" "httpd-user_data" {
     stack_s3_bucket = var.stack_s3_bucket
     dataset_s3_object_key = var.dataset-s3-object-key
     target-stack    = var.target-stack
+    dsm_url = var.dsm_url
   }
 }
 
@@ -68,6 +69,8 @@ data "template_file" "httpd-vhosts-conf" {
     wildfly-base-url = "http://${aws_instance.wildfly-ec2.private_ip}:8080"
     target-stack = var.target-stack
     release-id = var.stack_githash_long
+    env_private_dns_name = var.env_private_dns_name
+    env_public_dns_name = var.env_public_dns_name
   }
 }
 

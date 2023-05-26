@@ -48,3 +48,14 @@ variable "rds_master_password" {
   type        = string
   default     = "picsure!98765"  
 } 
+
+variable "env_public_dns_name" {
+  type        = string
+}
+variable "env_private_dns_name" {
+  type        = string
+}
+
+variable "dsm_url" {
+  type = string
+}
