@@ -87,7 +87,7 @@ LOCK TABLES `resource` WRITE;
 INSERT INTO `resource` VALUES (0x02E23F52F3544E8B992CD37C8B9BA140,NULL,'http://auth-hpds.${target-stack}.datastage.hms.harvard.edu:8080/PIC-SURE/','Authorized Access HPDS resource','auth-hpds',NULL, NULL, NULL);
 INSERT INTO `resource` VALUES (0x70c837be5ffc11ebae930242ac130002,NULL,'http://localhost:8080/pic-sure-aggregate-resource/pic-sure/aggregate-data-sharing','Open Access (aggregate) resource','open-hpds',NULL, NULL, NULL);
 INSERT INTO `resource` VALUES (0x36363664623161342d386538652d3131,NULL,'http://dictionary.${target-stack}.datastage.hms.harvard.edu:8080/dictionary/pic-sure','Dictionary','dictionary',NULL, NULL, NULL);
-INSERT INTO `resource` VALUES (0xCA0AD4A9130A3A8AAE00E35B07F1108B,NULL,'http://localhost:8080.datastage.hms.harvard.edu:8080/visualization','Visualization','visualization',NULL, NULL, NULL);
+INSERT INTO `resource` VALUES (0xCA0AD4A9130A3A8AAE00E35B07F1108B,NULL,'http://localhost:8080/visualization','Visualization','visualization',NULL, NULL, NULL);
 /*!40000 ALTER TABLE `resource` ENABLE KEYS */;
 UNLOCK TABLES;
 
