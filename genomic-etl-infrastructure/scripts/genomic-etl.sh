@@ -106,7 +106,7 @@ export PERL5LIB='/home/centos/cpanm/lib/perl5:/home/centos/bioperl-1.6.924:/home
 export HTSLIB_DIR='/home/centos/htslib/'
 echo ${chrom_number} chr${chrom_number}  > /home/centos/ensembl-vep/chrm_rename.txt
 
-/usr/local/bin/aws sts assume-role --role-arn arn:aws:iam::600168050588:role/nih-nhlbi-TopMed-EC2Access-S3 --role-session-name "get-genomic-source-file" > /usr/tmp/assume-role-output.txt
+/usr/local/bin/aws sts assume-role --role-arn arn:aws:iam::${input_s3_account}:role/nih-nhlbi-TopMed-EC2Access-S3 --role-session-name "get-genomic-source-file" > /usr/tmp/assume-role-output.txt
 
 export AWS_ACCESS_KEY_ID=`grep AccessKeyId /usr/tmp/assume-role-output.txt | cut -d ':' -f 2 | sed "s/[ ,\"]//g"`
 export AWS_SECRET_ACCESS_KEY=`grep SecretAccessKey /usr/tmp/assume-role-output.txt | cut -d ':' -f 2 | sed "s/[ ,\"]//g"`
@@ -172,6 +172,10 @@ echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} dec
 echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} vep stage
 wait
 echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} vep stage
+
+export ANNOTATEDLINECOUNT=`wc -l < /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.annotated.vcf`
+export NORMLINECOUNT=`wc -l < /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.normalized.vcf`
+
 /home/centos/htslib/bgzip -fki --threads 40 /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.annotated.vcf &
 echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} compressing stage
 wait
@@ -203,8 +207,7 @@ echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} outp
 /usr/local/bin/aws s3 cp /home/centos/ensembl-vep/${study_name}_${study_id}_TOPMed_WGS_freeze.9b.chr${chrom_number}.hg38${consent_group_tag}.vcf.gz s3://${output_s3_bucket}/genomic-etl/original_vcfs/${study_id}${consent_group_tag}.chr${chrom_number}.original.vcf.gz &
 wait
 echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} output stage
-export ANNOTATEDLINECOUNT=`wc -l < /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.annotated.vcf`
-export NORMLINECOUNT=`wc -l < /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.normalized.vcf`
+
 if (($ANNOTATEDLINECOUNT == $NORMLINECOUNT + 3))
 then
 /usr/local/bin/aws --region=us-east-1 ec2 create-tags --resources $${INSTANCE_ID} --tags Key=AnnotationComplete,Value=true
