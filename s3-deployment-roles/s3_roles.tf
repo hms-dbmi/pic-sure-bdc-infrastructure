@@ -82,6 +82,13 @@ resource "aws_iam_role_policy" "wildfly-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/jenkins_pipeline_build_${var.stack_githash_long}/visualization-resource.properties"
+    },
+    {
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
       "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/modules/*"
     },
     {
@@ -478,66 +485,5 @@ resource "aws_iam_role_policy_attachment" "attach-cloudwatch-server-policy-to-di
 }
 resource "aws_iam_role_policy_attachment" "attach-cloudwatch-ssm-policy-to-dictionary-role" {
   role       = aws_iam_role.dictionary-deployment-s3-role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-}
-
-
-resource "aws_iam_instance_profile" "visualization-deployment-s3-profile" {
-  name = aws_iam_role.visualization-deployment-s3-role.name
-  role = aws_iam_role.visualization-deployment-s3-role.name
-}
-
-resource "aws_iam_role_policy" "visualization-deployment-s3-policy" {
-  name = "visualization-deployment-s3-policy-${var.target-stack}-${var.stack_githash}"
-  role = aws_iam_role.visualization-deployment-s3-role.id
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": [
-        "s3:GetObject"
-      ],
-      "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/releases/jenkins_pipeline_build_${var.stack_githash_long}/pic-sure-hpds-visualization-resource.tar.gz"
-    },
-    {
-      "Action": [
-        "ec2:CreateTags"
-      ],
-      "Effect": "Allow",
-      "Resource": "arn:aws:ec2:*:*:instance/*"
-    }
-  ]
-}
-EOF
-}
-
-resource "aws_iam_role" "visualization-deployment-s3-role" {
-  name               = "visualization-deployment-s3-role-${var.target-stack}-${var.stack_githash}"
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "ec2.amazonaws.com"
-      },
-      "Effect": "Allow",
-      "Sid": ""
-    }
-  ]
-}
-EOF
-}
-
-resource "aws_iam_role_policy_attachment" "attach-cloudwatch-server-policy-to-visualization-role" {
-  role       = aws_iam_role.visualization-deployment-s3-role.name
-  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
-}
-
-resource "aws_iam_role_policy_attachment" "attach-cloudwatch-ssm-policy-to-visualization-role" {
-  role       = aws_iam_role.visualization-deployment-s3-role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
