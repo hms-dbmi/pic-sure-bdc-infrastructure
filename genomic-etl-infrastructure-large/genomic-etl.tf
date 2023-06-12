@@ -34,7 +34,7 @@ resource "aws_instance" "genomic-etl-ec2" {
 
   associate_public_ip_address = true
 
-  subnet_id = var.genomic-etl-subnet-us-east-id
+  subnet_id = var.genomic-etl-subnet-1f-id
 
   iam_instance_profile = "jenkins-s3-profile"
 
