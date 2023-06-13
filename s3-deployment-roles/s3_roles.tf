@@ -71,7 +71,15 @@ resource "aws_iam_role_policy" "wildfly-deployment-s3-policy" {
       ],
       "Effect": "Allow",
       "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/jenkins_pipeline_build_${var.stack_githash_long}/aggregate-resource.properties"
-    },{
+    },
+    {
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/jenkins_pipeline_build_${var.stack_githash_long}/visualization-resource.properties"
+    },
+    {
       "Action": [
         "s3:GetObject"
       ],
@@ -589,86 +597,5 @@ resource "aws_iam_role_policy_attachment" "attach-cloudwatch-server-policy-to-di
 }
 resource "aws_iam_role_policy_attachment" "attach-cloudwatch-ssm-policy-to-dictionary-role" {
   role       = aws_iam_role.dictionary-deployment-s3-role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-}
-
-
-resource "aws_iam_instance_profile" "visualization-deployment-s3-profile" {
-  name = aws_iam_role.visualization-deployment-s3-role.name
-  role = aws_iam_role.visualization-deployment-s3-role.name
-}
-
-resource "aws_iam_role_policy" "visualization-deployment-s3-policy" {
-  name = "visualization-deployment-s3-policy-${var.target-stack}-${var.stack_githash}"
-  role = aws_iam_role.visualization-deployment-s3-role.id
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": [
-        "s3:GetObject"
-      ],
-      "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/releases/jenkins_pipeline_build_${var.stack_githash_long}/pic-sure-hpds-visualization-resource.tar.gz"
-    }, {
-      "Action": [
-        "s3:GetObject"
-      ],
-      "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/splunk_config/splunkforwarder-9.0.3-dd0128b1f8cd-Linux-x86_64.tgz"
-    },
-    {
-      "Action": [
-        "s3:GetObject"
-      ],
-      "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/nessus_config/setup.sh"
-    },
-    {
-      "Action": [
-        "s3:GetObject"
-      ],
-      "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/nessus_config/NessusAgent-10.1.2-es7.x86_64.rpm"
-    },
-    {
-      "Action": [
-        "ec2:CreateTags"
-      ],
-      "Effect": "Allow",
-      "Resource": "arn:aws:ec2:*:*:instance/*"
-    }
-  ]
-}
-EOF
-}
-
-resource "aws_iam_role" "visualization-deployment-s3-role" {
-  name               = "visualization-deployment-s3-role-${var.target-stack}-${var.stack_githash}"
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "ec2.amazonaws.com"
-      },
-      "Effect": "Allow",
-      "Sid": ""
-    }
-  ]
-}
-EOF
-}
-
-resource "aws_iam_role_policy_attachment" "attach-cloudwatch-server-policy-to-visualization-role" {
-  role       = aws_iam_role.visualization-deployment-s3-role.name
-  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
-}
-
-resource "aws_iam_role_policy_attachment" "attach-cloudwatch-ssm-policy-to-visualization-role" {
-  role       = aws_iam_role.visualization-deployment-s3-role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }

@@ -7,7 +7,6 @@ data "template_file" "route53-ip-vars" {
     open-hpds-ec2-private_ip          = aws_instance.open-hpds-ec2.private_ip
     auth-hpds-ec2-private_ip          = aws_instance.auth-hpds-ec2.private_ip
     dictionary-ec2-private_ip         = aws_instance.dictionary-ec2.private_ip
-    visualization-ec2-private_ip      = aws_instance.visualization-ec2.private_ip
   }
 }
 
