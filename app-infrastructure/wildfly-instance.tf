@@ -110,7 +110,7 @@ resource "local_file" "aggregate-resource-properties-file" {
     filename = "aggregate-resource.properties"
 }
 
-data "template_file" "aggregate-resource-properties" {
+data "template_file" "visualization-resource-properties" {
   template = file("configs/visualization-resource.properties")
   vars = {
     target-stack                      = var.target-stack
