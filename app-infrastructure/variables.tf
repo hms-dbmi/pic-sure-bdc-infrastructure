@@ -55,6 +55,6 @@ variable "rds_master_password" {
 
 variable "allowed_hosts" {
   description = "List of allowed hosts for hosts header validation"
-  type        = tuple(string)
-  default     = [""]
+  type        = string
+  default     = ""
 }
