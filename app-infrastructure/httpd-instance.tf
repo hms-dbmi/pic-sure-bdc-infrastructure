@@ -66,6 +66,7 @@ resource "aws_instance" "httpd-ec2" {
 data "template_file" "httpd-vhosts-conf" {
   template = file("configs/httpd-vhosts.conf")
   vars = {
+    
     wildfly-base-url = "http://${aws_instance.wildfly-ec2.private_ip}:8080"
     target-stack = var.target-stack
     release-id = var.stack_githash_long
