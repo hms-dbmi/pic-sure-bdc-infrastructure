@@ -65,5 +65,5 @@ variable "jenkins_provisioning_assume_role_name" {
 }
 
 variable "jenkins_provisioning_assume_role_duration" {
-  type = string
+  type = number
 }
