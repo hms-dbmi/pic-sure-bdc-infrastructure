@@ -8,6 +8,7 @@ data "template_file" "wildfly-user_data" {
     mysql-instance-address = aws_db_instance.pic-sure-mysql.address
     mysql-instance-password = random_password.picsure-db-password.result
     target_stack = var.target_stack
+    dsm_url = var.dsm_url
   }
 }
 
@@ -77,6 +78,7 @@ data "template_file" "wildfly-standalone-xml" {
     picsure_token_introspection_token = var.picsure_token_introspection_token
     mysql-instance-address            = aws_db_instance.pic-sure-mysql.address
     env_private_dns_name = var.env_private_dns_name
+    env_public_dns_name = var.env_public_dns_name
   }
 }
 
