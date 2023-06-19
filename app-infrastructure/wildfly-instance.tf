@@ -9,6 +9,8 @@ data "template_file" "wildfly-user_data" {
     mysql-instance-password = random_password.picsure-db-password.result
     target_stack = var.target_stack
     dsm_url = var.dsm_url
+    env_private_dns_name = var.env_private_dns_name
+    env_public_dns_name = var.env_public_dns_name
   }
 }
 
