@@ -1,7 +1,7 @@
 resource "aws_security_group" "inbound-from-edge" {
   name = "allow_inbound_from_edge_subnet_to_app_subnet_${var.stack_githash}"
   description = "Allow inbound traffic from edge-private-subnets on port 8080 until we have TLS in place for app server"
-  vpc_id = var.target-vpc
+  vpc_id = "vpc-01dc79294f8bc1861"
 
   ingress {
     from_port = 8080
