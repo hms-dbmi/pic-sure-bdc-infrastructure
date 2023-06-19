@@ -5,22 +5,22 @@ variable "stack_githash_long" {
   type = string
 }
 
-variable "target-stack" {
+variable "target_stack" {
   description = "The stack identifier"
   type        = string
 }
 
-variable "dataset-s3-object-key" {
+variable "dataset_s3_object_key" {
   description = "The s3 object key within the environment s3 bucket"
   type        = string
 }
 
-variable "destigmatized-dataset-s3-object-key" {
+variable "destigmatized_dataset_s3_object_key" {
   description = "The s3 object key within the environment s3 bucket"
   type        = string
 }
 
-variable "genomic-dataset-s3-object-key" {
+variable "genomic_dataset_s3_object_key" {
   description = "The s3 object key within the environment s3 bucket"
   type        = string
 }

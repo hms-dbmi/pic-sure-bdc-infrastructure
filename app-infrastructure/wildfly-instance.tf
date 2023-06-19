@@ -4,10 +4,10 @@ data "template_file" "wildfly-user_data" {
   vars = {
     stack_githash   = var.stack_githash_long
     stack_s3_bucket = var.stack_s3_bucket
-    dataset_s3_object_key = var.dataset-s3-object-key
+    dataset_s3_object_key = var.dataset_s3_object_key
     mysql-instance-address = aws_db_instance.pic-sure-mysql.address
     mysql-instance-password = random_password.picsure-db-password.result
-    target-stack = var.target-stack
+    target_stack = var.target_stack
   }
 }
 
@@ -33,7 +33,7 @@ resource "aws_instance" "wildfly-ec2" {
 
   subnet_id = var.app-subnet-us-east-1a-id
 
-  iam_instance_profile = "wildfly-deployment-s3-profile-${var.target-stack}-${var.stack_githash}"
+  iam_instance_profile = "wildfly-deployment-s3-profile-${var.target_stack}-${var.stack_githash}"
 
   user_data = data.template_cloudinit_config.wildfly-user-data.rendered
 
@@ -55,7 +55,7 @@ resource "aws_instance" "wildfly-ec2" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "FISMA Terraform Playground - ${var.stack_githash} - Wildfly - ${var.target-stack}"
+    Name        = "FISMA Terraform Playground - ${var.stack_githash} - Wildfly - ${var.target_stack}"
   }
   
   metadata_options {
@@ -73,7 +73,7 @@ data "template_file" "wildfly-standalone-xml" {
     picsure_client_secret             = var.picsure_client_secret
     fence_client_secret               = var.fence_client_secret
     fence_client_id                   = var.fence_client_id
-    target-stack                      = var.target-stack
+    target_stack                      = var.target_stack
     picsure_token_introspection_token = var.picsure_token_introspection_token
     mysql-instance-address            = aws_db_instance.pic-sure-mysql.address
   }
@@ -88,7 +88,7 @@ data "template_file" "pic-sure-schema-sql" {
   template = file("configs/pic-sure-schema.sql")
   vars = {
     picsure_token_introspection_token = var.picsure_token_introspection_token
-    target-stack                      = var.target-stack
+    target_stack                      = var.target_stack
   }
 }
 
@@ -101,7 +101,7 @@ resource "local_file" "pic-sure-schema-sql-file" {
 data "template_file" "aggregate-resource-properties" {
   template = file("configs/aggregate-resource.properties")
   vars = {
-    target-stack                      = var.target-stack
+    target_stack                      = var.target_stack
   }
 }
 
@@ -110,3 +110,14 @@ resource "local_file" "aggregate-resource-properties-file" {
     filename = "aggregate-resource.properties"
 }
 
+data "template_file" "visualization-resource-properties" {
+  template = file("configs/visualization-resource.properties")
+  vars = {
+    target_stack                      = var.target_stack
+  }
+}
+
+resource "local_file" "visualization-resource-properties-file" {
+    content     = data.template_file.visualization-resource-properties.rendered
+    filename = "visualization-resource.properties"
+}

@@ -14,6 +14,6 @@ resource "aws_security_group" "outbound-to-internet" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "FISMA Terraform Playground - ${var.stack_githash} - outbound-to-internet Security Group - ${var.target-stack}"
+    Name        = "FISMA Terraform Playground - ${var.stack_githash} - outbound-to-internet Security Group - ${var.target_stack}"
   }
 }

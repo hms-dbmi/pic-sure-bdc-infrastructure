@@ -5,8 +5,8 @@ data "template_file" "httpd-user_data" {
     stack_githash   = var.stack_githash_long
     fence_client_id = var.fence_client_id
     stack_s3_bucket = var.stack_s3_bucket
-    dataset_s3_object_key = var.dataset-s3-object-key
-    target-stack    = var.target-stack
+    dataset_s3_object_key = var.dataset_s3_object_key
+    target_stack    = var.target_stack
     dsm_url = var.dsm_url
   }
 }
@@ -33,7 +33,7 @@ resource "aws_instance" "httpd-ec2" {
 
   subnet_id = var.edge-subnet-us-east-1a-id
 
-  iam_instance_profile = "httpd-deployment-s3-profile-${var.target-stack}-${var.stack_githash}"
+  iam_instance_profile = "httpd-deployment-s3-profile-${var.target_stack}-${var.stack_githash}"
 
   user_data = data.template_cloudinit_config.httpd-user-data.rendered
 
@@ -52,7 +52,7 @@ resource "aws_instance" "httpd-ec2" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "FISMA Terraform Playground - ${var.stack_githash} - Apache HTTPD - ${var.target-stack}"
+    Name        = "FISMA Terraform Playground - ${var.stack_githash} - Apache HTTPD - ${var.target_stack}"
   }
   
   metadata_options {
@@ -68,7 +68,7 @@ data "template_file" "httpd-vhosts-conf" {
   vars = {
     
     wildfly-base-url = "http://${aws_instance.wildfly-ec2.private_ip}:8080"
-    target-stack = var.target-stack
+    target_stack = var.target_stack
     release-id = var.stack_githash_long
     env_private_dns_name = var.env_private_dns_name
     env_public_dns_name = var.env_public_dns_name

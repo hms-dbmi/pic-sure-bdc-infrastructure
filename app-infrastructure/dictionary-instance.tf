@@ -4,7 +4,7 @@ data "template_file" "dictionary-user_data" {
   vars = {
     stack_githash = var.stack_githash_long
     stack_s3_bucket = var.stack_s3_bucket
-    target-stack    = var.target-stack
+    target_stack    = var.target_stack
   }
 }
 
@@ -33,7 +33,7 @@ resource "aws_instance" "dictionary-ec2" {
 
   subnet_id = var.db-subnet-us-east-1a-id
 
-  iam_instance_profile = "dictionary-deployment-s3-profile-${var.target-stack}-${var.stack_githash}"
+  iam_instance_profile = "dictionary-deployment-s3-profile-${var.target_stack}-${var.stack_githash}"
 
   user_data = data.template_cloudinit_config.dictionary-user-data.rendered
 
@@ -52,7 +52,7 @@ resource "aws_instance" "dictionary-ec2" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "FISMA Terraform Playground - ${var.stack_githash} - Dictionary - ${var.target-stack}"
+    Name        = "FISMA Terraform Playground - ${var.stack_githash} - Dictionary - ${var.target_stack}"
   }
 
   metadata_options {

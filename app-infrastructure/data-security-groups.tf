@@ -16,7 +16,7 @@ resource "aws_security_group" "inbound-hpds-from-app" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "FISMA Terraform Playground - ${var.stack_githash} - inbound-hpds-from-app Security Group - ${var.target-stack}"
+    Name        = "FISMA Terraform Playground - ${var.stack_githash} - inbound-hpds-from-app Security Group - ${var.target_stack}"
   }
 }
 
@@ -37,7 +37,7 @@ resource "aws_security_group" "inbound-data-ssh-from-nessus" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "FISMA Terraform Playground - ${var.stack_githash} - inbound-data-ssh-from-nessus - ${var.target-stack}"
+    Name        = "FISMA Terraform Playground - ${var.stack_githash} - inbound-data-ssh-from-nessus - ${var.target_stack}"
   }
 }
 
@@ -59,7 +59,7 @@ resource "aws_security_group" "inbound-mysql-from-app" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "FISMA Terraform Playground - ${var.stack_githash} - inbound-mysql-from-app Security Group - ${var.target-stack}"
+    Name        = "FISMA Terraform Playground - ${var.stack_githash} - inbound-mysql-from-app Security Group - ${var.target_stack}"
   }
 }
 

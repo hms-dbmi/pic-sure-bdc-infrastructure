@@ -16,7 +16,7 @@ resource "aws_security_group" "inbound-from-trend-micro" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "FISMA Terraform Playground - ${var.stack_githash} - inbound-from-trend-micro Security Group - ${var.target-stack}"
+    Name        = "FISMA Terraform Playground - ${var.stack_githash} - inbound-from-trend-micro Security Group - ${var.target_stack}"
   }
 }
 
@@ -46,6 +46,6 @@ resource "aws_security_group" "outbound-to-trend-micro" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = "development"
-    Name        = "FISMA Terraform Playground - ${var.stack_githash} - outbound-to-trend-micro Security Group - ${var.target-stack}"
+    Name        = "FISMA Terraform Playground - ${var.stack_githash} - outbound-to-trend-micro Security Group - ${var.target_stack}"
   }
 }
