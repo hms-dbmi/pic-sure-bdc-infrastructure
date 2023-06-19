@@ -5,7 +5,7 @@ variable "stack_githash_long" {
   type = string
 }
 
-variable "target-stack" {
+variable "target_stack" {
   description = "The stack identifier"
   type        = string
 }
