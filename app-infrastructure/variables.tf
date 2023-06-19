@@ -59,11 +59,3 @@ variable "env_private_dns_name" {
 variable "dsm_url" {
   type = string
 }
-
-variable "jenkins_provisioning_assume_role_name" {
-  type = string
-}
-
-variable "jenkins_provisioning_assume_role_duration" {
-  type = number
-}
