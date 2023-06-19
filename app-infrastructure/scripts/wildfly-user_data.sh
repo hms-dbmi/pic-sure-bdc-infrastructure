@@ -199,7 +199,7 @@ echo "completed Splunk configuration"
 
 ## Download and Install Nessus
 for i in {1..5}; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/nessus_config/setup.sh /opt/nessus_setup.sh && break || sleep 45; done
-sh /opt/nessus_setup.sh "${stack_s3_bucket}" "BDC_Prod_$(echo ${target-stack}|tr '[a-b]' '[A-B]')"
+sh /opt/nessus_setup.sh "${stack_s3_bucket}" "BDC_Prod_$(echo ${target_stack}|tr '[a-b]' '[A-B]')"
 
 for i in 1 2 3 4 5; do echo "trying to download docker image from s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-wildfly.tar.gz" && sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-wildfly.tar.gz /home/centos/pic-sure-wildfly.tar.gz && break || sleep 60; done
 echo "pulled wildfly docker image"
@@ -221,7 +221,7 @@ for i in 1 2 3 4 5; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${s
 sudo bash /root/domain-join.sh
 
 sudo docker run  -d --name schema-init -e "MYSQL_RANDOM_ROOT_PASSWORD=yes" --rm mysql
-sudo docker exec -i schema-init mysql -hpicsure-db.${target-stack}.datastage.hms.harvard.edu -uroot -p${mysql-instance-password} < /home/centos/pic-sure-schema.sql
+sudo docker exec -i schema-init mysql -hpicsure-db.${target_stack}.${env_private_dns_name} -uroot -p${mysql-instance-password} < /home/centos/pic-sure-schema.sql
 sudo docker stop schema-init
 echo "init'd mysql schemas"
 

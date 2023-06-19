@@ -159,7 +159,7 @@
                     </security>
                 </datasource>
                 <datasource jndi-name="java:jboss/datasources/AuthDS" pool-name="AuthDS" use-java-context="true">
-                    <connection-url>jdbc:mysql://picsure-db.${target-stack}.datastage.hms.harvard.edu:3306/auth?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true&amp;autoReconnectForPools=true</connection-url>
+                    <connection-url>jdbc:mysql://picsure-db.${target_stack}.${env_private_dns_name}:3306/auth?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true&amp;autoReconnectForPools=true</connection-url>
                     <driver>mysql</driver>
                     <pool>
                         <min-pool-size>2</min-pool-size>
@@ -179,7 +179,7 @@
                     </validation>
                 </datasource>
                 <datasource jndi-name="java:jboss/datasources/PicsureDS" pool-name="PicsureDS" use-java-context="true">
-                    <connection-url>jdbc:mysql://picsure-db.${target-stack}.${env_private_dns_name}:3306/picsure?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true&amp;autoReconnectForPools=true</connection-url>
+                    <connection-url>jdbc:mysql://picsure-db.${target_stack}.${env_private_dns_name}:3306/picsure?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true&amp;autoReconnectForPools=true</connection-url>
                     <driver>mysql</driver>
                     <pool>
                         <min-pool-size>3</min-pool-size>
@@ -474,7 +474,7 @@
 
                 <simple name="java:global/fence_client_id" value="${fence_client_id}"/>
                 <simple name="java:global/fence_client_secret" value="${fence_client_secret}"/>
-                <simple name="java:global/fence_redirect_url" value="https://picsure.biodatacatalyst.nhlbi.nih.gov/psamaui/login/" />
+                <simple name="java:global/fence_redirect_url" value="https://${env_public_dns_name}/psamaui/login/" />
 
  		<simple name="java:global/fence_standard_access_rules" value="AR_ONLY_INFO,AR_ONLY_SEARCH,AR_INFO_COLUMN_LISTING" />
                 <simple name="java:global/fence_allowed_query_types" value="COUNT,CROSS_COUNT,CATEGORICAL_CROSS_COUNT,CONTINUOUS_CROSS_COUNT,DATAFRAME" />
