@@ -90,6 +90,7 @@ data "template_file" "pic-sure-schema-sql" {
   vars = {
     picsure_token_introspection_token = var.picsure_token_introspection_token
     target_stack                      = var.target_stack
+    env_private_dns_name = var.env_private_dns_name
   }
 }
 
@@ -103,6 +104,7 @@ data "template_file" "aggregate-resource-properties" {
   template = file("configs/aggregate-resource.properties")
   vars = {
     target_stack                      = var.target_stack
+    env_private_dns_name = var.env_private_dns_name
   }
 }
 
