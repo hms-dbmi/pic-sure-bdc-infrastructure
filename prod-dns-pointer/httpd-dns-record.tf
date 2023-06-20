@@ -20,7 +20,7 @@ resource "aws_route53_record" "prod-httpd-dns-record" {
   name    = "prod-httpd"
   type    = "CNAME"
   ttl     = "60"
-  records = ["httpd.${var.target-prod-stack}.${var.env_private_dns_name}"]
+  records = ["httpd.${var.target_stack}.${var.env_private_dns_name}"]
 }
 
 resource "aws_route53_record" "next-prod-httpd-dns-record" {
@@ -28,5 +28,5 @@ resource "aws_route53_record" "next-prod-httpd-dns-record" {
   name    = "next-prod-httpd"
   type    = "CNAME"
   ttl     = "60"
-  records = ["httpd.${var.target-next-prod-stack}.${var.env_private_dns_name}"]
+  records = ["httpd.${var.target_next_stack}.${var.env_private_dns_name}"]
 }
