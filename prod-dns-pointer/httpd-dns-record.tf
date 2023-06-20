@@ -1,12 +1,12 @@
 
 # passed in by CI env pipeline parameter
-variable "target_prod_stack" {
+variable "target_stack" {
   description = "The stack identifier to become the current prod"
   type        = string
 }
 
 # passed in by CI env pipeline parameter
-variable "target-next-prod-stack" {
+variable "target_next_stack" {
   description = "The stack identifier to become the next prod(or stage)"
   type        = string
 }
