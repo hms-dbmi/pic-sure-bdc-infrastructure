@@ -56,6 +56,10 @@ variable "env_private_dns_name" {
   type        = string
 }
 
+variable "env_hosted_zone_id" {
+  type = string
+}
+
 variable "dsm_url" {
   type = string
 }
