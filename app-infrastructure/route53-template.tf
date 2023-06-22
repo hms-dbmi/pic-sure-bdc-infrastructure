@@ -65,5 +65,5 @@ resource "aws_route53_record" "picsure-db-cname-record" {
   name    = "picsure-db.${var.target_stack}.${var.env_private_dns_name}"
   type    = "CNAME"
   ttl     = 60
-  records = [aws_instance.picsure-db-ec2.private_ip]
+  records = [aws_db_instance.pic-sure-mysql.address]
 }
