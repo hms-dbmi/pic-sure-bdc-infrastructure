@@ -48,3 +48,9 @@ variable "rds_master_password" {
   type        = string
   default     = "picsure!98765"  
 } 
+
+variable "allowed_hosts" {
+  description = "List of allowed hosts for hosts header validation"
+  type        = string
+  default     = ""
+}
