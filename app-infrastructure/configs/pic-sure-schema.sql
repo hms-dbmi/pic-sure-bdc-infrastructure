@@ -660,7 +660,7 @@ where privilege.uuid = role_privilege.privilege_id
 SET @searchValuesAccessRuleUUID = REPLACE(uuid(),'-','');
 INSERT INTO access_rule (uuid, name, description, rule, type, value, checkMapKeyOnly, checkMapNode, subAccessRuleParent_uuid, isEvaluateOnlyByGates, isGateAnyRelation)
 VALUES (
-           unhex(@infoAccessRuleUUID),
+           unhex(@searchValuesAccessRuleUUID),
            'ALLOW_SEARCH_VALUES_ACCESS',
            'Allow access to search values endpoint',
            '$.path',
@@ -674,7 +674,7 @@ VALUES (
        );
 
 INSERT INTO accessRule_privilege (privilege_id, accessRule_id)
-SELECT privilege.uuid, unhex(@uuidGate) from privilege, role_privilege, role
+SELECT privilege.uuid, unhex(@searchValuesAccessRuleUUID) from privilege, role_privilege, role
 where privilege.uuid = role_privilege.privilege_id
   AND role_privilege.role_id = role.uuid
   AND role.name = 'FENCE_ROLE_OPEN_ACCESS';
