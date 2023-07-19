@@ -63,3 +63,12 @@ variable "env_hosted_zone_id" {
 variable "dsm_url" {
   type = string
 }
+
+variable "allowed_hosts" {
+  description = "List of allowed hosts for hosts header validation"
+  type        = string
+}
+
+variable "trendmicro_dsa_cidr_blocks" {
+  type = list
+}
