@@ -8,9 +8,7 @@ resource "aws_security_group" "inbound-from-trend-micro" {
     from_port = 4118
     to_port = 4118
     protocol = "tcp"
-    cidr_blocks = [
-      "172.25.255.78/32"
-    ]
+    cidr_blocks = var.trendmicro_dsa_cidr_blocks
   }
   
   tags = {
@@ -29,18 +27,14 @@ resource "aws_security_group" "outbound-to-trend-micro" {
     from_port = 4120
     to_port = 4120
     protocol = "tcp"
-    cidr_blocks = [
-      "172.25.255.78/32"
-    ]
+    cidr_blocks = var.trendmicro_dsa_cidr_blocks
   }
   
   egress {
     from_port = 5274
     to_port = 5274
     protocol = "tcp"
-    cidr_blocks = [
-      "172.25.255.78/32"
-    ]
+    cidr_blocks = var.trendmicro_dsa_cidr_blocks
   }
   
   tags = {
