@@ -2,24 +2,25 @@
 # this needs to be refactored.
 # should just make the route53 changes in terraform
 # instead of outputting this file and using jenkins + aws / cli in the Teardown and Rebuild job to make the record changes. Yikes!!
-data "template_file" "route53-ip-vars" {
-  template = file("route53-variables.template")
-  vars = {
-    pic-sure-mysql-address            = aws_db_instance.pic-sure-mysql.address
-    wildfly-ec2-private_ip            = aws_instance.wildfly-ec2.private_ip
-    httpd-ec2-private_ip              = aws_instance.httpd-ec2.private_ip
-    open-hpds-ec2-private_ip          = aws_instance.open-hpds-ec2.private_ip
-    auth-hpds-ec2-private_ip          = aws_instance.auth-hpds-ec2.private_ip
-    dictionary-ec2-private_ip         = aws_instance.dictionary-ec2.private_ip
-  }
-}
+# no longer generating this file 
+#data "template_file" "route53-ip-vars" {
+#  template = file("route53-variables.template")
+#  vars = {
+#    pic-sure-mysql-address            = aws_db_instance.pic-sure-mysql.address
+#    wildfly-ec2-private_ip            = aws_instance.wildfly-ec2.private_ip
+#    httpd-ec2-private_ip              = aws_instance.httpd-ec2.private_ip
+#    open-hpds-ec2-private_ip          = aws_instance.open-hpds-ec2.private_ip
+#    auth-hpds-ec2-private_ip          = aws_instance.auth-hpds-ec2.private_ip
+#    dictionary-ec2-private_ip         = aws_instance.dictionary-ec2.private_ip
+#  }
+#}
 
-resource "local_file" "route53-ip-vars-file" {
-    content = data.template_file.route53-ip-vars.rendered
-    filename = "ip-vars.properties"
-}
+#resource "local_file" "route53-ip-vars-file" {
+#    content = data.template_file.route53-ip-vars.rendered
+#    filename = "ip-vars.properties"
+#}
 
-# DNS RECORDS for all nodes
+# DNS RECORDS for all nodes.  move these to the resources tf files.  
 resource "aws_route53_record" "httpd-addr-record" {
   zone_id = var.env_hosted_zone_id
   name    = "httpd.${var.target_stack}.${var.env_private_dns_name}"
@@ -44,13 +45,14 @@ resource "aws_route53_record" "open-hpds-addr-record" {
   records = [aws_instance.open-hpds-ec2.private_ip]
 }
 
-resource "aws_route53_record" "auth-hpds-addr-record" {
-  zone_id = var.env_hosted_zone_id
-  name    = "auth-hpds.${var.target_stack}.${var.env_private_dns_name}"
-  type    = "A"
-  ttl     = 60
-  records = [aws_instance.auth-hpds-ec2.private_ip]
-}
+# moving this to auth-hpds-instance.  All for a node should be in a single terrafrom file for a flat model to work correctly.
+#resource "aws_route53_record" "auth-hpds-addr-record" {
+#  zone_id = var.env_hosted_zone_id
+#  name    = "auth-hpds.${var.target_stack}.${var.env_private_dns_name}"
+#  type    = "A"
+#  ttl     = 60
+#  records = [aws_instance.auth-hpds-ec2.private_ip]
+#}
 
 resource "aws_route53_record" "dictionary-addr-record" {
   zone_id = var.env_hosted_zone_id
