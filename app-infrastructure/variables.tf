@@ -72,3 +72,12 @@ variable "allowed_hosts" {
 variable "trendmicro_dsa_cidr_blocks" {
   type = list
 }
+
+variable "idp_provider_uri" {
+    type = string
+    default = "https://gen3.biodatacatalyst.nhlbi.nih.gov/"
+}
+variable "idp_provider" {
+    type = string
+    default = "fence"
+}

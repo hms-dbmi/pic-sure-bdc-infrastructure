@@ -79,8 +79,10 @@ data "template_file" "wildfly-standalone-xml" {
     target_stack                      = var.target_stack
     picsure_token_introspection_token = var.picsure_token_introspection_token
     mysql-instance-address            = aws_db_instance.pic-sure-mysql.address
-    env_private_dns_name = var.env_private_dns_name
-    env_public_dns_name = var.env_public_dns_name
+    env_private_dns_name              = var.env_private_dns_name
+    env_public_dns_name               = var.env_public_dns_name
+    idp_provider                      = var.idp_provider
+    idp_provider_uri                  = var.idp_provider_uri
   }
 }
 
