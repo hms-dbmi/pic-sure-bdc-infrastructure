@@ -11,7 +11,7 @@
   "picSureResourceId":"02e23f52-f354-4e8b-992c-d37c8b9ba140",
   "openAccessResourceId":"70c837be-5ffc-11eb-ae93-0242ac130002",
   "visualizationResourceId":"ca0ad4a9-130a-3a8a-ae00-e35b07f1108b",
-  "applicationIdForBaseQuery":"8b5722c9-62fd-48d6-b0bf-4f67e53efb2b",
+  "applicationIdForBaseQuery": null,
   "helpLink": "https://biodatacatalyst.nhlbi.nih.gov/contact\" aria-label='Contact Us, this link will open a new browser tab' target='_blank'",
   "pdfLink": "https://tinyurl.com/BDC-PIC-SURE-User-Guide\" aria-label='User Guide, this link will open a new browser tab' target='_blank'",
   "videoLink": "https://www.youtube.com/playlist?list=PLJ6YccH8TEufZ5L-ctxzFF7vuZRLVacKw\" aria-label='Video Demonstration, this link will open a new browser tab' target='_blank'",
