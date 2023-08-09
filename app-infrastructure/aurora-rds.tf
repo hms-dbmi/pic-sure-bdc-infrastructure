@@ -17,7 +17,7 @@
 #
 #  tags = {
 #    Owner       = "Avillach_Lab"
-#    Environment = "development"
+#    Environment = var.environment_name
 #    Name        = "FISMA Terraform Playground - ${var.stack_githash} - RDS Aurora Cluster"
 #  }  
 #}
@@ -35,7 +35,7 @@
 #  
 #  tags = {
 #    Owner       = "Avillach_Lab"
-#    Environment = "development"
+#    Environment = var.environment_name
 #    Name        = "FISMA Terraform Playground - ${var.stack_githash} - RDS Aurora DB Instance - ${count.index}"
 #  }
 #}
