@@ -24,7 +24,7 @@ resource "aws_instance" "dictionary-ec2" {
   //TODO double check this value at runtime to check that performance not impacted
   instance_type = "m5.xlarge"
 
-  subnet_id = local.private2_subnet_id
+  subnet_id = local.private2_subnet_ids[0]
 
   iam_instance_profile = "dictionary-deployment-s3-profile-${var.target_stack}-${var.stack_githash}"
 

@@ -26,7 +26,7 @@ resource "aws_instance" "open-hpds-ec2" {
   ami           = local.ami_id
   instance_type = "m5.2xlarge"
 
-  subnet_id = var.private2_subnet_id
+  subnet_id = var.private2_subnet_ids[0]
 
   iam_instance_profile = "open-hpds-deployment-s3-profile-${var.target_stack}-${var.stack_githash}"
 
