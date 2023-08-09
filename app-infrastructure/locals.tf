@@ -1,0 +1,38 @@
+#Lookup latest AMI
+data "aws_ami" "centos" {
+  most_recent = true
+  owners      = ["752463128620"]
+  name_regex  = "^srce-centos7-golden-*"
+}
+
+data "aws_subnet" "private1" {
+  vpc_id = var.target_vpc
+  filter {
+    name   = "tag:Name"
+    values = ["*private1*"]
+  }
+}
+
+data "aws_subnet" "private2" {
+  vpc_id = var.target_vpc
+  filter {
+    name   = "tag:Name"
+    values = ["*private2*"]
+  }
+}
+
+data "aws_subnet" "public" {
+  vpc_id = var.target_vpc
+  filter {
+    name   = "tag:Name"
+    values = ["*public*"]
+  }
+}
+
+
+locals {
+  ami_id              = data.aws_ami.centos.id
+  private1_subnet_ids = data.aws_subnet.private1[*].id
+  private2_subnet_ids = data.aws_subnet.private2[*].id
+  public_subnet_ids   = data.aws_subnet.public[*].id
+}
