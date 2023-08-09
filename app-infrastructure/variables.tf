@@ -71,7 +71,7 @@ variable "env_hosted_zone_id" {
 }
 
 variable "env_is_open_access" {
-  type = boolean
+  type = bool
 }
 
 variable "allowed_hosts" {
