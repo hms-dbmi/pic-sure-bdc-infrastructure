@@ -43,4 +43,5 @@ locals {
   private1_subnet_ids = data.aws_subnet.private1[*].id
   private2_subnet_ids = data.aws_subnet.private2[*].id
   public_subnet_ids   = data.aws_subnet.public[*].id
+  env_is_open_access  = tobool(var.env_is_open_access)
 }
