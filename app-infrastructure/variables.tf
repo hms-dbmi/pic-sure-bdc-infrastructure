@@ -39,7 +39,6 @@ variable "genomic_dataset_s3_object_key" {
 variable "environment_name" {
   description = "The name of the environment"
   type        = string
-  default     = var.environment_name
 }
 
 variable "env_staging_subdomain" {
