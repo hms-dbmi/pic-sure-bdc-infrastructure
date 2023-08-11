@@ -55,6 +55,12 @@ resource "aws_iam_role_policy" "wildfly-deployment-s3-policy" {
       "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/modules/*"
     },{
       "Action": [
+        "s3:ListObjectsV2*"
+      ],
+      "Effect": "Allow,
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/*"
+    },{
+      "Action": [
         "ec2:CreateTags"
       ],
       "Effect": "Allow",
@@ -168,6 +174,12 @@ resource "aws_iam_role_policy" "httpd-deployment-s3-policy" {
       "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/data/${var.dataset_s3_object_key}/fence_mapping.json"
     },{
       "Action": [
+        "s3:ListObjectsV2*"
+      ],
+      "Effect": "Allow,
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/*"
+    },{
+      "Action": [
         "ec2:CreateTags"
       ],
       "Effect": "Allow",
@@ -258,6 +270,12 @@ resource "aws_iam_role_policy" "auth-hpds-deployment-s3-policy" {
       "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/jenkins_pipeline_build_${var.stack_githash_long}/hpds-log4j.properties"
     },{
       "Action": [
+        "s3:ListObjectsV2*"
+      ],
+      "Effect": "Allow,
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/*"
+    },{
+      "Action": [
         "ec2:CreateTags"
       ],
       "Effect": "Allow",
@@ -329,6 +347,12 @@ resource "aws_iam_role_policy" "open-hpds-deployment-s3-policy" {
       "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/jenkins_pipeline_build_${var.stack_githash_long}/hpds-log4j.properties"
     },{
       "Action": [
+        "s3:ListObjectsV2*"
+      ],
+      "Effect": "Allow,
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/*"
+    },{
+      "Action": [
         "ec2:CreateTags"
       ],
       "Effect": "Allow",
@@ -386,6 +410,12 @@ resource "aws_iam_role_policy" "dictionary-deployment-s3-policy" {
       ],
       "Effect": "Allow",
       "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/releases/jenkins_pipeline_build_${var.stack_githash_long}/pic-sure-hpds-dictionary-resource.tar.gz"
+    },{
+      "Action": [
+        "s3:ListObjectsV2*"
+      ],
+      "Effect": "Allow,
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/*"
     },{
       "Action": [
         "ec2:CreateTags"
