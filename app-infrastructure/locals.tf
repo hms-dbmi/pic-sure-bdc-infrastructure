@@ -45,12 +45,17 @@ data "aws_subnets" "public" {
   }
 }
 
+data "aws_subnet" "public" {
+  for_each = toset(data.aws_subnets.public.ids)
+  id       = each.value
+}
+
 
 locals {
   ami_id              = data.aws_ami.centos.id
   target_vpc          = data.aws_vpc.target_vpc.id
   private1_subnet_ids = data.aws_subnets.private1[*].id
   private2_subnet_ids = data.aws_subnets.private2[*].id
-  public_subnet_cidrs = data.aws_subnets.public[*].cidr_block
+  public_subnet_cidrs = values(data.aws_subnet.public).*.cidr_block
   env_is_open_access  = tobool(var.env_is_open_access)
 }
