@@ -11,7 +11,7 @@ output "dictionary-ec2-id" {
 }
 
 output "open-hpds-ec2-id" {
-  value = one(aws_instance.open-hpds-ec2[*].id
+  value = one(aws_instance.open-hpds-ec2[*].id)
 }
 
 output "auth-hpds-ec2-id" {
