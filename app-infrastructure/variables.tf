@@ -69,11 +69,6 @@ variable "env_is_open_access" {
   type = string
 }
 
-variable "allowed_hosts" {
-  description = "List of allowed hosts for hosts header validation"
-  type        = string
-}
-
 variable "fence_client_id" {
   type    = string
   default = ""

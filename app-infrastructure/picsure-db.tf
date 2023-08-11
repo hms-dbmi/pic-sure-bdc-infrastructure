@@ -16,7 +16,7 @@ resource "aws_db_instance" "pic-sure-mysql" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = var.environment_name
-    Name        = "{var.stack_githash} - PIC-SURE DB Instance - ${var.target_stack}"
+    Name        = "PIC-SURE DB Instance - ${var.target_stack} - ${var.stack_githash}"
   }
 }
 
