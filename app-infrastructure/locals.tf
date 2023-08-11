@@ -12,7 +12,7 @@ data "aws_vpc" "target_vpc" {
   }
 }
 
-data "aws_subnet" "private1" {
+data "aws_subnets" "private1" {
   vpc_id = local.target_vpc
   filter {
     name   = "tag:Name"
@@ -20,7 +20,7 @@ data "aws_subnet" "private1" {
   }
 }
 
-data "aws_subnet" "private2" {
+data "aws_subnets" "private2" {
   vpc_id = local.target_vpc
   filter {
     name   = "tag:Name"
@@ -28,7 +28,7 @@ data "aws_subnet" "private2" {
   }
 }
 
-data "aws_subnet" "public" {
+data "aws_subnets" "public" {
   vpc_id = local.target_vpc
   filter {
     name   = "tag:Name"
@@ -40,8 +40,8 @@ data "aws_subnet" "public" {
 locals {
   ami_id              = data.aws_ami.centos.id
   target_vpc          = data.aws_vpc.target_vpc.id
-  private1_subnet_ids = data.aws_subnet.private1[*].id
-  private2_subnet_ids = data.aws_subnet.private2[*].id
-  public_subnet_ids   = data.aws_subnet.public[*].id
+  private1_subnet_ids = data.aws_subnets.private1[*].id
+  private2_subnet_ids = data.aws_subnets.private2[*].id
+  public_subnet_ids   = data.aws_subnets.public[*].id
   env_is_open_access  = tobool(var.env_is_open_access)
 }
