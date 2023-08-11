@@ -13,7 +13,10 @@ data "aws_vpc" "target_vpc" {
 }
 
 data "aws_subnets" "private1" {
-  vpc_id = local.target_vpc
+  filter {
+    name   = "vpc-id"
+    values = [local.target_vpc]
+  }
   filter {
     name   = "tag:Name"
     values = ["*private1*"]
@@ -21,7 +24,10 @@ data "aws_subnets" "private1" {
 }
 
 data "aws_subnets" "private2" {
-  vpc_id = local.target_vpc
+  filter {
+    name   = "vpc-id"
+    values = [local.target_vpc]
+  }
   filter {
     name   = "tag:Name"
     values = ["*private2*"]
@@ -29,7 +35,10 @@ data "aws_subnets" "private2" {
 }
 
 data "aws_subnets" "public" {
-  vpc_id = local.target_vpc
+  filter {
+    name   = "vpc-id"
+    values = [local.target_vpc]
+  }
   filter {
     name   = "tag:Name"
     values = ["*public*"]
