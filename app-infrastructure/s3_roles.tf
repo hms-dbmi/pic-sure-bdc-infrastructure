@@ -58,7 +58,7 @@ resource "aws_iam_role_policy" "wildfly-deployment-s3-policy" {
         "s3:ListBucket"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}",
       "Condition": {
         "StringLike": {
           "s3:prefix": [
@@ -187,7 +187,7 @@ resource "aws_iam_role_policy" "httpd-deployment-s3-policy" {
         "s3:ListBucket"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}",
       "Condition": {
         "StringLike": {
           "s3:prefix": [
@@ -366,7 +366,7 @@ resource "aws_iam_role_policy" "open-hpds-deployment-s3-policy" {
         "s3:ListBucket"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/*"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/*",
       "Condition": {
         "StringLike": {
           "s3:prefix": [
@@ -440,7 +440,7 @@ resource "aws_iam_role_policy" "dictionary-deployment-s3-policy" {
         "s3:ListBucket"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/*"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/*",
       "Condition": {
         "StringLike": {
           "s3:prefix": [
