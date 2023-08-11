@@ -74,5 +74,12 @@ variable "allowed_hosts" {
   type        = string
 }
 
-variable fence_client_id { nullable = true }
-variable "picsure_token_introspection_token" { nullable = true }
+variable "fence_client_id" {
+  type = string
+  default = ""
+}
+
+variable "picsure_token_introspection_token" {
+  type = string
+  default = ""
+}
