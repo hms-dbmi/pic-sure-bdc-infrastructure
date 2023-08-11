@@ -10,10 +10,6 @@ output "dictionary-ec2-id" {
   value = aws_instance.dictionary-ec2.id
 }
 
-output "open-hpds-ec2-id" {
-  value = one(aws_instance.open-hpds-ec2[*].id)
-}
-
-output "auth-hpds-ec2-id" {
-  value = one(aws_instance.auth-hpds-ec2[*].id)
+output "hpds-ec2-id" {
+  value = var.env_is_open_access ? aws_instance.open-hpds-ec2[0].id : aws_instance.auth-hpds-ec2[0].id
 }
