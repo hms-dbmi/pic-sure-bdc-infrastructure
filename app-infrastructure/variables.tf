@@ -6,10 +6,6 @@ variable "stack_githash_long" {
   type = string
 }
 
-variable "target_vpc" {
-  description = "Target VPC"
-  type        = string
-}
 
 variable "target_stack" {
   description = "The stack identifier"
@@ -77,3 +73,6 @@ variable "allowed_hosts" {
   description = "List of allowed hosts for hosts header validation"
   type        = string
 }
+
+variable fence_client_id { nullable = true }
+variable "picsure_token_introspection_token" { nullable = true }

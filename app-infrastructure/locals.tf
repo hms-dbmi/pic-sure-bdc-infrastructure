@@ -39,7 +39,7 @@ data "aws_subnet" "public" {
 
 locals {
   ami_id              = data.aws_ami.centos.id
-  target_vpc = data.aws_vpc.target_vpc[0].id
+  target_vpc = data.aws_vpc.target_vpc.id
   private1_subnet_ids = data.aws_subnet.private1[*].id
   private2_subnet_ids = data.aws_subnet.private2[*].id
   public_subnet_ids   = data.aws_subnet.public[*].id

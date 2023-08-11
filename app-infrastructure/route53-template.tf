@@ -13,10 +13,10 @@
 #  }
 #}
 
-resource "local_file" "route53-ip-vars-file" {
-  content  = data.template_file.route53-ip-vars.rendered
-  filename = "ip-vars.properties"
-}
+#resource "local_file" "route53-ip-vars-file" {
+#  content  = data.template_file.route53-ip-vars.rendered
+#  filename = "ip-vars.properties"
+#}
 
 # DNS RECORDS for all nodes
 resource "aws_route53_record" "httpd-addr-record" {

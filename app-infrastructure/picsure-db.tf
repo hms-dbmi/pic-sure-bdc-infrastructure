@@ -12,7 +12,7 @@ resource "aws_db_instance" "pic-sure-mysql" {
   db_subnet_group_name   = "main-${var.target_stack}"
   copy_tags_to_snapshot  = true
   skip_final_snapshot    = true
-  vpc_security_group_ids = [aws_security_group.inbound-mysql-from-app.id]
+  vpc_security_group_ids = [aws_security_group.inbound-mysql-from-wildfly.id]
   tags = {
     Owner       = "Avillach_Lab"
     Environment = var.environment_name
