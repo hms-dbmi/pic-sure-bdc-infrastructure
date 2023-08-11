@@ -57,5 +57,5 @@ locals {
   private1_subnet_ids = data.aws_subnets.private1.ids
   private2_subnet_ids = data.aws_subnets.private2.ids
   public_subnet_cidrs = values(data.aws_subnet.public).*.cidr_block
-  env_is_open_access  = tobool(var.env_is_open_access)
+  project             = var.env_is_open_access ? "Open PIC-SURE" : "Auth PIC-SURE"
 }

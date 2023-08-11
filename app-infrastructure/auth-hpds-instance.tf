@@ -22,7 +22,7 @@ data "template_cloudinit_config" "auth_hpds-user-data" {
 }
 
 resource "aws_instance" "auth-hpds-ec2" {
-  count = local.env_is_open_access ? 0 : 1
+  count = var.env_is_open_access ? 0 : 1
 
   ami           = local.ami_id
   instance_type = "m5.12xlarge"
@@ -48,6 +48,7 @@ resource "aws_instance" "auth-hpds-ec2" {
     Owner       = "Avillach_Lab"
     Environment = var.environment_name
     Stack       = var.env_staging_subdomain
+    Project     = local.project
     Name        = "${var.stack_githash} - Auth HPDS - ${var.target_stack}"
   }
 

@@ -48,6 +48,7 @@ resource "aws_instance" "wildfly-ec2" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = var.environment_name
+    Project     = local.project
     Stack       = var.env_staging_subdomain
     Name        = "{var.stack_githash} - Wildfly - ${var.target_stack}"
   }
