@@ -8,7 +8,7 @@ resource "aws_security_group" "inbound-httpd-from-alb" {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = local.public_subnet_ids
+    cidr_blocks = local.public_subnet_cidrs
   }
 
   tags = {
