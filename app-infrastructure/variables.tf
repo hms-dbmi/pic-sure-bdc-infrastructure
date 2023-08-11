@@ -75,11 +75,21 @@ variable "allowed_hosts" {
 }
 
 variable "fence_client_id" {
-  type = string
+  type    = string
   default = ""
 }
 
 variable "picsure_token_introspection_token" {
-  type = string
+  type    = string
+  default = ""
+}
+
+variable "picsure_client_secret" {
+  type    = string
+  default = ""
+}
+
+variable "fence_client_secret" {
+  type    = string
   default = ""
 }

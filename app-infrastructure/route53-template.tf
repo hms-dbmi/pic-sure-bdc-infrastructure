@@ -41,7 +41,7 @@ resource "aws_route53_record" "open-hpds-addr-record" {
   name    = "open-hpds.${var.target_stack}.${var.env_private_dns_name}"
   type    = "A"
   ttl     = 60
-  records = [aws_instance.open-hpds-ec2.private_ip]
+  records = [aws_instance.open-hpds-ec2[0].private_ip]
 }
 
 resource "aws_route53_record" "auth-hpds-addr-record" {
@@ -50,7 +50,7 @@ resource "aws_route53_record" "auth-hpds-addr-record" {
   name    = "auth-hpds.${var.target_stack}.${var.env_private_dns_name}"
   type    = "A"
   ttl     = 60
-  records = [aws_instance.auth-hpds-ec2.private_ip]
+  records = [aws_instance.auth-hpds-ec2[0].private_ip]
 }
 
 resource "aws_route53_record" "dictionary-addr-record" {

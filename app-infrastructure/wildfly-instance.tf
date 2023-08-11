@@ -28,7 +28,7 @@ resource "aws_instance" "wildfly-ec2" {
   ami           = local.ami_id
   instance_type = "m5.2xlarge"
 
-  subnet_id = var.private2_subnet_ids[0]
+  subnet_id = local.private2_subnet_ids[0]
 
   iam_instance_profile = "wildfly-deployment-s3-profile-${var.target_stack}-${var.stack_githash}"
 

@@ -25,7 +25,7 @@ resource "aws_instance" "httpd-ec2" {
   ami           = local.ami_id
   instance_type = "m5.large"
 
-  subnet_id = var.private1_subnet_ids[0]
+  subnet_id = local.private1_subnet_ids[0]
 
   iam_instance_profile = "httpd-deployment-s3-profile-${var.target_stack}-${var.stack_githash}"
 

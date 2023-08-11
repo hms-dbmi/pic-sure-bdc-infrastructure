@@ -26,7 +26,7 @@ resource "aws_instance" "open-hpds-ec2" {
   ami           = local.ami_id
   instance_type = "m5.2xlarge"
 
-  subnet_id = var.private2_subnet_ids[0]
+  subnet_id = local.private2_subnet_ids[0]
 
   iam_instance_profile = "open-hpds-deployment-s3-profile-${var.target_stack}-${var.stack_githash}"
 
@@ -34,7 +34,7 @@ resource "aws_instance" "open-hpds-ec2" {
 
   vpc_security_group_ids = [
     aws_security_group.outbound-to-internet.id,
-    aws_security_group.inbound-hpds-from-app.id,
+    aws_security_group.inbound-hpds-from-wildfly.id,
   ]
 
   root_block_device {
