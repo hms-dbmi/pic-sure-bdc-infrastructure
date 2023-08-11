@@ -49,7 +49,7 @@ resource "aws_instance" "auth-hpds-ec2" {
     Environment = var.environment_name
     Stack       = var.env_staging_subdomain
     Project     = local.project
-    Name        = "${var.stack_githash} - Auth HPDS - ${var.target_stack}"
+    Name        = "Auth HPDS - ${var.target_stack} - ${var.stack_githash}"
   }
 
   metadata_options {

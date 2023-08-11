@@ -47,7 +47,7 @@ resource "aws_instance" "httpd-ec2" {
     Environment = var.environment_name
     Stack       = var.env_staging_subdomain
     Project     = local.project
-    Name        = "{var.stack_githash} - Apache HTTPD - ${var.target_stack}"
+    Name        = "Apache HTTPD - ${var.target_stack} - ${var.stack_githash}"
   }
 
   metadata_options {

@@ -46,7 +46,7 @@ resource "aws_instance" "dictionary-ec2" {
     Environment = var.environment_name
     Stack       = var.env_staging_subdomain
     Project     = local.project
-    Name        = "{var.stack_githash} - Dictionary - ${var.target_stack}"
+    Name        = "Dictionary - ${var.target_stack} - ${var.stack_githash}"
   }
 
   metadata_options {
