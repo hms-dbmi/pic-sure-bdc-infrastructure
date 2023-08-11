@@ -6,10 +6,8 @@ echo "user-data progress starting update"
 sudo yum -y update
 
 s3_copy() {
-  local src=$1
-  local dest=$2
   for i in {1..5}; do
-    sudo /usr/bin/aws --region us-east-1 s3 cp $src $dest "$@" && break || sleep 30
+    sudo /usr/bin/aws --region us-east-1 s3 cp $* && break || sleep 30
   done
 }
 
