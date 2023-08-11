@@ -9,14 +9,14 @@ s3_copy() {
   local src=$1
   local dest=$2
   for i in {1..5}; do
-    sudo /usr/bin/aws --region us-east-1 s3 cp $src $dest --recursive && break || sleep 30
+    sudo /usr/bin/aws --region us-east-1 s3 cp $src $dest "$@" && break || sleep 30
   done
 }
 
 mkdir -p /opt/local/hpds/all
 s3_copy s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-hpds.tar.gz /home/centos/pic-sure-hpds.tar.gz
 s3_copy s3://${stack_s3_bucket}/data/${dataset_s3_object_key}/javabins_rekeyed.tar.gz /opt/local/hpds/javabins_rekeyed.tar.gz
-s3_copy s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/ /opt/local/hpds/all/
+s3_copy s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/ /opt/local/hpds/all/ --recursive
 
 cd /opt/local/hpds
 tar -xvzf javabins_rekeyed.tar.gz

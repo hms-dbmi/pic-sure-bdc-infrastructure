@@ -12,13 +12,13 @@ s3_copy() {
   local src=$1
   local dest=$2
   for i in {1..5}; do
-    sudo /usr/bin/aws --region us-east-1 s3 cp $src $dest --recursive && break || sleep 30
+    sudo /usr/bin/aws --region us-east-1 s3 cp $src $dest "$@" && break || sleep 30
   done
 }
 
 s3_copy s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-ui.tar.gz /home/centos/pic-sure-ui.tar.gz
 s3_copy s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/httpd-vhosts.conf /usr/local/docker-config/httpd-vhosts.conf
-s3_copy s3://${stack_s3_bucket}/certs/httpd/ /usr/local/docker-config/cert/
+s3_copy s3://${stack_s3_bucket}/certs/httpd/ /usr/local/docker-config/cert/ --recursive
 s3_copy s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/picsureui_settings.json /usr/local/docker-config/picsureui_settings.json
 s3_copy s3://${stack_s3_bucket}/data/${dataset_s3_object_key}/fence_mapping.json /home/centos/fence_mapping.json
 
