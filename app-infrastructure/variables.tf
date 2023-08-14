@@ -73,6 +73,6 @@ variable "trendmicro_dsa_cidr_blocks" {
   type = list
 }
 
-variable "analyticsId" {
+variable "analytics_id" {
   type = string
 }

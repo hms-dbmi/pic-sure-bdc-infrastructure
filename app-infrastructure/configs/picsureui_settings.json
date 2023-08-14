@@ -99,5 +99,5 @@
   "idp_provider":"fence",
   "idp_provider_uri":"https://gen3.biodatacatalyst.nhlbi.nih.gov",
   "fence_client_id":"${fence_client_id}",
-  "analyticsId":"${analyticsId}"
+  "analytics_id":"${analytics_id}"
 }
