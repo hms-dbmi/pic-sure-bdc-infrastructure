@@ -54,11 +54,11 @@ resource "aws_instance" "httpd-ec2" {
     Environment = "development"
     Name        = "FISMA Terraform Playground - ${var.stack_githash} - Apache HTTPD - ${var.target_stack}"
   }
-  
+
   metadata_options {
   	http_endpoint = "enabled"
   	http_tokens = "required"
-	  instance_metadata_tags = "enabled"  
+	  instance_metadata_tags = "enabled"
   }
 
 }
@@ -66,7 +66,7 @@ resource "aws_instance" "httpd-ec2" {
 data "template_file" "httpd-vhosts-conf" {
   template = file("configs/httpd-vhosts.conf")
   vars = {
-    
+
     wildfly-base-url = "http://${aws_instance.wildfly-ec2.private_ip}:8080"
     target_stack = var.target_stack
     release-id = var.stack_githash_long
@@ -84,7 +84,8 @@ resource "local_file" "httpd-vhosts-conf-file" {
 data "template_file" "picsureui_settings" {
   template = file("configs/picsureui_settings.json")
   vars = {
-    fence_client_id = var.fence_client_id
+    fence_client_id = var.fence_client_id,
+    analyticsId = var.analyticsId,
   }
 }
 

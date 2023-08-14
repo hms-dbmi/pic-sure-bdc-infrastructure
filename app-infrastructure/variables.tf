@@ -46,14 +46,14 @@ variable "rds_master_username" {
 variable "rds_master_password" {
   description = "Master Password"
   type        = string
-  default     = "picsure!98765"  
-} 
+  default     = "picsure!98765"
+}
 
 variable "env_public_dns_name" {
-  type        = string
+  type = string
 }
 variable "env_private_dns_name" {
-  type        = string
+  type = string
 }
 
 variable "env_hosted_zone_id" {
@@ -71,4 +71,8 @@ variable "allowed_hosts" {
 
 variable "trendmicro_dsa_cidr_blocks" {
   type = list
+}
+
+variable "analyticsId" {
+  type = string
 }
