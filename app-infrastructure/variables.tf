@@ -1,12 +1,19 @@
 variable "stack_githash" {
   type = string
 }
+
 variable "stack_githash_long" {
   type = string
 }
 
+
 variable "target_stack" {
   description = "The stack identifier"
+  type        = string
+}
+
+variable "stack_s3_bucket" {
+  description = "S3 bucket for deployments"
   type        = string
 }
 
@@ -25,16 +32,14 @@ variable "genomic_dataset_s3_object_key" {
   type        = string
 }
 
-
-variable "ami-id" {
-  description = "AMI to use for all ec2s"
-  type        = string
-}
-
 variable "environment_name" {
   description = "The name of the environment"
   type        = string
-  default     = "picsure"
+}
+
+variable "env_staging_subdomain" {
+  description = "Add Stack Tag"
+  type        = string
 }
 
 variable "rds_master_username" {
@@ -46,31 +51,42 @@ variable "rds_master_username" {
 variable "rds_master_password" {
   description = "Master Password"
   type        = string
-  default     = "picsure!98765"  
-} 
+  default     = "picsure!98765"
+}
 
 variable "env_public_dns_name" {
-  type        = string
+  type = string
 }
 variable "env_private_dns_name" {
-  type        = string
+  type = string
 }
 
 variable "env_hosted_zone_id" {
   type = string
 }
 
-variable "dsm_url" {
+variable "env_is_open_access" {
   type = string
 }
 
-variable "allowed_hosts" {
-  description = "List of allowed hosts for hosts header validation"
-  type        = string
+variable "fence_client_id" {
+  type    = string
+  default = ""
 }
 
-variable "trendmicro_dsa_cidr_blocks" {
-  type = list
+variable "picsure_token_introspection_token" {
+  type    = string
+  default = ""
+}
+
+variable "picsure_client_secret" {
+  type    = string
+  default = ""
+}
+
+variable "fence_client_secret" {
+  type    = string
+  default = ""
 }
 
 variable "idp_provider_uri" {

@@ -1,16 +1,14 @@
-
 data "template_file" "wildfly-user_data" {
   template = file("scripts/wildfly-user_data.sh")
   vars = {
-    stack_githash   = var.stack_githash_long
-    stack_s3_bucket = var.stack_s3_bucket
-    dataset_s3_object_key = var.dataset_s3_object_key
-    mysql-instance-address = aws_db_instance.pic-sure-mysql.address
+    stack_githash           = var.stack_githash_long
+    stack_s3_bucket         = var.stack_s3_bucket
+    dataset_s3_object_key   = var.dataset_s3_object_key
+    mysql-instance-address  = aws_db_instance.pic-sure-mysql.address
     mysql-instance-password = random_password.picsure-db-password.result
-    target_stack = var.target_stack
-    dsm_url = var.dsm_url
-    env_private_dns_name = var.env_private_dns_name
-    env_public_dns_name = var.env_public_dns_name
+    target_stack            = var.target_stack
+    env_private_dns_name    = var.env_private_dns_name
+    env_public_dns_name     = var.env_public_dns_name
   }
 }
 
@@ -27,14 +25,10 @@ data "template_cloudinit_config" "wildfly-user-data" {
 }
 
 resource "aws_instance" "wildfly-ec2" {
-  ami           = var.ami-id
+  ami           = local.ami_id
   instance_type = "m5.2xlarge"
 
-  key_name = "biodata_nessus"
-
-  associate_public_ip_address = false
-
-  subnet_id = var.app-subnet-us-east-1a-id
+  subnet_id = local.private2_subnet_ids[0]
 
   iam_instance_profile = "wildfly-deployment-s3-profile-${var.target_stack}-${var.stack_githash}"
 
@@ -42,13 +36,9 @@ resource "aws_instance" "wildfly-ec2" {
 
   vpc_security_group_ids = [
     aws_security_group.outbound-to-internet.id,
-    aws_security_group.inbound-from-edge.id,
-    aws_security_group.outbound-to-hpds.id,
-    aws_security_group.outbound-to-aurora.id,
-    aws_security_group.outbound-to-trend-micro.id,
-    aws_security_group.inbound-app-ssh-from-nessus.id,
-    aws_security_group.inbound-hpds-from-app.id
+    aws_security_group.inbound-wildfly-from-httpd.id
   ]
+
   root_block_device {
     delete_on_termination = true
     encrypted             = true
@@ -57,14 +47,16 @@ resource "aws_instance" "wildfly-ec2" {
 
   tags = {
     Owner       = "Avillach_Lab"
-    Environment = "development"
-    Name        = "FISMA Terraform Playground - ${var.stack_githash} - Wildfly - ${var.target_stack}"
+    Environment = var.environment_name
+    Project     = local.project
+    Stack       = var.env_staging_subdomain
+    Name        = "Wildfly - ${var.target_stack} - ${var.stack_githash}"
   }
-  
+
   metadata_options {
-  	http_endpoint = "enabled"
-  	http_tokens = "required"
-	  instance_metadata_tags = "enabled"  
+    http_endpoint          = "enabled"
+    http_tokens            = "required"
+    instance_metadata_tags = "enabled"
   }
 
 }
@@ -87,8 +79,8 @@ data "template_file" "wildfly-standalone-xml" {
 }
 
 resource "local_file" "wildfly-standalone-xml-file" {
-    content     = data.template_file.wildfly-standalone-xml.rendered
-    filename = "standalone.xml"
+  content  = data.template_file.wildfly-standalone-xml.rendered
+  filename = "standalone.xml"
 }
 
 data "template_file" "pic-sure-schema-sql" {
@@ -96,37 +88,37 @@ data "template_file" "pic-sure-schema-sql" {
   vars = {
     picsure_token_introspection_token = var.picsure_token_introspection_token
     target_stack                      = var.target_stack
-    env_private_dns_name = var.env_private_dns_name
+    env_private_dns_name              = var.env_private_dns_name
   }
 }
 
 resource "local_file" "pic-sure-schema-sql-file" {
-    content     = data.template_file.pic-sure-schema-sql.rendered
-    filename = "pic-sure-schema.sql"
+  content  = data.template_file.pic-sure-schema-sql.rendered
+  filename = "pic-sure-schema.sql"
 }
 
 
 data "template_file" "aggregate-resource-properties" {
   template = file("configs/aggregate-resource.properties")
   vars = {
-    target_stack                      = var.target_stack
+    target_stack         = var.target_stack
     env_private_dns_name = var.env_private_dns_name
   }
 }
 
 resource "local_file" "aggregate-resource-properties-file" {
-    content     = data.template_file.aggregate-resource-properties.rendered
-    filename = "aggregate-resource.properties"
+  content  = data.template_file.aggregate-resource-properties.rendered
+  filename = "aggregate-resource.properties"
 }
 
 data "template_file" "visualization-resource-properties" {
   template = file("configs/visualization-resource.properties")
   vars = {
-    target_stack                      = var.target_stack
+    target_stack = var.target_stack
   }
 }
 
 resource "local_file" "visualization-resource-properties-file" {
-    content     = data.template_file.visualization-resource-properties.rendered
-    filename = "visualization-resource.properties"
+  content  = data.template_file.visualization-resource-properties.rendered
+  filename = "visualization-resource.properties"
 }
