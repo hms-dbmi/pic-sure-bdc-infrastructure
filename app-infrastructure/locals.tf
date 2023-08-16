@@ -10,6 +10,10 @@ data "aws_vpc" "target_vpc" {
     name   = "tag:Name"
     values = ["*-picsure-${var.environment_name}-${var.target_stack}-vpc"]
   }
+  filter {
+    name   = "tag:ApplicationName"
+    values = [local.project]
+  }
 }
 
 data "aws_subnets" "private1" {
