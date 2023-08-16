@@ -90,10 +90,10 @@ variable "fence_client_secret" {
 }
 
 variable "idp_provider_uri" {
-    type = string
-    default = "https://gen3.biodatacatalyst.nhlbi.nih.gov/"
+  type    = string
+  default = "https://gen3.biodatacatalyst.nhlbi.nih.gov/"
 }
 variable "idp_provider" {
-    type = string
-    default = "fence"
+  type    = string
+  default = "fence"
 }

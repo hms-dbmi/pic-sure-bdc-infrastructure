@@ -58,11 +58,3 @@ resource "aws_instance" "auth-hpds-ec2" {
     instance_metadata_tags = "enabled"
   }
 }
-
-resource "aws_route53_record" "auth-hpds-addr-record" {
-  zone_id = var.env_hosted_zone_id
-  name    = "auth-hpds.${var.target_stack}.${var.env_private_dns_name}"
-  type    = "A"
-  ttl     = 60
-  records = [aws_instance.auth-hpds-ec2.private_ip]
-}
