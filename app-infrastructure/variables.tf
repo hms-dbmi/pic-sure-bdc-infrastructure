@@ -66,7 +66,8 @@ variable "env_hosted_zone_id" {
 }
 
 variable "env_is_open_access" {
-  type = string
+  type = bool
+  default = false
 }
 
 variable "fence_client_id" {
