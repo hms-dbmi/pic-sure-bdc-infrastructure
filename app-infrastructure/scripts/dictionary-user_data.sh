@@ -5,7 +5,13 @@ sh /opt/srce/scripts/start-gsstools.sh
 echo "user-data progress starting update"
 sudo yum -y update
 
-for i in {1..10}; do sudo /usr/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-hpds-dictionary-resource.tar.gz /home/centos/pic-sure-hpds-dictionary-resource.tar.gz && break || sleep 30; done
+s3_copy() {
+  for i in {1..5}; do
+    sudo /usr/bin/aws --region us-east-1 s3 cp $* && break || sleep 30
+  done
+}
+
+s3_copy s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-hpds-dictionary-resource.tar.gz /home/centos/pic-sure-hpds-dictionary-resource.tar.gz && break || sleep 30; done
 
 sudo mkdir -p /usr/local/docker-config/search/
 sudo mkdir -p /var/log/dictionary-docker-logs
