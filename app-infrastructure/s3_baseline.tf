@@ -28,13 +28,6 @@ resource "aws_s3_bucket_object" "releases-folder" {
   content_type = "application/x-directory"
 }
 
-resource "aws_s3_bucket_object" "stacks-json" {
-  bucket                        = var.stack_s3_bucket
-  key                           = "/deployment_state_metadata/stacks.json"
-  object_lock_legal_hold_status = "OFF"
-  content                       = file("configs/stacks.json")
-}
-
 resource "aws_s3_bucket_object" "mysql-connector-jar" {
   bucket         = var.stack_s3_bucket
   key            = "/modules/mysql/mysql-connector-java-5.1.38.jar"
