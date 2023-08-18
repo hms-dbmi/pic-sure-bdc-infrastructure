@@ -66,7 +66,7 @@ variable "env_hosted_zone_id" {
 }
 
 variable "env_is_open_access" {
-  type = bool
+  type    = bool
   default = false
 }
 
