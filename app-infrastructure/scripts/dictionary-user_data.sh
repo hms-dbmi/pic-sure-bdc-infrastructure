@@ -11,7 +11,7 @@ s3_copy() {
   done
 }
 
-s3_copy s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-hpds-dictionary-resource.tar.gz /home/centos/pic-sure-hpds-dictionary-resource.tar.gz && break || sleep 30; done
+s3_copy s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-hpds-dictionary-resource.tar.gz /home/centos/pic-sure-hpds-dictionary-resource.tar.gz
 
 sudo mkdir -p /usr/local/docker-config/search/
 sudo mkdir -p /var/log/dictionary-docker-logs
