@@ -91,7 +91,12 @@ variable "idp_provider_uri" {
   type    = string
   default = "https://gen3.biodatacatalyst.nhlbi.nih.gov"
 }
+
 variable "idp_provider" {
   type    = string
   default = "fence"
+}
+
+variable "application_id_for_base_query" {
+  type = string
 }

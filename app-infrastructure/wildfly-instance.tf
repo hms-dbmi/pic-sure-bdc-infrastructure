@@ -75,6 +75,8 @@ data "template_file" "wildfly-standalone-xml" {
     env_public_dns_name               = var.env_public_dns_name
     idp_provider                      = var.idp_provider
     idp_provider_uri                  = var.idp_provider_uri
+    application_id_for_base_query     = var.application_id_for_base_query
+    
   }
 }
 
