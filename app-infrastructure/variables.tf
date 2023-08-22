@@ -75,13 +75,14 @@ variable "fence_client_id" {
   default = ""
 }
 
-variable "picsure_token_introspection_token" {
-  type    = string
-}
+# removing for now as they are secrets handled by the stack_variables
+#variable "picsure_token_introspection_token" {
+#  type    = string
+#}
 
-variable "picsure_client_secret" {
-  type    = string
-}
+#variable "picsure_client_secret" {
+#  type    = string
+#}
 
 variable "fence_client_secret" {
   type    = string
