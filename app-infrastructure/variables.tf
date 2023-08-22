@@ -77,12 +77,10 @@ variable "fence_client_id" {
 
 variable "picsure_token_introspection_token" {
   type    = string
-  default = ""
 }
 
 variable "picsure_client_secret" {
   type    = string
-  default = ""
 }
 
 variable "fence_client_secret" {
