@@ -4,6 +4,7 @@ data "template_file" "dictionary-user_data" {
     stack_githash   = var.stack_githash_long
     stack_s3_bucket = var.stack_s3_bucket
     target_stack    = var.target_stack
+    gss_prefix      = "bdc_${var.env_is_open_access ? "open" : "auth"}_${var.environment_name}"
   }
 }
 

@@ -6,6 +6,7 @@ data "template_file" "httpd-user_data" {
     stack_s3_bucket       = var.stack_s3_bucket
     dataset_s3_object_key = var.dataset_s3_object_key
     target_stack          = var.target_stack
+    gss_prefix            = "bdc_${var.env_is_open_access ? "open" : "auth"}_${var.environment_name}"
   }
 }
 
