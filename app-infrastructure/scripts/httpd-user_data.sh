@@ -1,7 +1,7 @@
 #!/bin/bash
 
-echo "SPLUNK_INDEX=hms_aws_${gss_prefix}" > /opt/srce/startup.config
-echo "NESSUS_GROUP=${gss_prefix}_${target_stack}" >> /opt/srce/startup.config
+echo "SPLUNK_INDEX=hms_aws_${gss_prefix}" | sudo tee /opt/srce/startup.config
+echo "NESSUS_GROUP=${gss_prefix}_${target_stack}" | sudo tee -a /opt/srce/startup.config
 
 sudo sh /opt/srce/scripts/start-gsstools.sh
 

@@ -79,9 +79,9 @@ resource "local_file" "httpd-vhosts-conf-file" {
 data "template_file" "picsureui_settings" {
   template = file("configs/picsureui_settings.json")
   vars = {
-    fence_client_id  = var.fence_client_id
-    idp_provider     = var.idp_provider
-    idp_provider_uri = var.idp_provider_uri
+    fence_client_id               = var.fence_client_id
+    idp_provider                  = var.idp_provider
+    idp_provider_uri              = var.idp_provider_uri
     application_id_for_base_query = var.application_id_for_base_query
   }
 }
