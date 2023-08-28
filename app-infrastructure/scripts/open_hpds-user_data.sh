@@ -8,9 +8,16 @@ sudo sh /opt/srce/scripts/start-gsstools.sh
 echo "user-data progress starting update"
 sudo yum -y update
 
-for i in {1..5}; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-hpds.tar.gz /home/centos/pic-sure-hpds.tar.gz && break || sleep 45; done
+s3_copy() {
+  for i in {1..5}; do
+    sudo /usr/bin/aws --region us-east-1 s3 cp $* && break || sleep 30
+  done
+}
 
-for i in {1..5}; do sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/data/${destigmatized_dataset_s3_object_key}/destigmatized_javabins_rekeyed.tar.gz /opt/local/hpds/destigmatized_javabins_rekeyed.tar.gz  && break || sleep 45; done
+s3_copy s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-hpds.tar.gz /home/centos/pic-sure-hpds.tar.gz
+
+s3_copy s3://${stack_s3_bucket}/data/${destigmatized_dataset_s3_object_key}/destigmatized_javabins_rekeyed.tar.gz /opt/local/hpds/destigmatized_javabins_rekeyed.tar.gz
+
 cd /opt/local/hpds
 tar -xvzf destigmatized_javabins_rekeyed.tar.gz
 cd ~

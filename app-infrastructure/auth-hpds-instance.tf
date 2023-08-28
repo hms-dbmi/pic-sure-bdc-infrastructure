@@ -59,4 +59,3 @@ resource "aws_instance" "auth-hpds-ec2" {
     instance_metadata_tags = "enabled"
   }
 }
-

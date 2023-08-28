@@ -66,25 +66,37 @@ variable "env_hosted_zone_id" {
 }
 
 variable "env_is_open_access" {
+  type    = bool
+}
+
+# removing for now as they are secrets handled by the stack_variables
+#variable "picsure_token_introspection_token" {
+#  type    = string
+#}
+#
+#variable "picsure_client_secret" {
+#  type    = string
+#}
+#
+#variable "fence_client_secret" {
+#  type    = string
+#  default = ""
+#}
+#variable "fence_client_id" {
+#  type    = string
+#  default = ""
+#}
+
+variable "idp_provider_uri" {
+  type    = string
+  default = "https://gen3.biodatacatalyst.nhlbi.nih.gov"
+}
+
+variable "idp_provider" {
+  type    = string
+  default = "fence"
+}
+
+variable "application_id_for_base_query" {
   type = string
-}
-
-variable "fence_client_id" {
-  type    = string
-  default = ""
-}
-
-variable "picsure_token_introspection_token" {
-  type    = string
-  default = ""
-}
-
-variable "picsure_client_secret" {
-  type    = string
-  default = ""
-}
-
-variable "fence_client_secret" {
-  type    = string
-  default = ""
 }
