@@ -2,7 +2,6 @@ data "template_file" "httpd-user_data" {
   template = file("scripts/httpd-user_data.sh")
   vars = {
     stack_githash         = var.stack_githash_long
-    fence_client_id       = var.fence_client_id
     stack_s3_bucket       = var.stack_s3_bucket
     dataset_s3_object_key = var.dataset_s3_object_key
     target_stack          = var.target_stack
