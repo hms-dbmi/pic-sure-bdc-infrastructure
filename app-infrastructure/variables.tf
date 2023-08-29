@@ -70,22 +70,24 @@ variable "env_is_open_access" {
 }
 
 # removing for now as they are secrets handled by the stack_variables
-#variable "picsure_token_introspection_token" {
-#  type    = string
-#}
-#
-#variable "picsure_client_secret" {
-#  type    = string
-#}
-#
-#variable "fence_client_secret" {
-#  type    = string
-#  default = ""
-#}
-#variable "fence_client_id" {
-#  type    = string
-#  default = ""
-#}
+variable "picsure_token_introspection_token" {
+  type    = string
+  default = ""
+}
+
+variable "picsure_client_secret" {
+  type    = string
+  default = ""
+}
+
+variable "fence_client_secret" {
+  type    = string
+  default = ""
+}
+variable "fence_client_id" {
+  type    = string
+  default = ""
+}
 
 variable "idp_provider_uri" {
   type    = string
