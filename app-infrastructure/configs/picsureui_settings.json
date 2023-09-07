@@ -100,5 +100,5 @@
 	"idp_provider_uri":"https://gen3.biodatacatalyst.nhlbi.nih.gov",
 	"fence_client_id":"${fence_client_id}",
 	"fence_redirect_url":"https://biodatacatalyst.integration.hms.harvard.edu/psamaui/login/",
-	"analyticsId":"${analytics_id}"
+	"analytics_id":"${analytics_id}"
 }
