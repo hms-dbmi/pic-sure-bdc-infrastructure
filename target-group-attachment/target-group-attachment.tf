@@ -14,7 +14,7 @@ resource "aws_lb_target_group_attachment" "test" {
   target_group_arn = data.aws_lb_target_group.test.arn
   target_id        = var.target_id
   port             = 443
-  availability_zone = all
+  availability_zone = "all"
 }
 
 variable "lb_tg_arn" {
