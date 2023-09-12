@@ -36,7 +36,7 @@ resource "aws_route53_record" "wildfly-addr-record" {
 }
 
 resource "aws_route53_record" "open-hpds-addr-record" {
-  count   = var.env_is_open_access ? 1 : 0
+  count   = var.include_open_hpds ? 1 : 0
   zone_id = var.env_hosted_zone_id
   name    = "open-hpds.${var.target_stack}.${var.env_private_dns_name}"
   type    = "A"
@@ -45,7 +45,7 @@ resource "aws_route53_record" "open-hpds-addr-record" {
 }
 
 resource "aws_route53_record" "auth-hpds-addr-record" {
-  count   = var.env_is_open_access ? 0 : 1
+  count   = var.include_auth_hpds ? 1 : 0
   zone_id = var.env_hosted_zone_id
   name    = "auth-hpds.${var.target_stack}.${var.env_private_dns_name}"
   type    = "A"
