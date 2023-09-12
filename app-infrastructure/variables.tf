@@ -1,12 +1,19 @@
 variable "stack_githash" {
   type = string
 }
+
 variable "stack_githash_long" {
   type = string
 }
 
+
 variable "target_stack" {
   description = "The stack identifier"
+  type        = string
+}
+
+variable "stack_s3_bucket" {
+  description = "S3 bucket for deployments"
   type        = string
 }
 
@@ -25,16 +32,14 @@ variable "genomic_dataset_s3_object_key" {
   type        = string
 }
 
-
-variable "ami-id" {
-  description = "AMI to use for all ec2s"
-  type        = string
-}
-
 variable "environment_name" {
   description = "The name of the environment"
   type        = string
-  default     = "picsure"
+}
+
+variable "env_staging_subdomain" {
+  description = "Add Stack Tag"
+  type        = string
 }
 
 variable "rds_master_username" {
@@ -60,17 +65,40 @@ variable "env_hosted_zone_id" {
   type = string
 }
 
-variable "dsm_url" {
+variable "env_is_open_access" {
+  type    = bool
+}
+
+# removing for now as they are secrets handled by the stack_variables
+#variable "picsure_token_introspection_token" {
+#  type    = string
+#}
+#
+#variable "picsure_client_secret" {
+#  type    = string
+#}
+#
+#variable "fence_client_secret" {
+#  type    = string
+#  default = ""
+#}
+#variable "fence_client_id" {
+#  type    = string
+#  default = ""
+#}
+
+variable "idp_provider_uri" {
+  type    = string
+  default = "https://gen3.biodatacatalyst.nhlbi.nih.gov"
+}
+
+variable "idp_provider" {
+  type    = string
+  default = "fence"
+}
+
+variable "application_id_for_base_query" {
   type = string
-}
-
-variable "allowed_hosts" {
-  description = "List of allowed hosts for hosts header validation"
-  type        = string
-}
-
-variable "trendmicro_dsa_cidr_blocks" {
-  type = list
 }
 
 variable "analytics_id" {

@@ -469,8 +469,8 @@
                 <simple name="java:global/client_secret" value="${picsure_client_secret}"/>
                 <simple name="java:global/client_id" value="NOT_USED_WITH_FENCE"/>
                 <!-- Configure Identity Provider Parameters, with defaults-->
-                <simple name="java:global/idp_provider" value="fence"/>
-                <simple name="java:global/idp_provider_uri" value="https://gen3.biodatacatalyst.nhlbi.nih.gov/" />
+                <simple name="java:global/idp_provider" value="${idp_provider}"/>
+                <simple name="java:global/idp_provider_uri" value="${idp_provider_uri}/" />
 
                 <simple name="java:global/fence_client_id" value="${fence_client_id}"/>
                 <simple name="java:global/fence_client_secret" value="${fence_client_secret}"/>
@@ -484,7 +484,7 @@
 		<simple name="java:global/fence_parent_consent_group_concept_path" value="\_consents\" />
 		<simple name="java:global/variantAnnotationColumns" value="Variant_consequence_calculated,Variant_class,Gene_with_variant,Variant_severity,Variant_frequency_in_gnomAD,Variant_frequency_as_text" />
 
-                <simple name="java:global/defaultApplicationUUID" value="8b5722c9-62fd-48d6-b0bf-4f67e53efb2b" />
+                <simple name="java:global/defaultApplicationUUID" value="${application_id_for_base_query}" />
 
                 <simple name="java:global/systemName" value="PIC-SURE BioDataCatalyst"/>
                 <simple name="java:global/clientSecretIsBase64" value="False"/>

@@ -1,14 +1,11 @@
-
 data "template_file" "dictionary-user_data" {
   template = file("scripts/dictionary-user_data.sh")
   vars = {
-    stack_githash = var.stack_githash_long
+    stack_githash   = var.stack_githash_long
     stack_s3_bucket = var.stack_s3_bucket
     target_stack    = var.target_stack
-    dsm_url = var.dsm_url
   }
 }
-
 
 data "template_cloudinit_config" "dictionary-user-data" {
   gzip          = true
@@ -23,16 +20,11 @@ data "template_cloudinit_config" "dictionary-user-data" {
 }
 
 resource "aws_instance" "dictionary-ec2" {
-
-  ami = var.ami-id
+  ami = local.ami_id
   //TODO double check this value at runtime to check that performance not impacted
   instance_type = "m5.xlarge"
 
-  key_name = "biodata_nessus"
-
-  associate_public_ip_address = false
-
-  subnet_id = var.db-subnet-us-east-1a-id
+  subnet_id = local.private2_subnet_ids[0]
 
   iam_instance_profile = "dictionary-deployment-s3-profile-${var.target_stack}-${var.stack_githash}"
 
@@ -40,25 +32,26 @@ resource "aws_instance" "dictionary-ec2" {
 
   vpc_security_group_ids = [
     aws_security_group.outbound-to-internet.id,
-    aws_security_group.inbound-hpds-from-app.id,
-    aws_security_group.outbound-to-trend-micro.id,
-    aws_security_group.inbound-data-ssh-from-nessus.id
+    aws_security_group.inbound-dictionary-from-wildfly.id,
   ]
+
   root_block_device {
     delete_on_termination = true
-    encrypted = true
-    volume_size = 100
+    encrypted             = true
+    volume_size           = 100
   }
 
   tags = {
     Owner       = "Avillach_Lab"
-    Environment = "development"
-    Name        = "FISMA Terraform Playground - ${var.stack_githash} - Dictionary - ${var.target_stack}"
+    Environment = var.environment_name
+    Stack       = var.env_staging_subdomain
+    Project     = local.project
+    Name        = "Dictionary - ${var.target_stack} - ${var.stack_githash}"
   }
 
   metadata_options {
-  	http_endpoint = "enabled"
-  	http_tokens = "required"
-	  instance_metadata_tags = "enabled"  
+    http_endpoint          = "enabled"
+    http_tokens            = "required"
+    instance_metadata_tags = "enabled"
   }
 }
