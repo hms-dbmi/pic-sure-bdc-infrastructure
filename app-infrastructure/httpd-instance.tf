@@ -61,9 +61,10 @@ resource "aws_instance" "httpd-ec2" {
 data "template_file" "httpd-vhosts-conf" {
   template = file("configs/httpd-vhosts.conf")
   vars = {
-    wildfly-base-url     = "http://${aws_instance.wildfly-ec2.private_ip}:8080"
-    target_stack         = var.target_stack
-    release-id           = var.stack_githash_long
+
+    wildfly-base-url = "http://${aws_instance.wildfly-ec2.private_ip}:8080"
+    target_stack = var.target_stack
+    release-id = var.stack_githash_long
     env_private_dns_name = var.env_private_dns_name
     env_public_dns_name  = var.env_public_dns_name
   }
@@ -78,6 +79,7 @@ resource "local_file" "httpd-vhosts-conf-file" {
 data "template_file" "picsureui_settings" {
   template = file("configs/picsureui_settings.json")
   vars = {
+    analytics_id = var.analytics_id,
     fence_client_id  = var.fence_client_id
     idp_provider     = var.idp_provider
     idp_provider_uri = var.idp_provider_uri

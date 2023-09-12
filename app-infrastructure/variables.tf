@@ -100,3 +100,7 @@ variable "idp_provider" {
 variable "application_id_for_base_query" {
   type = string
 }
+
+variable "analytics_id" {
+  type = string
+}
