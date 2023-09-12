@@ -22,7 +22,7 @@ data "template_cloudinit_config" "auth_hpds-user-data" {
 }
 
 resource "aws_instance" "auth-hpds-ec2" {
-  count = var.env_is_open_access ? 0 : 1
+  count = var.env_is_auth ? 0 : 1
 
   ami           = local.ami_id
   instance_type = "m5.12xlarge"
