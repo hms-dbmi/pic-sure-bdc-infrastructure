@@ -1,3 +1,10 @@
+provider "aws" {
+  region  = "us-east-1"
+  profile = "avillachlab-secure-infrastructure"
+  version = "3.74"
+
+}
+
 data "aws_lb_target_group" "test" {
   arn  = var.lb_tg_arn
   name = var.lb_tg_name
