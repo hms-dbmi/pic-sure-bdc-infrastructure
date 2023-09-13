@@ -69,6 +69,10 @@ variable "env_is_open_access" {
   type    = bool
 }
 
+variable "env_is_auth" {
+  type    = bool
+}
+
 # removing for now as they are secrets handled by the stack_variables
 #variable "picsure_token_introspection_token" {
 #  type    = string
