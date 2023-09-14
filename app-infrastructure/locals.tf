@@ -63,5 +63,5 @@ locals {
   private1_subnet_ids = data.aws_subnets.private1.ids
   private2_subnet_ids = data.aws_subnets.private2.ids
   public_subnet_cidrs = values(data.aws_subnet.public).*.cidr_block
-  project             = var.env_project ? 
+  project             = var.env_project
 }
