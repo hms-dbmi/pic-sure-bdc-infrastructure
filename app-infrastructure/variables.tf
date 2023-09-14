@@ -112,3 +112,7 @@ variable "application_id_for_base_query" {
 variable "analytics_id" {
   type = string
 }
+
+variable "env_project" {
+  type = string
+}
