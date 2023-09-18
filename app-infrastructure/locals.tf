@@ -65,12 +65,14 @@ data "aws_subnet" "public" {
   id       = each.value
 }
 
-
+# valid project values "Open PIC-SURE" : "Auth PIC-SURE"
+# better off explicitly setting this so we can deploy any project's resources in an environment.
+# won't be able to look up correct vpc tags otherwise
 locals {
   ami_id              = data.aws_ami.centos.id
   target_vpc          = data.aws_vpc.target_vpc.id
   private1_subnet_ids = data.aws_subnets.private1.ids
   private2_subnet_ids = data.aws_subnets.private2.ids
   public_subnet_cidrs = values(data.aws_subnet.public).*.cidr_block
-  project             = var.env_is_open_access ? "Open PIC-SURE" : "Auth PIC-SURE"
+  project             = var.env_project
 }
