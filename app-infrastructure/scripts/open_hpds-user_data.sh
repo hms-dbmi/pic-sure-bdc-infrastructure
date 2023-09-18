@@ -1,6 +1,17 @@
 #!/bin/bash
 
-sh /opt/srce/scripts/start-gsstools.sh
+echo "SPLUNK_INDEX=hms_aws_${gss_prefix}" | sudo tee /opt/srce/startup.config
+echo "NESSUS_GROUP=${gss_prefix}_${target_stack}" | sudo tee -a /opt/srce/startup.config
+
+sudo sh /opt/srce/scripts/start-gsstools.sh
+
+echo "
+[monitor:///var/log/hpds-docker-logs]
+sourcetype = hms_app_logs
+source = hpds_logs
+index=hms_aws_${gss_prefix}
+" | sudo tee -a /opt/splunkforwarder/etc/system/local/inputs.conf
+sudo systemctl restart SplunkForwarder || true
 
 echo "user-data progress starting update"
 sudo yum -y update

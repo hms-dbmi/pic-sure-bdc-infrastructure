@@ -16,6 +16,17 @@ data "aws_vpc" "target_vpc" {
   }
 }
 
+data "aws_vpc" "alb_vpc" {
+  filter {
+    name   = "tag:Name"
+    values = ["*-picsure-${var.environment_name}-a-vpc"]
+  }
+  filter {
+    name   = "tag:ApplicationName"
+    values = [local.project]
+  }
+}
+
 data "aws_subnets" "private1" {
   filter {
     name   = "vpc-id"
@@ -41,7 +52,7 @@ data "aws_subnets" "private2" {
 data "aws_subnets" "public" {
   filter {
     name   = "vpc-id"
-    values = [local.target_vpc]
+    values = [local.alb_vpc]
   }
   filter {
     name   = "tag:Name"

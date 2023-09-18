@@ -2,10 +2,10 @@ data "template_file" "httpd-user_data" {
   template = file("scripts/httpd-user_data.sh")
   vars = {
     stack_githash         = var.stack_githash_long
-    fence_client_id       = var.fence_client_id
     stack_s3_bucket       = var.stack_s3_bucket
     dataset_s3_object_key = var.dataset_s3_object_key
     target_stack          = var.target_stack
+    gss_prefix            = "bdc_${var.env_is_open_access ? "open" : "auth"}_${var.environment_name}"
   }
 }
 
@@ -79,10 +79,10 @@ resource "local_file" "httpd-vhosts-conf-file" {
 data "template_file" "picsureui_settings" {
   template = file("configs/picsureui_settings.json")
   vars = {
-    analytics_id = var.analytics_id,
-    fence_client_id  = var.fence_client_id
-    idp_provider     = var.idp_provider
-    idp_provider_uri = var.idp_provider_uri
+    analytics_id                  = var.analytics_id,
+    fence_client_id               = var.fence_client_id
+    idp_provider                  = var.idp_provider
+    idp_provider_uri              = var.idp_provider_uri
     application_id_for_base_query = var.application_id_for_base_query
   }
 }
@@ -91,4 +91,3 @@ resource "local_file" "picsureui-settings-json" {
   content  = data.template_file.picsureui_settings.rendered
   filename = "picsureui-settings.json"
 }
-
