@@ -52,7 +52,7 @@ data "aws_subnets" "private2" {
 data "aws_subnets" "public" {
   filter {
     name   = "vpc-id"
-    values = [local.alb_vpc]
+    values = [data.aws_vpc.alb_vpc.id]
   }
   filter {
     name   = "tag:Name"
