@@ -52,7 +52,7 @@ data "aws_subnets" "private2" {
 data "aws_subnets" "public" {
   filter {
     name   = "vpc-id"
-    values = [data.aws_vpc.alb_vpc.id]
+    values = [local.alb_vpc]
   }
   filter {
     name   = "tag:Name"
@@ -71,6 +71,7 @@ data "aws_subnet" "public" {
 locals {
   ami_id              = data.aws_ami.centos.id
   target_vpc          = data.aws_vpc.target_vpc.id
+  alb_vpc             = data.aws_vpc.alb_vpc.id
   private1_subnet_ids = data.aws_subnets.private1.ids
   private2_subnet_ids = data.aws_subnets.private2.ids
   public_subnet_cidrs = values(data.aws_subnet.public).*.cidr_block
