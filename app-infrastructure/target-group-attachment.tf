@@ -14,7 +14,7 @@ data "aws_lb_target_group" "lb_tg_data" {
 }
 
 # use the arn from data resource staging.
-# use the instance-id for the httpd server
+# use the instance-id for the httpd server < instance-id does not seem to work with current provider. Can use private ip.
 # each stack gets attached to a single tg
 
 resource "aws_lb_target_group_attachment" "stack_lb_tga" {
