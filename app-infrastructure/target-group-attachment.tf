@@ -1,14 +1,10 @@
 # Doing a lookup for the staging environments target group and attach the http instance that is being deployed
 # Use tags for Project and Stack to find correct target group to update
 data "aws_lb_target_group" "lb_tg_data" {
-  filter = {
-    name = "tag:Project"
-    values = [ local.project ]
+  tags = {
+    Project = local.project
+    Stack	= var.lb_target_stack
   }
-  #filter = {
-  #  name = "tag:Stack"
-  #  values = [ var.lb_target_stack ]
-  #}
 }
 
 # use the arn from data resource staging.
