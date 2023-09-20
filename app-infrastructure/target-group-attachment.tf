@@ -5,10 +5,10 @@ data "aws_lb_target_group" "lb_tg_data" {
     name = "tag:Project"
     values = [ local.project ]
   }
-  filter = {
-    name = "tag:Stack"
-    values = [ var.lb_target_stack ]
-  }
+  #filter = {
+  #  name = "tag:Stack"
+  #  values = [ var.lb_target_stack ]
+  #}
 }
 
 # use the arn from data resource staging.
