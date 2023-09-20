@@ -16,7 +16,7 @@ data "aws_lb_target_group" "lb_tg_data" {
 # use the arn from data resource staging.
 # use the instance-id for the httpd server < instance-id does not seem to work with current provider. Can use private ip.
 # each stack gets attached to a single tg
-
+# availability zone must be all to use vpcs out of scope of the alb.
 resource "aws_lb_target_group_attachment" "stack_lb_tga" {
   target_group_arn  = data.aws_lb_target_group.lb_tg_data.arn
   target_id         = aws_instance.httpd-ec2.private_ip
