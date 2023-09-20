@@ -32,6 +32,6 @@ variable "is_promote_lb_tg" {
 # is_live tag to let us know if the stack is the live server or not.
 
 locals {
-  lb_target_stack = is_promote_lb_tg ? var.env_live_subdomain : var.env_staging_subdomain
-  is_live = is_promote_lb_tg ? true: false
+  lb_target_stack = var.is_promote_lb_tg ? var.env_live_subdomain : var.env_staging_subdomain
+  is_live = var.is_promote_lb_tg ? true: false
 }
