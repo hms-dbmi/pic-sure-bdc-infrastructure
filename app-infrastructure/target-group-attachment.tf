@@ -50,6 +50,6 @@ locals {
   is_live         = var.is_promote_lb_tg ? true: false
   
   # for use to support not having tags remove when provider is updated
-  alb_name        = var.is_promote_lb_tg ? var.live_lb_name: staging_lb_name
+  alb_name        = var.is_promote_lb_tg ? var.live_lb_name: var.staging_lb_name
   
 }
