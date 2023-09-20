@@ -33,10 +33,10 @@ variable "is_promote_lb_tg" {
 }
 
 #### Remove these when moving to tags.  
-variable "staging_lb_name: {
+variable "staging_lb_name" {
   type = string
 }
-variable "live_lb_name: {
+variable "live_lb_name" {
   type = string
 }
 
