@@ -19,7 +19,7 @@ data "aws_lb_target_group" "lb_tg_data" {
 
 resource "aws_lb_target_group_attachment" "stack_lb_tga" {
   target_group_arn  = data.aws_lb_target_group.lb_tg_data.arn
-  target_id         = aws_instance.httpd-ec2.id
+  target_id         = aws_instance.httpd-ec2.private_ip
   port              = 443
   availability_zone = "all"
 }
