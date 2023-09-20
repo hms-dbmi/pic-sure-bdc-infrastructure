@@ -9,7 +9,7 @@ resource "aws_db_instance" "pic-sure-mysql" {
   password               = random_password.picsure-db-password.result
   parameter_group_name   = "default.mysql5.7"
   storage_encrypted      = true
-  db_subnet_group_name   = "main-${var.environment_name}-${var.target_stack}"
+  db_subnet_group_name   = local.db_subnet_group_name
   copy_tags_to_snapshot  = true
   skip_final_snapshot    = true
   vpc_security_group_ids = [aws_security_group.inbound-mysql-from-wildfly.id]
