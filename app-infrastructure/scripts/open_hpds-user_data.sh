@@ -99,7 +99,7 @@ cd ~
 sudo mkdir -p /var/log/hpds-docker-logs
 
 HPDS_IMAGE=`sudo docker load < /pic-sure-hpds.tar.gz | cut -d ' ' -f 3`
-sudo docker run --name=hpds -v /opt/local/hpds:/opt/local/hpds -p 8080:8080 --entrypoint=java -d $HPDS_IMAGE -XX:+UseParallelGC -XX:SurvivorRatio=250 -Xms1g -Xmx26g -server -jar hpds.jar -httpPort 8080 -DCACHE_SIZE=5000 -DSMALL_TASK_THREADS=1 -DLARGE_TASK_THREADS=1 -DSMALL_JOB_LIMIT=100 -DID_BATCH_SIZE=7500 "-DALL_IDS_CONCEPT=NONE"  "-DID_CUBE_NAME=NONE"
+sudo docker run --restart unless-stopped --name=hpds -v /opt/local/hpds:/opt/local/hpds -e CATALINA_OPTS=" -XX:+UseParallelGC -XX:SurvivorRatio=250 -Xms1g -Xmx26g -DCACHE_SIZE=2500 -DSMALL_TASK_THREADS=1 -DLARGE_TASK_THREADS=1 -DSMALL_JOB_LIMIT=100 -DID_BATCH_SIZE=5000 " -p 8080:8080 -d $HPDS_IMAGE
 
 sudo docker logs -f hpds > /var/log/hpds-docker-logs/hpds.log &
 
