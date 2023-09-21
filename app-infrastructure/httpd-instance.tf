@@ -46,7 +46,6 @@ resource "aws_instance" "httpd-ec2" {
     Owner       = "Avillach_Lab"
     Environment = var.environment_name
     Stack       = var.target_stack
-    isLive      = local.is_live
     Project     = local.project
     Name        = "Apache HTTPD - ${var.target_stack} - ${var.stack_githash}"
   }
