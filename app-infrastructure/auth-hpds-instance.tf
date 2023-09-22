@@ -49,7 +49,6 @@ resource "aws_instance" "auth-hpds-ec2" {
     Owner       = "Avillach_Lab"
     Environment = var.environment_name
     Stack       = var.target_stack
-    isLive      = local.is_live
     Project     = local.project
     Name        = "Auth HPDS - ${var.target_stack} - ${var.stack_githash}"
   }

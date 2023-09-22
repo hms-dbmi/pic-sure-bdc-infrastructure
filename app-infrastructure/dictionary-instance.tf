@@ -47,7 +47,6 @@ resource "aws_instance" "dictionary-ec2" {
     Environment = var.environment_name
     Stack       = var.target_stack
     Project     = local.project
-    isLive      = local.is_live
     Name        = "Dictionary - ${var.target_stack} - ${var.stack_githash}"
   }
 
