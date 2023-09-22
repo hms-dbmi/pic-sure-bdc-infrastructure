@@ -50,7 +50,6 @@ resource "aws_instance" "open-hpds-ec2" {
     Project     = local.project
     Stack       = var.target_stack
     Name        = "Open HPDS - ${var.target_stack} - ${var.stack_githash}"
-    isLive      = local.is_live
   }
 
   metadata_options {
