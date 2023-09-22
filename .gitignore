@@ -12,3 +12,6 @@ stack_variables_a.tf.baseline
 stack_variables_b.tf.baseline
 .DS_Store
 ip-vars.properties
+
+.idea/
+*.iml
