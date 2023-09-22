@@ -487,7 +487,7 @@
                 <simple name="java:global/defaultApplicationUUID" value="${application_id_for_base_query}" />
 
                 <simple name="java:global/systemName" value="PIC-SURE BioDataCatalyst"/>
-                <simple name="java:global/clientSecretIsBase64" value="False"/>
+                <simple name="java:global/clientSecretIsBase64" value="true"/>
                 <simple name="java:global/userActivationTemplatePath" value="/psama/activation"/>
                 <simple name="java:global/userActivationReplyTo" value="NOT_USED_WITH_FENCE"/>
                 <simple name="java:global/templatePath" value="/usr/local/docker-config/" />
