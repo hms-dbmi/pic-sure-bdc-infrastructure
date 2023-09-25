@@ -43,6 +43,7 @@ resource "aws_instance" "httpd-ec2" {
   }
 
   tags = {
+    Node        = "HTTPD"
     Owner       = "Avillach_Lab"
     Environment = var.environment_name
     Stack       = var.target_stack
