@@ -43,9 +43,10 @@ resource "aws_instance" "httpd-ec2" {
   }
 
   tags = {
+    Node        = "HTTPD"
     Owner       = "Avillach_Lab"
     Environment = var.environment_name
-    Stack       = var.env_staging_subdomain
+    Stack       = var.target_stack
     Project     = local.project
     Name        = "Apache HTTPD - ${var.target_stack} - ${var.stack_githash}"
   }

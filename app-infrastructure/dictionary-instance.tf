@@ -45,7 +45,7 @@ resource "aws_instance" "dictionary-ec2" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = var.environment_name
-    Stack       = var.env_staging_subdomain
+    Stack       = var.target_stack
     Project     = local.project
     Name        = "Dictionary - ${var.target_stack} - ${var.stack_githash}"
   }

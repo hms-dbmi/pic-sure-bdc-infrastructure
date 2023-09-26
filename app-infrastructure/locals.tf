@@ -76,4 +76,5 @@ locals {
   private2_subnet_ids = data.aws_subnets.private2.ids
   public_subnet_cidrs = values(data.aws_subnet.public).*.cidr_block
   project             = var.env_project
+  db_subnet_group_name = local.project == "Open PIC-SURE" ? "open-pic-sure-${var.environment_name}-${var.target_stack}" : "auth-pic-sure-${var.environment_name}-${var.target_stack}"
 }

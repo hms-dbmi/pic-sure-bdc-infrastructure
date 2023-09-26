@@ -48,7 +48,7 @@ resource "aws_instance" "auth-hpds-ec2" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = var.environment_name
-    Stack       = var.env_staging_subdomain
+    Stack       = var.target_stack
     Project     = local.project
     Name        = "Auth HPDS - ${var.target_stack} - ${var.stack_githash}"
   }
