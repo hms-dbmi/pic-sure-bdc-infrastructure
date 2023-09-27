@@ -60,5 +60,6 @@ variable "allowed_hosts" {
 }
 
 variable "analytics_id" {
-  type = string
+  type        = string
+  default     = "__ANALYTICS_ID__"
 }
