@@ -66,8 +66,9 @@ data "template_file" "httpd-vhosts-conf" {
     wildfly-base-url = "http://${aws_instance.wildfly-ec2.private_ip}:8080"
     target_stack = var.target_stack
     release-id = var.stack_githash_long
-    env_private_dns_name = var.env_private_dns_name
-    env_public_dns_name  = var.env_public_dns_name
+    env_private_dns_name        = var.env_private_dns_name
+    env_public_dns_name         = var.env_public_dns_name
+    env_public_dns_name_staging = var.env_public_dns_name_staging
   }
 }
 

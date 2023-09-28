@@ -62,6 +62,11 @@ variable "rds_master_password" {
 variable "env_public_dns_name" {
   type = string
 }
+
+variable "env_public_dns_name_staging" {
+  type = string
+}
+
 variable "env_private_dns_name" {
   type = string
 }
