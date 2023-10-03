@@ -11,11 +11,11 @@ output "dictionary-ec2-id" {
 }
 
 output "hpds-ec2-open-id" {
-  value = var.include_open_hpds ? local.open_hpds_instance_id
+  value = local.open_hpds_instance_id
 }
 
 output "hpds-ec2-auth-id" {
-  value = var.include_auth_hpds ? local.auth_instance_id
+  value = local.auth_instance_id
 }
 
 locals {
