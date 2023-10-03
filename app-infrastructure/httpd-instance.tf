@@ -48,7 +48,7 @@ resource "aws_instance" "httpd-ec2" {
     Environment = var.environment_name
     Stack       = var.target_stack
     Project     = local.project
-    Name        = "Apache HTTPD - ${var.target_stack} - ${var.stack_githash}"
+    Name        = "Apache HTTPD - ${var.target_stack} - ${local.uniq_name}"
   }
 
   metadata_options {

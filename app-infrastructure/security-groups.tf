@@ -1,6 +1,6 @@
 ### Inbound
 resource "aws_security_group" "inbound-httpd-from-alb" {
-  name        = "allow_inbound_from_public_subnet_to_httpd_${var.stack_githash}"
+  name        = "allow_inbound_from_public_subnet_to_httpd_${local.uniq_name}"
   description = "Allow inbound traffic from public subnets to httpd servers"
   vpc_id      = local.target_vpc
 
@@ -14,12 +14,12 @@ resource "aws_security_group" "inbound-httpd-from-alb" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = var.environment_name
-    Name        = "inbound-from-public-internet Security Group - ${var.target_stack} - ${var.stack_githash}"
+    Name        = "inbound-from-public-internet Security Group - ${var.target_stack} - ${local.uniq_name}"
   }
 }
 
 resource "aws_security_group" "inbound-wildfly-from-httpd" {
-  name        = "allow_inbound_from_httpd_subnet_${var.stack_githash}"
+  name        = "allow_inbound_from_httpd_subnet_${local.uniq_name}"
   description = "Allow inbound traffic from httpd to port 8080 on wildfly"
   vpc_id      = local.target_vpc
 
@@ -34,13 +34,13 @@ resource "aws_security_group" "inbound-wildfly-from-httpd" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = var.environment_name
-    Name        = "inbound-for-hpds Security Group - ${var.target_stack} - ${var.stack_githash}"
+    Name        = "inbound-for-hpds Security Group - ${var.target_stack} - ${local.uniq_name}"
   }
 }
 
 
 resource "aws_security_group" "inbound-hpds-from-wildfly" {
-  name        = "allow_inbound_from_private_subnet_to_hpds_${var.stack_githash}"
+  name        = "allow_inbound_from_private_subnet_to_hpds_${local.uniq_name}"
   description = "Allow inbound traffic from private-subnets on port 8080 for hpds"
   vpc_id      = local.target_vpc
 
@@ -54,13 +54,13 @@ resource "aws_security_group" "inbound-hpds-from-wildfly" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = var.environment_name
-    Name        = "inbound-hpds Security Group - ${var.target_stack} - ${var.stack_githash}"
+    Name        = "inbound-hpds Security Group - ${var.target_stack} - ${local.uniq_name}"
   }
 }
 
 
 resource "aws_security_group" "inbound-dictionary-from-wildfly" {
-  name        = "allow_inbound_from_dictionary_to_hpds_${var.stack_githash}"
+  name        = "allow_inbound_from_dictionary_to_hpds_${local.uniq_name}"
   description = "Allow inbound traffic from private-subnets on port 8080 for hpds"
   vpc_id      = local.target_vpc
 
@@ -74,13 +74,13 @@ resource "aws_security_group" "inbound-dictionary-from-wildfly" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = var.environment_name
-    Name        = "inbound-wildfly Security Group - ${var.target_stack} - ${var.stack_githash}"
+    Name        = "inbound-wildfly Security Group - ${var.target_stack} - ${local.uniq_name}"
   }
 }
 
 
 resource "aws_security_group" "inbound-mysql-from-wildfly" {
-  name        = "allow_inbound_from_wildfly_to_mysql_${var.stack_githash}"
+  name        = "allow_inbound_from_wildfly_to_mysql_${local.uniq_name}"
   description = "Allow inbound traffic from wildfly to mysql on port 3306"
   vpc_id      = local.target_vpc
 
@@ -95,14 +95,14 @@ resource "aws_security_group" "inbound-mysql-from-wildfly" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = var.environment_name
-    Name        = "inbound-mysql Security Group - ${var.target_stack} - ${var.stack_githash}"
+    Name        = "inbound-mysql Security Group - ${var.target_stack} - ${local.uniq_name}"
   }
 }
 
 
 ### Outbound
 resource "aws_security_group" "outbound-to-internet" {
-  name        = "allow_outbound_to_public_internet_${var.stack_githash}"
+  name        = "allow_outbound_to_public_internet_${local.uniq_name}"
   description = "Allow outbound traffic to public internet"
   vpc_id      = local.target_vpc
 
@@ -116,6 +116,6 @@ resource "aws_security_group" "outbound-to-internet" {
   tags = {
     Owner       = "Avillach_Lab"
     Environment = var.environment_name
-    Name        = "outbound-to-internet Security Group - ${var.target_stack} - ${var.stack_githash}"
+    Name        = "outbound-to-internet Security Group - ${var.target_stack} - ${local.uniq_name}"
   }
 }

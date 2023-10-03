@@ -51,7 +51,7 @@ resource "aws_instance" "wildfly-ec2" {
     Environment = var.environment_name
     Project     = local.project
     Stack       = var.target_stack
-    Name        = "Wildfly - ${var.target_stack} - ${var.stack_githash}"
+    Name        = "Wildfly - ${var.target_stack} - ${local.uniq_name}"
   }
 
   metadata_options {
