@@ -15,7 +15,7 @@ output "hpds-ec2-open-id" {
 }
 
 output "hpds-ec2-auth-id" {
-  value = local.auth_instance_id
+  value = local.auth_hpds_instance_id
 }
 
 locals {
