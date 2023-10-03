@@ -19,6 +19,6 @@ output "hpds-ec2-auth-id" {
 }
 
 locals {
-  open_hpds_instance_id = length(aws_instance.open-hpds-ec2) > 1 ? aws_instance.open-hpds-ec2[0].id : "No Open HPDS Instances Available"
-  auth_hpds_instance_id = length(aws_instance.auth-hpds-ec2) > 1 ? aws_instance.auth-hpds-ec2[0].id : "No Auth HPDS Instances Available"
+  open_hpds_instance_id = length(aws_instance.open-hpds-ec2) > 0 ? aws_instance.open-hpds-ec2[0].id : "No Open HPDS Instances Available"
+  auth_hpds_instance_id = length(aws_instance.auth-hpds-ec2) > 0 ? aws_instance.auth-hpds-ec2[0].id : "No Auth HPDS Instances Available"
 }
