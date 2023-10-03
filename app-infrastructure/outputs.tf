@@ -11,9 +11,14 @@ output "dictionary-ec2-id" {
 }
 
 output "hpds-ec2-open-id" {
-  value = var.include_open_hpds ? aws_instance.open-hpds-ec2[0].id : ""
+  value = var.include_open_hpds ? local.open_hpds_instance_id
 }
 
 output "hpds-ec2-auth-id" {
-  value = var.include_auth_hpds ? aws_instance.auth-hpds-ec2[0].id : ""
+  value = var.include_auth_hpds ? local.auth_instance_id
+}
+
+locals {
+  open_hpds_instance_id = length(aws_instance.open-hpds-ec2) > 1 ? aws_instance.open-hpds-ec2[0].id : "No Open HPDS Instances Available"
+  auth_hpds_instance_id = length(aws_instance.auth-hpds-ec2) > 1 ? aws_instance.auth-hpds-ec2[0].id : "No Auth HPDS Instances Available"
 }
