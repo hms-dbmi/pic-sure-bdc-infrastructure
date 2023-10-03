@@ -1,11 +1,11 @@
 
 resource "aws_iam_instance_profile" "wildfly-deployment-s3-profile" {
-  name = "wildfly-deployment-s3-profile-${var.target_stack}-${var.stack_githash}"
+  name = "wildfly-deployment-s3-profile-${var.target_stack}-${local.uniq_name}"
   role = aws_iam_role.wildfly-deployment-s3-role.name
 }
 
 resource "aws_iam_role_policy" "wildfly-deployment-s3-policy" {
-  name   = "wildfly-deployment-s3-policy-${var.target_stack}-${var.stack_githash}"
+  name   = "wildfly-deployment-s3-policy-${var.target_stack}-${local.uniq_name}"
   role   = aws_iam_role.wildfly-deployment-s3-role.id
   policy = <<EOF
 {
@@ -82,7 +82,7 @@ EOF
 }
 
 resource "aws_iam_role" "wildfly-deployment-s3-role" {
-  name               = "wildfly-deployment-s3-role-${var.target_stack}-${var.stack_githash}"
+  name               = "wildfly-deployment-s3-role-${var.target_stack}-${local.uniq_name}"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -111,12 +111,12 @@ resource "aws_iam_role_policy_attachment" "attach-cloudwatch-ssm-policy-to-wildf
 
 
 resource "aws_iam_instance_profile" "httpd-deployment-s3-profile" {
-  name = "httpd-deployment-s3-profile-${var.target_stack}-${var.stack_githash}"
+  name = "httpd-deployment-s3-profile-${var.target_stack}-${local.uniq_name}"
   role = aws_iam_role.httpd-deployment-s3-role.name
 }
 
 resource "aws_iam_role_policy" "httpd-deployment-s3-policy" {
-  name   = "httpd-deployment-s3-policy-${var.target_stack}-${var.stack_githash}"
+  name   = "httpd-deployment-s3-policy-${var.target_stack}-${local.uniq_name}"
   role   = aws_iam_role.httpd-deployment-s3-role.id
   policy = <<EOF
 {
@@ -211,7 +211,7 @@ EOF
 }
 
 resource "aws_iam_role" "httpd-deployment-s3-role" {
-  name               = "httpd-deployment-s3-role-${var.target_stack}-${var.stack_githash}"
+  name               = "httpd-deployment-s3-role-${var.target_stack}-${local.uniq_name}"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -240,12 +240,12 @@ resource "aws_iam_role_policy_attachment" "attach-cloudwatch-ssm-policy-to-httpd
 
 
 resource "aws_iam_instance_profile" "auth-hpds-deployment-s3-profile" {
-  name = "auth-hpds-deployment-s3-profile-${var.target_stack}-${var.stack_githash}"
+  name = "auth-hpds-deployment-s3-profile-${var.target_stack}-${local.uniq_name}"
   role = aws_iam_role.auth-hpds-deployment-s3-role.name
 }
 
 resource "aws_iam_role_policy" "auth-hpds-deployment-s3-policy" {
-  name   = "auth-hpds-deployment-s3-policy-${var.target_stack}-${var.stack_githash}"
+  name   = "auth-hpds-deployment-s3-policy-${var.target_stack}-${local.uniq_name}"
   role   = aws_iam_role.auth-hpds-deployment-s3-role.id
   policy = <<EOF
 {
@@ -303,7 +303,7 @@ EOF
 }
 
 resource "aws_iam_role" "auth-hpds-deployment-s3-role" {
-  name               = "auth-hpds-deployment-s3-role-${var.target_stack}-${var.stack_githash}"
+  name               = "auth-hpds-deployment-s3-role-${var.target_stack}-${local.uniq_name}"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -332,12 +332,12 @@ resource "aws_iam_role_policy_attachment" "attach-cloudwatch-ssm-policy-to-auth-
 
 
 resource "aws_iam_instance_profile" "open-hpds-deployment-s3-profile" {
-  name = "open-hpds-deployment-s3-profile-${var.target_stack}-${var.stack_githash}"
+  name = "open-hpds-deployment-s3-profile-${var.target_stack}-${local.uniq_name}"
   role = aws_iam_role.open-hpds-deployment-s3-role.name
 }
 
 resource "aws_iam_role_policy" "open-hpds-deployment-s3-policy" {
-  name   = "open-hpds-deployment-s3-policy-${var.target_stack}-${var.stack_githash}"
+  name   = "open-hpds-deployment-s3-policy-${var.target_stack}-${local.uniq_name}"
   role   = aws_iam_role.open-hpds-deployment-s3-role.id
   policy = <<EOF
 {
@@ -389,7 +389,7 @@ EOF
 }
 
 resource "aws_iam_role" "open-hpds-deployment-s3-role" {
-  name               = "open-hpds-deployment-s3-role-${var.target_stack}-${var.stack_githash}"
+  name               = "open-hpds-deployment-s3-role-${var.target_stack}-${local.uniq_name}"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -418,12 +418,12 @@ resource "aws_iam_role_policy_attachment" "attach-cloudwatch-ssm-policy-to-open-
 
 
 resource "aws_iam_instance_profile" "dictionary-deployment-s3-profile" {
-  name = "dictionary-deployment-s3-profile-${var.target_stack}-${var.stack_githash}"
+  name = "dictionary-deployment-s3-profile-${var.target_stack}-${local.uniq_name}"
   role = aws_iam_role.dictionary-deployment-s3-role.name
 }
 
 resource "aws_iam_role_policy" "dictionary-deployment-s3-policy" {
-  name   = "dictionary-deployment-s3-policy-${var.target_stack}-${var.stack_githash}"
+  name   = "dictionary-deployment-s3-policy-${var.target_stack}-${local.uniq_name}"
   role   = aws_iam_role.dictionary-deployment-s3-role.id
   policy = <<EOF
 {
@@ -461,7 +461,7 @@ EOF
 }
 
 resource "aws_iam_role" "dictionary-deployment-s3-role" {
-  name               = "dictionary-deployment-s3-role-${var.target_stack}-${var.stack_githash}"
+  name               = "dictionary-deployment-s3-role-${var.target_stack}-${local.uniq_name}"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",

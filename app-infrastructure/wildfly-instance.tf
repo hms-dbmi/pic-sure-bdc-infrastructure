@@ -31,7 +31,7 @@ resource "aws_instance" "wildfly-ec2" {
 
   subnet_id = local.private2_subnet_ids[0]
 
-  iam_instance_profile = "wildfly-deployment-s3-profile-${var.target_stack}-${var.stack_githash}"
+  iam_instance_profile = "wildfly-deployment-s3-profile-${var.target_stack}-${local.uniq_name}"
 
   user_data = data.template_cloudinit_config.wildfly-user-data.rendered
 
