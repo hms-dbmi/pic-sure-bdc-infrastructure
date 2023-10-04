@@ -82,7 +82,7 @@ EOF
 }
 
 resource "aws_iam_role" "wildfly-deployment-s3-role" {
-  name               = "wildfly-deployment-s3-role-${var.target_stack}-${local.uniq_name}"
+  name               = "${env_project}-wildfly-deployment-s3-role-${var.target_stack}-${local.uniq_name}"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -211,7 +211,7 @@ EOF
 }
 
 resource "aws_iam_role" "httpd-deployment-s3-role" {
-  name               = "httpd-deployment-s3-role-${var.target_stack}-${local.uniq_name}"
+  name               = "${env_project}-httpd-deployment-s3-role-${var.target_stack}-${local.uniq_name}"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -303,7 +303,7 @@ EOF
 }
 
 resource "aws_iam_role" "auth-hpds-deployment-s3-role" {
-  name               = "auth-hpds-deployment-s3-role-${var.target_stack}-${local.uniq_name}"
+  name               = "${env_project}-auth-hpds-deployment-s3-role-${var.target_stack}-${local.uniq_name}"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -389,7 +389,7 @@ EOF
 }
 
 resource "aws_iam_role" "open-hpds-deployment-s3-role" {
-  name               = "open-hpds-deployment-s3-role-${var.target_stack}-${local.uniq_name}"
+  name               = "${env_project}-open-hpds-deployment-s3-role-${var.target_stack}-${local.uniq_name}"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -461,7 +461,7 @@ EOF
 }
 
 resource "aws_iam_role" "dictionary-deployment-s3-role" {
-  name               = "dictionary-deployment-s3-role-${var.target_stack}-${local.uniq_name}"
+  name               = "${env_project}-dictionary-deployment-s3-role-${var.target_stack}-${local.uniq_name}"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
