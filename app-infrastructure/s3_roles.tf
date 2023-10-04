@@ -489,6 +489,6 @@ resource "aws_iam_role_policy_attachment" "attach-cloudwatch-ssm-policy-to-dicti
 }
 
 locals {
-  project_no_space     = replace(var.env_project, " ", "_")
+  project_no_space     = replace(var.env_project, " ", "-")
 }
 
