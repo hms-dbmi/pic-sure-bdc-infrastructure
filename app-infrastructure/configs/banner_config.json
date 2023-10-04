@@ -6,7 +6,7 @@
       "endDate": "2024-09-29T00:00:00Z",
       "styles": "background-color: #C0143C; color: #fff; font-size: 1.1em; padding: 10px;",
       "isDismissible": false,
-      "disable": true
+      "disabled": true
     }
   ]
 }
