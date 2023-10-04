@@ -82,7 +82,7 @@ EOF
 }
 
 resource "aws_iam_role" "wildfly-deployment-s3-role" {
-  name               = "${env_project}-wildfly-deployment-s3-role-${var.target_stack}-${local.uniq_name}"
+  name               = "${local.project_no_space}-wildfly-deployment-s3-role-${var.target_stack}-${local.uniq_name}"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -211,7 +211,7 @@ EOF
 }
 
 resource "aws_iam_role" "httpd-deployment-s3-role" {
-  name               = "${env_project}-httpd-deployment-s3-role-${var.target_stack}-${local.uniq_name}"
+  name               = "${local.project_no_space}-httpd-deployment-s3-role-${var.target_stack}-${local.uniq_name}"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -303,7 +303,7 @@ EOF
 }
 
 resource "aws_iam_role" "auth-hpds-deployment-s3-role" {
-  name               = "${env_project}-auth-hpds-deployment-s3-role-${var.target_stack}-${local.uniq_name}"
+  name               = "${local.project_no_space}-auth-hpds-deployment-s3-role-${var.target_stack}-${local.uniq_name}"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -389,7 +389,7 @@ EOF
 }
 
 resource "aws_iam_role" "open-hpds-deployment-s3-role" {
-  name               = "${env_project}-open-hpds-deployment-s3-role-${var.target_stack}-${local.uniq_name}"
+  name               = "${local.project_no_space}-open-hpds-deployment-s3-role-${var.target_stack}-${local.uniq_name}"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -461,7 +461,7 @@ EOF
 }
 
 resource "aws_iam_role" "dictionary-deployment-s3-role" {
-  name               = "${env_project}-dictionary-deployment-s3-role-${var.target_stack}-${local.uniq_name}"
+  name               = "${local.project_no_space}-dictionary-deployment-s3-role-${var.target_stack}-${local.uniq_name}"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -486,5 +486,9 @@ resource "aws_iam_role_policy_attachment" "attach-cloudwatch-server-policy-to-di
 resource "aws_iam_role_policy_attachment" "attach-cloudwatch-ssm-policy-to-dictionary-role" {
   role       = aws_iam_role.dictionary-deployment-s3-role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+locals {
+  project_no_space     = replace(var.env_project, " ", "_")
 }
 
