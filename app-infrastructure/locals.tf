@@ -1,8 +1,19 @@
+
 #Lookup latest AMI
 data "aws_ami" "centos" {
   most_recent = true
   owners      = ["752463128620"]
   name_regex  = "^srce-centos7-golden-*"
+}
+
+# Random string to use for dynamic names.
+# use to get rid of git_hash in names causes conflicts if different env use same release controls
+resource "random_string" "random" {
+   length  = 6
+   special = false
+}
+locals {
+   uniq_name = random_string.random.result
 }
 
 data "aws_vpc" "target_vpc" {
