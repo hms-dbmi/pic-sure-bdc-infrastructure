@@ -99,5 +99,5 @@
   "idp_provider":"${idp_provider}",
   "idp_provider_uri":"${idp_provider_uri}",
   "fence_client_id":"${fence_client_id}",
-  "analytics_id":"${analytics_id}"
+  "analyticsId":"${analytics_id}"
 }

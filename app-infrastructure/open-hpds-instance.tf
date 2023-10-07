@@ -29,7 +29,7 @@ resource "aws_instance" "open-hpds-ec2" {
 
   subnet_id = local.private2_subnet_ids[0]
 
-  iam_instance_profile = "open-hpds-deployment-s3-profile-${var.target_stack}-${var.stack_githash}"
+  iam_instance_profile = "open-hpds-deployment-s3-profile-${var.target_stack}-${local.uniq_name}"
 
   user_data = data.template_cloudinit_config.open_hpds-user-data.rendered
 
@@ -49,7 +49,7 @@ resource "aws_instance" "open-hpds-ec2" {
     Environment = var.environment_name
     Project     = local.project
     Stack       = var.target_stack
-    Name        = "Open HPDS - ${var.target_stack} - ${var.stack_githash}"
+    Name        = "Open HPDS - ${var.target_stack} - ${local.uniq_name}"
   }
 
   metadata_options {

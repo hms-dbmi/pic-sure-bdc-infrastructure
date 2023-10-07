@@ -27,7 +27,7 @@ resource "aws_instance" "httpd-ec2" {
 
   subnet_id = local.private1_subnet_ids[0]
 
-  iam_instance_profile = "httpd-deployment-s3-profile-${var.target_stack}-${var.stack_githash}"
+  iam_instance_profile = "httpd-deployment-s3-profile-${var.target_stack}-${local.uniq_name}"
 
   user_data = data.template_cloudinit_config.httpd-user-data.rendered
 
@@ -48,7 +48,7 @@ resource "aws_instance" "httpd-ec2" {
     Environment = var.environment_name
     Stack       = var.target_stack
     Project     = local.project
-    Name        = "Apache HTTPD - ${var.target_stack} - ${var.stack_githash}"
+    Name        = "Apache HTTPD - ${var.target_stack} - ${local.uniq_name}"
   }
 
   metadata_options {

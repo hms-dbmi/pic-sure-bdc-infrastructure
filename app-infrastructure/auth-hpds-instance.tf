@@ -30,7 +30,7 @@ resource "aws_instance" "auth-hpds-ec2" {
 
   subnet_id = local.private2_subnet_ids[0]
 
-  iam_instance_profile = "auth-hpds-deployment-s3-profile-${var.target_stack}-${var.stack_githash}"
+  iam_instance_profile = "auth-hpds-deployment-s3-profile-${var.target_stack}-${local.uniq_name}"
 
   user_data = data.template_cloudinit_config.auth_hpds-user-data.rendered
 
@@ -50,7 +50,7 @@ resource "aws_instance" "auth-hpds-ec2" {
     Environment = var.environment_name
     Stack       = var.target_stack
     Project     = local.project
-    Name        = "Auth HPDS - ${var.target_stack} - ${var.stack_githash}"
+    Name        = "Auth HPDS - ${var.target_stack} - ${local.uniq_name}"
   }
 
   metadata_options {
