@@ -82,6 +82,7 @@ data "template_file" "picsureui_settings" {
   template = file("configs/picsureui_settings.json")
   vars = {
     analytics_id                  = var.analytics_id,
+    tag_manager_id                = var.tag_manager_id
     fence_client_id               = var.fence_client_id
     idp_provider                  = var.idp_provider
     idp_provider_uri              = var.idp_provider_uri

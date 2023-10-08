@@ -123,6 +123,12 @@ variable "application_id_for_base_query" {
 
 variable "analytics_id" {
   type = string
+  default = "__ANALYTICS_ID__"
+}
+
+variable "tag_manager_id" {
+  type = string
+  default = "__TAG_MANAGER_ID__"
 }
 
 variable "env_project" {
