@@ -42,11 +42,6 @@ variable "env_staging_subdomain" {
   type        = string
 }
 
-variable "env_live_subdomain" {
-  description = "Add Stack Tag"
-  type        = string
-}
-
 variable "rds_master_username" {
   description = "Master Username"
   type        = string
