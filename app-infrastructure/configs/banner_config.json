@@ -1,0 +1,12 @@
+{
+  "bannerConfiguration": [
+    {
+      "text": "Because of a lapse in government funding, the information on this website may not be up to date, transactions submitted via the website may not be processed, and the agency may not be able to respond to inquiries until appropriations are enacted. <br />The NIH Clinical Center (the research hospital of NIH) is open. For more details about its operating status, please visit <a href='https://urldefense.proofpoint.com/v2/url?u=http-3A__cc.nih.gov_&d=DwMF-g&c=WO-RGvefibhHBZq3fL85hQ&r=JrvHRNUaLM4JEXPBO7asJ6K88twMitD1WUK5OovbsHHtoJgrwK3owhHE-Qe_RQjE&m=i1X4Vqc_51lPo_Vgc-Tr6mtbqokt7q4j6wEtg9e4sWaoYz7riX2NwLQBhJKhpbr5&s=VlQRwDFt1QfEHKjjrud8hpr3fUx5SGtHk3ImbwgjGak&e=' target='_blank'>cc.nih.gov</a>. <br />Updates regarding government operating status and resumption of normal operations can be found at <a href='https://urldefense.proofpoint.com/v2/url?u=https-3A__www.opm.gov_&d=DwMF-g&c=WO-RGvefibhHBZq3fL85hQ&r=JrvHRNUaLM4JEXPBO7asJ6K88twMitD1WUK5OovbsHHtoJgrwK3owhHE-Qe_RQjE&m=i1X4Vqc_51lPo_Vgc-Tr6mtbqokt7q4j6wEtg9e4sWaoYz7riX2NwLQBhJKhpbr5&s=tpDX_bYTpgVCobViig4inj3nuyix1vi_6Qs5XGcUzCM&e=' target='_blank'>OPM.gov</a>.",
+      "startDate": "2023-09-29T00:00:00Z",
+      "endDate": "2024-09-29T00:00:00Z",
+      "styles": "background-color: #C0143C; color: #fff; font-size: 1.1em; padding: 10px;",
+      "isDismissible": false,
+      "disabled": true
+    }
+  ]
+}

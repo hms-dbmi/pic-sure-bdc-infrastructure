@@ -105,7 +105,7 @@ sudo docker run --name=open-hpds \
                 -v /opt/local/hpds:/opt/local/hpds -p 8080:8080 \
                 -e CATALINA_OPTS=" -XX:+UseParallelGC -XX:SurvivorRatio=250 -Xms1g -Xmx26g -DCACHE_SIZE=2500 -DSMALL_TASK_THREADS=1 -DLARGE_TASK_THREADS=1 -DSMALL_JOB_LIMIT=100 -DID_BATCH_SIZE=5000 " \
                 -d $HPDS_IMAGE
-		
+
 sudo docker logs -f hpds > /var/log/hpds-docker-logs/hpds.log &
 
 INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)
