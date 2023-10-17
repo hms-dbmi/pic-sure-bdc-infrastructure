@@ -164,6 +164,9 @@ useradd -r -m splunk
 for i in 1 2 3 4 5; do echo "trying to download Splunk local forwarder from s3://${stack_s3_bucket}/splunk_config/splunkforwarder-9.0.3-dd0128b1f8cd-Linux-x86_64.tgz" && sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/splunk_config/splunkforwarder-9.0.3-dd0128b1f8cd-Linux-x86_64.tgz /opt/ && break || sleep 60; done
 echo "pulled Splunk tar file, extracting"
 
+for i in 1 2 3 4 5; do echo "trying to download fence mapping from s3://${stack_s3_bucket}/data/${dataset_s3_object_key}/fence_mapping.json" && sudo /usr/local/bin/aws --region us-east-1 s3 cp s3://${stack_s3_bucket}/data/${dataset_s3_object_key}/fence_mapping.json /home/centos/fence_mapping.json && break || sleep 45; done
+echo "pulled fence mapping"
+
 cd /opt
 sudo tar -xf splunkforwarder-9.0.3-dd0128b1f8cd-Linux-x86_64.tgz
 
@@ -208,7 +211,7 @@ for i in 1 2 3 4 5 6 7 8 9; do sudo /usr/local/bin/aws --region us-east-1 s3 cp 
 sudo mkdir -p /usr/local/docker-config/search/
 
 DICTIONARY_IMAGE=`sudo docker load < /home/centos/pic-sure-hpds-dictionary-resource.tar.gz | cut -d ' ' -f 3`
-sudo docker run --name=dictionary -v /var/log/dictionary-docker-logs/:/usr/local/tomcat/logs/ -e CATALINA_OPTS=" -Xms1g -Xmx12g " -p 8080:8080 -d $DICTIONARY_IMAGE
+sudo docker run --name=dictionary -v /var/log/dictionary-docker-logs/:/usr/local/tomcat/logs/ -v /home/centos/fence_mapping.json:/usr/local/fence_mapping.json -e CATALINA_OPTS=" -Xms1g -Xmx12g " -p 8080:8080 -d $DICTIONARY_IMAGE
 
 INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)
 sudo /usr/local/bin/aws --region=us-east-1 ec2 create-tags --resources $${INSTANCE_ID} --tags Key=InitComplete,Value=true
