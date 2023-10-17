@@ -83,6 +83,7 @@ data "template_file" "picsureui_settings" {
   vars = {
     fence_client_id = var.fence_client_id
     analytics_id = var.analytics_id
+    tag_manager_id = var.tag_manager_id
   }
 }
 
