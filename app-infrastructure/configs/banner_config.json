@@ -7,6 +7,14 @@
       "styles": "background-color: #C0143C; color: #fff; font-size: 1.1em; padding: 10px;",
       "isDismissible": false,
       "disabled": true
+    },
+    {
+      "text": "Open PIC-SURE without login is now live! Users can search, query, and build cohorts using data in BDC, with no login required. Check out this new feature <a href='https://openpicsure.biodatacatalyst.nhlbi.nih.gov/picsureui/' target='_blank' style='color: #fff; text-decoration: underline;'>here</a>.<br />The “Open Access” tab will no longer be accessible from this site starting December 2023. Please use the <a href='http://openpicsure.biodatacatalyst.nhlbi.nih.gov/' target='_blank' style='color: #fff; text-decoration: underline;'>Open PIC-SURE site</a> to continue using the Open Access functionality.",
+      "startDate": "2023-11-01T00:00:00Z",
+      "endDate": "2024-12-23T00:00:00Z",
+      "styles": "background-color: #1a568c; color: #fff; font-size: 1.1em; padding: 10px;",
+      "isDismissible": true,
+      "disabled": false
     }
   ]
 }
