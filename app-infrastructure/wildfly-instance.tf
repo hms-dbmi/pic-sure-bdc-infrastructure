@@ -92,6 +92,8 @@ data "template_file" "pic-sure-schema-sql" {
     picsure_token_introspection_token = var.picsure_token_introspection_token
     target_stack                      = var.target_stack
     env_private_dns_name              = var.env_private_dns_name
+    include_auth_hpds                 = var.include_auth_hpds
+    include_open_hpds                 = var.include_open_hpds
   }
 }
 
