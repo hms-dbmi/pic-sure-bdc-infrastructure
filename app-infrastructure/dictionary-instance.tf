@@ -1,10 +1,10 @@
-data "template_file" "dictionary-user_data" {
+data "template_file" "dictionary-user-data-template" {
   template = file("scripts/dictionary-user_data.sh")
   vars = {
     stack_githash   = var.stack_githash_long
     stack_s3_bucket = var.stack_s3_bucket
     target_stack    = var.target_stack
-    dataset_s3_object_key = var.dataset-s3-object-key
+    dataset_s3_object_key = var.dataset_s3_object_key
     gss_prefix      = "bdc_${var.env_is_open_access ? "open" : "auth"}_${var.environment_name}"
   }
 }
@@ -16,7 +16,7 @@ data "template_cloudinit_config" "dictionary-user-data" {
   # user_data
   part {
     content_type = "text/x-shellscript"
-    content      = data.template_file.dictionary-user_data.rendered
+    content      = data.template_file.dictionary-user-data-template.rendered
   }
 
 }
