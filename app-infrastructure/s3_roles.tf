@@ -437,6 +437,12 @@ resource "aws_iam_role_policy" "dictionary-deployment-s3-policy" {
       "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/releases/jenkins_pipeline_build_${var.stack_githash_long}/pic-sure-hpds-dictionary-resource.tar.gz"
     },{
       "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/data/${var.dataset_s3_object_key}/fence_mapping.json"
+    },{
+      "Action": [
         "s3:ListBucket"
       ],
       "Effect": "Allow",
@@ -444,7 +450,8 @@ resource "aws_iam_role_policy" "dictionary-deployment-s3-policy" {
       "Condition": {
         "StringLike": {
           "s3:prefix": [
-            "releases/jenkins_pipeline_build_${var.stack_githash_long}/*"
+            "releases/jenkins_pipeline_build_${var.stack_githash_long}/*",
+            "data/${var.dataset_s3_object_key}/*"
           ]
         }
       }
