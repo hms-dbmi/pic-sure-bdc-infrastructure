@@ -6,9 +6,13 @@ variable "stack_githash_long" {
   type = string
 }
 
+variable "live_stack" {
+  description = "Current blue stack. Used to identify RDS resources to backup."
+  type        = string
+}
 
 variable "target_stack" {
-  description = "The stack identifier"
+  description = "Green stack to target for deployment"
   type        = string
 }
 
