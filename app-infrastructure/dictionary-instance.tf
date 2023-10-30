@@ -5,7 +5,6 @@ data "template_file" "dictionary-user_data" {
     stack_githash = var.stack_githash_long
     stack_s3_bucket = var.stack_s3_bucket
     dataset_s3_object_key = var.dataset-s3-object-key
-    source_dictionary_s3_object_key = var.source_dictionary_s3_object_key
     target-stack    = var.target-stack
   }
 }
