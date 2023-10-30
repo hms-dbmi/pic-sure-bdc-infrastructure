@@ -10,6 +10,7 @@ data "template_file" "wildfly-user_data" {
     gss_prefix              = "bdc_${var.env_is_open_access ? "open" : "auth"}_${var.environment_name}"
     env_private_dns_name    = var.env_private_dns_name
     env_public_dns_name     = var.env_public_dns_name
+    picsure_rds_snapshot_id = var.picsure_rds_snapshot_id
   }
 }
 

@@ -1,18 +1,3 @@
-# Take snaphot of current live RDS and propagate 
-data "aws_db_snapshot" "snapshot" {
-  most_recent = true
-
-  filter {
-    name   = "tag:Project"
-    values = [ var.env_project ]
-  }
-
-  filter {
-    name   = "tag:Stack"
-    values = [ var.live_stack ]
-  }
-}
-
 resource "aws_db_instance" "pic-sure-mysql" {
   allocated_storage      = 50
   storage_type           = "gp2"
@@ -29,9 +14,7 @@ resource "aws_db_instance" "pic-sure-mysql" {
   skip_final_snapshot    = true
   vpc_security_group_ids = [aws_security_group.inbound-mysql-from-wildfly.id]
 
-  # If a snapshot is not found in the ata.aws_db_snapshot.snapshot.id it will just create a new rds without using it
-  # gracefully according to tf
-  snapshot_identifier    = data.aws_db_snapshot.snapshot.id
+  snapshot_identifier    = var.picsure_rds_snapshot_id
 
   tags = {
     Owner       = "Avillach_Lab"

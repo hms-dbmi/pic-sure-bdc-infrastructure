@@ -6,8 +6,8 @@ variable "stack_githash_long" {
   type = string
 }
 
-variable "live_stack" {
-  description = "Current blue stack. Used to identify RDS resources to backup."
+variable "picsure_rds_snapshot_id" {
+  description = "Snapshot id to use for picsure rds instance.  leave blank to create rds without a snapshot"
   type        = string
 }
 
