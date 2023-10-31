@@ -17,66 +17,146 @@
       "disabled": false
     },
     {
-      "text": "Banner 4: Displaying from 4 PM to 4:15 PM",
-      "startDate": "2023-10-30 16:00:00",
-      "endDate": "2023-10-30 16:15:00",
-      "styles": "background-color: #FF00FF; color: #000; font-size: 1.1em; padding: 10px;",
-      "isDismissible": true,
-      "disabled": false
-    },
-    {
-      "text": "Banner 5: Displaying from 4:15 PM to 4:30 PM",
-      "startDate": "2023-10-30 16:15:00",
-      "endDate": "2023-10-30 16:30:00",
-      "styles": "background-color: #00FFFF; color: #000; font-size: 1.1em; padding: 10px;",
-      "isDismissible": true,
-      "disabled": false
-    },
-    {
-      "text": "Banner 6: Displaying from 4:30 PM to 4:45 PM",
-      "startDate": "2023-10-30 16:30:00",
-      "endDate": "2023-10-30 16:45:00",
-      "styles": "background-color: #FFFF00; color: #000; font-size: 1.1em; padding: 10px;",
-      "isDismissible": true,
-      "disabled": false
-    },
-    {
-      "text": "Banner 6: Displaying from 4:15 PM to 4:30 PM",
-      "startDate": "2023-10-30 16:45:00",
-      "endDate": "2023-10-30 17:00:00",
-      "styles": "background-color: #FF0000; color: #000; font-size: 1.1em; padding: 10px;",
-      "isDismissible": true,
-      "disabled": false
-    },
-    {
-      "text": "Banner 6: Displaying from 5 PM to 5:15 PM",
-      "startDate": "2023-10-30 17:00:00",
-      "endDate": "2023-10-30 17:15:00",
-      "styles": "background-color: #00FF00; color: #000; font-size: 1.1em; padding: 10px;",
-      "isDismissible": true,
-      "disabled": false
-    },
-    {
-      "text": "Banner 1: Displaying from 5:15 PM to 3:30 PM",
-      "startDate": "2023-10-30 17:15:00",
-      "endDate": "2023-10-30 17:30:00",
+      "text": "Banner 1: Displaying from 9 AM to 9:30 AM",
+      "startDate": "2023-10-31 09:00:00",
+      "endDate": "2023-10-31 09:30:00",
       "styles": "background-color: #FF0000; color: #fff; font-size: 1.1em; padding: 10px;",
+      "class": "",
       "isDismissible": true,
       "disabled": false
     },
     {
-      "text": "Banner 2: Displaying from 5:30 PM to 5:45 PM",
-      "startDate": "2023-10-30 17:30:00",
-      "endDate": "2023-10-30 17:45:00",
-      "styles": "background-color: #00FF00; color: #000; font-size: 1.1em; padding: 10px;",
+      "text": "Banner 2: Displaying from 9:30 AM to 10 AM",
+      "startDate": "2023-10-31 09:30:00",
+      "endDate": "2023-10-31 10:00:00",
+      "styles": "background-color: #FFA500; color: #fff; font-size: 1.1em; padding: 10px;",
+      "class": "",
       "isDismissible": true,
       "disabled": false
     },
     {
-      "text": "Banner 3: Displaying from 5:45 PM to 6 PM",
-      "startDate": "2023-10-30 17:45:00",
-      "endDate": "2023-10-30 18:00:00",
-      "styles": "background-color: #0000FF; color: #fff; font-size: 1.1em; padding: 10px;",
+      "text": "Banner 3: Displaying from 10 AM to 10:30 AM",
+      "startDate": "2023-10-31 10:00:00",
+      "endDate": "2023-10-31 10:30:00",
+      "styles": "background-color: #FF0000; color: #fff; font-size: 1.1em; padding: 10px;",
+      "class": "",
+      "isDismissible": true,
+      "disabled": false
+    },
+    {
+      "text": "Banner 4: Displaying from 10:30 AM to 11 AM",
+      "startDate": "2023-10-31 10:30:00",
+      "endDate": "2023-10-31 11:00:00",
+      "styles": "background-color: #FFA500; color: #fff; font-size: 1.1em; padding: 10px;",
+      "class": "",
+      "isDismissible": true,
+      "disabled": false
+    },
+    {
+      "text": "Banner 5: Displaying from 11 AM to 11:30 AM",
+      "startDate": "2023-10-31 11:00:00",
+      "endDate": "2023-10-31 11:30:00",
+      "styles": "background-color: #FF0000; color: #fff; font-size: 1.1em; padding: 10px;",
+      "class": "",
+      "isDismissible": true,
+      "disabled": false
+    },
+    {
+      "text": "Banner 6: Displaying from 11:30 AM to 12 PM",
+      "startDate": "2023-10-31 11:30:00",
+      "endDate": "2023-10-31 12:00:00",
+      "styles": "background-color: #FFA500; color: #fff; font-size: 1.1em; padding: 10px;",
+      "class": "",
+      "isDismissible": true,
+      "disabled": false
+    },
+    {
+      "text": "Banner 7: Displaying from 12 PM to 12:30 PM",
+      "startDate": "2023-10-31 12:00:00",
+      "endDate": "2023-10-31 12:30:00",
+      "styles": "background-color: #FF0000; color: #fff; font-size: 1.1em; padding: 10px;",
+      "class": "",
+      "isDismissible": true,
+      "disabled": false
+    },
+    {
+      "text": "Banner 8: Displaying from 12:30 PM to 1 PM",
+      "startDate": "2023-10-31 12:30:00",
+      "endDate": "2023-10-31 13:00:00",
+      "styles": "background-color: #FFA500; color: #fff; font-size: 1.1em; padding: 10px;",
+      "class": "",
+      "isDismissible": true,
+      "disabled": false
+    },
+    {
+      "text": "Banner 9: Displaying from 1 PM to 1:30 PM",
+      "startDate": "2023-10-31 13:00:00",
+      "endDate": "2023-10-31 13:30:00",
+      "styles": "font-size: 1.1em; padding: 10px;",
+      "class": "alert alert-success",
+      "isDismissible": true,
+      "disabled": false
+    },
+    {
+      "text": "Banner 10: Displaying from 1:30 PM to 2 PM",
+      "startDate": "2023-10-31 13:30:00",
+      "endDate": "2023-10-31 14:00:00",
+      "styles": "font-size: 1.1em; padding: 10px;",
+      "class": "alert alert-info",
+      "isDismissible": true,
+      "disabled": false
+    },
+    {
+      "text": "Banner 11: Displaying from 2 PM to 2:30 PM",
+      "startDate": "2023-10-31 14:00:00",
+      "endDate": "2023-10-31 14:30:00",
+      "styles": "font-size: 1.1em; padding: 10px;",
+      "class": "alert alert-success",
+      "isDismissible": true,
+      "disabled": false
+    },
+    {
+      "text": "Banner 12: Displaying from 2:30 PM to 3 PM",
+      "startDate": "2023-10-31 14:30:00",
+      "endDate": "2023-10-31 15:00:00",
+      "styles": "font-size: 1.1em; padding: 10px;",
+      "class": "alert alert-info",
+      "isDismissible": true,
+      "disabled": false
+    },
+    {
+      "text": "Banner 13: Displaying from 3 PM to 3:30 PM",
+      "startDate": "2023-10-31 15:00:00",
+      "endDate": "2023-10-31 15:30:00",
+      "styles": "font-size: 1.1em; padding: 10px;",
+      "class": "alert alert-success",
+      "isDismissible": true,
+      "disabled": false
+    },
+    {
+      "text": "Banner 14: Displaying from 3:30 PM to 4 PM",
+      "startDate": "2023-10-31 15:30:00",
+      "endDate": "2023-10-31 16:00:00",
+      "styles": "font-size: 1.1em; padding: 10px;",
+      "class": "alert alert-info",
+      "isDismissible": true,
+      "disabled": false
+    },
+    {
+      "text": "Banner 15: Displaying from 4 PM to 4:30 PM",
+      "startDate": "2023-10-31 16:00:00",
+      "endDate": "2023-10-31 16:30:00",
+      "styles": "font-size: 1.1em; padding: 10px;",
+      "class": "alert alert-success",
+      "isDismissible": true,
+      "disabled": false
+    },
+    {
+      "text": "Banner 16: Displaying from 4:30 PM to 5 PM",
+      "startDate": "2023-10-31 16:30:00",
+      "endDate": "2023-10-31 17:00:00",
+      "styles": "font-size: 1.1em; padding: 10px;",
+      "class": "alert alert-info",
       "isDismissible": true,
       "disabled": false
     }
