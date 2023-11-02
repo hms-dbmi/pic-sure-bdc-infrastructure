@@ -6,9 +6,13 @@ variable "stack_githash_long" {
   type = string
 }
 
+variable "picsure_rds_snapshot_id" {
+  description = "Snapshot id to use for picsure rds instance.  leave blank to create rds without a snapshot"
+  type        = string
+}
 
 variable "target_stack" {
-  description = "The stack identifier"
+  description = "Green stack to target for deployment"
   type        = string
 }
 

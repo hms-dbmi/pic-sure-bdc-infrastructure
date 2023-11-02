@@ -13,6 +13,9 @@ resource "aws_db_instance" "pic-sure-mysql" {
   copy_tags_to_snapshot  = true
   skip_final_snapshot    = true
   vpc_security_group_ids = [aws_security_group.inbound-mysql-from-wildfly.id]
+
+  snapshot_identifier    = var.picsure_rds_snapshot_id
+
   tags = {
     Owner       = "Avillach_Lab"
     Environment = var.environment_name
