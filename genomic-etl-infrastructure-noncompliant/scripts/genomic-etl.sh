@@ -106,7 +106,7 @@ export PERL5LIB='/home/centos/cpanm/lib/perl5:/home/centos/bioperl-1.6.924:/home
 export HTSLIB_DIR='/home/centos/htslib/'
 echo ${chrom_number} chr${chrom_number}  > /home/centos/ensembl-vep/chrm_rename.txt
 
-wget -P /home/centos/ensemble-vep/ http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/1000G_2504_high_coverage/working/20220422_3202_phased_SNV_INDEL_SV/1kGP_high_coverage_Illumina.chr${chrom_number}.filtered.SNV_INDEL_SV_phased_panel.vcf.gz &
+wget -P /home/centos/ensemblS-vep/ http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/1000G_2504_high_coverage/working/20220422_3202_phased_SNV_INDEL_SV/1kGP_high_coverage_Illumina.chr${chrom_number}.filtered.SNV_INDEL_SV_phased_panel.vcf.gz &
 
 wait
 
