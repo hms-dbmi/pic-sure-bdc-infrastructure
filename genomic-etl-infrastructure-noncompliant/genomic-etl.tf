@@ -3,8 +3,6 @@ data "template_file" "genomic-user_data" {
   template = file("scripts/genomic-etl.sh")
   vars = {
     output_s3_bucket = var.output_s3_bucket
-    input_s3_account = var.input_s3_account
-    input_s3_bucket = var.input_s3_bucket
     study_id = var.study_id
     chrom_number = var.chrom_number
     study_name = var.study_name
