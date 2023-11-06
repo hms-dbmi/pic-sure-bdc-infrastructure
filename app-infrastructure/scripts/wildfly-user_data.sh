@@ -45,6 +45,7 @@ fi
 
 WILDFLY_IMAGE=`sudo docker load < /home/centos/pic-sure-wildfly.tar.gz | cut -d ' ' -f 3`
 JAVA_OPTS="-Xms2g -Xmx26g -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=1024m -Djava.net.preferIPv4Stack=true"
+container_name="wildfly"
 
 sudo mkdir /var/log/{wildfly-docker-logs,wildfly-docker-os-logs}
 
@@ -61,5 +62,37 @@ sudo docker run -u root --name=wildfly \
                         -v /home/centos/visualization-resource.properties:/opt/jboss/wildfly/standalone/configuration/visualization/pic-sure-visualization-resource/resource.properties \
                         -p 8080:8080 -e JAVA_OPTS="$JAVA_OPTS" -d $WILDFLY_IMAGE
 
-INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)
-sudo /usr/bin/aws --region=us-east-1 ec2 create-tags --resources $${INSTANCE_ID} --tags Key=InitComplete,Value=true
+# Waiting for application to finish initialization
+
+init_message="ContextLoader:344 - Root WebApplicationContext: initialization completed"
+container_name="my-container"
+init_message="Container initialized"
+timeout_seconds=2400  # Set your desired timeout in seconds
+init_start_time=$(date +%s)
+
+while [ true ]; do
+  if docker logs --tail 0 --follow "$container_name" | grep -q "$init_message"; then
+    echo "$container_name container has initialized."
+    
+    INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)
+    sudo /usr/bin/aws --region=us-east-1 ec2 create-tags --resources $INSTANCE_ID --tags Key=InitComplete,Value=true
+
+    break
+  fi
+  
+  # Timeout 
+  current_time=$(date +%s)
+  elapsed_time=$((current_time - init_start_time))
+
+  if [ "$elapsed_time" -ge "$timeout_seconds" ]; then
+    echo "Timeout reached ($timeout_seconds seconds). The $container_name container initialization didn't complete."
+    INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)
+    sudo /usr/bin/aws --region=us-east-1 ec2 create-tags --resources $INSTANCE_ID --tags Key=InitComplete,Value=failed
+
+    break
+  else
+    sleep 20
+  fi
+done
+
+
