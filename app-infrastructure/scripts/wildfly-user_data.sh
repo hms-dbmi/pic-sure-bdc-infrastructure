@@ -45,11 +45,11 @@ fi
 
 WILDFLY_IMAGE=`sudo docker load < /home/centos/pic-sure-wildfly.tar.gz | cut -d ' ' -f 3`
 JAVA_OPTS="-Xms2g -Xmx26g -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=1024m -Djava.net.preferIPv4Stack=true"
-container_name="wildfly"
+CONTAINER_NAME="wildfly"
 
 sudo mkdir /var/log/{wildfly-docker-logs,wildfly-docker-os-logs}
 
-sudo docker run -u root --name=wildfly \
+sudo docker run -u root --name=$CONTAINER_NAME \
                         --restart unless-stopped \
                         --log-driver syslog --log-opt tag=wildfly \
                         -v /var/log/wildfly-docker-logs/:/opt/jboss/wildfly/standalone/log/ \
@@ -64,15 +64,13 @@ sudo docker run -u root --name=wildfly \
 
 # Waiting for application to finish initialization
 
-init_message="ContextLoader:344 - Root WebApplicationContext: initialization completed"
-container_name="my-container"
-init_message="Container initialized"
-timeout_seconds=2400  # Set your desired timeout in seconds
-init_start_time=$(date +%s)
+INIT_MESSAGE="ContextLoader:344 - Root WebApplicationContext: initialization completed"
+INIT_TIMEOUT_SEX=2400  # Set your desired timeout in seconds
+INIT_START_TIME=$(date +%s)
 
 while [ true ]; do
-  if docker logs --tail 0 --follow "$container_name" | grep -q "$init_message"; then
-    echo "$container_name container has initialized."
+  if docker logs --tail 0 --follow "$CONTAINER_NAME" | grep -q "$INIT_MESSAGE"; then
+    echo "$CONTAINER_NAME container has initialized."
     
     INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)
     sudo /usr/bin/aws --region=us-east-1 ec2 create-tags --resources $INSTANCE_ID --tags Key=InitComplete,Value=true
@@ -81,11 +79,11 @@ while [ true ]; do
   fi
   
   # Timeout 
-  current_time=$(date +%s)
-  elapsed_time=$((current_time - init_start_time))
+  CURRENT_TIME=$(date +%s)
+  ELAPSED_TIME=$((CURRENT_TIME - INIT_START_TIME))
 
-  if [ "$elapsed_time" -ge "$timeout_seconds" ]; then
-    echo "Timeout reached ($timeout_seconds seconds). The $container_name container initialization didn't complete."
+  if [ "$ELAPSED_TIME" -ge "$INIT_TIMEOUT_SEX" ]; then
+    echo "Timeout reached ($INIT_TIMEOUT_SEX seconds). The $CONTAINER_NAME container initialization didn't complete."
     INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)
     sudo /usr/bin/aws --region=us-east-1 ec2 create-tags --resources $INSTANCE_ID --tags Key=InitComplete,Value=failed
 
