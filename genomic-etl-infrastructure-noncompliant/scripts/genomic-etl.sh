@@ -129,7 +129,14 @@ echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} norm
 wait
 
 echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} normalize stage
-/home/centos/htslib/bgzip -d /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.normalized.vcf.gz &
+bcftools view --exclude-types bnd,other -O z -o ${study_id}${consent_group_tag}.chr${chrom_number}.cleaned.vcf.gz ${study_id}${consent_group_tag}.chr${chrom_number}.normalized.vcf.gz &
+echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} cleanup stage
+
+wait
+
+echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} cleanup stage
+
+/home/centos/htslib/bgzip -d /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.cleaned.vcf.gz &
 echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} decompress stage
 
 wait
@@ -143,7 +150,7 @@ echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} dec
 --fork 4 \
 --dir_cache /root/.vep \
 --species homo_sapiens \
---input_file /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.normalized.vcf \
+--input_file /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.cleaned.vcf \
 --format vcf \
 --output_file /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.annotated.vcf \
 --no_stats \
