@@ -41,7 +41,7 @@ if [ -z ${picsure_rds_snapshot_id} ]; then
   sudo docker exec -i schema-init mysql -hpicsure-db.${target_stack}.${env_private_dns_name} -uroot -p${mysql-instance-password} < /home/centos/pic-sure-schema.sql
   sudo docker stop schema-init
   echo "init'd mysql schemas"
-fi
+finish
 
 WILDFLY_IMAGE=`sudo docker load < /home/centos/pic-sure-wildfly.tar.gz | cut -d ' ' -f 3`
 JAVA_OPTS="-Xms2g -Xmx26g -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=1024m -Djava.net.preferIPv4Stack=true"
@@ -62,35 +62,7 @@ sudo docker run -u root --name=$CONTAINER_NAME \
                         -v /home/centos/visualization-resource.properties:/opt/jboss/wildfly/standalone/configuration/visualization/pic-sure-visualization-resource/resource.properties \
                         -p 8080:8080 -e JAVA_OPTS="$JAVA_OPTS" -d $WILDFLY_IMAGE
 
-# Waiting for application to finish initialization
 
-INIT_MESSAGE="ContextLoader:344 - Root WebApplicationContext: initialization completed"
-INIT_TIMEOUT_SEX=2400  # Set your desired timeout in seconds
-INIT_START_TIME=$(date +%s)
 
-while [ true ]; do
-  if docker logs --tail 0 --follow "$CONTAINER_NAME" | grep -q "$INIT_MESSAGE"; then
-    echo "$CONTAINER_NAME container has initialized."
-    
-    INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)
-    sudo /usr/bin/aws --region=us-east-1 ec2 create-tags --resources $INSTANCE_ID --tags Key=InitComplete,Value=true
-
-    break
-  fi
-  
-  # Timeout 
-  CURRENT_TIME=$(date +%s)
-  ELAPSED_TIME=$((CURRENT_TIME - INIT_START_TIME))
-
-  if [ "$ELAPSED_TIME" -ge "$INIT_TIMEOUT_SEX" ]; then
-    echo "Timeout reached ($INIT_TIMEOUT_SEX seconds). The $CONTAINER_NAME container initialization didn't complete."
-    INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)
-    sudo /usr/bin/aws --region=us-east-1 ec2 create-tags --resources $INSTANCE_ID --tags Key=InitComplete,Value=failed
-
-    break
-  else
-    sleep 20
-  fi
-done
-
+INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)
 

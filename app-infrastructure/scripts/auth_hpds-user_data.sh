@@ -31,8 +31,11 @@ cd /opt/local/hpds
 tar -xvzf javabins_rekeyed.tar.gz
 cd ~
 
+
+CONTAINER_NAME="auth-hpds"
+
 HPDS_IMAGE=`sudo docker load < /home/centos/pic-sure-hpds.tar.gz | cut -d ' ' -f 3`
-sudo docker run --name=auth-hpds \
+sudo docker run --name=$CONTAINER_NAME \
                 --restart unless-stopped \
                 --log-driver syslog --log-opt tag=auth-hpds \
                 -v /opt/local/hpds:/opt/local/hpds \
@@ -40,5 +43,33 @@ sudo docker run --name=auth-hpds \
                 -e CATALINA_OPTS=" -XX:+UseParallelGC -XX:SurvivorRatio=250 -Xms10g -Xmx110g -DCACHE_SIZE=2500 -DSMALL_TASK_THREADS=1 -DLARGE_TASK_THREADS=1 -DSMALL_JOB_LIMIT=100 -DID_BATCH_SIZE=5000 '-DALL_IDS_CONCEPT=NONE'  '-DID_CUBE_NAME=NONE'"  \
                 -d $HPDS_IMAGE
 
-INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)
-sudo /usr/bin/aws --region=us-east-1 ec2 create-tags --resources $${INSTANCE_ID} --tags Key=InitComplete,Value=true
+
+# Waiting for application to finish initialization
+INIT_MESSAGE="ContextLoader:344 - Root WebApplicationContext: initialization completed"
+INIT_TIMEOUT_SEX=2400  # Set your desired timeout in seconds
+INIT_START_TIME=$(date +%s)
+
+while [ true ]; do
+  if docker logs --tail 0 --follow "$CONTAINER_NAME" | grep -q "$INIT_MESSAGE"; then
+    echo "$CONTAINER_NAME container has initialized."
+    
+    INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)
+    sudo /usr/bin/aws --region=us-east-1 ec2 create-tags --resources $INSTANCE_ID --tags Key=InitComplete,Value=true
+
+    break
+  fi
+  
+  # Timeout 
+  CURRENT_TIME=$(date +%s)
+  ELAPSED_TIME=$((CURRENT_TIME - INIT_START_TIME))
+
+  if [ "$ELAPSED_TIME" -ge "$INIT_TIMEOUT_SEX" ]; then
+    echo "Timeout reached ($INIT_TIMEOUT_SEX seconds). The $CONTAINER_NAME container initialization didn't complete."
+    INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)
+    sudo /usr/bin/aws --region=us-east-1 ec2 create-tags --resources $INSTANCE_ID --tags Key=InitComplete,Value=failed
+
+    break
+  else
+    sleep 20
+  fi
+done
