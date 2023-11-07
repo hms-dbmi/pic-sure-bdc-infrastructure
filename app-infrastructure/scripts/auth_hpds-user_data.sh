@@ -43,23 +43,17 @@ sudo docker run --name=$CONTAINER_NAME \
                 -e CATALINA_OPTS=" -XX:+UseParallelGC -XX:SurvivorRatio=250 -Xms10g -Xmx110g -DCACHE_SIZE=2500 -DSMALL_TASK_THREADS=1 -DLARGE_TASK_THREADS=1 -DSMALL_JOB_LIMIT=100 -DID_BATCH_SIZE=5000 '-DALL_IDS_CONCEPT=NONE'  '-DID_CUBE_NAME=NONE'"  \
                 -d $HPDS_IMAGE
 
-
 # Waiting for application to finish initialization
 INIT_MESSAGE="WebApplicationContext: initialization completed"
 INIT_TIMEOUT_SEX=2400  # Set your desired timeout in seconds
 INIT_START_TIME=$(date +%s)
 
-while [ true ]; do
-  if docker logs --tail 0 --follow "$CONTAINER_NAME" | grep -q "$INIT_MESSAGE"; then
-    echo "$CONTAINER_NAME container has initialized."
-    
-    INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)
-    sudo /usr/bin/aws --region=us-east-1 ec2 create-tags --resources $INSTANCE_ID --tags Key=InitComplete,Value=true
+while docker logs "$CONTAINER_NAME" 2>&1 | grep "$INIT_MESSAGE"; do
+  echo "$CONTAINER_NAME container has initialized."
 
-    break
-  fi
-  
-  # Timeout 
+  INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)
+  sudo /usr/bin/aws --region=us-east-1 ec2 create-tags --resources $INSTANCE_ID --tags Key=InitComplete,Value=true
+
   CURRENT_TIME=$(date +%s)
   ELAPSED_TIME=$((CURRENT_TIME - INIT_START_TIME))
 
