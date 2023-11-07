@@ -45,7 +45,7 @@ sudo docker run --name=$CONTAINER_NAME \
 
 
 # Waiting for application to finish initialization
-INIT_MESSAGE="ContextLoader:344 - Root WebApplicationContext: initialization completed"
+INIT_MESSAGE="WebApplicationContext: initialization completed"
 INIT_TIMEOUT_SEX=2400  # Set your desired timeout in seconds
 INIT_START_TIME=$(date +%s)
 
