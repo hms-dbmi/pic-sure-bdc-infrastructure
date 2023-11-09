@@ -31,8 +31,8 @@ resource "aws_iam_instance_profile" "wildfly-deployment-s3-profile" {
 }
 
 resource "aws_iam_role_policy" "wildfly-deployment-s3-policy" {
-  name = "wildfly-deployment-s3-policy-${var.target-stack}-${var.stack_githash}"
-  role = aws_iam_role.wildfly-deployment-s3-role.id
+  name   = "wildfly-deployment-s3-policy-${var.target-stack}-${var.stack_githash}"
+  role   = aws_iam_role.wildfly-deployment-s3-role.id
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -161,8 +161,8 @@ resource "aws_iam_instance_profile" "httpd-deployment-s3-profile" {
 }
 
 resource "aws_iam_role_policy" "httpd-deployment-s3-policy" {
-  name = "httpd-deployment-s3-policy-${var.target-stack}-${var.stack_githash}"
-  role = aws_iam_role.httpd-deployment-s3-role.id
+  name   = "httpd-deployment-s3-policy-${var.target-stack}-${var.stack_githash}"
+  role   = aws_iam_role.httpd-deployment-s3-role.id
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -221,6 +221,12 @@ resource "aws_iam_role_policy" "httpd-deployment-s3-policy" {
       ],
       "Effect": "Allow",
       "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/jenkins_pipeline_build_${var.stack_githash_long}/picsureui_settings.json"
+    },{
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/jenkins_pipeline_build_${var.stack_githash_long}/banner_config.json"
     },{
       "Action": [
         "s3:GetObject"
@@ -302,8 +308,8 @@ resource "aws_iam_instance_profile" "auth-hpds-deployment-s3-profile" {
 }
 
 resource "aws_iam_role_policy" "auth-hpds-deployment-s3-policy" {
-  name = "auth-hpds-deployment-s3-policy-${var.target-stack}-${var.stack_githash}"
-  role = aws_iam_role.auth-hpds-deployment-s3-role.id
+  name   = "auth-hpds-deployment-s3-policy-${var.target-stack}-${var.stack_githash}"
+  role   = aws_iam_role.auth-hpds-deployment-s3-role.id
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -425,8 +431,8 @@ resource "aws_iam_instance_profile" "open-hpds-deployment-s3-profile" {
 }
 
 resource "aws_iam_role_policy" "open-hpds-deployment-s3-policy" {
-  name = "open-hpds-deployment-s3-policy-${var.target-stack}-${var.stack_githash}"
-  role = aws_iam_role.open-hpds-deployment-s3-role.id
+  name   = "open-hpds-deployment-s3-policy-${var.target-stack}-${var.stack_githash}"
+  role   = aws_iam_role.open-hpds-deployment-s3-role.id
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -527,8 +533,8 @@ resource "aws_iam_instance_profile" "dictionary-deployment-s3-profile" {
 }
 
 resource "aws_iam_role_policy" "dictionary-deployment-s3-policy" {
-  name = "dictionary-deployment-s3-policy-${var.target-stack}-${var.stack_githash}"
-  role = aws_iam_role.dictionary-deployment-s3-role.id
+  name   = "dictionary-deployment-s3-policy-${var.target-stack}-${var.stack_githash}"
+  role   = aws_iam_role.dictionary-deployment-s3-role.id
   policy = <<EOF
 {
   "Version": "2012-10-17",
