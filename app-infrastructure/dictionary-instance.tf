@@ -59,6 +59,6 @@ resource "aws_instance" "dictionary-ec2" {
   metadata_options {
   	http_endpoint = "enabled"
   	http_tokens = "required"
-	  instance_metadata_tags = "enabled"  
+	  instance_metadata_tags = "enabled"
   }
 }
