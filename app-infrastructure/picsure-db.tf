@@ -64,6 +64,6 @@ data "template_file" "resources-registration" {
 }
 
 resource "local_file" "resources-registration-file" {
-  content  = data.template_file.pic-sure-schema-sql.rendered
+  content  = data.template_file.resources-registration.rendered
   filename = "resources-registration.sql"
 }
