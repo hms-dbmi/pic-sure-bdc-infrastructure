@@ -4,6 +4,7 @@ The resources are not stored in a dynamic fashion so they need to be upserted wi
 
 **/
 
+USE `picsure`;
 -- Upsert to resources tables to handle stack hardcodings.
 -- We have multiple stacks so we CANNOT use the same UUID for both if they are both reliant on the same RDS
 -- if we ever want to make this compatiable with other interfaces we must make resource configuration more abstract and dynamic. - TD
