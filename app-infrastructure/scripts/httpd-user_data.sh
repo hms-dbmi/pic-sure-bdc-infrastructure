@@ -24,6 +24,10 @@ s3_copy() {
     sudo /usr/bin/aws --region us-east-1 s3 cp $* && break || sleep 30
   done
 }
+# sleep for awhile because as these files are could still be in the process of being rendered.
+# containerize already.
+echo "waiting for terraform to render files"
+sleep 2400
 
 s3_copy s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-ui.tar.gz /home/centos/pic-sure-ui.tar.gz
 s3_copy s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/httpd-vhosts.conf /usr/local/docker-config/httpd-vhosts.conf
