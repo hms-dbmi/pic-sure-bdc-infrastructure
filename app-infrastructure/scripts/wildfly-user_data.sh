@@ -40,15 +40,18 @@ s3_copy s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/
 # if no snapshot db will be empty use this to atleast initialize it somewhere for now. - TD
 if [ -z ${picsure_rds_snapshot_id} ]; then
   sudo docker run  -d --name schema-init -e "MYSQL_RANDOM_ROOT_PASSWORD=yes" --rm mysql
-  sudo docker exec -i schema-init mysql -hpicsure-db.${target_stack}.${env_private_dns_name} -uroot -p${mysql-instance-password} < /home/centos/resources-registration.sql
+  sudo docker exec -i schema-init mysql -hpicsure-db.${target_stack}.${env_private_dns_name} -uroot -p${mysql-instance-password} < /home/centos/pic-sure-schema.sql
   sudo docker stop schema-init
   echo "init'd mysql schemas"
 else
 # if snapshot of live stack rds is used we need to configure target stack rds resource table with deployed stacks resources.
 # We cannot and should not be doing CORS between stacks. -TD
   sudo docker run  -d --name schema-init -e "MYSQL_RANDOM_ROOT_PASSWORD=yes" --rm mysql
-  sudo docker exec -i schema-init mysql -hpicsure-db.${target_stack}.${env_private_dns_name} -uroot -p${mysql-instance-password} < /home/centos/pic-sure-schema.sql
+  sudo docker exec -i schema-init mysql -hpicsure-db.${target_stack}.${env_private_dns_name} -uroot -p${mysql-instance-password} < /home/centos/resources-registration.sql
+  sudo docker stop schema-init
+  echo "updated resources"
 fi
+
 WILDFLY_IMAGE=`sudo docker load < /home/centos/pic-sure-wildfly.tar.gz | cut -d ' ' -f 3`
 JAVA_OPTS="-Xms2g -Xmx26g -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=1024m -Djava.net.preferIPv4Stack=true"
 
