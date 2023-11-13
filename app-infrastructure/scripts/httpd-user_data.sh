@@ -24,7 +24,7 @@ s3_copy() {
     sudo /usr/bin/aws --region us-east-1 s3 cp $* && break || sleep 30
   done
 }
-# sleep for awhile because as these files could still be in the process of being rendered.
+# sleep for awhile as these files could still be in the process of being rendered.
 echo "waiting for terraform to render files"
 sleep 1200
 
