@@ -26,21 +26,34 @@ s3_copy() {
     sudo /usr/bin/aws --region us-east-1 s3 cp $* && break || sleep 30
   done
 }
+# sleep for awhile because as these files are could still be in the process of being rendered.
+# containerize already.
+echo "waiting for terraform to render files"
+sleep 600
 
 s3_copy s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-wildfly.tar.gz /home/centos/pic-sure-wildfly.tar.gz
 s3_copy s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/standalone.xml /home/centos/standalone.xml
 s3_copy s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/pic-sure-schema.sql /home/centos/pic-sure-schema.sql
+s3_copy s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/resources-registration.sql /home/centos/resources-registration.sql
 s3_copy s3://${stack_s3_bucket}/modules/mysql/module.xml /home/centos/mysql_module.xml
 s3_copy s3://${stack_s3_bucket}/modules/mysql/mysql-connector-java-5.1.38.jar /home/centos/mysql-connector-java-5.1.38.jar
 s3_copy s3://${stack_s3_bucket}/data/${dataset_s3_object_key}/fence_mapping.json /home/centos/fence_mapping.json
 s3_copy s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/aggregate-resource.properties /home/centos/aggregate-resource.properties
 s3_copy s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/visualization-resource.properties /home/centos/visualization-resource.properties
 
-if [ -z $picsure_rds_snapshot_id ]; then
+# if no snapshot db will be empty use this to atleast initialize it somewhere for now. - TD
+if [ -z ${picsure_rds_snapshot_id} ]; then
   sudo docker run  -d --name schema-init -e "MYSQL_RANDOM_ROOT_PASSWORD=yes" --rm mysql
   sudo docker exec -i schema-init mysql -hpicsure-db.${target_stack}.${env_private_dns_name} -uroot -p${mysql-instance-password} < /home/centos/pic-sure-schema.sql
   sudo docker stop schema-init
   echo "init'd mysql schemas"
+else
+# if snapshot of live stack rds is used we need to configure target stack rds resource table with deployed stacks resources.
+# We cannot and should not be doing CORS between stacks. -TD
+  sudo docker run  -d --name schema-init -e "MYSQL_RANDOM_ROOT_PASSWORD=yes" --rm mysql
+  sudo docker exec -i schema-init mysql -hpicsure-db.${target_stack}.${env_private_dns_name} -uroot -p${mysql-instance-password} < /home/centos/resources-registration.sql
+  sudo docker stop schema-init
+  echo "updated resources"
 fi
 
 WILDFLY_IMAGE=`sudo docker load < /home/centos/pic-sure-wildfly.tar.gz | cut -d ' ' -f 3`

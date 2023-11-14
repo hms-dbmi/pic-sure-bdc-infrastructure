@@ -29,3 +29,41 @@ resource "random_password" "picsure-db-password" {
   length  = 16
   special = false
 }
+
+data "template_file" "pic-sure-schema-sql" {
+  template = file("configs/pic-sure-schema.sql")
+  vars = {
+    picsure_token_introspection_token = var.picsure_token_introspection_token
+    target_stack                      = var.target_stack
+    env_private_dns_name              = var.env_private_dns_name
+    include_auth_hpds                 = var.include_auth_hpds
+    include_open_hpds                 = var.include_open_hpds
+  }
+}
+
+resource "local_file" "pic-sure-schema-sql-file" {
+  content  = data.template_file.pic-sure-schema-sql.rendered
+  filename = "pic-sure-schema.sql"
+}
+
+# Need to handle if the a stack is using a the hardcoded urls for resources in the db.
+# Upserts on deployments will at least ensure a newly deployed stack is using the correct urls for resources
+# This will not be a good methodology for standalone as each stack cannot use the same UUID. 
+# Need a more dynamic and abstract method to find resources instead of hardcoding them into config files.
+# Another table with simple uniq names that app can configure to lookup the UUIDs.
+# 
+data "template_file" "resources-registration" {
+  template = file("configs/resources-registration.sql")
+  vars = {
+    picsure_token_introspection_token = var.picsure_token_introspection_token
+    target_stack                      = var.target_stack
+    env_private_dns_name              = var.env_private_dns_name
+    include_auth_hpds                 = var.include_auth_hpds
+    include_open_hpds                 = var.include_open_hpds
+  }
+}
+
+resource "local_file" "resources-registration-file" {
+  content  = data.template_file.resources-registration.rendered
+  filename = "resources-registration.sql"
+}
