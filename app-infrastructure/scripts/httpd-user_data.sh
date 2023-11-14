@@ -32,6 +32,7 @@ s3_copy s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}
 s3_copy s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/httpd-vhosts.conf /usr/local/docker-config/httpd-vhosts.conf
 s3_copy s3://${stack_s3_bucket}/certs/httpd/ /usr/local/docker-config/cert/ --recursive
 s3_copy s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/picsureui_settings.json /usr/local/docker-config/picsureui_settings.json
+s3_copy s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/banner_config.json /usr/local/docker-config/banner_config.json
 s3_copy s3://${stack_s3_bucket}/data/${dataset_s3_object_key}/fence_mapping.json /home/centos/fence_mapping.json
 
 for i in 1 2 3 4 5; do echo "confirming wildfly resolvable" && sudo curl --connect-timeout 1 $(grep -A30 preprod /usr/local/docker-config/httpd-vhosts.conf | grep wildfly | grep api | cut -d "\"" -f 2 | sed 's/pic-sure-api-2.*//') || if [ $? = 6 ]; then (exit 1); fi && break || sleep 60; done
@@ -44,6 +45,7 @@ sudo docker run --name=httpd \
                 --log-driver syslog --log-opt tag=httpd \
                 -v /var/log/httpd-docker-logs/:/usr/local/apache2/logs/ \
                 -v /usr/local/docker-config/picsureui_settings.json:/usr/local/apache2/htdocs/picsureui/settings/settings.json \
+                -v /usr/local/docker-config/banner_config.json:/usr/local/apache2/htdocs/picsureui/settings/banner_config.json \
                 -v /home/centos/fence_mapping.json:/usr/local/apache2/htdocs/picsureui/studyAccess/studies-data.json \
                 -v /usr/local/docker-config/cert:/usr/local/apache2/cert/ \
                 -v /usr/local/docker-config/httpd-vhosts.conf:/usr/local/apache2/conf/extra/httpd-vhosts.conf \
