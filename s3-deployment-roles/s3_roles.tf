@@ -119,6 +119,13 @@ resource "aws_iam_role_policy" "wildfly-deployment-s3-policy" {
       ],
       "Effect": "Allow",
       "Resource": "arn:aws:ec2:*:*:instance/*"
+    },
+    {
+      "Action": [
+        "cloudwatch:PutMetricData"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
     }
   ]
 }
@@ -260,6 +267,13 @@ resource "aws_iam_role_policy" "httpd-deployment-s3-policy" {
       ],
       "Effect": "Allow",
       "Resource": "arn:aws:ec2:*:*:instance/*"
+    },
+    {
+      "Action": [
+        "cloudwatch:PutMetricData"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
     }
   ]
 }
@@ -383,6 +397,13 @@ resource "aws_iam_role_policy" "auth-hpds-deployment-s3-policy" {
       ],
       "Effect": "Allow",
       "Resource": "arn:aws:ec2:*:*:instance/*"
+    },
+    {
+      "Action": [
+        "cloudwatch:PutMetricData"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
     }
   ]
 }
@@ -485,6 +506,13 @@ resource "aws_iam_role_policy" "open-hpds-deployment-s3-policy" {
       ],
       "Effect": "Allow",
       "Resource": "arn:aws:ec2:*:*:instance/*"
+    },
+    {
+      "Action": [
+        "cloudwatch:PutMetricData"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
     }
   ]
 }
@@ -565,6 +593,13 @@ resource "aws_iam_role_policy" "dictionary-deployment-s3-policy" {
       ],
       "Effect": "Allow",
       "Resource": "arn:aws:ec2:*:*:instance/*"
+    },
+    {
+      "Action": [
+        "cloudwatch:PutMetricData"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
     }
   ]
 }
