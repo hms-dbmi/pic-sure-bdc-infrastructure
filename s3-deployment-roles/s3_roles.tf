@@ -145,13 +145,6 @@ resource "aws_iam_role" "wildfly-deployment-s3-role" {
       },
       "Effect": "Allow",
       "Sid": ""
-    },
-    {
-      "Action": [
-        "cloudwatch:PutMetricData"
-      ],
-      "Effect": "Allow",
-      "Resource": "*"
     }
   ]
 }
@@ -300,13 +293,6 @@ resource "aws_iam_role" "httpd-deployment-s3-role" {
       },
       "Effect": "Allow",
       "Sid": ""
-    },
-    {
-      "Action": [
-        "cloudwatch:PutMetricData"
-      ],
-      "Effect": "Allow",
-      "Resource": "*"
     }
   ]
 }
@@ -437,13 +423,6 @@ resource "aws_iam_role" "auth-hpds-deployment-s3-role" {
       },
       "Effect": "Allow",
       "Sid": ""
-    },
-    {
-      "Action": [
-        "cloudwatch:PutMetricData"
-      ],
-      "Effect": "Allow",
-      "Resource": "*"
     }
   ]
 }
@@ -553,13 +532,6 @@ resource "aws_iam_role" "open-hpds-deployment-s3-role" {
       },
       "Effect": "Allow",
       "Sid": ""
-    },
-    {
-      "Action": [
-        "cloudwatch:PutMetricData"
-      ],
-      "Effect": "Allow",
-      "Resource": "*"
     }
   ]
 }
@@ -647,13 +619,6 @@ resource "aws_iam_role" "dictionary-deployment-s3-role" {
       },
       "Effect": "Allow",
       "Sid": ""
-    },
-    {
-      "Action": [
-        "cloudwatch:PutMetricData"
-      ],
-      "Effect": "Allow",
-      "Resource": "*"
     }
   ]
 }
