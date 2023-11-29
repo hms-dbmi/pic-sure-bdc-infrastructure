@@ -232,6 +232,12 @@ resource "aws_iam_role_policy" "httpd-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/jenkins_pipeline_build_${var.stack_githash_long}/banner_config.json"
+    },{
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
       "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/data/${var.dataset_s3_object_key}/fence_mapping.json"
     },{
       "Action": [
