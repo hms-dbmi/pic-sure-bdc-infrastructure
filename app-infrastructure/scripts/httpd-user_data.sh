@@ -45,7 +45,7 @@ sudo docker run --name=httpd \
                 --log-driver syslog --log-opt tag=httpd \
                 -v /var/log/httpd-docker-logs/:/usr/local/apache2/logs/ \
                 -v /usr/local/docker-config/picsureui_settings.json:/usr/local/apache2/htdocs/picsureui/settings/settings.json \
-                -v /usr/local/docker-config/banner_config.json:/usr/local/apache2/htdocs/picsureui/banner_config.json \
+                -v /usr/local/docker-config/banner_config.json:/usr/local/apache2/htdocs/picsureui/settings/banner_config.json \
                 -v /home/centos/fence_mapping.json:/usr/local/apache2/htdocs/picsureui/studyAccess/studies-data.json \
                 -v /usr/local/docker-config/cert:/usr/local/apache2/cert/ \
                 -v /usr/local/docker-config/httpd-vhosts.conf:/usr/local/apache2/conf/extra/httpd-vhosts.conf \
