@@ -129,14 +129,9 @@ echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} norm
 wait
 
 echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} normalize stage
-bcftools view --exclude-types bnd,other -O z -o ${study_id}${consent_group_tag}.chr${chrom_number}.cleaned.vcf.gz ${study_id}${consent_group_tag}.chr${chrom_number}.normalized.vcf.gz &
-echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} cleanup stage
 
-wait
 
-echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} cleanup stage
-
-/home/centos/htslib/bgzip -d /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.cleaned.vcf.gz &
+/home/centos/htslib/bgzip -d /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.normalized.vcf.gz &
 echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} decompress stage
 
 wait
@@ -150,7 +145,7 @@ echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} dec
 --fork 4 \
 --dir_cache /root/.vep \
 --species homo_sapiens \
---input_file /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.cleaned.vcf \
+--input_file /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.normalized.vcf \
 --format vcf \
 --output_file /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.annotated.vcf \
 --no_stats \
@@ -174,7 +169,15 @@ echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} vep
 echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} compressing stage
 wait
 echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} compressing stage
-/home/centos/htslib/tabix /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.annotated.vcf.gz &
+
+bcftools view --exclude-types bnd,other -O z -o ${study_id}${consent_group_tag}.chr${chrom_number}.cleaned.vcf.gz ${study_id}${consent_group_tag}.chr${chrom_number}.annotated.vcf.gz &
+echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} cleanup stage
+
+wait
+
+echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} cleanup stage
+
+/home/centos/htslib/tabix /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.cleaned.vcf.gz &
 echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} tabix stage
 wait
 echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} tabix stage
@@ -182,7 +185,7 @@ echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} tab
 /bin/python3 /home/centos/python_script/hpds_annotation/transform_csq.v3.py \
 -R /home/centos/fasta/Homo_sapiens_assembly38.fasta \
 --vep-gnomad-af gnomADg_AF \
-/home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.annotated.vcf.gz \
+/home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.cleaned.vcf.gz \
 /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.annotated.hpds.vcf.gz
 
 echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} python stage
