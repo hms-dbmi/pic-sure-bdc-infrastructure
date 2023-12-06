@@ -170,7 +170,7 @@ echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} comp
 wait
 echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} compressing stage
 
-bcftools view --exclude-types bnd,other -O z -o ${study_id}${consent_group_tag}.chr${chrom_number}.cleaned.vcf.gz ${study_id}${consent_group_tag}.chr${chrom_number}.annotated.vcf.gz &
+bcftools view --exclude-types bnd,other -O z -o /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.cleaned.vcf.gz /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.annotated.vcf.gz &
 echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} cleanup stage
 
 wait
