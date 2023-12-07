@@ -96,9 +96,10 @@
 		"The_Jackson_Heart_Study_JHS_",
 		"_Consents"
 	],
-	"idp_provider":"fence",
-	"idp_provider_uri":"https://gen3.biodatacatalyst.nhlbi.nih.gov",
-	"fence_client_id":"${fence_client_id}",
-	"fence_redirect_url":"https://biodatacatalyst.integration.hms.harvard.edu/psamaui/login/",
-	"analytics_id":"${analytics_id}"
+	"idp_provider": "fence",
+	"idp_provider_uri": "https://gen3.biodatacatalyst.nhlbi.nih.gov",
+	"fence_client_id": "${fence_client_id}",
+	"fence_redirect_url": "https://biodatacatalyst.integration.hms.harvard.edu/psamaui/login/",
+	"analyticsId": "${analytics_id}",
+	"tagManagerId": "${tag_manager_id}"
 }
