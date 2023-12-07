@@ -119,7 +119,7 @@ mkdir /var/log/wildfly-docker-logs/
 sudo chmod a+w /var/log/wildfly-docker*
 
 WILDFLY_IMAGE=`sudo docker load < pic-sure-wildfly.tar.gz | cut -d ' ' -f 3`
-JAVA_OPTS="-Xms2g -Xmx26g -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=256m -Djava.net.preferIPv4Stack=true"
+JAVA_OPTS="-Xms2g -Xmx26g -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=256m -Djava.net.preferIPv4Stack=true -DTARGET_STACK=${target-stack} "
 sudo docker run --name=wildfly \
 -v /var/log/wildfly-docker-logs/:/opt/jboss/wildfly/standalone/log/ \
 -v /home/centos/standalone.xml:/opt/jboss/wildfly/standalone/configuration/standalone.xml \
