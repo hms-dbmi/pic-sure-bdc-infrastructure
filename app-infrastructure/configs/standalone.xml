@@ -575,13 +575,18 @@
                     <location name="/" handler="welcome-content"/>
                     <http-invoker security-realm="ApplicationRealm"/>
                     <filter-ref name="gzipFilter" predicate="exists['%%{o,Content-Type}'] and regex[pattern='(?:application/javascript|text/css|text/html|text/xml|application/json)(;.*)?', value=%%{o,Content-Type}, full-match=true]"/>
-      <filter-ref name="Vary-header"/>
+                    <filter-ref name="Vary-header"/>
 
-		</host>
+                </host>
             </server>
             <servlet-container name="default">
                 <jsp-config/>
                 <websockets/>
+                <setting name="disable-caching-for-secured-pages" value="true"/>
+                <setting name="cookies">
+                    <cookie name="httpOnly" value="true"/>
+                    <cookie name="secure" value="true"/>
+                </setting>
             </servlet-container>
 	    <filters>
     <gzip name="gzipFilter"/>
