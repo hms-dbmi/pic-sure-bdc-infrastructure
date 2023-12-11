@@ -582,11 +582,6 @@
             <servlet-container name="default">
                 <jsp-config/>
                 <websockets/>
-                <setting name="disable-caching-for-secured-pages" value="true"/>
-                <setting name="cookies">
-                    <cookie name="httpOnly" value="true"/>
-                    <cookie name="secure" value="true"/>
-                </setting>
             </servlet-container>
 	    <filters>
     <gzip name="gzipFilter"/>
