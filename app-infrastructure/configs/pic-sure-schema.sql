@@ -101,11 +101,14 @@ CREATE TABLE `resource` (
 --
 -- Dumping data for table `resource`
 --
+-- ___target_stack___ will be replaced by the appropriate target stack via the TARGET_STACK environment variable
+-- See edu.harvard.dbmi.avillach.data.entity.Resource for details
+--
 LOCK TABLES `resource` WRITE;
 /*!40000 ALTER TABLE `resource` DISABLE KEYS */;
-${include_auth_hpds ? "INSERT INTO `resource` VALUES (0x02E23F52F3544E8B992CD37C8B9BA140,NULL,'http://auth-hpds.___target_stack___.${env_private_dns_name}:8080/PIC-SURE/','Authorized Access HPDS resource','auth-hpds',NULL, NULL, NULL);" : ""}
+${include_auth_hpds ? "INSERT INTO `resource` VALUES (0x02E23F52F3544E8B992CD37C8B9BA140,NULL,'http://auth-hpds.___target_stack___:8080/PIC-SURE/','Authorized Access HPDS resource','auth-hpds',NULL, NULL, NULL);" : ""}
 ${include_open_hpds ? "INSERT INTO `resource` VALUES (0x70c837be5ffc11ebae930242ac130002,NULL,'http://localhost:8080/pic-sure-aggregate-resource/pic-sure/aggregate-data-sharing','Open Access (aggregate) resource','open-hpds',NULL, NULL, NULL);" : ""}
-INSERT INTO `resource` VALUES (0x36363664623161342d386538652d3131,NULL,'http://dictionary.___target_stack___.${env_private_dns_name}:8080/dictionary/pic-sure','Dictionary','dictionary',NULL, NULL, NULL);
+INSERT INTO `resource` VALUES (0x36363664623161342d386538652d3131,NULL,'http://dictionary.___target_stack___:8080/dictionary/pic-sure','Dictionary','dictionary',NULL, NULL, NULL);
 INSERT INTO `resource` VALUES (0xCA0AD4A9130A3A8AAE00E35B07F1108B,NULL,'http://localhost:8080/pic-sure-visualization-resource/pic-sure/visualization','Visualization','visualization',NULL, NULL, NULL);
 /*!40000 ALTER TABLE `resource` ENABLE KEYS */;
 UNLOCK TABLES;
