@@ -507,7 +507,7 @@
                 <simple name="java:global/KeyTimeOutInMinutes" value="720"/>
                 <simple name="java:global/userField" value="sub"/>
                 <simple name="java:global/longTermTokenExpirationTime" value="2592000000"/>
-                <simple name="java:lobal/tokenExpirationTime" value="3600000"/>
+                <simple name="java:global/tokenExpirationTime" value="3600000"/>
             </bindings>
             <remote-naming/>
         </subsystem>
