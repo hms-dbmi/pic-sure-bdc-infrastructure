@@ -507,7 +507,7 @@
                 <simple name="java:global/KeyTimeOutInMinutes" value="720"/>
                 <simple name="java:global/userField" value="sub"/>
                 <simple name="java:global/longTermTokenExpirationTime" value="2592000000"/>
-                <simple name="java:global/tokenExpirationTime" value="3600000"/>
+                <simple name="java:lobal/tokenExpirationTime" value="3600000"/>
             </bindings>
             <remote-naming/>
         </subsystem>
@@ -580,13 +580,13 @@
                 </host>
             </server>
             <servlet-container name="default">
+                <session-cookie http-only="true" secure="true"/>
                 <jsp-config/>
-                <websockets/>
             </servlet-container>
 	    <filters>
-    <gzip name="gzipFilter"/>
-    <response-header name="Vary-header" header-name="Vary" header-value="Accept-Encoding"/>
-  </filters>
+            <gzip name="gzipFilter"/>
+            <response-header name="Vary-header" header-name="Vary" header-value="Accept-Encoding"/>
+        </filters>
             <handlers>
                 <file name="welcome-content" path="$${jboss.home.dir}/welcome-content"/>
             </handlers>
