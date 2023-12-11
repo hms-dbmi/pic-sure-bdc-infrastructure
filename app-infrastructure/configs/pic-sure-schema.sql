@@ -100,6 +100,8 @@ CREATE TABLE `resource` (
 
 --
 -- Dumping data for table `resource`
+-- ___target_stack___ will be replaced by the appropriate target stack.
+-- See edu.harvard.dbmi.avillach.data.entity.Resource for details
 --
 
 LOCK TABLES `resource` WRITE;
