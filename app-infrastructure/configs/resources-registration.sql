@@ -13,4 +13,4 @@ ${include_auth_hpds ? "INSERT INTO `resource` VALUES (0x02E23F52F3544E8B992CD37C
 INSERT INTO `resource` VALUES (0x36363664623161342d386538652d3131, NULL, 'http://dictionary.${target_stack}.${env_private_dns_name}:8080/dictionary/pic-sure', 'Dictionary', 'dictionary', NULL, NULL, NULL) ON DUPLICATE KEY UPDATE `resourceRSPath` = VALUES(`resourceRSPath`);
 
 -- Need to upsert token incase it already exists 
-INSERT INTO `application` VALUES (0x8B5722C962FD48D6B0BF4F67E53EFB2B,'PIC-SURE multiple data access API',0x01,'PICSURE','${picsure_token_introspection_token}','/picsureui') ON DUPLICATE KEY UPDATE 'token' = VALUES('token');
+INSERT INTO `application` VALUES (0x8B5722C962FD48D6B0BF4F67E53EFB2B,'PIC-SURE multiple data access API',0x01,'PICSURE','${picsure_token_introspection_token}','/picsureui') ON DUPLICATE KEY UPDATE `token` = VALUES(`token`);
