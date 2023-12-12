@@ -1,12 +1,11 @@
-
 data "template_file" "httpd-user_data" {
   template = file("scripts/httpd-user_data.sh")
   vars = {
-    stack_githash   = var.stack_githash_long
-    fence_client_id = var.fence_client_id
-    stack_s3_bucket = var.stack_s3_bucket
-    dataset_s3_object_key = var.dataset-s3-object-key
-    target-stack    = var.target-stack
+    stack_githash         = var.stack_githash_long
+    stack_s3_bucket       = var.stack_s3_bucket
+    dataset_s3_object_key = var.dataset_s3_object_key
+    target_stack          = var.target_stack
+    gss_prefix            = "bdc_${var.env_is_open_access ? "open" : "auth"}_${var.environment_name}"
   }
 }
 
@@ -23,25 +22,20 @@ data "template_cloudinit_config" "httpd-user-data" {
 }
 
 resource "aws_instance" "httpd-ec2" {
-  ami           = var.ami-id
+  ami           = local.ami_id
   instance_type = "m5.large"
 
-  key_name = "biodata_nessus"
+  subnet_id = local.private1_subnet_ids[0]
 
-  associate_public_ip_address = false
-
-  subnet_id = var.edge-subnet-us-east-1a-id
-
-  iam_instance_profile = "httpd-deployment-s3-profile-${var.target-stack}-${var.stack_githash}"
+  iam_instance_profile = "httpd-deployment-s3-profile-${var.target_stack}-${local.uniq_name}"
 
   user_data = data.template_cloudinit_config.httpd-user-data.rendered
 
   vpc_security_group_ids = [
     aws_security_group.outbound-to-internet.id,
-    aws_security_group.inbound-from-public-internet.id,
-    aws_security_group.outbound-to-app.id,
-    aws_security_group.inbound-edge-ssh-from-nessus.id
+    aws_security_group.inbound-httpd-from-alb.id,
   ]
+
   root_block_device {
     delete_on_termination = true
     encrypted             = true
@@ -49,15 +43,18 @@ resource "aws_instance" "httpd-ec2" {
   }
 
   tags = {
+    Node        = "HTTPD"
     Owner       = "Avillach_Lab"
-    Environment = "development"
-    Name        = "FISMA Terraform Playground - ${var.stack_githash} - Apache HTTPD - ${var.target-stack}"
+    Environment = var.environment_name
+    Stack       = var.target_stack
+    Project     = local.project
+    Name        = "Apache HTTPD - ${var.target_stack} - ${local.uniq_name}"
   }
-  
+
   metadata_options {
-  	http_endpoint = "enabled"
-  	http_tokens = "required"
-	  instance_metadata_tags = "enabled"  
+    http_endpoint          = "enabled"
+    http_tokens            = "required"
+    instance_metadata_tags = "enabled"
   }
 
 }
@@ -65,30 +62,35 @@ resource "aws_instance" "httpd-ec2" {
 data "template_file" "httpd-vhosts-conf" {
   template = file("configs/httpd-vhosts.conf")
   vars = {
+
     wildfly-base-url = "http://${aws_instance.wildfly-ec2.private_ip}:8080"
-    target-stack = var.target-stack
+    target_stack = var.target_stack
     release-id = var.stack_githash_long
-    allowed_hosts = var.allowed_hosts
+    env_private_dns_name        = var.env_private_dns_name
+    env_public_dns_name         = var.env_public_dns_name
+    env_public_dns_name_staging = var.env_public_dns_name_staging
   }
 }
 
 resource "local_file" "httpd-vhosts-conf-file" {
-    content     = data.template_file.httpd-vhosts-conf.rendered
-    filename = "httpd-vhosts.conf"
+  content  = data.template_file.httpd-vhosts-conf.rendered
+  filename = "httpd-vhosts.conf"
 }
 
 
 data "template_file" "picsureui_settings" {
   template = file("configs/picsureui_settings.json")
   vars = {
-    fence_client_id = var.fence_client_id
-    analytics_id = var.analytics_id
-    tag_manager_id = var.tag_manager_id
+    analytics_id                  = var.analytics_id,
+    tag_manager_id                = var.tag_manager_id
+    fence_client_id               = var.fence_client_id
+    idp_provider                  = var.idp_provider
+    idp_provider_uri              = var.idp_provider_uri
+    application_id_for_base_query = var.application_id_for_base_query
   }
 }
 
 resource "local_file" "picsureui-settings-json" {
-    content     = data.template_file.picsureui_settings.rendered
-    filename = "picsureui-settings.json"
+  content  = data.template_file.picsureui_settings.rendered
+  filename = "picsureui-settings.json"
 }
-

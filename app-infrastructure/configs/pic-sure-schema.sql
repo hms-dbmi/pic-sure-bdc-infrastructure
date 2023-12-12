@@ -101,12 +101,11 @@ CREATE TABLE `resource` (
 --
 -- Dumping data for table `resource`
 --
-
 LOCK TABLES `resource` WRITE;
 /*!40000 ALTER TABLE `resource` DISABLE KEYS */;
-INSERT INTO `resource` VALUES (0x02E23F52F3544E8B992CD37C8B9BA140,NULL,'http://auth-hpds.${target-stack}.datastage.hms.harvard.edu:8080/PIC-SURE/','Authorized Access HPDS resource','auth-hpds',NULL, NULL, NULL);
-INSERT INTO `resource` VALUES (0x70c837be5ffc11ebae930242ac130002,NULL,'http://localhost:8080/pic-sure-aggregate-resource/pic-sure/aggregate-data-sharing','Open Access (aggregate) resource','open-hpds',NULL, NULL, NULL);
-INSERT INTO `resource` VALUES (0x36363664623161342d386538652d3131,NULL,'http://dictionary.${target-stack}.datastage.hms.harvard.edu:8080/dictionary/pic-sure','Dictionary','dictionary',NULL, NULL, NULL);
+${include_auth_hpds ? "INSERT INTO `resource` VALUES (0x02E23F52F3544E8B992CD37C8B9BA140,NULL,'http://auth-hpds.${target_stack}.${env_private_dns_name}:8080/PIC-SURE/','Authorized Access HPDS resource','auth-hpds',NULL, NULL, NULL);" : ""}
+${include_open_hpds ? "INSERT INTO `resource` VALUES (0x70c837be5ffc11ebae930242ac130002,NULL,'http://localhost:8080/pic-sure-aggregate-resource/pic-sure/aggregate-data-sharing','Open Access (aggregate) resource','open-hpds',NULL, NULL, NULL);" : ""}
+INSERT INTO `resource` VALUES (0x36363664623161342d386538652d3131,NULL,'http://dictionary.${target_stack}.${env_private_dns_name}:8080/dictionary/pic-sure','Dictionary','dictionary',NULL, NULL, NULL);
 INSERT INTO `resource` VALUES (0xCA0AD4A9130A3A8AAE00E35B07F1108B,NULL,'http://localhost:8080/pic-sure-visualization-resource/pic-sure/visualization','Visualization','visualization',NULL, NULL, NULL);
 /*!40000 ALTER TABLE `resource` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -671,28 +670,6 @@ VALUES (
 
 INSERT INTO accessRule_privilege (privilege_id, accessRule_id)
 SELECT privilege.uuid, unhex(@uuidGate) from privilege, role_privilege, role
-where privilege.uuid = role_privilege.privilege_id
-  AND role_privilege.role_id = role.uuid
-  AND role.name = 'FENCE_ROLE_OPEN_ACCESS';
-
-SET @searchValuesAccessRuleUUID = REPLACE(uuid(),'-','');
-INSERT INTO access_rule (uuid, name, description, rule, type, value, checkMapKeyOnly, checkMapNode, subAccessRuleParent_uuid, isEvaluateOnlyByGates, isGateAnyRelation)
-VALUES (
-           unhex(@searchValuesAccessRuleUUID),
-           'ALLOW_SEARCH_VALUES_ACCESS',
-           'Allow access to search values endpoint',
-           '$.path',
-           11,
-           '/search/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/values',
-           false,
-           true,
-           NULL,
-           true,
-           false
-       );
-
-INSERT INTO accessRule_privilege (privilege_id, accessRule_id)
-SELECT privilege.uuid, unhex(@searchValuesAccessRuleUUID) from privilege, role_privilege, role
 where privilege.uuid = role_privilege.privilege_id
   AND role_privilege.role_id = role.uuid
   AND role.name = 'FENCE_ROLE_OPEN_ACCESS';
