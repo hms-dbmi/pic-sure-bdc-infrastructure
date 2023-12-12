@@ -582,6 +582,7 @@
             <servlet-container name="default">
                 <jsp-config/>
                 <websockets/>
+                <session-cookie http-only="true" secure="true"/>
             </servlet-container>
 	    <filters>
     <gzip name="gzipFilter"/>
