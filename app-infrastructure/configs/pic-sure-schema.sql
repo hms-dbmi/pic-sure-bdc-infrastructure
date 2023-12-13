@@ -697,3 +697,18 @@ SELECT privilege.uuid, unhex(@searchValuesAccessRuleUUID) from privilege, role_p
 where privilege.uuid = role_privilege.privilege_id
   AND role_privilege.role_id = role.uuid
   AND role.name = 'FENCE_ROLE_OPEN_ACCESS';
+
+-- TODO: Make below better
+
+INSERT INTO privilege VALUES 
+(0x7044061AF65B425F86CE73A1BF7F4402,'PIC-SURE Auth super admin for managing roles/privileges/application/connections','SUPER_ADMIN',NULL,'[]',NULL),
+(0xAD08212E096F414CBA8D1BAE09415DAB,'PIC-SURE Auth admin for managing users.','ADMIN',NULL,'[]',NULL);
+
+INSERT INTO role VALUES (0x002DC366B0D8420F998F885D0ED797FD,'PIC-SURE Top Admin','PIC-SURE Auth Micro App Top admin including Admin and super Admin, can manage roles and privileges directly');
+INSERT INTO role VALUES (0x8F885D0ED797FD002DC366B0D8420F99,'Admin','Normal admin users, can manage other users including assignment of roles and privileges');
+
+INSERT INTO role_privilege VALUES 
+(0x002DC366B0D8420F998F885D0ED797FD,0x7044061AF65B425F86CE73A1BF7F4402),
+(0x002DC366B0D8420F998F885D0ED797FD,0xAD08212E096F414CBA8D1BAE09415DAB),
+(0x8F885D0ED797FD002DC366B0D8420F99,0xAD08212E096F414CBA8D1BAE09415DAB);
+
