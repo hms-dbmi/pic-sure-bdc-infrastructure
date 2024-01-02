@@ -6,7 +6,7 @@ data "template_file" "auth_hpds-user_data" {
     genomic_dataset_s3_object_key = var.genomic_dataset_s3_object_key
     stack_s3_bucket               = var.stack_s3_bucket
     target_stack                  = var.target_stack
-    gss_prefix                    = "bdc_${var.env_is_open_access ? "open" : "auth"}_${var.environment_name}"
+    gss_prefix          = "${var.environment_prefix}_${var.env_is_open_access ? "open" : "auth"}_${var.environment_name}"
   }
 }
 

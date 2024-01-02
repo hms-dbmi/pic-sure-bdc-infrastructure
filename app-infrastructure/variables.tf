@@ -133,3 +133,8 @@ variable "tag_manager_id" {
 variable "env_project" {
   type = string
 }
+
+variable "environment_prefix" {
+  type = string
+  default = "bdc"
+}
