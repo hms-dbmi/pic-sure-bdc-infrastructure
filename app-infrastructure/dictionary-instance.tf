@@ -5,7 +5,7 @@ data "template_file" "dictionary-user-data-template" {
     stack_s3_bucket = var.stack_s3_bucket
     target_stack    = var.target_stack
     dataset_s3_object_key = var.dataset_s3_object_key
-    gss_prefix      = "bdc_${var.env_is_open_access ? "open" : "auth"}_${var.environment_name}"
+    gss_prefix          = "${var.environment_prefix}_${var.env_is_open_access ? "open" : "auth"}_${var.environment_name}"
   }
 }
 
