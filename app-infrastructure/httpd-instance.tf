@@ -88,6 +88,7 @@ data "template_file" "picsureui_settings" {
     idp_provider_uri              = var.idp_provider_uri
     application_id_for_base_query = var.application_id_for_base_query
     help_link                     = var.help_link
+    login_link                    = var.login_link
   }
 }
 

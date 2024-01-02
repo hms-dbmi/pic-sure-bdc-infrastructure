@@ -143,3 +143,9 @@ variable "help_link" {
   type = string
   default = "https://biodatacatalyst.nhlbi.nih.gov/contact\" aria-label='Contact Us, this link will open a new browser tab' target='_blank'"
 }
+
+variable "login_link" {
+    type = string
+    Description = "Relative or absolute URL to redirect to upon login"
+    default = "/psamaui/login/?redirection_url=/picsureui/"
+}
