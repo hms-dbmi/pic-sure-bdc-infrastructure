@@ -138,3 +138,8 @@ variable "environment_prefix" {
   type = string
   default = "bdc"
 }
+
+variable "help_link" {
+  type = string
+  default = "https://biodatacatalyst.nhlbi.nih.gov/contact\" aria-label='Contact Us, this link will open a new browser tab' target='_blank'"
+}
