@@ -5,7 +5,7 @@ data "template_file" "open_hpds-user_data" {
     destigmatized_dataset_s3_object_key = var.destigmatized_dataset_s3_object_key
     stack_s3_bucket                     = var.stack_s3_bucket
     target_stack                        = var.target_stack
-    gss_prefix                          = "bdc_${var.env_is_open_access ? "open" : "auth"}_${var.environment_name}"
+    gss_prefix          = "${var.environment_prefix}_${var.env_is_open_access ? "open" : "auth"}_${var.environment_name}"
   }
 }
 
