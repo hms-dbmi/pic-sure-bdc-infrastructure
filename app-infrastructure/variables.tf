@@ -138,3 +138,14 @@ variable "environment_prefix" {
   type = string
   default = "bdc"
 }
+
+variable "help_link" {
+  type = string
+  default = "https://bdcatalyst.freshdesk.com/support/home"
+}
+
+variable "login_link" {
+    type = string
+    description = "Relative or absolute URL to redirect to upon login"
+    default = "/psamaui/login/?redirection_url=/picsureui/"
+}
