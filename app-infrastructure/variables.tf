@@ -146,6 +146,6 @@ variable "help_link" {
 
 variable "login_link" {
     type = string
-    Description = "Relative or absolute URL to redirect to upon login"
+    description = "Relative or absolute URL to redirect to upon login"
     default = "/psamaui/login/?redirection_url=/picsureui/"
 }
