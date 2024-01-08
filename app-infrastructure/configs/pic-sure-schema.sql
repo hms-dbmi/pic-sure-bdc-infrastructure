@@ -712,3 +712,6 @@ INSERT INTO role_privilege VALUES
 (0x002DC366B0D8420F998F885D0ED797FD,0xAD08212E096F414CBA8D1BAE09415DAB),
 (0x8F885D0ED797FD002DC366B0D8420F99,0xAD08212E096F414CBA8D1BAE09415DAB);
 
+INSERT INTO access_rule (uuid, name, description, rule, type, value, checkMapKeyOnly, checkMapNode, subAccessRuleParent_uuid, isEvaluateOnlyByGates, isGateAnyRelation) 
+	VALUES (uuid(),'AR_ALLOW_ANY_QUERY_TO_HPDS','allow Any Query to hpds auth resource','$.query.resourceUUID',9,'02e23f52-f354-4e8b-992c-d37c8b9ba140',0, 0, NULL,0,0);
+
