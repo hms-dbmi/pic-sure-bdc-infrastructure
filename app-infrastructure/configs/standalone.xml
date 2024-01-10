@@ -468,10 +468,16 @@
                <!-- psama configuration-->
                 <simple name="java:global/client_secret" value="${picsure_client_secret}"/>
                 <simple name="java:global/client_id" value="NOT_USED_WITH_FENCE"/>
+
+                <!-- Configure OTKA Parameters -->
+                <simple name="java:global/okta_client_api_token" value="${okta_client_api_token}"/>
+                <simple name="java:global/okta_client_origin" value="${okta_client_origin}"/>
+
                 <!-- Configure Identity Provider Parameters, with defaults-->
                 <simple name="java:global/idp_provider" value="${idp_provider}"/>
                 <simple name="java:global/idp_provider_uri" value="${idp_provider_uri}/" />
 
+                <!-- Configure Fence Parameters, with defaults-->
                 <simple name="java:global/fence_client_id" value="${fence_client_id}"/>
                 <simple name="java:global/fence_client_secret" value="${fence_client_secret}"/>
                 <simple name="java:global/fence_redirect_url" value="https://${env_public_dns_name}/psamaui/login/" />

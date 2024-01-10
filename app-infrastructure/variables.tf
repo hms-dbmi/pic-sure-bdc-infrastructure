@@ -149,3 +149,15 @@ variable "login_link" {
     description = "Relative or absolute URL to redirect to upon login"
     default = "/psamaui/login/?redirection_url=/picsureui/"
 }
+
+variable "okta_client_api_token" {
+  type = string
+  default = "disabled"
+  description = "The api token for the okta application. Used for session management currently."
+}
+
+variable "okta_client_origin" {
+  type = string
+  default = "disabled"
+    description = "The domain of the okta application. Used for session management currently."
+}
