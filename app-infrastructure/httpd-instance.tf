@@ -1,5 +1,5 @@
 module "httpd" {
-  source                        = "../terraform_module_approach/httpd"
+  source                        = "../terraform_module_approach/modules/httpd"
   ami_id                        = local.ami_id
   application_id_for_base_query = var.application_id_for_base_query
   dataset_s3_object_key         = var.dataset_s3_object_key
