@@ -698,20 +698,37 @@ where privilege.uuid = role_privilege.privilege_id
   AND role_privilege.role_id = role.uuid
   AND role.name = 'FENCE_ROLE_OPEN_ACCESS';
 
--- TODO: Make below better
+-- 
+-- Create Super Admin and admin roles and privileges
+-- 
+@superAdminPrivilegeUUID = UNHEX('7044061AF65B425F86CE73A1BF7F4402');
+@adminPrivilegeUUID = UNHEX('AD08212E096F414CBA8D1BAE09415DAB');
 
-INSERT INTO privilege VALUES 
-(0x7044061AF65B425F86CE73A1BF7F4402,'PIC-SURE Auth super admin for managing roles/privileges/application/connections','SUPER_ADMIN',NULL,'[]',NULL),
-(0xAD08212E096F414CBA8D1BAE09415DAB,'PIC-SURE Auth admin for managing users.','ADMIN',NULL,'[]',NULL);
+INSERT INTO privilege (uuid, description, name, application_id, queryTemplate, queryScope) VALUES
+(@superAdminPrivilegeUUID,'PIC-SURE Auth super admin for managing roles/privileges/application/connections','SUPER_ADMIN',NULL,'[]',NULL),
+(@adminPrivilegeUUID,'PIC-SURE Auth admin for managing users.','ADMIN',NULL,'[]',NULL);
 
-INSERT INTO role VALUES (0x002DC366B0D8420F998F885D0ED797FD,'PIC-SURE Top Admin','PIC-SURE Auth Micro App Top admin including Admin and super Admin, can manage roles and privileges directly');
-INSERT INTO role VALUES (0x8F885D0ED797FD002DC366B0D8420F99,'Admin','Normal admin users, can manage other users including assignment of roles and privileges');
+@superAdminRoleUUID = UNHEX('002DC366B0D8420F998F885D0ED797FD');
+@adminRoleUUID = UNHEX('8F885D0ED797FD002DC366B0D8420F99');
 
-INSERT INTO role_privilege VALUES 
-(0x002DC366B0D8420F998F885D0ED797FD,0x7044061AF65B425F86CE73A1BF7F4402),
-(0x002DC366B0D8420F998F885D0ED797FD,0xAD08212E096F414CBA8D1BAE09415DAB),
-(0x8F885D0ED797FD002DC366B0D8420F99,0xAD08212E096F414CBA8D1BAE09415DAB);
+INSERT INTO role (uuid, name, description) VALUES 
+(@superAdminRoleUUID,'PIC-SURE Top Admin','PIC-SURE Auth Micro App Top admin including Admin and super Admin, can manage roles and privileges directly'),
+(@adminRoleUUID,'Admin','Normal admin users, can manage other users including assignment of roles and privileges');
 
-INSERT INTO access_rule (uuid, name, description, rule, type, value, checkMapKeyOnly, checkMapNode, subAccessRuleParent_uuid, isEvaluateOnlyByGates, isGateAnyRelation) 
-	VALUES (uuid(),'AR_ALLOW_ANY_QUERY_TO_HPDS','allow Any Query to hpds auth resource','$.query.resourceUUID',9,'02e23f52-f354-4e8b-992c-d37c8b9ba140',0, 0, NULL,0,0);
+INSERT INTO role_privilege (role_id, privilege_id) VALUES 
+(@superAdminRoleUUID,@superAdminPrivilegeUUID),
+(@superAdminRoleUUID,@adminPrivilegeUUID),
+(@adminRoleUUID,@adminPrivilegeUUID);
 
+CREATE PROCEDURE CreateSuperUser @Email varchar(255), @ConnectionId varchar(255)
+AS
+SELECT @userUUID := uuid FROM auth.user WHERE email = @Email AND connectionId = @ConnectionId;
+IF @userUUID IS NULL THEN
+    SET @userUUID = UNHEX(REPLACE(UUID(), '-', ''));
+	SELECT @connectionUUID := uuid FROM auth.connection WHERE id = @ConnectionId;
+	INSERT INTO auth.user (uuid, general_metadata, acceptedTOS, connectionId, email, matched, subject, is_active, long_term_token, isGateAnyRelation)
+	       VALUES (@userUUID, null, (SELECT CURRENT_TIMESTAMP), @connectionUUID, @Email, 0, null, 1, null, 1);
+END IF;
+INSERT INTO auth.user_role (user_id, role_id) VALUES (@userUUID,@superAdminRoleUUID);
+INSERT INTO auth.user_role (user_id, role_id) VALUES (@userUUID,@adminRoleUUID);
+GO;
