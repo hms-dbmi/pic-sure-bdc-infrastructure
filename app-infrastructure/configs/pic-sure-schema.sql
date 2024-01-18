@@ -723,12 +723,14 @@ INSERT INTO role_privilege (role_id, privilege_id) VALUES
 CREATE PROCEDURE CreateSuperUser @Email varchar(255), @ConnectionId varchar(255)
 AS
 SELECT @userUUID := uuid FROM auth.user WHERE email = @Email AND connectionId = @ConnectionId;
+SELECT @saUUID := uuid FROM auth.role WHERE name = 'PIC-SURE Top Admin';
+SELECT @adminUUID := uuid FROM auth.role WHERE name = 'Admin';
 IF @userUUID IS NULL THEN
     SET @userUUID = UNHEX(REPLACE(UUID(), '-', ''));
 	SELECT @connectionUUID := uuid FROM auth.connection WHERE id = @ConnectionId;
 	INSERT INTO auth.user (uuid, general_metadata, acceptedTOS, connectionId, email, matched, subject, is_active, long_term_token, isGateAnyRelation)
 	       VALUES (@userUUID, null, (SELECT CURRENT_TIMESTAMP), @connectionUUID, @Email, 0, null, 1, null, 1);
 END IF;
-INSERT INTO auth.user_role (user_id, role_id) VALUES (@userUUID,@superAdminRoleUUID);
-INSERT INTO auth.user_role (user_id, role_id) VALUES (@userUUID,@adminRoleUUID);
+INSERT INTO auth.user_role (user_id, role_id) VALUES (@userUUID,@saUUID);
+INSERT INTO auth.user_role (user_id, role_id) VALUES (@userUUID,@adminUUID);
 GO;
