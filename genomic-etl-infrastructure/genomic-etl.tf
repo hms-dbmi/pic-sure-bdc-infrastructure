@@ -21,10 +21,6 @@ locals {
     "subnetId" = (var.genomic-etl-subnet-1a-id)
     "type" = "r5.2xlarge"
   },
-  {
-    "subnetId" = (var.genomic-etl-subnet-1a-id)
-    "type" = "c5.2xlarge"
-  },
     {
     "subnetId" = (var.genomic-etl-subnet-1a-id)
     "type" =  "c5.4xlarge"
@@ -44,10 +40,6 @@ locals {
   },
       {
     "subnetId" = (var.genomic-etl-subnet-1b-id)
-    "type" = "c5.2xlarge"
-  },
-      {
-    "subnetId" = (var.genomic-etl-subnet-1b-id)
     "type" = "c5.4xlarge"
   },
       {
@@ -57,10 +49,6 @@ locals {
     {
     "subnetId" = (var.genomic-etl-subnet-1c-id)
     "type" = "r5.2xlarge"
-  },
-      {
-    "subnetId" = (var.genomic-etl-subnet-1c-id)
-    "type" =  "c5.2xlarge"
   },
       {
     "subnetId" = (var.genomic-etl-subnet-1c-id)
@@ -80,10 +68,6 @@ locals {
   },
       {
     "subnetId" = (var.genomic-etl-subnet-1d-id)
-    "type" = "c5.2xlarge"
-  },
-      {
-    "subnetId" = (var.genomic-etl-subnet-1d-id)
     "type" =  "m5.2xlarge"
   },
       {
@@ -93,10 +77,6 @@ locals {
   {
     "subnetId" = (var.genomic-etl-subnet-1f-id)
     "type" = "r5.2xlarge"
-  },
-    {
-    "subnetId" = (var.genomic-etl-subnet-1f-id)
-    "type" = "c5.2xlarge"
   },
     {
     "subnetId" = (var.genomic-etl-subnet-1f-id)
