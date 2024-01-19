@@ -701,15 +701,15 @@ where privilege.uuid = role_privilege.privilege_id
 -- 
 -- Create Super Admin and admin roles and privileges
 -- 
-@superAdminPrivilegeUUID = UNHEX('7044061AF65B425F86CE73A1BF7F4402');
-@adminPrivilegeUUID = UNHEX('AD08212E096F414CBA8D1BAE09415DAB');
+SET @superAdminPrivilegeUUID = UNHEX('7044061AF65B425F86CE73A1BF7F4402');
+SET @adminPrivilegeUUID = UNHEX('AD08212E096F414CBA8D1BAE09415DAB');
 
 INSERT INTO privilege (uuid, description, name, application_id, queryTemplate, queryScope) VALUES
 (@superAdminPrivilegeUUID,'PIC-SURE Auth super admin for managing roles/privileges/application/connections','SUPER_ADMIN',NULL,'[]',NULL),
 (@adminPrivilegeUUID,'PIC-SURE Auth admin for managing users.','ADMIN',NULL,'[]',NULL);
 
-@superAdminRoleUUID = UNHEX('002DC366B0D8420F998F885D0ED797FD');
-@adminRoleUUID = UNHEX('8F885D0ED797FD002DC366B0D8420F99');
+SET @superAdminRoleUUID = UNHEX('002DC366B0D8420F998F885D0ED797FD');
+SET @adminRoleUUID = UNHEX('8F885D0ED797FD002DC366B0D8420F99');
 
 INSERT INTO role (uuid, name, description) VALUES 
 (@superAdminRoleUUID,'PIC-SURE Top Admin','PIC-SURE Auth Micro App Top admin including Admin and super Admin, can manage roles and privileges directly'),
@@ -720,17 +720,20 @@ INSERT INTO role_privilege (role_id, privilege_id) VALUES
 (@superAdminRoleUUID,@adminPrivilegeUUID),
 (@adminRoleUUID,@adminPrivilegeUUID);
 
-CREATE PROCEDURE CreateSuperUser @Email varchar(255), @ConnectionId varchar(255)
-AS
-SELECT @userUUID := uuid FROM auth.user WHERE email = @Email AND connectionId = @ConnectionId;
+DROP PROCEDURE IF EXISTS CreateSuperUser;
+delimiter //
+CREATE PROCEDURE CreateSuperUser (IN user_email varchar(255), IN connection_id varchar(255))
+BEGIN
+SELECT @userUUID := uuid FROM auth.user WHERE email = user_email AND connectionId = connection_id;
 SELECT @saUUID := uuid FROM auth.role WHERE name = 'PIC-SURE Top Admin';
 SELECT @adminUUID := uuid FROM auth.role WHERE name = 'Admin';
 IF @userUUID IS NULL THEN
     SET @userUUID = UNHEX(REPLACE(UUID(), '-', ''));
-	SELECT @connectionUUID := uuid FROM auth.connection WHERE id = @ConnectionId;
+	SELECT @connectionUUID := uuid FROM auth.connection WHERE id = connection_id;
 	INSERT INTO auth.user (uuid, general_metadata, acceptedTOS, connectionId, email, matched, subject, is_active, long_term_token, isGateAnyRelation)
-	       VALUES (@userUUID, null, (SELECT CURRENT_TIMESTAMP), @connectionUUID, @Email, 0, null, 1, null, 1);
+	       VALUES (@userUUID, null, (SELECT CURRENT_TIMESTAMP), @connectionUUID, user_email, 0, null, 1, null, 1);
 END IF;
 INSERT INTO auth.user_role (user_id, role_id) VALUES (@userUUID,@saUUID);
 INSERT INTO auth.user_role (user_id, role_id) VALUES (@userUUID,@adminUUID);
-GO;
+END//
+delimiter ;
