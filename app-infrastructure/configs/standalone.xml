@@ -47,7 +47,9 @@
             <security-realm name="ApplicationRealm">
                 <server-identities>
                     <ssl>
-                        <keystore path="application.keystore" relative-to="jboss.server.config.dir" keystore-password="password" alias="server" key-password="password" generate-self-signed-certificate-host="localhost"/>
+                        <keystore path="application.keystore" relative-to="jboss.server.config.dir"
+                                  keystore-password="password" alias="server" key-password="password"
+                                  generate-self-signed-certificate-host="localhost"/>
                     </ssl>
                 </server-identities>
                 <authentication>
@@ -64,7 +66,8 @@
                 <json-formatter name="json-formatter"/>
             </formatters>
             <handlers>
-                <file-handler name="file" formatter="json-formatter" path="audit-log.log" relative-to="jboss.server.data.dir"/>
+                <file-handler name="file" formatter="json-formatter" path="audit-log.log"
+                              relative-to="jboss.server.data.dir"/>
             </handlers>
             <logger log-boot="true" log-read-only="false" enabled="false">
                 <handlers>
@@ -115,7 +118,7 @@
             </logger>
 
             <logger category="org.apache.http.wire">
-              <level name="WARN"/>
+                <level name="WARN"/>
             </logger>
             <logger category="edu.harvard">
                 <level name="INFO"/>
@@ -150,7 +153,8 @@
         <subsystem xmlns="urn:jboss:domain:core-management:1.0"/>
         <subsystem xmlns="urn:jboss:domain:datasources:5.0">
             <datasources>
-                <datasource jndi-name="java:jboss/datasources/ExampleDS" pool-name="ExampleDS" enabled="true" use-java-context="true">
+                <datasource jndi-name="java:jboss/datasources/ExampleDS" pool-name="ExampleDS" enabled="true"
+                            use-java-context="true">
                     <connection-url>jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</connection-url>
                     <driver>h2</driver>
                     <security>
@@ -159,7 +163,9 @@
                     </security>
                 </datasource>
                 <datasource jndi-name="java:jboss/datasources/AuthDS" pool-name="AuthDS" use-java-context="true">
-                    <connection-url>jdbc:mysql://picsure-db.${target_stack}.${env_private_dns_name}:3306/auth?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true&amp;autoReconnectForPools=true</connection-url>
+                    <connection-url>
+                        jdbc:mysql://picsure-db.${target_stack}.${env_private_dns_name}:3306/auth?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true&amp;autoReconnectForPools=true
+                    </connection-url>
                     <driver>mysql</driver>
                     <pool>
                         <min-pool-size>2</min-pool-size>
@@ -171,15 +177,19 @@
                         <password>${picsure-db-password}</password>
                     </security>
                     <validation>
-                        <valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLValidConnectionChecker"/>
+                        <valid-connection-checker
+                                class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLValidConnectionChecker"/>
                         <check-valid-connection-sql>SELECT 1</check-valid-connection-sql>
                         <validate-on-match>true</validate-on-match>
                         <background-validation>false</background-validation>
-                        <exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLExceptionSorter"/>
+                        <exception-sorter
+                                class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLExceptionSorter"/>
                     </validation>
                 </datasource>
                 <datasource jndi-name="java:jboss/datasources/PicsureDS" pool-name="PicsureDS" use-java-context="true">
-                    <connection-url>jdbc:mysql://picsure-db.${target_stack}.${env_private_dns_name}:3306/picsure?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true&amp;autoReconnectForPools=true</connection-url>
+                    <connection-url>
+                        jdbc:mysql://picsure-db.${target_stack}.${env_private_dns_name}:3306/picsure?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true&amp;autoReconnectForPools=true
+                    </connection-url>
                     <driver>mysql</driver>
                     <pool>
                         <min-pool-size>3</min-pool-size>
@@ -191,11 +201,13 @@
                         <password>${picsure-db-password}</password>
                     </security>
                     <validation>
-                        <valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLValidConnectionChecker"/>
+                        <valid-connection-checker
+                                class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLValidConnectionChecker"/>
                         <check-valid-connection-sql>SELECT 1</check-valid-connection-sql>
                         <validate-on-match>true</validate-on-match>
                         <background-validation>false</background-validation>
-                        <exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLExceptionSorter"/>
+                        <exception-sorter
+                                class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLExceptionSorter"/>
                     </validation>
                 </datasource>
                 <drivers>
@@ -209,26 +221,38 @@
             </datasources>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:deployment-scanner:2.0">
-            <deployment-scanner path="deployments" relative-to="jboss.server.base.dir" scan-interval="5000" runtime-failure-causes-rollback="$${jboss.deployment.scanner.rollback.on.failure:false}"/>
+            <deployment-scanner path="deployments" relative-to="jboss.server.base.dir" scan-interval="5000"
+                                runtime-failure-causes-rollback="$${jboss.deployment.scanner.rollback.on.failure:false}"/>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:discovery:1.0"/>
         <subsystem xmlns="urn:jboss:domain:ee:4.0">
             <spec-descriptor-property-replacement>false</spec-descriptor-property-replacement>
             <concurrent>
                 <context-services>
-                    <context-service name="default" jndi-name="java:jboss/ee/concurrency/context/default" use-transaction-setup-provider="true"/>
+                    <context-service name="default" jndi-name="java:jboss/ee/concurrency/context/default"
+                                     use-transaction-setup-provider="true"/>
                 </context-services>
                 <managed-thread-factories>
-                    <managed-thread-factory name="default" jndi-name="java:jboss/ee/concurrency/factory/default" context-service="default"/>
+                    <managed-thread-factory name="default" jndi-name="java:jboss/ee/concurrency/factory/default"
+                                            context-service="default"/>
                 </managed-thread-factories>
                 <managed-executor-services>
-                    <managed-executor-service name="default" jndi-name="java:jboss/ee/concurrency/executor/default" context-service="default" hung-task-threshold="60000" keepalive-time="5000"/>
+                    <managed-executor-service name="default" jndi-name="java:jboss/ee/concurrency/executor/default"
+                                              context-service="default" hung-task-threshold="60000"
+                                              keepalive-time="5000"/>
                 </managed-executor-services>
                 <managed-scheduled-executor-services>
-                    <managed-scheduled-executor-service name="default" jndi-name="java:jboss/ee/concurrency/scheduler/default" context-service="default" hung-task-threshold="60000" keepalive-time="3000"/>
+                    <managed-scheduled-executor-service name="default"
+                                                        jndi-name="java:jboss/ee/concurrency/scheduler/default"
+                                                        context-service="default" hung-task-threshold="60000"
+                                                        keepalive-time="3000"/>
                 </managed-scheduled-executor-services>
             </concurrent>
-            <default-bindings context-service="java:jboss/ee/concurrency/context/default" datasource="java:jboss/datasources/ExampleDS" managed-executor-service="java:jboss/ee/concurrency/executor/default" managed-scheduled-executor-service="java:jboss/ee/concurrency/scheduler/default" managed-thread-factory="java:jboss/ee/concurrency/factory/default"/>
+            <default-bindings context-service="java:jboss/ee/concurrency/context/default"
+                              datasource="java:jboss/datasources/ExampleDS"
+                              managed-executor-service="java:jboss/ee/concurrency/executor/default"
+                              managed-scheduled-executor-service="java:jboss/ee/concurrency/scheduler/default"
+                              managed-thread-factory="java:jboss/ee/concurrency/factory/default"/>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:ee-security:1.0"/>
         <subsystem xmlns="urn:jboss:domain:ejb3:5.0">
@@ -241,8 +265,10 @@
             </session-bean>
             <pools>
                 <bean-instance-pools>
-                    <strict-max-pool name="mdb-strict-max-pool" derive-size="from-cpu-count" instance-acquisition-timeout="5" instance-acquisition-timeout-unit="MINUTES"/>
-                    <strict-max-pool name="slsb-strict-max-pool" derive-size="from-worker-pools" instance-acquisition-timeout="5" instance-acquisition-timeout-unit="MINUTES"/>
+                    <strict-max-pool name="mdb-strict-max-pool" derive-size="from-cpu-count"
+                                     instance-acquisition-timeout="5" instance-acquisition-timeout-unit="MINUTES"/>
+                    <strict-max-pool name="slsb-strict-max-pool" derive-size="from-worker-pools"
+                                     instance-acquisition-timeout="5" instance-acquisition-timeout-unit="MINUTES"/>
                 </bean-instance-pools>
             </pools>
             <caches>
@@ -255,7 +281,8 @@
             <async thread-pool-name="default"/>
             <timer-service thread-pool-name="default" default-data-store="default-file-store">
                 <data-stores>
-                    <file-data-store name="default-file-store" path="timer-service-data" relative-to="jboss.server.data.dir"/>
+                    <file-data-store name="default-file-store" path="timer-service-data"
+                                     relative-to="jboss.server.data.dir"/>
                 </data-stores>
             </timer-service>
             <remote connector-ref="http-remoting-connector" thread-pool-name="default">
@@ -274,7 +301,8 @@
             <default-missing-method-permissions-deny-access value="true"/>
             <log-system-exceptions value="true"/>
         </subsystem>
-        <subsystem xmlns="urn:wildfly:elytron:3.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
+        <subsystem xmlns="urn:wildfly:elytron:3.0" final-providers="combined-providers"
+                   disallowed-providers="OracleUcrypto">
             <providers>
                 <aggregate-providers name="combined-providers">
                     <providers name="elytron"/>
@@ -287,11 +315,13 @@
                 <file-audit-log name="local-audit" path="audit.log" relative-to="jboss.server.log.dir" format="JSON"/>
             </audit-logging>
             <security-domains>
-                <security-domain name="ApplicationDomain" default-realm="ApplicationRealm" permission-mapper="default-permission-mapper">
+                <security-domain name="ApplicationDomain" default-realm="ApplicationRealm"
+                                 permission-mapper="default-permission-mapper">
                     <realm name="ApplicationRealm" role-decoder="groups-to-roles"/>
                     <realm name="local"/>
                 </security-domain>
-                <security-domain name="ManagementDomain" default-realm="ManagementRealm" permission-mapper="default-permission-mapper">
+                <security-domain name="ManagementDomain" default-realm="ManagementRealm"
+                                 permission-mapper="default-permission-mapper">
                     <realm name="ManagementRealm" role-decoder="groups-to-roles"/>
                     <realm name="local" role-mapper="super-user-mapper"/>
                 </security-domain>
@@ -299,11 +329,13 @@
             <security-realms>
                 <identity-realm name="local" identity="$local"/>
                 <properties-realm name="ApplicationRealm">
-                    <users-properties path="application-users.properties" relative-to="jboss.server.config.dir" digest-realm-name="ApplicationRealm"/>
+                    <users-properties path="application-users.properties" relative-to="jboss.server.config.dir"
+                                      digest-realm-name="ApplicationRealm"/>
                     <groups-properties path="application-roles.properties" relative-to="jboss.server.config.dir"/>
                 </properties-realm>
                 <properties-realm name="ManagementRealm">
-                    <users-properties path="mgmt-users.properties" relative-to="jboss.server.config.dir" digest-realm-name="ManagementRealm"/>
+                    <users-properties path="mgmt-users.properties" relative-to="jboss.server.config.dir"
+                                      digest-realm-name="ManagementRealm"/>
                     <groups-properties path="mgmt-groups.properties" relative-to="jboss.server.config.dir"/>
                 </properties-realm>
             </security-realms>
@@ -329,13 +361,16 @@
                     <permission class-name="org.wildfly.security.auth.permission.LoginPermission"/>
                 </permission-set>
                 <permission-set name="default-permissions">
-                    <permission class-name="org.wildfly.extension.batch.jberet.deployment.BatchPermission" module="org.wildfly.extension.batch.jberet" target-name="*"/>
-                    <permission class-name="org.wildfly.transaction.client.RemoteTransactionPermission" module="org.wildfly.transaction.client"/>
+                    <permission class-name="org.wildfly.extension.batch.jberet.deployment.BatchPermission"
+                                module="org.wildfly.extension.batch.jberet" target-name="*"/>
+                    <permission class-name="org.wildfly.transaction.client.RemoteTransactionPermission"
+                                module="org.wildfly.transaction.client"/>
                     <permission class-name="org.jboss.ejb.client.RemoteEJBPermission" module="org.jboss.ejb-client"/>
                 </permission-set>
             </permission-sets>
             <http>
-                <http-authentication-factory name="application-http-authentication" security-domain="ApplicationDomain" http-server-mechanism-factory="global">
+                <http-authentication-factory name="application-http-authentication" security-domain="ApplicationDomain"
+                                             http-server-mechanism-factory="global">
                     <mechanism-configuration>
                         <mechanism mechanism-name="BASIC">
                             <mechanism-realm realm-name="Application Realm"/>
@@ -343,7 +378,8 @@
                         <mechanism mechanism-name="FORM"/>
                     </mechanism-configuration>
                 </http-authentication-factory>
-                <http-authentication-factory name="management-http-authentication" security-domain="ManagementDomain" http-server-mechanism-factory="global">
+                <http-authentication-factory name="management-http-authentication" security-domain="ManagementDomain"
+                                             http-server-mechanism-factory="global">
                     <mechanism-configuration>
                         <mechanism mechanism-name="DIGEST">
                             <mechanism-realm realm-name="ManagementRealm"/>
@@ -353,7 +389,8 @@
                 <provider-http-server-mechanism-factory name="global"/>
             </http>
             <sasl>
-                <sasl-authentication-factory name="application-sasl-authentication" sasl-server-factory="configured" security-domain="ApplicationDomain">
+                <sasl-authentication-factory name="application-sasl-authentication" sasl-server-factory="configured"
+                                             security-domain="ApplicationDomain">
                     <mechanism-configuration>
                         <mechanism mechanism-name="JBOSS-LOCAL-USER" realm-mapper="local"/>
                         <mechanism mechanism-name="DIGEST-MD5">
@@ -361,7 +398,8 @@
                         </mechanism>
                     </mechanism-configuration>
                 </sasl-authentication-factory>
-                <sasl-authentication-factory name="management-sasl-authentication" sasl-server-factory="configured" security-domain="ManagementDomain">
+                <sasl-authentication-factory name="management-sasl-authentication" sasl-server-factory="configured"
+                                             security-domain="ManagementDomain">
                     <mechanism-configuration>
                         <mechanism mechanism-name="JBOSS-LOCAL-USER" realm-mapper="local"/>
                         <mechanism mechanism-name="DIGEST-MD5">
@@ -395,7 +433,8 @@
                     <file-store passivation="true" purge="false"/>
                 </local-cache>
             </cache-container>
-            <cache-container name="ejb" aliases="sfsb" default-cache="passivation" module="org.wildfly.clustering.ejb.infinispan">
+            <cache-container name="ejb" aliases="sfsb" default-cache="passivation"
+                             module="org.wildfly.clustering.ejb.infinispan">
                 <local-cache name="passivation">
                     <locking isolation="REPEATABLE_READ"/>
                     <transaction mode="BATCH"/>
@@ -450,10 +489,11 @@
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:jsf:1.1"/>
         <subsystem xmlns="urn:jboss:domain:mail:3.0">
-            <mail-session name="java:jboss/mail/gmail" from="$${env.EMAIL_USERNAME_FROM:emailFromName}" jndi-name="java:jboss/mail/gmail" debug="false">
+            <mail-session name="java:jboss/mail/gmail" from="$${env.EMAIL_USERNAME_FROM:emailFromName}"
+                          jndi-name="java:jboss/mail/gmail" debug="false">
                 <smtp-server outbound-socket-binding-ref="mail-smtp-gmail" tls="true"
-									username="$${env.EMAIL_USERNAME:missingEmailUsername}"
-										password="$${env.EMAIL_PASSWORD:missingEmailPassword}" />
+                             username="$${env.EMAIL_USERNAME:missingEmailUsername}"
+                             password="$${env.EMAIL_PASSWORD:missingEmailPassword}"/>
             </mail-session>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:naming:2.0">
@@ -463,47 +503,50 @@
                 <simple name="java:global/roles_claim" value="privileges"/>
                 <!-- Used in IRCT as well -->
                 <simple name="java:global/verify_user_method" value="tokenIntrospection"/>
-                <simple name="java:global/token_introspection_url" value="http://localhost:8080/pic-sure-auth-services/auth/token/inspect"/>
+                <simple name="java:global/token_introspection_url"
+                        value="http://localhost:8080/pic-sure-auth-services/auth/token/inspect"/>
                 <simple name="java:global/token_introspection_token" value="${picsure_token_introspection_token}"/>
-               <!-- psama configuration-->
+
+                <!-- psama configuration-->
                 <simple name="java:global/client_secret" value="${picsure_client_secret}"/>
-                <simple name="java:global/client_id" value="${client_id}"/>
 
                 <!-- Configure OTKA Parameters -->
-                <!-- okta configuration-->
                 <simple name="java:global/client_id" value="${client_id}"/>
                 <simple name="java:global/sp_client_secret" value="${sp_client_secret}"/>
 
                 <!-- Configure Identity Provider Parameters, with defaults-->
                 <simple name="java:global/idp_provider" value="${idp_provider}"/>
-                <simple name="java:global/idp_provider_uri" value="${idp_provider_uri}/" />
+                <simple name="java:global/idp_provider_uri" value="${idp_provider_uri}/"/>
 
                 <!-- Configure Fence Parameters, with defaults-->
                 <simple name="java:global/fence_client_id" value="${fence_client_id}"/>
                 <simple name="java:global/fence_client_secret" value="${fence_client_secret}"/>
-                <simple name="java:global/fence_redirect_url" value="https://${env_public_dns_name}/psamaui/login/" />
+                <simple name="java:global/fence_redirect_url" value="https://${env_public_dns_name}/psamaui/login/"/>
 
- 		        <simple name="java:global/fence_standard_access_rules" value="AR_ONLY_INFO,AR_ONLY_SEARCH,AR_INFO_COLUMN_LISTING" />
-                <simple name="java:global/fence_allowed_query_types" value="COUNT,CROSS_COUNT,CATEGORICAL_CROSS_COUNT,CONTINUOUS_CROSS_COUNT,DATAFRAME" />
-                <simple name="java:global/fence_harmonized_concept_path" value="\DCC Harmonized data set\" />
-                <simple name="java:global/fence_harmonized_consent_group_concept_path" value="\_harmonized_consent\" />
-                <simple name="java:global/fence_topmed_consent_group_concept_path" value="\_topmed_consents\" />
-                <simple name="java:global/fence_parent_consent_group_concept_path" value="\_consents\" />
-                <simple name="java:global/variantAnnotationColumns" value="Variant_consequence_calculated,Variant_class,Gene_with_variant,Variant_severity,Variant_frequency_in_gnomAD,Variant_frequency_as_text" />
+                <simple name="java:global/fence_standard_access_rules"
+                        value="AR_ONLY_INFO,AR_ONLY_SEARCH,AR_INFO_COLUMN_LISTING"/>
+                <simple name="java:global/fence_allowed_query_types"
+                        value="COUNT,CROSS_COUNT,CATEGORICAL_CROSS_COUNT,CONTINUOUS_CROSS_COUNT,DATAFRAME"/>
+                <simple name="java:global/fence_harmonized_concept_path" value="\DCC Harmonized data set\"/>
+                <simple name="java:global/fence_harmonized_consent_group_concept_path" value="\_harmonized_consent\"/>
+                <simple name="java:global/fence_topmed_consent_group_concept_path" value="\_topmed_consents\"/>
+                <simple name="java:global/fence_parent_consent_group_concept_path" value="\_consents\"/>
+                <simple name="java:global/variantAnnotationColumns"
+                        value="Variant_consequence_calculated,Variant_class,Gene_with_variant,Variant_severity,Variant_frequency_in_gnomAD,Variant_frequency_as_text"/>
 
-                <simple name="java:global/defaultApplicationUUID" value="${application_id_for_base_query}" />
+                <simple name="java:global/defaultApplicationUUID" value="${application_id_for_base_query}"/>
 
                 <simple name="java:global/systemName" value="PIC-SURE BioDataCatalyst"/>
                 <simple name="java:global/clientSecretIsBase64" value="False"/>
                 <simple name="java:global/userActivationTemplatePath" value="/psama/activation"/>
                 <simple name="java:global/userActivationReplyTo" value="NOT_USED_WITH_FENCE"/>
-                <simple name="java:global/templatePath" value="/usr/local/docker-config/" />
-                <simple name="java:global/tosEnabled" value="False" />
-                <simple name="java:global/auth0host" value="NOT_USED_WITH_FENCE" />
-                <simple name="java:global/emailTemplatePath" value="/usr/local/docker-config/" />
-                <simple name="java:global/accessGrantEmailSubject" value="NOT_USED_WITH_FENCE" />
-                <simple name="java:global/deniedEmailEnabled" value="false" />
-                <simple name="java:global/adminUsers" value="NOT_USED_WITH_FENCE" />
+                <simple name="java:global/templatePath" value="/usr/local/docker-config/"/>
+                <simple name="java:global/tosEnabled" value="False"/>
+                <simple name="java:global/auth0host" value="NOT_USED_WITH_FENCE"/>
+                <simple name="java:global/emailTemplatePath" value="/usr/local/docker-config/"/>
+                <simple name="java:global/accessGrantEmailSubject" value="NOT_USED_WITH_FENCE"/>
+                <simple name="java:global/deniedEmailEnabled" value="false"/>
+                <simple name="java:global/adminUsers" value="NOT_USED_WITH_FENCE"/>
 
                 <!-- irct service, if configured -->
                 <simple name="java:global/domain" value="unused_but_required"/>
@@ -573,15 +616,19 @@
             <recovery-environment socket-binding="txn-recovery-environment" status-socket-binding="txn-status-manager"/>
             <object-store path="tx-object-store" relative-to="jboss.server.data.dir"/>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:undertow:6.0" default-server="default-server" default-virtual-host="default-host" default-servlet-container="default" default-security-domain="other">
+        <subsystem xmlns="urn:jboss:domain:undertow:6.0" default-server="default-server"
+                   default-virtual-host="default-host" default-servlet-container="default"
+                   default-security-domain="other">
             <buffer-cache name="default"/>
             <server name="default-server">
                 <http-listener name="default" socket-binding="http" redirect-socket="https" enable-http2="true"/>
-                <https-listener name="https" socket-binding="https" security-realm="ApplicationRealm" enable-http2="true"/>
+                <https-listener name="https" socket-binding="https" security-realm="ApplicationRealm"
+                                enable-http2="true"/>
                 <host name="default-host" alias="localhost">
                     <location name="/" handler="welcome-content"/>
                     <http-invoker security-realm="ApplicationRealm"/>
-                    <filter-ref name="gzipFilter" predicate="exists['%%{o,Content-Type}'] and regex[pattern='(?:application/javascript|text/css|text/html|text/xml|application/json)(;.*)?', value=%%{o,Content-Type}, full-match=true]"/>
+                    <filter-ref name="gzipFilter"
+                                predicate="exists['%%{o,Content-Type}'] and regex[pattern='(?:application/javascript|text/css|text/html|text/xml|application/json)(;.*)?', value=%%{o,Content-Type}, full-match=true]"/>
                     <filter-ref name="Vary-header"/>
 
                 </host>
@@ -590,10 +637,10 @@
                 <session-cookie http-only="true" secure="true"/>
                 <jsp-config/>
             </servlet-container>
-	    <filters>
-            <gzip name="gzipFilter"/>
-            <response-header name="Vary-header" header-name="Vary" header-value="Accept-Encoding"/>
-        </filters>
+            <filters>
+                <gzip name="gzipFilter"/>
+                <response-header name="Vary-header" header-name="Vary" header-value="Accept-Encoding"/>
+            </filters>
             <handlers>
                 <file name="welcome-content" path="$${jboss.home.dir}/welcome-content"/>
             </handlers>
@@ -602,7 +649,8 @@
             <wsdl-host>$${jboss.bind.address:0.0.0.0}</wsdl-host>
             <endpoint-config name="Standard-Endpoint-Config"/>
             <endpoint-config name="Recording-Endpoint-Config">
-                <pre-handler-chain name="recording-handlers" protocol-bindings="##SOAP11_HTTP ##SOAP11_HTTP_MTOM ##SOAP12_HTTP ##SOAP12_HTTP_MTOM">
+                <pre-handler-chain name="recording-handlers"
+                                   protocol-bindings="##SOAP11_HTTP ##SOAP11_HTTP_MTOM ##SOAP12_HTTP ##SOAP12_HTTP_MTOM">
                     <handler name="RecordingHandler" class="org.jboss.ws.common.invocation.RecordingServerHandler"/>
                 </pre-handler-chain>
             </endpoint-config>
@@ -618,7 +666,8 @@
             <inet-address value="$${jboss.bind.address:0.0.0.0}"/>
         </interface>
     </interfaces>
-    <socket-binding-group name="standard-sockets" default-interface="public" port-offset="$${jboss.socket.binding.port-offset:0}">
+    <socket-binding-group name="standard-sockets" default-interface="public"
+                          port-offset="$${jboss.socket.binding.port-offset:0}">
         <socket-binding name="management-http" interface="management" port="$${jboss.management.http.port:9990}"/>
         <socket-binding name="management-https" interface="management" port="$${jboss.management.https.port:9993}"/>
         <socket-binding name="ajp" port="$${jboss.ajp.port:8009}"/>
