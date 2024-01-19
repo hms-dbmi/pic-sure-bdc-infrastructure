@@ -467,11 +467,12 @@
                 <simple name="java:global/token_introspection_token" value="${picsure_token_introspection_token}"/>
                <!-- psama configuration-->
                 <simple name="java:global/client_secret" value="${picsure_client_secret}"/>
-                <simple name="java:global/client_id" value="NOT_USED_WITH_FENCE"/>
+                <simple name="java:global/client_id" value="${client_id]"/>
 
                 <!-- Configure OTKA Parameters -->
-                <simple name="java:global/okta_client_api_token" value="${okta_client_api_token}"/>
-                <simple name="java:global/okta_client_origin" value="${okta_client_origin}"/>
+                <!-- okta configuration-->
+                <simple name="java:global/client_id" value="${client_id}"/>
+                <simple name="java:global/sp_client_secret" value="${sp_client_secret}"/>
 
                 <!-- Configure Identity Provider Parameters, with defaults-->
                 <simple name="java:global/idp_provider" value="${idp_provider}"/>

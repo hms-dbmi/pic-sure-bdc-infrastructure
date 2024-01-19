@@ -79,11 +79,11 @@ variable "env_is_open_access" {
 }
 
 variable "include_auth_hpds" {
-    type    = bool
+  type    = bool
 }
 
 variable "include_open_hpds" {
-    type    = bool
+  type    = bool
 }
 
 # removing for now as they are secrets handled by the stack_variables
@@ -145,19 +145,45 @@ variable "help_link" {
 }
 
 variable "login_link" {
-    type = string
-    description = "Relative or absolute URL to redirect to upon login"
-    default = "/psamaui/login/?redirection_url=/picsureui/"
+  type = string
+  description = "Relative or absolute URL to redirect to upon login"
+  default = "/psamaui/login/?redirection_url=/picsureui/"
 }
 
-variable "okta_client_api_token" {
+variable "initial_administrator_email" {
+  default = ""
   type = string
-  default = "disabled"
-  description = "The api token for the okta application. Used for session management currently."
+}
+variable "initial_administrator_connection_label" {
+  default = ""
+  type = string
+}
+variable "include_initial_admin_user" {
+  default = false
+  type = bool
 }
 
-variable "okta_client_origin" {
+variable "client_id" {
+  default = ""
   type = string
-  default = "disabled"
-    description = "The domain of the okta application. Used for session management currently."
+  description = "Service Provider Client ID"
+}
+
+variable "sp_client_secret" {
+  default = ""
+  type = string
+  description = "Service Provider Client Secret"
+}
+variable "connection_label" {
+  default = "FENCE"
+  type = string
+}
+variable "connection_sub_prefix" {
+  default = "fence|"
+  type = string
+}
+
+variable "connection_id" {
+  default = "Fence"
+  type = string
 }
