@@ -467,7 +467,7 @@
                 <simple name="java:global/token_introspection_token" value="${picsure_token_introspection_token}"/>
                <!-- psama configuration-->
                 <simple name="java:global/client_secret" value="${picsure_client_secret}"/>
-                <simple name="java:global/client_id" value="${client_id]"/>
+                <simple name="java:global/client_id" value="${client_id}"/>
 
                 <!-- Configure OTKA Parameters -->
                 <!-- okta configuration-->
