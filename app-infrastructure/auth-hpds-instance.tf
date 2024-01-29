@@ -26,7 +26,7 @@ resource "aws_instance" "auth-hpds-ec2" {
   count = var.include_auth_hpds ? 1 : 0
 
   ami           = local.ami_id
-  instance_type = "m5.12xlarge"
+  instance_type = "r5.12xlarge"
 
   subnet_id = local.private2_subnet_ids[0]
 
