@@ -71,17 +71,3 @@ resource "local_file" "resources-registration-file" {
   filename = "resources-registration.sql"
 }
 
-data "template_file" "initial-administrator" {
-  template = file("configs/initial-administrator.sql")
-  vars     = {
-    admin_email                = var.initial_administrator_email
-    connection_label           = var.initial_administrator_connection_label
-    include_initial_admin_user = var.include_initial_admin_user
-  }
-}
-
-resource "local_file" "initial-administrator-file" {
-  content  = data.template_file.initial-administrator.rendered
-  filename = "aim-initial-administrator.sql"
-}
-

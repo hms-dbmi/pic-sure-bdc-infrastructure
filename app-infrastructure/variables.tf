@@ -150,19 +150,6 @@ variable "login_link" {
   default = "/psamaui/login/?redirection_url=/picsureui/"
 }
 
-variable "initial_administrator_email" {
-  default = ""
-  type = string
-}
-variable "initial_administrator_connection_label" {
-  default = ""
-  type = string
-}
-variable "include_initial_admin_user" {
-  default = false
-  type = bool
-}
-
 variable "client_id" {
   default = ""
   type = string

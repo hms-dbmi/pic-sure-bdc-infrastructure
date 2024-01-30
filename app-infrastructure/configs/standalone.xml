@@ -510,9 +510,10 @@
                 <!-- psama configuration-->
                 <simple name="java:global/client_secret" value="${picsure_client_secret}"/>
 
-                <!-- Configure OTKA Parameters -->
+                <!-- okta configuration-->
                 <simple name="java:global/client_id" value="${client_id}"/>
                 <simple name="java:global/sp_client_secret" value="${sp_client_secret}"/>
+                <simple name="java:global/connection_id" value="${connection_id}"/>
 
                 <!-- Configure Identity Provider Parameters, with defaults-->
                 <simple name="java:global/idp_provider" value="${idp_provider}"/>

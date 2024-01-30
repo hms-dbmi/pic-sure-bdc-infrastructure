@@ -1,3 +1,0 @@
--- This script is used to create the initial administrator user in the database.
--- It will also create the initial connection for the administrator user.
-${include_initial_admin_user ? "INSERT INTO auth.user VALUES (UNHEX(REPLACE(UUID(), '-', '')), null, '{\"email\":\"${admin_email}\"}', null, (SELECT uuid FROM connection WHERE label = '${connection_label}'), '${admin_email}', 0, null, 1, null);" : "" }
