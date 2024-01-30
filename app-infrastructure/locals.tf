@@ -93,4 +93,6 @@ locals {
   open_subnet_group_name = local.project == "Open PIC-SURE" ? "open-pic-sure-${var.environment_name}-${var.target_stack}": ""
   auth_subnet_group_name = local.project == "Auth PIC-SURE" ? "auth-pic-sure-${var.environment_name}-${var.target_stack}": ""
   picsure_subnet_group_name = local.project == "PIC-SURE" ? "pic-sure-${var.environment_name}-${var.target_stack}": ""
-  db_subnet_group_name = coalesce(local.open_subnet_group_name, local.auth_subnet_group_name, local.picsure_subnet_group_name)}
+  db_subnet_group_name = coalesce(local.open_subnet_group_name, local.auth_subnet_group_name, local.picsure_subnet_group_name)
+}
+
