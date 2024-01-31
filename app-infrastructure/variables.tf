@@ -151,7 +151,7 @@ variable "login_link" {
 }
 
 variable "client_id" {
-  default = ""
+  default = "not_used_in_fence"
   type = string
   description = "Service Provider Client ID"
 }
@@ -176,7 +176,7 @@ variable "connection_id" {
 }
 
 variable "swb_login_url" {
-  default = "n/a"
+  default = ""
   type = string
   description = "SWB Login URL. Only used in AIM-AHEAD environment"
 }
