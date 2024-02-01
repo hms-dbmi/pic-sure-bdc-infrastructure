@@ -89,7 +89,6 @@ data "template_file" "picsureui_settings" {
     help_link                     = var.help_link
     login_link                    = var.login_link
     client_id                     = var.client_id
-    swb_login_url                 = var.swb_login_url
   }
 }
 

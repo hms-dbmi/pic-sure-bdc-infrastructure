@@ -174,9 +174,3 @@ variable "connection_id" {
   default = "Fence"
   type = string
 }
-
-variable "swb_login_url" {
-  default = ""
-  type = string
-  description = "SWB Login URL. Only used in AIM-AHEAD environment"
-}
