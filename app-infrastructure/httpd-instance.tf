@@ -89,6 +89,7 @@ data "template_file" "picsureui_settings" {
     help_link                     = var.help_link
     login_link                    = var.login_link
     client_id                     = var.client_id
+    pdf_link                      = var.pdf_link
   }
 }
 

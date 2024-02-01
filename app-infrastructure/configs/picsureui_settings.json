@@ -14,7 +14,7 @@
 	"applicationIdForBaseQuery": "${application_id_for_base_query}",
 	"helpLink": "${help_link}",
 	"loginLink": "${login_link}",
-	"pdfLink": "https://tinyurl.com/BDC-PIC-SURE-User-Guide\" aria-label='User Guide, this link will open a new browser tab' target='_blank'",
+	"pdfLink": "${pdf_link}",
 	"videoLink": "https://www.youtube.com/playlist?list=PLJ6YccH8TEufZ5L-ctxzFF7vuZRLVacKw\" aria-label='Video Demonstration, this link will open a new browser tab' target='_blank'",
 	"jupyterExampleLink": "https://github.com/hms-dbmi/Access-to-Data-using-PIC-SURE-API/tree/master/NHLBI_BioData_Catalyst\" aria-label='Jupyter Example Notebooks, this link will open a new browser tab' target='_blank'",
 	"documentationLink": "https://bdcatalyst.gitbook.io/biodata-catalyst-documentation/written-documentation/getting-started/explore-available-data/pic-sure-for-biodata-catalyst-user-guide\" aria-label='BioData Catalyst Documentation, this link will open a new browser tab' target='_blank'",

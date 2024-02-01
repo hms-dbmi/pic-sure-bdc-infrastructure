@@ -174,3 +174,8 @@ variable "connection_id" {
   default = "Fence"
   type = string
 }
+
+variable "pdf_link" {
+  type = string
+  default = "https://tinyurl.com/BDC-PIC-SURE-User-Guide"
+}
