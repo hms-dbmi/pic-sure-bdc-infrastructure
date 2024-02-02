@@ -78,7 +78,9 @@ data "template_file" "wildfly-standalone-xml" {
     idp_provider                      = var.idp_provider
     idp_provider_uri                  = var.idp_provider_uri
     application_id_for_base_query     = var.application_id_for_base_query
-
+    client_id                         = var.client_id
+    sp_client_secret                  = var.sp_client_secret
+    connection_id                     = var.connection_id
   }
 }
 
