@@ -173,8 +173,6 @@ echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} vep 
 wait
 echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} vep stage
 
-export ANNOTATEDLINECOUNT=`wc -l < /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.annotated.vcf`
-export NORMLINECOUNT=`wc -l < /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.normalized.vcf`
 
 /home/centos/htslib/bgzip -fki --threads 40 /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.annotated.vcf &
 echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} compressing stage
@@ -208,12 +206,8 @@ echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} outp
 wait
 echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} output stage
 
-if (($ANNOTATEDLINECOUNT == $NORMLINECOUNT + 3))
-then
+
 /usr/local/bin/aws --region=us-east-1 ec2 create-tags --resources $${INSTANCE_ID} --tags Key=AnnotationComplete,Value=true
-else
-/usr/local/bin/aws --region=us-east-1 ec2 create-tags --resources $${INSTANCE_ID} --tags Key=AnnotationComplete,Value=false
-fi
 
 unset AWS_ACCESS_KEY_ID
 unset AWS_SECRET_ACCESS_KEY
