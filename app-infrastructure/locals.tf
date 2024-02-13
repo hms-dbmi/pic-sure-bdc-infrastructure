@@ -1,4 +1,3 @@
-
 #Lookup latest AMI
 data "aws_ami" "centos" {
   most_recent = true
@@ -9,11 +8,11 @@ data "aws_ami" "centos" {
 # Random string to use for dynamic names.
 # use to get rid of git_hash in names causes conflicts if different env use same release controls
 resource "random_string" "random" {
-   length  = 6
-   special = false
+  length  = 6
+  special = false
 }
 locals {
-   uniq_name = random_string.random.result
+  uniq_name = random_string.random.result
 }
 
 data "aws_vpc" "target_vpc" {
@@ -80,12 +79,19 @@ data "aws_subnet" "public" {
 # better off explicitly setting this so we can deploy any project's resources in an environment.
 # won't be able to look up correct vpc tags otherwise
 locals {
-  ami_id              = data.aws_ami.centos.id
-  target_vpc          = data.aws_vpc.target_vpc.id
-  alb_vpc             = data.aws_vpc.alb_vpc.id
-  private1_subnet_ids = data.aws_subnets.private1.ids
-  private2_subnet_ids = data.aws_subnets.private2.ids
-  public_subnet_cidrs = values(data.aws_subnet.public).*.cidr_block
-  project             = var.env_project
-  db_subnet_group_name = local.project == "Open PIC-SURE" ? "open-pic-sure-${var.environment_name}-${var.target_stack}" : "auth-pic-sure-${var.environment_name}-${var.target_stack}"
+  ami_id               = data.aws_ami.centos.id
+  target_vpc           = data.aws_vpc.target_vpc.id
+  alb_vpc              = data.aws_vpc.alb_vpc.id
+  private1_subnet_ids  = data.aws_subnets.private1.ids
+  private2_subnet_ids  = data.aws_subnets.private2.ids
+  public_subnet_cidrs  = values(data.aws_subnet.public).*.cidr_block
+  project              = var.env_project
+
+  # db subnet group name needs to be more elastic
+  # let's leverage the project variable to dynamically set set the requried name for now
+  open_subnet_group_name = local.project == "Open PIC-SURE" ? "open-pic-sure-${var.environment_name}-${var.target_stack}": ""
+  auth_subnet_group_name = local.project == "Auth PIC-SURE" ? "auth-pic-sure-${var.environment_name}-${var.target_stack}": ""
+  picsure_subnet_group_name = local.project == "PIC-SURE" ? "pic-sure-${var.environment_name}-${var.target_stack}": ""
+  db_subnet_group_name = coalesce(local.open_subnet_group_name, local.auth_subnet_group_name, local.picsure_subnet_group_name)
+
 }

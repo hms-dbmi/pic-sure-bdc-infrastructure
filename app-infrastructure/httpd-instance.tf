@@ -77,7 +77,6 @@ resource "local_file" "httpd-vhosts-conf-file" {
   filename = "httpd-vhosts.conf"
 }
 
-
 data "template_file" "picsureui_settings" {
   template = file("configs/picsureui_settings.json")
   vars = {
@@ -89,6 +88,8 @@ data "template_file" "picsureui_settings" {
     application_id_for_base_query = var.application_id_for_base_query
     help_link                     = var.help_link
     login_link                    = var.login_link
+    client_id                     = var.client_id
+    pdf_link                      = var.pdf_link
   }
 }
 
