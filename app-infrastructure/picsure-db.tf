@@ -14,7 +14,7 @@ resource "aws_db_instance" "pic-sure-mysql" {
   skip_final_snapshot    = true
   vpc_security_group_ids = [aws_security_group.inbound-mysql-from-wildfly.id]
 
-  snapshot_identifier    = var.picsure_rds_snapshot_id
+  snapshot_identifier = var.picsure_rds_snapshot_id
 
   tags = {
     Owner       = "Avillach_Lab"
@@ -32,12 +32,15 @@ resource "random_password" "picsure-db-password" {
 
 data "template_file" "pic-sure-schema-sql" {
   template = file("configs/pic-sure-schema.sql")
-  vars = {
+  vars     = {
     picsure_token_introspection_token = var.picsure_token_introspection_token
     target_stack                      = var.target_stack
     env_private_dns_name              = var.env_private_dns_name
     include_auth_hpds                 = var.include_auth_hpds
     include_open_hpds                 = var.include_open_hpds
+    connection_label                  = var.connection_label
+    connection_sub_prefix             = var.connection_sub_prefix
+    connection_id                     = var.connection_id
   }
 }
 
@@ -48,13 +51,13 @@ resource "local_file" "pic-sure-schema-sql-file" {
 
 # Need to handle if the a stack is using a the hardcoded urls for resources in the db.
 # Upserts on deployments will at least ensure a newly deployed stack is using the correct urls for resources
-# This will not be a good methodology for standalone as each stack cannot use the same UUID. 
+# This will not be a good methodology for standalone as each stack cannot use the same UUID.
 # Need a more dynamic and abstract method to find resources instead of hardcoding them into config files.
 # Another table with simple uniq names that app can configure to lookup the UUIDs.
-# 
+#
 data "template_file" "resources-registration" {
   template = file("configs/resources-registration.sql")
-  vars = {
+  vars     = {
     picsure_token_introspection_token = var.picsure_token_introspection_token
     target_stack                      = var.target_stack
     env_private_dns_name              = var.env_private_dns_name
@@ -67,3 +70,4 @@ resource "local_file" "resources-registration-file" {
   content  = data.template_file.resources-registration.rendered
   filename = "resources-registration.sql"
 }
+

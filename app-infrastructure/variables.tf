@@ -79,11 +79,11 @@ variable "env_is_open_access" {
 }
 
 variable "include_auth_hpds" {
-    type    = bool
+  type    = bool
 }
 
 variable "include_open_hpds" {
-    type    = bool
+  type    = bool
 }
 
 # removing for now as they are secrets handled by the stack_variables
@@ -145,7 +145,37 @@ variable "help_link" {
 }
 
 variable "login_link" {
-    type = string
-    description = "Relative or absolute URL to redirect to upon login"
-    default = "/psamaui/login/?redirection_url=/picsureui/"
+  type = string
+  description = "Relative or absolute URL to redirect to upon login"
+  default = "/psamaui/login/?redirection_url=/picsureui/"
+}
+
+variable "client_id" {
+  default = "not_used_in_fence"
+  type = string
+  description = "Service Provider Client ID"
+}
+
+variable "sp_client_secret" {
+  default = ""
+  type = string
+  description = "Service Provider Client Secret"
+}
+variable "connection_label" {
+  default = "FENCE"
+  type = string
+}
+variable "connection_sub_prefix" {
+  default = "fence|"
+  type = string
+}
+
+variable "connection_id" {
+  default = "Fence"
+  type = string
+}
+
+variable "pdf_link" {
+  type = string
+  default = "https://tinyurl.com/BDC-PIC-SURE-User-Guide"
 }
