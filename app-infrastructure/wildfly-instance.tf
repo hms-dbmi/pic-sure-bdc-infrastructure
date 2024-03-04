@@ -1,16 +1,11 @@
 data "template_file" "wildfly-user_data" {
   template = file("scripts/wildfly-user_data.sh")
-  vars = {
+  vars     = {
     stack_githash           = var.stack_githash_long
     stack_s3_bucket         = var.stack_s3_bucket
     dataset_s3_object_key   = var.dataset_s3_object_key
-    mysql-instance-address  = aws_db_instance.pic-sure-mysql.address
-    mysql-instance-password = random_password.picsure-db-password.result
     target_stack            = var.target_stack
-    gss_prefix          = "${var.environment_prefix}_${var.env_is_open_access ? "open" : "auth"}_${var.environment_name}"
-    env_private_dns_name    = var.env_private_dns_name
-    env_public_dns_name     = var.env_public_dns_name
-    picsure_rds_snapshot_id = var.picsure_rds_snapshot_id
+    gss_prefix              = "${var.environment_prefix}_${var.env_is_open_access ? "open" : "auth"}_${var.environment_name}"
   }
 }
 
@@ -23,12 +18,11 @@ data "template_cloudinit_config" "wildfly-user-data" {
     content_type = "text/x-shellscript"
     content      = data.template_file.wildfly-user_data.rendered
   }
-
 }
 
 resource "aws_instance" "wildfly-ec2" {
   ami           = local.ami_id
-  instance_type = "m5.2xlarge"
+  instance_type = "m5.large"
 
   subnet_id = local.private2_subnet_ids[0]
 
@@ -44,7 +38,7 @@ resource "aws_instance" "wildfly-ec2" {
   root_block_device {
     delete_on_termination = true
     encrypted             = true
-    volume_size           = 150
+    volume_size           = 50
   }
 
   tags = {
@@ -65,14 +59,15 @@ resource "aws_instance" "wildfly-ec2" {
 
 data "template_file" "wildfly-standalone-xml" {
   template = file("configs/standalone.xml")
-  vars = {
-    picsure-db-password               = random_password.picsure-db-password.result
+  vars     = {
+    picsure-db-password               = var.picsure_db_password
+    picsure-db-username               = var.picsure_db_username
+    picsure-db-host                   = var.picsure_db_host
     picsure_client_secret             = var.picsure_client_secret
     fence_client_secret               = var.fence_client_secret
     fence_client_id                   = var.fence_client_id
     target_stack                      = var.target_stack
     picsure_token_introspection_token = var.picsure_token_introspection_token
-    mysql-instance-address            = aws_db_instance.pic-sure-mysql.address
     env_private_dns_name              = var.env_private_dns_name
     env_public_dns_name               = var.env_public_dns_name
     idp_provider                      = var.idp_provider
@@ -91,7 +86,7 @@ resource "local_file" "wildfly-standalone-xml-file" {
 
 data "template_file" "aggregate-resource-properties" {
   template = file("configs/aggregate-resource.properties")
-  vars = {
+  vars     = {
     target_stack         = var.target_stack
     env_private_dns_name = var.env_private_dns_name
   }
@@ -104,8 +99,9 @@ resource "local_file" "aggregate-resource-properties-file" {
 
 data "template_file" "visualization-resource-properties" {
   template = file("configs/visualization-resource.properties")
-  vars = {
-    target_stack = var.target_stack
+  vars     = {
+    target_stack                      = var.target_stack
+    auth_hpds_resource_id             = var.auth_hpds_resource_id
   }
 }
 

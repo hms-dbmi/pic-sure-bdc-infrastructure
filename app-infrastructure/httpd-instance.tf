@@ -61,14 +61,16 @@ resource "aws_instance" "httpd-ec2" {
 
 data "template_file" "httpd-vhosts-conf" {
   template = file("configs/httpd-vhosts.conf")
-  vars = {
+  vars     = {
 
-    wildfly-base-url = "http://${aws_instance.wildfly-ec2.private_ip}:8080"
-    target_stack = var.target_stack
-    release-id = var.stack_githash_long
+    wildfly-base-url            = "http://${aws_instance.wildfly-ec2.private_ip}:8080"
+    target_stack                = var.target_stack
+    release-id                  = var.stack_githash_long
     env_private_dns_name        = var.env_private_dns_name
     env_public_dns_name         = var.env_public_dns_name
     env_public_dns_name_staging = var.env_public_dns_name_staging
+    referer_allowed_domains     = var.referer_allowed_domains
+    login_link                  = var.login_link
   }
 }
 
@@ -79,7 +81,7 @@ resource "local_file" "httpd-vhosts-conf-file" {
 
 data "template_file" "picsureui_settings" {
   template = file("configs/picsureui_settings.json")
-  vars = {
+  vars     = {
     analytics_id                  = var.analytics_id,
     tag_manager_id                = var.tag_manager_id
     fence_client_id               = var.fence_client_id
@@ -90,6 +92,8 @@ data "template_file" "picsureui_settings" {
     login_link                    = var.login_link
     client_id                     = var.client_id
     pdf_link                      = var.pdf_link
+    auth_hpds_resource_id         = var.auth_hpds_resource_id
+    dictionary_resource_id        = var.dictionary_resource_id
   }
 }
 
