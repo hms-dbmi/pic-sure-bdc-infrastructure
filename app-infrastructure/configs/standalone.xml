@@ -164,7 +164,7 @@
                 </datasource>
                 <datasource jndi-name="java:jboss/datasources/AuthDS" pool-name="AuthDS" use-java-context="true">
                     <connection-url>
-                        jdbc:mysql://picsure-db.${target_stack}.${env_private_dns_name}:3306/auth?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true&amp;autoReconnectForPools=true
+                        jdbc:mysql://${picsure-db-host}/auth?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true&amp;autoReconnectForPools=true
                     </connection-url>
                     <driver>mysql</driver>
                     <pool>
@@ -173,7 +173,7 @@
                         <prefill>true</prefill>
                     </pool>
                     <security>
-                        <user-name>root</user-name>
+                        <user-name>${picsure-db-username}</user-name>
                         <password>${picsure-db-password}</password>
                     </security>
                     <validation>
@@ -188,7 +188,7 @@
                 </datasource>
                 <datasource jndi-name="java:jboss/datasources/PicsureDS" pool-name="PicsureDS" use-java-context="true">
                     <connection-url>
-                        jdbc:mysql://picsure-db.${target_stack}.${env_private_dns_name}:3306/picsure?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true&amp;autoReconnectForPools=true
+                        jdbc:mysql://${picsure-db-host}/picsure?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true&amp;autoReconnectForPools=true
                     </connection-url>
                     <driver>mysql</driver>
                     <pool>
@@ -197,7 +197,7 @@
                         <prefill>true</prefill>
                     </pool>
                     <security>
-                        <user-name>root</user-name>
+                        <user-name>${picsure-db-username}</user-name>
                         <password>${picsure-db-password}</password>
                     </security>
                     <validation>
@@ -212,7 +212,7 @@
                 </datasource>
                 <drivers>
                     <driver name="mysql" module="com.sql.mysql">
-                        <driver-class>com.mysql.jdbc.Driver</driver-class>
+                        <driver-class>com.mysql.cj.jdbc.Driver</driver-class>
                     </driver>
                     <driver name="h2" module="com.h2database.h2">
                         <xa-datasource-class>org.h2.jdbcx.JdbcDataSource</xa-datasource-class>
