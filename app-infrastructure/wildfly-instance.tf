@@ -101,7 +101,6 @@ data "template_file" "visualization-resource-properties" {
   template = file("configs/visualization-resource.properties")
   vars     = {
     target_stack                      = var.target_stack
-    auth_hpds_resource_id             = var.auth_hpds_resource_id
   }
 }
 
