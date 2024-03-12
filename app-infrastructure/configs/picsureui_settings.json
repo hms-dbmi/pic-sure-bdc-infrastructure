@@ -8,10 +8,10 @@
     }
   ],
   "queryExportType": "EXPORT_ASYNC",
-  "picSureResourceId": "${auth_hpds_resource_id}",
+  "picSureResourceId": "02e23f52-f354-4e8b-992c-d37c8b9ba140",
   "openAccessResourceId": "70c837be-5ffc-11eb-ae93-0242ac130002",
   "visualizationResourceId": "ca0ad4a9-130a-3a8a-ae00-e35b07f1108b",
-  "dictionaryResourceId": "${dictionary_resource_id}",
+  "dictionaryResourceId": "36363664-6231-6134-2d38-6538652d3131",
   "applicationIdForBaseQuery": "${application_id_for_base_query}",
   "helpLink": "${help_link}",
   "loginLink": "${login_link}",

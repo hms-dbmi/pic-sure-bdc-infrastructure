@@ -92,8 +92,6 @@ data "template_file" "picsureui_settings" {
     login_link                    = var.login_link
     client_id                     = var.client_id
     pdf_link                      = var.pdf_link
-    auth_hpds_resource_id         = var.auth_hpds_resource_id
-    dictionary_resource_id        = var.dictionary_resource_id
   }
 }
 

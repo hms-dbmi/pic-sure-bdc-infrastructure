@@ -40,7 +40,7 @@ s3_copy s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/
 s3_copy s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/visualization-resource.properties /home/centos/visualization-resource.properties
 
 WILDFLY_IMAGE=`sudo docker load < /home/centos/pic-sure-wildfly.tar.gz | cut -d ' ' -f 3`
-JAVA_OPTS="-Xms2g -Xmx26g -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=1024m -Djava.net.preferIPv4Stack=true"
+JAVA_OPTS="-Xms2g -Xmx26g -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=1024m -Djava.net.preferIPv4Stack=true -DTARGET_STACK=${target_stack}.${env_private_dns_name}"
 
 sudo mkdir /var/log/{wildfly-docker-logs,wildfly-docker-os-logs}
 
