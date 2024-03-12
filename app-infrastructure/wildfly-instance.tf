@@ -6,6 +6,7 @@ data "template_file" "wildfly-user_data" {
     dataset_s3_object_key   = var.dataset_s3_object_key
     target_stack            = var.target_stack
     gss_prefix              = "${var.environment_prefix}_${var.env_is_open_access ? "open" : "auth"}_${var.environment_name}"
+    env_private_dns_name    = var.env_private_dns_name
   }
 }
 
