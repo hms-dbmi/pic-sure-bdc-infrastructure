@@ -45,7 +45,7 @@ sudo docker run --name=$CONTAINER_NAME \
                 --log-driver syslog --log-opt tag=auth-hpds \
                 -v /opt/local/hpds:/opt/local/hpds \
                 -p 8080:8080 \
-                -e CATALINA_OPTS=" -XX:+UseParallelGC -XX:SurvivorRatio=250 -Xms10g -Xmx110g -DCACHE_SIZE=2500 -DSMALL_TASK_THREADS=1 -DLARGE_TASK_THREADS=1 -DSMALL_JOB_LIMIT=100 -DID_BATCH_SIZE=5000 '-DALL_IDS_CONCEPT=NONE'  '-DID_CUBE_NAME=NONE'"  \
+                -e JAVA_OPTS=" -XX:+UseParallelGC -XX:SurvivorRatio=250 -Xms10g -Xmx128g -Dserver.port=8080 -Dspring.profiles.active=development -DCACHE_SIZE=2500 -DID_BATCH_SIZE=5000 -DALL_IDS_CONCEPT=NONE -DID_CUBE_NAME=NONE "  \
                 -d $HPDS_IMAGE
 
 echo "Waiting for container to initialize"
