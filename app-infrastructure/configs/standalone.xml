@@ -517,7 +517,7 @@
 
                 <!-- Configure Identity Provider Parameters, with defaults-->
                 <simple name="java:global/idp_provider" value="${idp_provider}"/>
-                <simple name="java:global/idp_provider_uri" value="${idp_provider_uri}/"/>
+                <simple name="java:global/idp_provider_uri" value="${idp_provider_uri}"/>
 
                 <!-- Configure Fence Parameters, with defaults-->
                 <simple name="java:global/fence_client_id" value="${fence_client_id}"/>
