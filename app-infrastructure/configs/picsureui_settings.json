@@ -104,5 +104,6 @@
   "fence_client_id": "${fence_client_id}",
   "analyticsId": "${analytics_id}",
   "tagManagerId": "${tag_manager_id}",
-  "client_id": "${client_id}"
+  "client_id": "${client_id}",
+  "include_bdc_specific_filters": true
 }
