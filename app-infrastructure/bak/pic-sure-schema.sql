@@ -101,12 +101,11 @@ CREATE TABLE `resource` (
 --
 -- Dumping data for table `resource`
 --
-
 LOCK TABLES `resource` WRITE;
 /*!40000 ALTER TABLE `resource` DISABLE KEYS */;
-INSERT INTO `resource` VALUES (0x02E23F52F3544E8B992CD37C8B9BA140,NULL,'http://auth-hpds.${target-stack}.datastage.hms.harvard.edu:8080/PIC-SURE/','Authorized Access HPDS resource','auth-hpds',NULL, NULL, NULL);
-INSERT INTO `resource` VALUES (0x70c837be5ffc11ebae930242ac130002,NULL,'http://localhost:8080/pic-sure-aggregate-resource/pic-sure/aggregate-data-sharing','Open Access (aggregate) resource','open-hpds',NULL, NULL, NULL);
-INSERT INTO `resource` VALUES (0x36363664623161342d386538652d3131,NULL,'http://dictionary.${target-stack}.datastage.hms.harvard.edu:8080/dictionary/pic-sure','Dictionary','dictionary',NULL, NULL, NULL);
+${include_auth_hpds ? "INSERT INTO `resource` VALUES (0x02E23F52F3544E8B992CD37C8B9BA140,NULL,'http://auth-hpds.${target_stack}.${env_private_dns_name}:8080/PIC-SURE/','Authorized Access HPDS resource','auth-hpds',NULL, NULL, NULL);" : ""}
+${include_open_hpds ? "INSERT INTO `resource` VALUES (0x70c837be5ffc11ebae930242ac130002,NULL,'http://localhost:8080/pic-sure-aggregate-resource/pic-sure/aggregate-data-sharing','Open Access (aggregate) resource','open-hpds',NULL, NULL, NULL);" : ""}
+INSERT INTO `resource` VALUES (0x36363664623161342d386538652d3131,NULL,'http://dictionary.${target_stack}.${env_private_dns_name}:8080/dictionary/pic-sure','Dictionary','dictionary',NULL, NULL, NULL);
 INSERT INTO `resource` VALUES (0xCA0AD4A9130A3A8AAE00E35B07F1108B,NULL,'http://localhost:8080/pic-sure-visualization-resource/pic-sure/visualization','Visualization','visualization',NULL, NULL, NULL);
 /*!40000 ALTER TABLE `resource` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -249,7 +248,7 @@ CREATE TABLE `application` (
 
 LOCK TABLES `application` WRITE;
 /*!40000 ALTER TABLE `application` DISABLE KEYS */;
-INSERT INTO `application` VALUES (0x8B5722C962FD48D6B0BF4F67E53EFB2B,'PIC-SURE multiple data access API',0x01,'PICSURE','${picsure_token_introspection_token}','/picsureui');
+INSERT INTO `application` VALUES (0x8B5722C962FD48D6B0BF4F67E53EFB2B,'PIC-SURE multiple data access API',0x01,'PICSURE','${picsure_token_introspection_token}','/picsureui') ON DUPLICATE KEY UPDATE `token` = VALUES(`token`);
 /*!40000 ALTER TABLE `application` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -277,7 +276,7 @@ CREATE TABLE `connection` (
 
 LOCK TABLES `connection` WRITE;
 /*!40000 ALTER TABLE `connection` DISABLE KEYS */;
-INSERT INTO `connection` VALUES (0xD8C456813239437C951D706D5E56CAB8,'FENCE','fence','fence|','[{\"label\":\"email\",\"id\":\"email\"}]');
+INSERT INTO connection VALUES (0xD8C456813239437C951D706D5E56CAB8, '${connection_label}', '${connection_id}','${connection_sub_prefix}|','[{"label":"Email", "id":"email"}]');
 /*!40000 ALTER TABLE `connection` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -675,24 +674,42 @@ where privilege.uuid = role_privilege.privilege_id
   AND role_privilege.role_id = role.uuid
   AND role.name = 'FENCE_ROLE_OPEN_ACCESS';
 
-SET @searchValuesAccessRuleUUID = REPLACE(uuid(),'-','');
-INSERT INTO access_rule (uuid, name, description, rule, type, value, checkMapKeyOnly, checkMapNode, subAccessRuleParent_uuid, isEvaluateOnlyByGates, isGateAnyRelation)
-VALUES (
-           unhex(@searchValuesAccessRuleUUID),
-           'ALLOW_SEARCH_VALUES_ACCESS',
-           'Allow access to search values endpoint',
-           '$.path',
-           11,
-           '/search/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/values',
-           false,
-           true,
-           NULL,
-           true,
-           false
-       );
+--
+-- Create Super Admin and admin roles and privileges
+--
+SET @superAdminPrivilegeUUID = UNHEX('7044061AF65B425F86CE73A1BF7F4402');
+SET @adminPrivilegeUUID = UNHEX('AD08212E096F414CBA8D1BAE09415DAB');
 
-INSERT INTO accessRule_privilege (privilege_id, accessRule_id)
-SELECT privilege.uuid, unhex(@searchValuesAccessRuleUUID) from privilege, role_privilege, role
-where privilege.uuid = role_privilege.privilege_id
-  AND role_privilege.role_id = role.uuid
-  AND role.name = 'FENCE_ROLE_OPEN_ACCESS';
+INSERT INTO privilege (uuid, description, name, application_id, queryTemplate, queryScope) VALUES
+                                                                                               (@superAdminPrivilegeUUID,'PIC-SURE Auth super admin for managing roles/privileges/application/connections','SUPER_ADMIN',NULL,'[]',NULL),
+                                                                                               (@adminPrivilegeUUID,'PIC-SURE Auth admin for managing users.','ADMIN',NULL,'[]',NULL);
+
+SET @superAdminRoleUUID = UNHEX('002DC366B0D8420F998F885D0ED797FD');
+SET @adminRoleUUID = UNHEX('8F885D0ED797FD002DC366B0D8420F99');
+
+INSERT INTO role (uuid, name, description) VALUES
+                                               (@superAdminRoleUUID,'PIC-SURE Top Admin','PIC-SURE Auth Micro App Top admin including Admin and super Admin, can manage roles and privileges directly'),
+                                               (@adminRoleUUID,'Admin','Normal admin users, can manage other users including assignment of roles and privileges');
+
+INSERT INTO role_privilege (role_id, privilege_id) VALUES
+                                                       (@superAdminRoleUUID,@superAdminPrivilegeUUID),
+                                                       (@superAdminRoleUUID,@adminPrivilegeUUID),
+                                                       (@adminRoleUUID,@adminPrivilegeUUID);
+
+DROP PROCEDURE IF EXISTS CreateSuperUser;
+delimiter //
+CREATE PROCEDURE CreateSuperUser (IN user_email varchar(255), IN connection_id varchar(255))
+BEGIN
+    SELECT @userUUID := uuid FROM auth.user WHERE email = user_email AND connectionId = connection_id;
+    SELECT @saUUID := uuid FROM auth.role WHERE name = 'PIC-SURE Top Admin';
+    SELECT @adminUUID := uuid FROM auth.role WHERE name = 'Admin';
+    IF @userUUID IS NULL THEN
+        SET @userUUID = UNHEX(REPLACE(UUID(), '-', ''));
+        SELECT @connectionUUID := uuid FROM auth.connection WHERE id = connection_id;
+        INSERT INTO auth.user (uuid, general_metadata, acceptedTOS, connectionId, email, matched, subject, is_active, long_term_token, isGateAnyRelation)
+        VALUES (@userUUID, null, (SELECT CURRENT_TIMESTAMP), @connectionUUID, user_email, 0, null, 1, null, 1);
+    END IF;
+    INSERT INTO auth.user_role (user_id, role_id) VALUES (@userUUID,@saUUID);
+    INSERT INTO auth.user_role (user_id, role_id) VALUES (@userUUID,@adminUUID);
+END//
+delimiter ;

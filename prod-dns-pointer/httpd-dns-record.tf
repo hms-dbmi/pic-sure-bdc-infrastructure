@@ -1,12 +1,18 @@
 
-variable "target-prod-stack" {
+# passed in by CI env pipeline parameter
+variable "target_stack" {
   description = "The stack identifier to become the current prod"
   type        = string
 }
 
-variable "target-next-prod-stack" {
+# passed in by CI env pipeline parameter
+variable "target_next_stack" {
   description = "The stack identifier to become the next prod(or stage)"
   type        = string
+}
+
+variable "env_private_dns_name" {
+  type = string
 }
 
 resource "aws_route53_record" "prod-httpd-dns-record" {
@@ -14,7 +20,7 @@ resource "aws_route53_record" "prod-httpd-dns-record" {
   name    = "prod-httpd"
   type    = "CNAME"
   ttl     = "60"
-  records = ["httpd.${var.target-prod-stack}.datastage.hms.harvard.edu"]
+  records = ["httpd.${var.target_stack}.${var.env_private_dns_name}"]
 }
 
 resource "aws_route53_record" "next-prod-httpd-dns-record" {
@@ -22,5 +28,5 @@ resource "aws_route53_record" "next-prod-httpd-dns-record" {
   name    = "next-prod-httpd"
   type    = "CNAME"
   ttl     = "60"
-  records = ["httpd.${var.target-next-prod-stack}.datastage.hms.harvard.edu"]
+  records = ["httpd.${var.target_next_stack}.${var.env_private_dns_name}"]
 }
