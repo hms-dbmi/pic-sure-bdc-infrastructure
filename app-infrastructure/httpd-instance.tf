@@ -92,6 +92,7 @@ data "template_file" "picsureui_settings" {
     login_link                    = var.login_link
     client_id                     = var.client_id
     pdf_link                      = var.pdf_link
+    pic_sure_resource_id          = var.pic_sure_resource_id
   }
 }
 
