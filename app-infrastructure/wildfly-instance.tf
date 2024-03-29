@@ -23,7 +23,7 @@ data "template_cloudinit_config" "wildfly-user-data" {
 
 resource "aws_instance" "wildfly-ec2" {
   ami           = local.ami_id
-  instance_type = "m5.large"
+  instance_type = "m5.2xlarge"
 
   subnet_id = local.private2_subnet_ids[0]
 
