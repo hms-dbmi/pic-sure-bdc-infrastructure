@@ -203,4 +203,5 @@ variable "referer_allowed_domains" {
 variable "pic_sure_resource_id" {
     type = string
     description = "The resource id for the pic-sure. Used for auth or open HPDS generally"
+
 }
