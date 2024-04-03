@@ -33,3 +33,13 @@ resource "aws_iam_role_policy" "wildfly-deployment-sm-policy" {
 }
 EOF
 }
+
+resource "aws_iam_role_policy_attachment" "attach-cloudwatch-server-policy-to-sm-role" {
+  role       = aws_iam_role.wildfly-deployment-sm-role.name
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+}
+
+resource "aws_iam_role_policy_attachment" "attach-cloudwatch-ssm-policy-to-sm-role" {
+  role       = aws_iam_role.wildfly-deployment-sm-role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
