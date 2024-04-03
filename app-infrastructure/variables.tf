@@ -205,3 +205,19 @@ variable "pic_sure_resource_id" {
     description = "The resource id for the pic-sure. Used for auth or open HPDS generally"
 
 }
+
+variable "app_acct_id" {
+    type = string
+    description = "The account id for the application"
+}
+
+variable "app_user_secret_name" {
+    type = string
+    description = "The secret name for the application user"
+}
+
+variable "aws_region" {
+    type = string
+    description = "The region for the deployment"
+    default = "us-east-1"
+}
