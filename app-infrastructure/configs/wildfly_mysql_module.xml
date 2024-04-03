@@ -1,6 +1,7 @@
-<module xmlns="urn:jboss:module:1.1" name="com.amazonaws.secretsmanager.sql">
+<module xmlns="urn:jboss:module:1.1" name="com.sql.mysql">
 <resources>
     <resource-root path="aws-secretsmanager-jdbc-2.0.2.jar"/>
+    <resource-root path="mysql-connector-java-8.0.23.jar"/>
 </resources>
 <dependencies>
 <module name="javax.api"/>

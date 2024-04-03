@@ -164,7 +164,7 @@
                         <prefill>true</prefill>
                     </pool>
                     <security>
-                        <user-name>${database_app_user_secret}</user-name>
+                        <user-name>${app_user_secret_name}</user-name>
                     </security>
                     <validation>
                         <valid-connection-checker
@@ -187,7 +187,7 @@
                         <prefill>true</prefill>
                     </pool>
                     <security>
-                        <user-name>${database_app_user_secret}</user-name>
+                        <user-name>${app_user_secret_name}</user-name>
                     </security>
                     <validation>
                         <valid-connection-checker
@@ -200,10 +200,10 @@
                     </validation>
                 </datasource>
                 <drivers>
-                    <driver name="aws-secretsmanager-mysql" module="com.amazonaws.secretsmanager.sql">
+                    <driver name="aws-secretsmanager-mysql" module="com.sql.mysql">
                         <driver-class>com.amazonaws.secretsmanager.sql.AWSSecretsManagerMySQLDriver</driver-class>
                     </driver>
-                    <driver name="aws-secretsmanager-h2" module="com.amazonaws.secretsmanager.sql">
+                    <driver name="aws-secretsmanager-h2" module="com.sql.mysql">
                         <xa-datasource-class>com.amazonaws.secretsmanager.sql.AWSSecretsManagerDriver</xa-datasource-class>
                     </driver>
                 </drivers>
