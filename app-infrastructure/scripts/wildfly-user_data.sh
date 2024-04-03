@@ -35,6 +35,7 @@ s3_copy s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}
 s3_copy s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/standalone.xml /home/centos/standalone.xml
 s3_copy s3://${stack_s3_bucket}/modules/mysql/aws-module.xml /home/centos/mysql_module.xml
 s3_copy s3://${stack_s3_bucket}/modules/mysql/aws-secretsmanager-jdbc-2.0.2.jar /home/centos/aws-secretsmanager-jdbc-2.0.2.jar
+s3_copy s3://${stack_s3_bucket}/modules/mysql/mysql-connector-j-8.0.33.jar /home/centos/mysql-connector-j-8.0.33.jar
 s3_copy s3://${stack_s3_bucket}/data/${dataset_s3_object_key}/fence_mapping.json /home/centos/fence_mapping.json
 s3_copy s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/aggregate-resource.properties /home/centos/aggregate-resource.properties
 s3_copy s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/visualization-resource.properties /home/centos/visualization-resource.properties
