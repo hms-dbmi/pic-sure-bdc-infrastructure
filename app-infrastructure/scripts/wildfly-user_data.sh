@@ -33,8 +33,8 @@ sleep 600
 
 s3_copy s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-wildfly.tar.gz /home/centos/pic-sure-wildfly.tar.gz
 s3_copy s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/standalone.xml /home/centos/standalone.xml
-s3_copy s3://${stack_s3_bucket}/modules/mysql/module.xml /home/centos/mysql_module.xml
-s3_copy s3://${stack_s3_bucket}/modules/mysql/mysql-connector-j-8.0.33.jar /home/centos/mysql-connector-j-8.0.33.jar
+s3_copy s3://${stack_s3_bucket}/modules/mysql/aws-module.xml /home/centos/mysql_module.xml
+s3_copy s3://${stack_s3_bucket}/modules/mysql/aws-secretsmanager-jdbc-2.0.2.jar /home/centos/aws-secretsmanager-jdbc-2.0.2.jar
 s3_copy s3://${stack_s3_bucket}/data/${dataset_s3_object_key}/fence_mapping.json /home/centos/fence_mapping.json
 s3_copy s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/aggregate-resource.properties /home/centos/aggregate-resource.properties
 s3_copy s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/visualization-resource.properties /home/centos/visualization-resource.properties
@@ -52,7 +52,7 @@ sudo docker run -u root --name=wildfly \
                         -v /home/centos/fence_mapping.json:/usr/local/docker-config/fence_mapping.json \
                         -v /home/centos/aggregate-resource.properties:/opt/jboss/wildfly/standalone/configuration/aggregate-data-sharing/pic-sure-aggregate-resource/resource.properties \
                         -v /home/centos/mysql_module.xml:/opt/jboss/wildfly/modules/system/layers/base/com/sql/mysql/main/module.xml  \
-                        -v /home/centos/mysql-connector-j-8.0.33.jar:/opt/jboss/wildfly/modules/system/layers/base/com/sql/mysql/main/mysql-connector-j-8.0.33.jar \
+                        -v /home/centos/aws-secretsmanager-jdbc-2.0.2.jar:/opt/jboss/wildfly/modules/system/layers/base/com/sql/mysql/main/aws-secretsmanager-jdbc-2.0.2.jar \
                         -v /var/log/wildfly-docker-os-logs/:/var/log/ \
                         -v /home/centos/visualization-resource.properties:/opt/jboss/wildfly/standalone/configuration/visualization/pic-sure-visualization-resource/resource.properties \
                         -p 8080:8080 -e JAVA_OPTS="$JAVA_OPTS" -d $WILDFLY_IMAGE
