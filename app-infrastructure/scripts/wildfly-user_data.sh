@@ -54,6 +54,7 @@ sudo docker run -u root --name=wildfly \
                         -v /home/centos/aggregate-resource.properties:/opt/jboss/wildfly/standalone/configuration/aggregate-data-sharing/pic-sure-aggregate-resource/resource.properties \
                         -v /home/centos/mysql_module.xml:/opt/jboss/wildfly/modules/system/layers/base/com/sql/mysql/main/module.xml  \
                         -v /home/centos/aws-secretsmanager-jdbc-2.0.2.jar:/opt/jboss/wildfly/modules/system/layers/base/com/sql/mysql/main/aws-secretsmanager-jdbc-2.0.2.jar \
+                        -v /home/centos/mysql-connector-j-8.0.33.jar:/opt/jboss/wildfly/modules/system/layers/base/com/sql/mysql/main/mysql-connector-j-8.0.33.jar \
                         -v /var/log/wildfly-docker-os-logs/:/var/log/ \
                         -v /home/centos/visualization-resource.properties:/opt/jboss/wildfly/standalone/configuration/visualization/pic-sure-visualization-resource/resource.properties \
                         -p 8080:8080 -e JAVA_OPTS="$JAVA_OPTS" -d $WILDFLY_IMAGE
