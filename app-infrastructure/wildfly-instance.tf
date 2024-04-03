@@ -1,12 +1,12 @@
 data "template_file" "wildfly-user_data" {
   template = file("scripts/wildfly-user_data.sh")
   vars     = {
-    stack_githash           = var.stack_githash_long
-    stack_s3_bucket         = var.stack_s3_bucket
-    dataset_s3_object_key   = var.dataset_s3_object_key
-    target_stack            = var.target_stack
-    gss_prefix              = "${var.environment_prefix}_${var.env_is_open_access ? "open" : "auth"}_${var.environment_name}"
-    env_private_dns_name    = var.env_private_dns_name
+    stack_githash         = var.stack_githash_long
+    stack_s3_bucket       = var.stack_s3_bucket
+    dataset_s3_object_key = var.dataset_s3_object_key
+    target_stack          = var.target_stack
+    gss_prefix            = "${var.environment_prefix}_${var.env_is_open_access ? "open" : "auth"}_${var.environment_name}"
+    env_private_dns_name  = var.env_private_dns_name
   }
 }
 
@@ -77,6 +77,7 @@ data "template_file" "wildfly-standalone-xml" {
     client_id                         = var.client_id
     sp_client_secret                  = var.sp_client_secret
     connection_id                     = var.connection_id
+    app_user_secret_name              = var.app_user_secret_name
   }
 }
 
@@ -101,7 +102,7 @@ resource "local_file" "aggregate-resource-properties-file" {
 data "template_file" "visualization-resource-properties" {
   template = file("configs/visualization-resource.properties")
   vars     = {
-    target_stack                      = var.target_stack
+    target_stack = var.target_stack
   }
 }
 
