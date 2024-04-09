@@ -203,5 +203,14 @@ variable "referer_allowed_domains" {
 variable "pic_sure_resource_id" {
     type = string
     description = "The resource id for the pic-sure. Used for auth or open HPDS generally"
+}
 
+variable "app_acct_id" {
+    type = string
+    description = "The account id for the application"
+}
+
+variable "app_user_secret_name" {
+    type = string
+    description = "The secret name for the application user"
 }

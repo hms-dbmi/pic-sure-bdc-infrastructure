@@ -164,17 +164,16 @@
                 </datasource>
                 <datasource jndi-name="java:jboss/datasources/AuthDS" pool-name="AuthDS" use-java-context="true">
                     <connection-url>
-                        jdbc:mysql://${picsure-db-host}/auth?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true&amp;autoReconnectForPools=true
+                        jdbc-secretsmanager:mysql://${picsure-db-host}/auth?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true&amp;autoReconnectForPools=true
                     </connection-url>
-                    <driver>mysql</driver>
+                    <driver>aws-secretsmanager-mysql</driver>
                     <pool>
                         <min-pool-size>2</min-pool-size>
                         <max-pool-size>10</max-pool-size>
                         <prefill>true</prefill>
                     </pool>
                     <security>
-                        <user-name>${picsure-db-username}</user-name>
-                        <password>${picsure-db-password}</password>
+                        <user-name>${app_user_secret_name}</user-name>
                     </security>
                     <validation>
                         <valid-connection-checker
@@ -188,17 +187,16 @@
                 </datasource>
                 <datasource jndi-name="java:jboss/datasources/PicsureDS" pool-name="PicsureDS" use-java-context="true">
                     <connection-url>
-                        jdbc:mysql://${picsure-db-host}/picsure?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true&amp;autoReconnectForPools=true
+                        jdbc-secretsmanager:mysql://${picsure-db-host}/picsure?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true&amp;autoReconnectForPools=true
                     </connection-url>
-                    <driver>mysql</driver>
+                    <driver>aws-secretsmanager-mysql</driver>
                     <pool>
                         <min-pool-size>3</min-pool-size>
                         <max-pool-size>10</max-pool-size>
                         <prefill>true</prefill>
                     </pool>
                     <security>
-                        <user-name>${picsure-db-username}</user-name>
-                        <password>${picsure-db-password}</password>
+                        <user-name>${app_user_secret_name}</user-name>
                     </security>
                     <validation>
                         <valid-connection-checker
@@ -216,6 +214,9 @@
                     </driver>
                     <driver name="h2" module="com.h2database.h2">
                         <xa-datasource-class>org.h2.jdbcx.JdbcDataSource</xa-datasource-class>
+                    </driver>
+                    <driver name="aws-secretsmanager-mysql" module="com.sql.mysql">
+                        <driver-class>com.amazonaws.secretsmanager.sql.AWSSecretsManagerMySQLDriver</driver-class>
                     </driver>
                 </drivers>
             </datasources>
