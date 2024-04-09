@@ -155,9 +155,9 @@
             <datasources>
                 <datasource jndi-name="java:jboss/datasources/AuthDS" pool-name="AuthDS" use-java-context="true">
                     <connection-url>
-                        jdbc:mysql://${picsure-db-host}/auth?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true&amp;autoReconnectForPools=true
+                        jdbc-secretsmanager:mysql://${picsure-db-host}/auth?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true&amp;autoReconnectForPools=true
                     </connection-url>
-                    <driver>com.amazonaws.secretsmanager.sql.AWSSecretsManagerMySQLDriver</driver>
+                    <driver>aws-secretsmanager-mysql</driver>
                     <pool>
                         <min-pool-size>2</min-pool-size>
                         <max-pool-size>10</max-pool-size>
@@ -178,9 +178,9 @@
                 </datasource>
                 <datasource jndi-name="java:jboss/datasources/PicsureDS" pool-name="PicsureDS" use-java-context="true">
                     <connection-url>
-                        jdbc:mysql://${picsure-db-host}/picsure?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true&amp;autoReconnectForPools=true
+                        jdbc-secretsmanager:mysql://${picsure-db-host}/picsure?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true&amp;autoReconnectForPools=true
                     </connection-url>
-                    <driver>com.amazonaws.secretsmanager.sql.AWSSecretsManagerMySQLDriver</driver>
+                    <driver>aws-secretsmanager-mysql</driver>
                     <pool>
                         <min-pool-size>3</min-pool-size>
                         <max-pool-size>10</max-pool-size>
