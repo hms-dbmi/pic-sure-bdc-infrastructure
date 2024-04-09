@@ -203,7 +203,6 @@ variable "referer_allowed_domains" {
 variable "pic_sure_resource_id" {
     type = string
     description = "The resource id for the pic-sure. Used for auth or open HPDS generally"
-
 }
 
 variable "app_acct_id" {
@@ -214,10 +213,4 @@ variable "app_acct_id" {
 variable "app_user_secret_name" {
     type = string
     description = "The secret name for the application user"
-}
-
-variable "aws_region" {
-    type = string
-    description = "The region for the deployment"
-    default = "us-east-1"
 }
