@@ -200,11 +200,14 @@
                     </validation>
                 </datasource>
                 <drivers>
+                    <driver name="mysql" module="com.sql.mysql">
+                        <driver-class>com.mysql.cj.jdbc.Driver</driver-class>
+                    </driver>
+                    <driver name="h2" module="com.h2database.h2">
+                        <xa-datasource-class>org.h2.jdbcx.JdbcDataSource</xa-datasource-class>
+                    </driver>
                     <driver name="aws-secretsmanager-mysql" module="com.sql.mysql">
                         <driver-class>com.amazonaws.secretsmanager.sql.AWSSecretsManagerMySQLDriver</driver-class>
-                    </driver>
-                    <driver name="aws-secretsmanager-h2" module="com.sql.mysql">
-                        <xa-datasource-class>com.amazonaws.secretsmanager.sql.AWSSecretsManagerDriver</xa-datasource-class>
                     </driver>
                 </drivers>
             </datasources>
