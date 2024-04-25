@@ -188,8 +188,9 @@ echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} tab
 /bin/python3 /home/centos/python_script/hpds_annotation/transform_csq.v3.py \
 -R /home/centos/fasta/Homo_sapiens_assembly38.fasta \
 --vep-gnomad-af gnomADg_AF \
+--cds \
 /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.annotated.vcf.gz \
-/home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.annotated.hpds.vcf.gz
+/home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.annotated_remove_modifiers.hpds.vcf.gz &
 
 echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} python stage
 wait
@@ -203,17 +204,14 @@ export AWS_SESSION_TOKEN=`grep SessionToken /usr/tmp/assume-role-output.txt | cu
 
 echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} output stage
 
-/usr/local/bin/aws s3 cp /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.annotated.hpds.vcf.gz s3://${output_s3_bucket}/genomic-etl/hpds_vcfs/ &
+/usr/local/bin/aws s3 cp /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.annotated_remove_modifiers.hpds.vcf.gz s3://${output_s3_bucket}/genomic-etl/hpds_vcfs/modifiers_removed/ &
+/usr/local/bin/aws s3 cp /home/centos/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.annotated.vcf.gz s3://${output_s3_bucket}/genomic-etl/vep_vcf_output/ &
 /usr/local/bin/aws s3 cp /home/centos/ensembl-vep/${study_name}_${study_id}_TOPMed_WGS_freeze.9b.chr${chrom_number}.hg38${consent_group_tag}.vcf.gz s3://${output_s3_bucket}/genomic-etl/original_vcfs/${study_id}${consent_group_tag}.chr${chrom_number}.original.vcf.gz &
 wait
 echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} output stage
 
-if (($ANNOTATEDLINECOUNT == $NORMLINECOUNT + 3))
-then
+
 /usr/local/bin/aws --region=us-east-1 ec2 create-tags --resources $${INSTANCE_ID} --tags Key=AnnotationComplete,Value=true
-else
-/usr/local/bin/aws --region=us-east-1 ec2 create-tags --resources $${INSTANCE_ID} --tags Key=AnnotationComplete,Value=false
-fi
 
 unset AWS_ACCESS_KEY_ID
 unset AWS_SECRET_ACCESS_KEY
