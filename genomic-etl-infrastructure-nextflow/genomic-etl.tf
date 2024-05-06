@@ -44,7 +44,7 @@ data "template_cloudinit_config" "genomic-user-data" {
 
 }
 
-resource "aws_ec2_spot_fleet_request" "genomic-etl-ec2"{
+resource "aws_spot_fleet_request" "genomic-etl-ec2"{
   iam_fleet_role = "arn:aws:iam::900561893673:role/aws-service-role/spotfleet.amazonaws.com/AWSServiceRoleForEC2SpotFleet"
   target_capacity = 1
   allocation_strategy = "capacityOptimized"
