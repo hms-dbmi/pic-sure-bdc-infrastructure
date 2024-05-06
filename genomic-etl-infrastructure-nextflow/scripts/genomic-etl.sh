@@ -103,7 +103,14 @@ export VOLUME_ID=`/usr/local/bin/aws ec2 describe-volumes --filters Name='tag:la
 aws ec2 attach-volume --volume-id $VOLUME_ID --device /dev/sdb --instance-id $INSTANCE_ID --region us-east-1 &
 wait
 mkdir /annotation_pipeline
+
+while [ ! -d /annotation_pipeline/anno/ ]
+do
+echo 'checking mount'
 mount /dev/nvme1n1 /annotation_pipeline
+done
+echo 'Mount done'
+
 
 echo 'Init complete, moving to annotation'
 
