@@ -124,7 +124,7 @@ export PERL5LIB=$PERL5LIB:/annotation_pipeline/anno/cpanm/lib/perl5:/annotation_
 export HTSLIB_DIR=/annotation_pipeline/anno/htslib/
 export PATH=/usr/local/bin:/annotation_pipeline/anno/ensembl-vep:/annotation_pipeline/anno/htslib:/annotation_pipeline/anno/bin:$PATH
 
-. /annotation_pipeline/anno/ActiveState.var
+. /annotation_pipeline/anno/ensembl-vep/ActiveState.var
 echo 'Pipeline starting state is ' $ActiveState
 
 
@@ -147,8 +147,8 @@ unset AWS_ACCESS_KEY_ID
 unset AWS_SECRET_ACCESS_KEY
 unset AWS_SESSION_TOKEN
 
-echo 'ActiveState=Filtering' > /annotation_pipeline/anno/ActiveState.var
-. /annotation_pipeline/anno/ActiveState.var
+echo 'ActiveState=Filtering' > /annotation_pipeline/anno/ensembl-vep/ActiveState.var
+. /annotation_pipeline/anno/ensembl-vep/ActiveState.var
 echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} download stage
 fi
 
@@ -161,8 +161,8 @@ echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} filt
 
 wait
 
-echo 'ActiveState=Renaming' > /annotation_pipeline/anno/ActiveState.var
-. /annotation_pipeline/anno/ActiveState.var
+echo 'ActiveState=Renaming' > /annotation_pipeline/anno/ensembl-vep/ActiveState.var
+. annotation_pipeline/anno/ensembl-vep/ActiveState.var
 echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} filter stage
 fi
 
@@ -175,8 +175,8 @@ echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} rena
 
 wait
 
-echo 'ActiveState=Normalizing' > /annotation_pipeline/anno/ActiveState.var
-. /annotation_pipeline/anno/ActiveState.var
+echo 'ActiveState=Normalizing' > /annotation_pipeline/anno/ensembl-vep/ActiveState.var
+. /annotation_pipeline/anno/ensembl-vep/ActiveState.var
 echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} rename stage
 fi
 
@@ -201,8 +201,8 @@ tabix /annotation_pipeline/anno/ensembl-vep/${study_id}${consent_group_tag}.chr$
 
 wait
 
-echo 'ActiveState=Annotating' > /annotation_pipeline/anno/ActiveState.var
-. /annotation_pipeline/anno/ActiveState.var
+echo 'ActiveState=Annotating' > /annotation_pipeline/anno/ensembl-vep/ActiveState.var
+. /annotation_pipeline/anno/ensembl-vep/ActiveState.var
 echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} normalize stage
 fi
 
@@ -217,8 +217,8 @@ nextflow run -bg -resume nextflow/workflows/run_vep.nf \
 echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} vep stage
 wait
 
-echo 'ActiveState=Scripting' > /annotation_pipeline/anno/ActiveState.var
-. /annotation_pipeline/anno/ActiveState.var
+echo 'ActiveState=Scripting' > /annotation_pipeline/anno/ensembl-vep/ActiveState.var
+. /annotation_pipeline/anno/ensembl-vep/ActiveState.var
 echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} vep stage
 fi
 
@@ -234,8 +234,8 @@ echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} pyth
 wait
 
 
-echo 'ActiveState=Uploading' > /annotation_pipeline/anno/ActiveState.var
-. /annotation_pipeline/anno/ActiveState.var
+echo 'ActiveState=Uploading' > /annotation_pipeline/anno/ensembl-vep/ActiveState.var
+. /annotation_pipeline/anno/ensembl-vep/ActiveState.var
 echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} python stage
 fi
 
@@ -249,8 +249,8 @@ echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} outp
 wait
 
 
-echo 'ActiveState=Done' > /annotation_pipeline/anno/ActiveState.var
-. /annotation_pipeline/anno/ActiveState.var
+echo 'ActiveState=Done' > /annotation_pipeline/anno/ensembl-vep/ActiveState.var
+. /annotation_pipeline/anno/ensembl-vep/ActiveState.var
 echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} upload stage
 fi
 
