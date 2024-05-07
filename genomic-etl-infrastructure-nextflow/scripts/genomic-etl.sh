@@ -128,7 +128,7 @@ export PATH=/usr/local/bin:/annotation_pipeline/anno/ensembl-vep:/annotation_pip
 echo 'Pipeline starting state is ' $ActiveState
 
 
-
+cd /annotation_pipeline/anno/ensembl-vep/
 if (( $ActiveState == 'Downloading' ))
 then
 echo ${chrom_number} chr${chrom_number}  > /annotation_pipeline/anno/ensembl-vep/chrm_rename.txt
