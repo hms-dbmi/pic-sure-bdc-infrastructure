@@ -209,13 +209,12 @@ fi
 
 if (( $ActiveState == 'Annotating' ))
 then
-nextflow run -bg -resume nextflow/workflows/run_vep.nf \
+echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} vep stage
+nextflow run -resume nextflow/workflows/run_vep.nf \
 --vcf /annotation_pipeline/anno/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.normalized.vcf.gz \
 --skip_check 1 \
 --vep_config /annotation_pipeline/anno/ensembl-vep/nextflow/vep_config/vep.ini \
---bin_size 25000 &
-echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} vep stage
-wait
+--bin_size 25000
 
 echo 'ActiveState=Scripting' > /annotation_pipeline/anno/ensembl-vep/ActiveState.var
 . /annotation_pipeline/anno/ensembl-vep/ActiveState.var
