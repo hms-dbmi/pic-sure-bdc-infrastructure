@@ -189,11 +189,11 @@ echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} norm
 
 wait
 
-/usr/local/bin/bgzip -d /annotation_pipeline/anno/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.normalized.vcf.gz &
+bgzip -d /annotation_pipeline/anno/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.normalized.vcf.gz &
 
 wait
 
-/usr/local/bin/bgzip /annotation_pipeline/anno/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.normalized.vcf > /annotation_pipeline/anno/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.normalized.vcf.gz &
+bgzip -f /annotation_pipeline/anno/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.normalized.vcf &
 
 wait
 
@@ -242,9 +242,9 @@ fi
 if (( $ActiveState == 'Uploading' ))
 then
 echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} output stage
-/usr/local/bin/aws s3 cp /annotation_pipeline/anno/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.annotated_remove_modifiers.hpds.vcf.gz s3://${output_s3_bucket}/genomic-etl/hpds_vcfs/modifiers_removed/ &
-/usr/local/bin/aws s3 cp /annotation_pipeline/anno/ensembl-vep/outdir/${study_id}${consent_group_tag}.chr${chrom_number}.normalized_VEP.vcf.gz s3://${output_s3_bucket}/genomic-etl/vep_vcf_output/ &
-/usr/local/bin/aws s3 cp /annotation_pipeline/anno/ensembl-vep/${study_name}_${study_id}_TOPMed_WGS_freeze.9b.chr${chrom_number}.hg38${consent_group_tag}.vcf.gz s3://${output_s3_bucket}/genomic-etl/original_vcfs/${study_id}${consent_group_tag}.chr${chrom_number}.original.vcf.gz &
+aws s3 cp /annotation_pipeline/anno/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.annotated_remove_modifiers.hpds.vcf.gz s3://${output_s3_bucket}/genomic-etl/hpds_vcfs/modifiers_removed/ &
+aws s3 cp /annotation_pipeline/anno/ensembl-vep/outdir/${study_id}${consent_group_tag}.chr${chrom_number}.normalized_VEP.vcf.gz s3://${output_s3_bucket}/genomic-etl/vep_vcf_output/ &
+aws s3 cp /annotation_pipeline/anno/ensembl-vep/${study_name}_${study_id}_TOPMed_WGS_freeze.9b.chr${chrom_number}.hg38${consent_group_tag}.vcf.gz s3://${output_s3_bucket}/genomic-etl/original_vcfs/${study_id}${consent_group_tag}.chr${chrom_number}.original.vcf.gz &
 
 wait
 
@@ -256,5 +256,5 @@ fi
 
 if (( $ActiveState == 'Done' ))
 then
-/usr/local/bin/aws --region=us-east-1 ec2 create-tags --resources $${INSTANCE_ID} --tags Key=AnnotationComplete,Value=true
+aws --region=us-east-1 ec2 create-tags --resources $${INSTANCE_ID} --tags Key=AnnotationComplete,Value=true
 fi
