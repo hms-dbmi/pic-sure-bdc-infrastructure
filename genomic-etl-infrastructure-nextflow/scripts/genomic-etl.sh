@@ -162,7 +162,7 @@ echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} filt
 wait
 
 echo 'ActiveState=Renaming' > /annotation_pipeline/anno/ensembl-vep/ActiveState.var
-. annotation_pipeline/anno/ensembl-vep/ActiveState.var
+. /annotation_pipeline/anno/ensembl-vep/ActiveState.var
 echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} filter stage
 fi
 
@@ -205,12 +205,13 @@ echo 'ActiveState=Annotating' > /annotation_pipeline/anno/ensembl-vep/ActiveStat
 . /annotation_pipeline/anno/ensembl-vep/ActiveState.var
 echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} normalize stage
 fi
-
+yum install -y java-11-openjdk &
+wait
 
 if (( $ActiveState == 'Annotating' ))
 then
 echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} vep stage
-nextflow run -bg -resume /annotation_pipeline/anno/ensembl-vep/nextflow/workflows/run_vep.nf \
+nextflow run -resume /annotation_pipeline/anno/ensembl-vep/nextflow/workflows/run_vep.nf \
 --vcf /annotation_pipeline/anno/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.normalized.vcf.gz \
 --skip_check 1 \
 --vep_config /annotation_pipeline/anno/ensembl-vep/nextflow/vep_config/vep.ini \
