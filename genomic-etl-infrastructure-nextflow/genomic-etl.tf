@@ -46,7 +46,7 @@ data "template_cloudinit_config" "genomic-user-data" {
 
 resource "aws_ebs_volume" "genomic-etl-volume"{
   availability_zone = "us-east-1d"
-  snapshot_id = "snap-0914ea91f5d1df433"
+  snapshot_id = "snap-0298668e41d905f24"
   tags = {
     label = "${var.study_id}${var.consent_group_tag}.chr${var.chrom_number}"
   }
