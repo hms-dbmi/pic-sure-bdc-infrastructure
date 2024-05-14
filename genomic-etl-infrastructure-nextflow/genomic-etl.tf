@@ -18,15 +18,15 @@ data "template_file" "genomic-user_data" {
 locals {
     instanceList = [
       {
-    "subnetId" = (var.genomic-etl-subnet-1d-id)
+    "subnetId" = (var.genomic-etl-subnet-1b-id)
     "type" =  "m5.4xlarge"
   },
     {
-    "subnetId" = (var.genomic-etl-subnet-1d-id)
+    "subnetId" = (var.genomic-etl-subnet-1b-id)
     "type" = "r5.4xlarge"
   },
       {
-    "subnetId" = (var.genomic-etl-subnet-1d-id)
+    "subnetId" = (var.genomic-etl-subnet-1b-id)
     "type" = "c5.4xlarge"
   }
 ]
@@ -45,7 +45,7 @@ data "template_cloudinit_config" "genomic-user-data" {
 }
 
 resource "aws_ebs_volume" "genomic-etl-volume"{
-  availability_zone = "us-east-1d"
+  availability_zone = "us-east-1b"
   snapshot_id = "snap-0298668e41d905f24"
   type="gp3"
   tags = {
