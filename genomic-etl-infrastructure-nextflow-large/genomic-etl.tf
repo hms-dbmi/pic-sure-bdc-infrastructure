@@ -17,78 +17,17 @@ data "template_file" "genomic-user_data" {
 
 locals {
     instanceList = [
-  {
-    "subnetId" = (var.genomic-etl-subnet-1a-id)
-    "type" = "r5.2xlarge"
-  },
-    {
-    "subnetId" = (var.genomic-etl-subnet-1a-id)
-    "type" =  "c5.4xlarge"
-  },
-    {
-    "subnetId" = (var.genomic-etl-subnet-1a-id)
-    "type" = "m5.2xlarge"
-  },
-    {
-    "subnetId" = (var.genomic-etl-subnet-1a-id)
-    "type" =  "m5.4xlarge"
-  },
-
-    {
-    "subnetId" = (var.genomic-etl-subnet-1b-id)
-    "type" = "r5.2xlarge"
-  },
       {
-    "subnetId" = (var.genomic-etl-subnet-1b-id)
-    "type" = "c5.4xlarge"
-  },
-      {
-    "subnetId" = (var.genomic-etl-subnet-1b-id)
-    "type" = "m5.2xlarge"
-  },
-    {
-    "subnetId" = (var.genomic-etl-subnet-1c-id)
-    "type" = "r5.2xlarge"
-  },
-      {
-    "subnetId" = (var.genomic-etl-subnet-1c-id)
-    "type" = "c5.4xlarge"
-  },
-      {
-    "subnetId" = (var.genomic-etl-subnet-1c-id)
-    "type" = "m5.2xlarge"
-  },
-      {
-    "subnetId" = (var.genomic-etl-subnet-1c-id)
-    "type" = "m5.4xlarge"
-  },
-    {
-    "subnetId" = (var.genomic-etl-subnet-1d-id)
-    "type" = "r5.2xlarge"
-  },
-      {
-    "subnetId" = (var.genomic-etl-subnet-1d-id)
-    "type" =  "m5.2xlarge"
-  },
-      {
-    "subnetId" = (var.genomic-etl-subnet-1d-id)
-    "type" =  "m5.4xlarge"
-  },
-  {
     "subnetId" = (var.genomic-etl-subnet-1f-id)
-    "type" = "r5.2xlarge"
+    "type" =  "m5.8xlarge"
   },
     {
     "subnetId" = (var.genomic-etl-subnet-1f-id)
-    "type" = "c5.4xlarge"
+    "type" = "r5.8xlarge"
   },
-    {
+      {
     "subnetId" = (var.genomic-etl-subnet-1f-id)
-    "type" = "m5.2xlarge"
-  },
-    {
-    "subnetId" = (var.genomic-etl-subnet-1f-id)
-    "type" = "m5.4xlarge"
+    "type" = "c5.8xlarge"
   }
 ]
 }
@@ -103,6 +42,16 @@ data "template_cloudinit_config" "genomic-user-data" {
     content      = data.template_file.genomic-user_data.rendered
   }
 
+}
+
+resource "aws_ebs_volume" "genomic-etl-volume"{
+  availability_zone = "us-east-1f"
+  snapshot_id = "snap-0298668e41d905f24"
+  type="gp3"
+  size=2500
+  tags = {
+    label = "${var.study_id}${var.consent_group_tag}.chr${var.chrom_number}"
+  }
 }
 
 resource "aws_spot_fleet_request" "genomic-etl-ec2"{
