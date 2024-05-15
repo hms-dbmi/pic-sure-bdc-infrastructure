@@ -129,7 +129,7 @@ echo 'Pipeline starting state is ' $ActiveState
 
 
 cd /annotation_pipeline/anno/ensembl-vep/
-if (( $ActiveState == 'Downloading' ))
+if [ $ActiveState == 'Downloading' ]
 then
 echo ${chrom_number} chr${chrom_number}  > /annotation_pipeline/anno/ensembl-vep/chrm_rename.txt
 
@@ -154,7 +154,7 @@ fi
 
 
 
-if (( $ActiveState == 'Filtering' ))
+if [ $ActiveState == 'Filtering' ]
 then
 /usr/local/bin/bcftools view -Oz --threads 40 -f PASS,. /annotation_pipeline/anno/ensembl-vep/${study_name}_${study_id}_TOPMed_WGS_freeze.9b.chr${chrom_number}.hg38${consent_group_tag}.vcf.gz > /annotation_pipeline/anno/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.filtered.vcf.gz &
 echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} filter stage
@@ -168,7 +168,7 @@ fi
 
 
 
-if (( $ActiveState == 'Renaming' ))
+if [ $ActiveState == 'Renaming' ]
 then
 /usr/local/bin/bcftools annotate --threads 40 --rename-chrs /annotation_pipeline/anno/ensembl-vep/chrm_rename.txt /annotation_pipeline/anno/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.filtered.vcf.gz | /annotation_pipeline/anno/htslib/bgzip > /annotation_pipeline/anno/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.renamed.vcf.gz &
 echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} rename stage
@@ -182,7 +182,7 @@ fi
 
 
 
-if (( $ActiveState == 'Normalizing' ))
+if [ $ActiveState == 'Normalizing' ]
 then
 /usr/local/bin/bcftools norm --threads 40 -m -any -f /annotation_pipeline/anno/fasta/Homo_sapiens_assembly38.fasta -o /annotation_pipeline/anno/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.normalized.vcf.gz /annotation_pipeline/anno/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.renamed.vcf.gz &
 echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} normalize stage
@@ -210,7 +210,7 @@ yum install -y java-11-openjdk &
 wait
 update-alternatives --set java /usr/lib/jvm/java-11-openjdk-11.0.23.0.9-3.el8.x86_64/bin/java
 
-if (( $ActiveState == 'Annotating' ))
+if [ $ActiveState == 'Annotating' ]
 then
 echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} vep stage
 nextflow run -resume /annotation_pipeline/anno/ensembl-vep/nextflow/workflows/run_vep.nf \
@@ -224,7 +224,7 @@ echo 'ActiveState=Scripting' > /annotation_pipeline/anno/ensembl-vep/ActiveState
 echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} vep stage
 fi
 
-if (( $ActiveState == 'Scripting' ))
+if [ $ActiveState == 'Scripting' ]
 then
 python3 /annotation_pipeline/anno/ensembl-vep/hpds_annotation/transform_csq.v3.py \
 -R /annotation_pipeline/anno/ensembl-vep/fasta/Homo_sapiens_assembly38.fasta \
@@ -241,7 +241,7 @@ echo 'ActiveState=Uploading' > /annotation_pipeline/anno/ensembl-vep/ActiveState
 echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} python stage
 fi
 
-if (( $ActiveState == 'Uploading' ))
+if [ $ActiveState == 'Uploading' ]
 then
 echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} output stage
 aws s3 cp /annotation_pipeline/anno/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.annotated_remove_modifiers.hpds.vcf.gz s3://${output_s3_bucket}/genomic-etl/hpds_vcfs/modifiers_removed/ &
@@ -256,7 +256,7 @@ echo 'ActiveState=Done' > /annotation_pipeline/anno/ensembl-vep/ActiveState.var
 echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} upload stage
 fi
 
-if (( $ActiveState == 'Done' ))
+if [ $ActiveState == 'Done' ]
 then
 aws --region=us-east-1 ec2 create-tags --resources $${INSTANCE_ID} --tags Key=AnnotationComplete,Value=true
 fi
