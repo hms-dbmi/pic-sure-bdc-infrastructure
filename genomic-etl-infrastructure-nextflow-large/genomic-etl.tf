@@ -19,15 +19,15 @@ locals {
     instanceList = [
       {
     "subnetId" = (var.genomic-etl-subnet-1f-id)
-    "type" =  "m5.8xlarge"
+    "type" =  "m5.12xlarge"
   },
     {
     "subnetId" = (var.genomic-etl-subnet-1f-id)
-    "type" = "r5.8xlarge"
+    "type" = "r5.12xlarge"
   },
       {
     "subnetId" = (var.genomic-etl-subnet-1f-id)
-    "type" = "c5.8xlarge"
+    "type" = "c5.12xlarge"
   }
 ]
 }
