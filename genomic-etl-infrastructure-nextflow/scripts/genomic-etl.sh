@@ -213,8 +213,6 @@ yum install -y java-11-openjdk &
 wait
 update-alternatives --set java /usr/lib/jvm/java-11-openjdk-11.0.23.0.9-3.el8.x86_64/bin/java
 
-echo 'ActiveState=Annotating' > /annotation_pipeline/anno/ensembl-vep/ActiveState.var
-. /annotation_pipeline/anno/ensembl-vep/ActiveState.var
 
 if [ $ActiveState == 'Annotating' ]
 then
