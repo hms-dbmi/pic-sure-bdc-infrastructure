@@ -22,7 +22,7 @@ locals {
     "type" =  "m5.12xlarge"
   }, */
     {
-    "subnetId" = (var.genomic-etl-subnet-1a-id)
+    "subnetId" = (var.genomic-etl-subnet-1f-id)
     "type" = "r5.12xlarge"
   }
 ]
@@ -41,7 +41,7 @@ data "template_cloudinit_config" "genomic-user-data" {
 }
 
  resource "aws_ebs_volume" "genomic-etl-volume"{
-  availability_zone = "us-east-1a"
+  availability_zone = "us-east-1f"
   snapshot_id = "snap-0a0957538f16a171b"
   type="gp3"
   size=2500
