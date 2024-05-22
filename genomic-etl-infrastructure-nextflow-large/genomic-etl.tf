@@ -40,7 +40,7 @@ data "template_cloudinit_config" "genomic-user-data" {
 
 }
 
- resource "aws_ebs_volume" "genomic-etl-volume"{
+/*  resource "aws_ebs_volume" "genomic-etl-volume"{
   availability_zone = "us-east-1a"
   snapshot_id = "snap-0a0957538f16a171b"
   type="gp3"
@@ -48,7 +48,7 @@ data "template_cloudinit_config" "genomic-user-data" {
   tags = {
     label = "${var.study_id}${var.consent_group_tag}.chr${var.chrom_number}"
   }
-} 
+}  */
 
 resource "aws_spot_fleet_request" "genomic-etl-ec2"{
   iam_fleet_role = "arn:aws:iam::900561893673:role/aws-service-role/spotfleet.amazonaws.com/AWSServiceRoleForEC2SpotFleet"
