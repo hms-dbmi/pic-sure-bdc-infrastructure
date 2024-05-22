@@ -18,14 +18,14 @@ data "template_file" "genomic-user_data" {
 locals {
     instanceList = [
      {
-    "subnetId" = (var.genomic-etl-subnet-1f-id)
+    "subnetId" = (var.genomic-etl-subnet-1a-id)
     "type" =  "r5.12xlarge"
   },  {
-    "subnetId" = (var.genomic-etl-subnet-1f-id)
+    "subnetId" = (var.genomic-etl-subnet-1a-id)
     "type" =  "m5.12xlarge"
   }, 
     {
-    "subnetId" = (var.genomic-etl-subnet-1f-id)
+    "subnetId" = (var.genomic-etl-subnet-1a-id)
     "type" = "r5.8xlarge"
   }
 ]
