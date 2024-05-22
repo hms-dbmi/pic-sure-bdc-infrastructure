@@ -24,6 +24,23 @@ resource "aws_iam_role" "wildfly-deployment-role" {
 EOF
 }
 
+resource "aws_iam_role_policy" "wildfly-deployment-ecr-policy" {
+  name = "wildfly-deployment-ecr-policy-${var.target_stack}-${local.uniq_name}"
+  role   = aws_iam_role.wildfly-deployment-role.id
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+      {
+      "Action": [
+            "ecr:*",
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+      }
+    ]
+}
+
 resource "aws_iam_role_policy" "wildfly-deployment-sm-policy" {
   name   = "wildfly-deployment-sm-policy-${var.target_stack}-${local.uniq_name}"
   role   = aws_iam_role.wildfly-deployment-role.id
