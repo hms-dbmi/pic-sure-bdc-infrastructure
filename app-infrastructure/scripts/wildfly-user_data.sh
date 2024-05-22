@@ -39,10 +39,13 @@ s3_copy s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/
 
 WILDFLY_IMAGE=`sudo docker load < /home/centos/pic-sure-wildfly.tar.gz | cut -d ' ' -f 3`
 JAVA_OPTS="-Xms2g -Xmx26g -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=1024m -Djava.net.preferIPv4Stack=true -DTARGET_STACK=${target_stack}.${env_private_dns_name}"
+PSAMA_OPTS="-Xms2g -Xmx26g -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=1024m -Djava.net.preferIPv4Stack=true"
 
 sudo mkdir /var/log/{wildfly-docker-logs,wildfly-docker-os-logs}
 
+sudo docker network create picsure
 sudo docker run -u root --name=wildfly \
+                        --network=picsure \
                         --restart unless-stopped \
                         --log-driver syslog --log-opt tag=wildfly \
                         -v /var/log/wildfly-docker-logs/:/opt/jboss/wildfly/standalone/log/ \
@@ -52,6 +55,16 @@ sudo docker run -u root --name=wildfly \
                         -v /var/log/wildfly-docker-os-logs/:/var/log/ \
                         -v /home/centos/visualization-resource.properties:/opt/jboss/wildfly/standalone/configuration/visualization/pic-sure-visualization-resource/resource.properties \
                         -p 8080:8080 -e JAVA_OPTS="$JAVA_OPTS" -d $WILDFLY_IMAGE
+
+# This docker container pulls its container from the AWS ECR, so it needs to be logged in to the AWS ECR.
+# This is done by running the following command:
+sh "aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${DOCKER_REGISTRY}"
+docker run -u root --name=psama --restart always \
+  --network=picsure \
+  --env-file /home/centos/psama.env \
+  -e JAVA_OPTS="$PSAMA_OPTS" \
+  -p 8090:8090 \
+  -d ${DOCKER_REGISTRY}/psama-test:LATEST
 
 INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)
 sudo /usr/bin/aws --region=us-east-1 ec2 create-tags --resources $${INSTANCE_ID} --tags Key=InitComplete,Value=true

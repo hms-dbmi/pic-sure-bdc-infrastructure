@@ -214,3 +214,8 @@ variable "app_user_secret_name" {
     type = string
     description = "The secret name for the application user"
 }
+
+variable "docker_registry" {
+    type = string
+    description = "The docker registry to use for the deployment"
+}

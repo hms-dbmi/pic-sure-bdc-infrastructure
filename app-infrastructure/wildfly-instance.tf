@@ -7,6 +7,7 @@ data "template_file" "wildfly-user_data" {
     target_stack          = var.target_stack
     gss_prefix            = "${var.environment_prefix}_${var.env_is_open_access ? "open" : "auth"}_${var.environment_name}"
     env_private_dns_name  = var.env_private_dns_name
+    docker_registry       = var.docker_registry
   }
 }
 
