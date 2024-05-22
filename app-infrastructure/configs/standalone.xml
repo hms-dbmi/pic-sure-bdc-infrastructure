@@ -162,29 +162,6 @@
                         <password>sa</password>
                     </security>
                 </datasource>
-                <datasource jndi-name="java:jboss/datasources/AuthDS" pool-name="AuthDS" use-java-context="true">
-                    <connection-url>
-                        jdbc-secretsmanager:mysql://${picsure-db-host}/auth?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true&amp;autoReconnectForPools=true
-                    </connection-url>
-                    <driver>aws-secretsmanager-mysql</driver>
-                    <pool>
-                        <min-pool-size>2</min-pool-size>
-                        <max-pool-size>10</max-pool-size>
-                        <prefill>true</prefill>
-                    </pool>
-                    <security>
-                        <user-name>${app_user_secret_name}</user-name>
-                    </security>
-                    <validation>
-                        <valid-connection-checker
-                                class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLValidConnectionChecker"/>
-                        <check-valid-connection-sql>SELECT 1</check-valid-connection-sql>
-                        <validate-on-match>true</validate-on-match>
-                        <background-validation>false</background-validation>
-                        <exception-sorter
-                                class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLExceptionSorter"/>
-                    </validation>
-                </datasource>
                 <datasource jndi-name="java:jboss/datasources/PicsureDS" pool-name="PicsureDS" use-java-context="true">
                     <connection-url>
                         jdbc-secretsmanager:mysql://${picsure-db-host}/picsure?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true&amp;autoReconnectForPools=true
