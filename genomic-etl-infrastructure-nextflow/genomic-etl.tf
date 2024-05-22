@@ -24,6 +24,10 @@ locals {
     {
     "subnetId" = (var.genomic-etl-subnet-1c-id)
     "type" = "r5.4xlarge"
+  },
+      {
+    "subnetId" = (var.genomic-etl-subnet-1c-id)
+    "type" = "r5.2xlarge"
   }
 ]
 }
