@@ -39,6 +39,7 @@ resource "aws_iam_role_policy" "wildfly-deployment-ecr-policy" {
       "Resource": "*"
       }
     ]
+EOF
 }
 
 resource "aws_iam_role_policy" "wildfly-deployment-sm-policy" {
