@@ -45,7 +45,7 @@ data "template_cloudinit_config" "genomic-user-data" {
 }
 
 resource "aws_ebs_volume" "genomic-etl-volume"{
-  availability_zone = "us-east-1c"
+  availability_zone = "us-east-1b"
   snapshot_id = "snap-0a0957538f16a171b"
   type="gp3"
   tags = {
