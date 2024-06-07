@@ -61,24 +61,39 @@ resource "aws_instance" "wildfly-ec2" {
 data "template_file" "wildfly-standalone-xml" {
   template = file("configs/standalone.xml")
   vars     = {
-    picsure-db-password               = var.picsure_db_password
-    picsure-db-username               = var.picsure_db_username
     picsure-db-host                   = var.picsure_db_host
-    picsure_client_secret             = var.picsure_client_secret
-    fence_client_secret               = var.fence_client_secret
-    fence_client_id                   = var.fence_client_id
     target_stack                      = var.target_stack
     picsure_token_introspection_token = var.picsure_token_introspection_token
     env_private_dns_name              = var.env_private_dns_name
     env_public_dns_name               = var.env_public_dns_name
-    idp_provider                      = var.idp_provider
-    idp_provider_uri                  = var.idp_provider_uri
     application_id_for_base_query     = var.application_id_for_base_query
     client_id                         = var.client_id
-    sp_client_secret                  = var.sp_client_secret
-    connection_id                     = var.connection_id
     app_user_secret_name              = var.app_user_secret_name
   }
+}
+
+data "template_file" "psama-env" {
+  template = file("configs/psama.env")
+  vars     = {
+    target_stack = var.target_stack
+    fence_client_secret               = var.fence_client_secret
+    fence_client_id                   = var.fence_client_id
+    idp_provider                      = var.idp_provider
+    idp_provider_uri                  = var.idp_provider_uri
+    sp_client_secret                  = var.sp_client_secret
+    client_id                         = var.client_id
+    sp_client_id                      = var.client_id
+    connection_id                     = var.connection_id
+    app_user_secret_name              = var.app_user_secret_name
+    picsure_db_host                   = var.picsure_db_host
+    picsure_client_secret             = var.picsure_client_secret
+    application_id_for_base_query     = var.application_id_for_base_query
+  }
+}
+
+resource "local_file" "psama-env-file" {
+  filename = "psama.env"
+  content  = data.template_file.psama-env.rendered
 }
 
 resource "local_file" "wildfly-standalone-xml-file" {
