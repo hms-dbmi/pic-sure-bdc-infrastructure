@@ -162,29 +162,6 @@
                         <password>sa</password>
                     </security>
                 </datasource>
-                <datasource jndi-name="java:jboss/datasources/AuthDS" pool-name="AuthDS" use-java-context="true">
-                    <connection-url>
-                        jdbc-secretsmanager:mysql://${picsure-db-host}/auth?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true&amp;autoReconnectForPools=true
-                    </connection-url>
-                    <driver>aws-secretsmanager-mysql</driver>
-                    <pool>
-                        <min-pool-size>2</min-pool-size>
-                        <max-pool-size>10</max-pool-size>
-                        <prefill>true</prefill>
-                    </pool>
-                    <security>
-                        <user-name>${app_user_secret_name}</user-name>
-                    </security>
-                    <validation>
-                        <valid-connection-checker
-                                class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLValidConnectionChecker"/>
-                        <check-valid-connection-sql>SELECT 1</check-valid-connection-sql>
-                        <validate-on-match>true</validate-on-match>
-                        <background-validation>false</background-validation>
-                        <exception-sorter
-                                class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLExceptionSorter"/>
-                    </validation>
-                </datasource>
                 <datasource jndi-name="java:jboss/datasources/PicsureDS" pool-name="PicsureDS" use-java-context="true">
                     <connection-url>
                         jdbc-secretsmanager:mysql://${picsure-db-host}/picsure?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true&amp;autoReconnectForPools=true
@@ -505,25 +482,8 @@
                 <!-- Used in IRCT as well -->
                 <simple name="java:global/verify_user_method" value="tokenIntrospection"/>
                 <simple name="java:global/token_introspection_url"
-                        value="http://localhost:8080/pic-sure-auth-services/auth/token/inspect"/>
+                        value="http://psama:8090/pic-sure-auth-services/auth/token/inspect"/>
                 <simple name="java:global/token_introspection_token" value="${picsure_token_introspection_token}"/>
-
-                <!-- psama configuration-->
-                <simple name="java:global/client_secret" value="${picsure_client_secret}"/>
-
-                <!-- okta configuration-->
-                <simple name="java:global/client_id" value="${client_id}"/>
-                <simple name="java:global/sp_client_secret" value="${sp_client_secret}"/>
-                <simple name="java:global/connection_id" value="${connection_id}"/>
-
-                <!-- Configure Identity Provider Parameters, with defaults-->
-                <simple name="java:global/idp_provider" value="${idp_provider}"/>
-                <simple name="java:global/idp_provider_uri" value="${idp_provider_uri}"/>
-
-                <!-- Configure Fence Parameters, with defaults-->
-                <simple name="java:global/fence_client_id" value="${fence_client_id}"/>
-                <simple name="java:global/fence_client_secret" value="${fence_client_secret}"/>
-                <simple name="java:global/fence_redirect_url" value="https://${env_public_dns_name}/psamaui/login/"/>
 
                 <simple name="java:global/fence_standard_access_rules"
                         value="AR_ONLY_INFO,AR_ONLY_SEARCH,AR_INFO_COLUMN_LISTING"/>
