@@ -185,16 +185,6 @@ variable "picsure_db_host" {
     description = "The host for the picsure db"
 }
 
-variable "picsure_db_password" {
-    type = string
-    description = "The password for the picsure db"
-}
-
-variable "picsure_db_username" {
-    type = string
-    description = "The username for the picsure db"
-}
-
 variable "referer_allowed_domains" {
     type = string
     description = "The referer allowed domains. A regex string to match the referer domain"
