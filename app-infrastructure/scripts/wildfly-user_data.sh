@@ -29,29 +29,27 @@ s3_copy() {
 # sleep for awhile because as these files are could still be in the process of being rendered.
 # containerize already.
 echo "waiting for terraform to render files"
-sleep 600
+sleep 300
 
-s3_copy s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-wildfly.tar.gz /home/centos/pic-sure-wildfly.tar.gz
-s3_copy s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/standalone.xml /home/centos/standalone.xml
-s3_copy s3://${stack_s3_bucket}/data/${dataset_s3_object_key}/fence_mapping.json /home/centos/fence_mapping.json
-s3_copy s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/aggregate-resource.properties /home/centos/aggregate-resource.properties
-s3_copy s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/visualization-resource.properties /home/centos/visualization-resource.properties
-
-WILDFLY_IMAGE=`sudo docker load < /home/centos/pic-sure-wildfly.tar.gz | cut -d ' ' -f 3`
-JAVA_OPTS="-Xms2g -Xmx26g -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=1024m -Djava.net.preferIPv4Stack=true -DTARGET_STACK=${target_stack}.${env_private_dns_name}"
-
+# make picsure network
+sudo docker network create picsure
 sudo mkdir /var/log/{wildfly-docker-logs,wildfly-docker-os-logs}
 
-sudo docker run -u root --name=wildfly \
-                        --restart unless-stopped \
-                        --log-driver syslog --log-opt tag=wildfly \
-                        -v /var/log/wildfly-docker-logs/:/opt/jboss/wildfly/standalone/log/ \
-                        -v /home/centos/standalone.xml:/opt/jboss/wildfly/standalone/configuration/standalone.xml \
-                        -v /home/centos/fence_mapping.json:/usr/local/docker-config/fence_mapping.json \
-                        -v /home/centos/aggregate-resource.properties:/opt/jboss/wildfly/standalone/configuration/aggregate-data-sharing/pic-sure-aggregate-resource/resource.properties \
-                        -v /var/log/wildfly-docker-os-logs/:/var/log/ \
-                        -v /home/centos/visualization-resource.properties:/opt/jboss/wildfly/standalone/configuration/visualization/pic-sure-visualization-resource/resource.properties \
-                        -p 8080:8080 -e JAVA_OPTS="$JAVA_OPTS" -d $WILDFLY_IMAGE
+# Download the wildfly and psama docker scripts
+s3_copy s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/wildfly-docker.sh /home/centos/wildfly-docker.sh
+s3_copy s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/psama-docker.sh /home/centos/psama-docker.sh
+
+sudo chmod +x /home/centos/wildfly-docker.sh
+sudo chmod +x /home/centos/psama-docker.sh
+
+target_stack="${target_stack}"
+env_private_dns_name="${env_private_dns_name}"
+stack_s3_bucket="${stack_s3_bucket}"
+stack_githash="${stack_githash}"
+dataset_s3_object_key="${dataset_s3_object_key}"
+
+sudo /home/centos/wildfly-docker.sh "$target_stack" "$env_private_dns_name" "$stack_s3_bucket" "$stack_githash" "$dataset_s3_object_key"
+sudo /home/centos/psama-docker.sh "$stack_s3_bucket" "$stack_githash"
 
 INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)
 sudo /usr/bin/aws --region=us-east-1 ec2 create-tags --resources $${INSTANCE_ID} --tags Key=InitComplete,Value=true
