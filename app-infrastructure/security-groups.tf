@@ -31,6 +31,13 @@ resource "aws_security_group" "inbound-wildfly-from-httpd" {
     security_groups = [aws_security_group.inbound-httpd-from-alb.id]
   }
 
+  ingress {
+    from_port = 8090
+    to_port   = 8090
+    protocol  = "tcp"
+    security_groups = [aws_security_group.inbound-httpd-from-alb.id]
+  }
+
   tags = {
     Owner       = "Avillach_Lab"
     Environment = var.environment_name
