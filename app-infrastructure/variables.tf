@@ -92,30 +92,6 @@ variable "picsure_token_introspection_token" {
   default = ""
 }
 
-variable "picsure_client_secret" {
-  type    = string
-  default = ""
-}
-
-variable "fence_client_secret" {
-  type    = string
-  default = ""
-}
-variable "fence_client_id" {
-  type    = string
-  default = ""
-}
-
-variable "idp_provider_uri" {
-  type    = string
-  default = "https://gen3.biodatacatalyst.nhlbi.nih.gov"
-}
-
-variable "idp_provider" {
-  type    = string
-  default = "fence"
-}
-
 variable "application_id_for_base_query" {
   type = string
 }
@@ -156,11 +132,6 @@ variable "client_id" {
   description = "Service Provider Client ID"
 }
 
-variable "sp_client_secret" {
-  default = ""
-  type = string
-  description = "Service Provider Client Secret"
-}
 variable "connection_label" {
   default = "FENCE"
   type = string
