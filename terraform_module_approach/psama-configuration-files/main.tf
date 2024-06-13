@@ -10,8 +10,6 @@ data "template_file" "psama-env" {
     datasource_username             = var.app_user_secret_name,
     picsure_db_host                 = var.picsure_db_host,
     stack_specific_application_id   = var.application_id_for_base_query,
-    idp_provider                    = var.idp_provider,
-    idp_provider_uri                = var.idp_provider_uri,
     client_secret                   = var.picsure_client_secret,
     system_name                     = "PIC-SURE BioDataCatalyst",
     fence_client_id                 = var.fence_client_id,
