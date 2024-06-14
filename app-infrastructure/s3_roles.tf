@@ -77,6 +77,12 @@ resource "aws_iam_role_policy" "httpd-deployment-s3-policy" {
       ],
       "Effect": "Allow",
       "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/data/${var.dataset_s3_object_key}/fence_mapping.json"
+    },
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/httpd-docker.sh"
     },{
       "Action": [
         "s3:ListBucket"
@@ -164,6 +170,12 @@ resource "aws_iam_role_policy" "auth-hpds-deployment-s3-policy" {
       ],
       "Effect": "Allow",
       "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/data/${var.genomic_dataset_s3_object_key}/all/*"
+    },{
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/auth-hpds-docker.sh"
     },{
       "Action": [
         "s3:ListBucket"
@@ -264,6 +276,12 @@ resource "aws_iam_role_policy" "open-hpds-deployment-s3-policy" {
       "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/open-hpds-docker.sh"
     },{
       "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/open-hpds-docker.sh"
+    },{
+      "Action": [
         "s3:ListBucket"
       ],
       "Effect": "Allow",
@@ -342,6 +360,12 @@ resource "aws_iam_role_policy" "dictionary-deployment-s3-policy" {
       ],
       "Effect": "Allow",
       "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/data/${var.dataset_s3_object_key}/fence_mapping.json"
+    },{
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/dictionary-docker.sh"
     },{
       "Action": [
         "s3:ListBucket"
