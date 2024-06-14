@@ -19,34 +19,34 @@ locals {
     subid = (var.genomic-etl-subnet-1f-id)
     instanceList = [
      {
-    "subnetId" = (subid)
+    "subnetId" = (local.subid)
     "type" =  "r5.12xlarge"
   }, /*  {
-    "subnetId" = (subid)
+    "subnetId" = (local.subid)
     "type" =  "m5.12xlarge"
   },  */
     {
-    "subnetId" = (subid)
+    "subnetId" = (local.subid)
     "type" =  "r5a.8xlarge"
   },
     {
-    "subnetId" = (subid)
+    "subnetId" = (local.subid)
     "type" =  "r5a.12xlarge"
   },
     {
-    "subnetId" = (subid)
+    "subnetId" = (local.subid)
     "type" =  "r5n.8xlarge"
   },
    {
-    "subnetId" = (subid)
+    "subnetId" = (local.subid)
     "type" =  "r5d.8xlarge"
   },
    {
-    "subnetId" = (subid)
+    "subnetId" = (local.subid)
     "type" =  "r5b.8xlarge"
   },
     {
-    "subnetId" = (subid)
+    "subnetId" = (local.subid)
     "type" = "r5.8xlarge"
   }
 ]
