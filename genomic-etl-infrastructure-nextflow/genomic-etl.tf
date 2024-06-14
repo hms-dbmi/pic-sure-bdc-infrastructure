@@ -16,18 +16,28 @@ data "template_file" "genomic-user_data" {
 }
 
 locals {
+  subid = (var.genomic-etl-subnet-1c-id)
+    az = "us-east-1c"
     instanceList = [
+       {
+    "subnetId" = (local.subid)
+    "type" =  "r5.4xlarge"
+  },
       {
-    "subnetId" = (var.genomic-etl-subnet-1c-id)
-    "type" =  "m5.4xlarge"
+    "subnetId" = (local.subid)
+    "type" =  "r5a.4xlarge"
   },
     {
-    "subnetId" = (var.genomic-etl-subnet-1c-id)
-    "type" = "r5.4xlarge"
+    "subnetId" = (local.subid)
+    "type" =  "r5n.4xlarge"
   },
-      {
-    "subnetId" = (var.genomic-etl-subnet-1c-id)
-    "type" = "r5.2xlarge"
+   {
+    "subnetId" = (local.subid)
+    "type" =  "r5d.4xlarge"
+  },
+   {
+    "subnetId" = (local.subid)
+    "type" =  "r5b.4xlarge"
   }
 ]
 }
@@ -45,7 +55,7 @@ data "template_cloudinit_config" "genomic-user-data" {
 }
 
 resource "aws_ebs_volume" "genomic-etl-volume"{
-  availability_zone = "us-east-1c"
+  availability_zone = local.az
   snapshot_id = "snap-0a0957538f16a171b"
   type="gp3"
   tags = {

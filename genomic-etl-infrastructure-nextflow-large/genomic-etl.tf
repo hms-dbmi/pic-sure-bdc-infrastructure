@@ -17,6 +17,7 @@ data "template_file" "genomic-user_data" {
 
 locals {
     subid = (var.genomic-etl-subnet-1f-id)
+    az = "us-east-1f"
     instanceList = [
      {
     "subnetId" = (local.subid)
@@ -65,7 +66,7 @@ data "template_cloudinit_config" "genomic-user-data" {
 }
 
  resource "aws_ebs_volume" "genomic-etl-volume"{
-  availability_zone = "us-east-1f"
+  availability_zone = local.az
   snapshot_id = "snap-0a0957538f16a171b"
   type="gp3"
   size=2500
