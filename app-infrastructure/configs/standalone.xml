@@ -482,7 +482,7 @@
                 <!-- Used in IRCT as well -->
                 <simple name="java:global/verify_user_method" value="tokenIntrospection"/>
                 <simple name="java:global/token_introspection_url"
-                        value="http://psama:8090/pic-sure-auth-services/auth/token/inspect"/>
+                        value="http://psama:8090/auth/token/inspect"/>
                 <simple name="java:global/token_introspection_token" value="${picsure_token_introspection_token}"/>
 
                 <simple name="java:global/fence_standard_access_rules"
