@@ -1,7 +1,7 @@
 #!/bin/bash
 
-stack_s3_bucket="${stack_s3_bucket}"
-dataset_s3_object_key="${dataset_s3_object_key}"
+stack_s3_bucket=$1
+dataset_s3_object_key=$2
 
 s3_copy() {
   for i in {1..5}; do
