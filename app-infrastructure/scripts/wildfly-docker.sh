@@ -13,11 +13,11 @@ s3_copy() {
   done
 }
 
-s3_copy "s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-wildfly.tar.gz" "/home/centos/pic-sure-wildfly.tar.gz"
-s3_copy "s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/standalone.xml" "/home/centos/standalone.xml"
+s3_copy "s3://${stack_s3_bucket}/releases/pic-sure-wildfly.tar.gz" "/home/centos/pic-sure-wildfly.tar.gz"
+s3_copy "s3://${stack_s3_bucket}/configs/standalone.xml" "/home/centos/standalone.xml"
 s3_copy "s3://${stack_s3_bucket}/data/${dataset_s3_object_key}/fence_mapping.json" "/home/centos/fence_mapping.json"
-s3_copy "s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/aggregate-resource.properties" "/home/centos/aggregate-resource.properties"
-s3_copy "s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/visualization-resource.properties" "/home/centos/visualization-resource.properties"
+s3_copy "s3://${stack_s3_bucket}/configs/aggregate-resource.properties" "/home/centos/aggregate-resource.properties"
+s3_copy "s3://${stack_s3_bucket}/configs/visualization-resource.properties" "/home/centos/visualization-resource.properties"
 
 
 WILDFLY_IMAGE=`sudo docker load < /home/centos/pic-sure-wildfly.tar.gz | cut -d ' ' -f 3`

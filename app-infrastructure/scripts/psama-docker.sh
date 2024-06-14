@@ -9,9 +9,9 @@ s3_copy() {
   done
 }
 
-s3_copy "s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/psama.env" "/home/centos/psama.env"
-s3_copy "s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/psama-db-config.properties" "/home/centos/psama-db-config.properties"
-s3_copy "s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/psama.tar.gz" "/home/centos/psama.tar.gz"
+s3_copy "s3://${stack_s3_bucket}/configs/psama.env" "/home/centos/psama.env"
+s3_copy "s3://${stack_s3_bucket}/configs/psama-db-config.properties" "/home/centos/psama-db-config.properties"
+s3_copy "s3://${stack_s3_bucket}/releases/psama.tar.gz" "/home/centos/psama.tar.gz"
 
 # This script is responsible for starting or updating the psama container
 PSAMA_IMAGE=`sudo docker load < /home/centos/psama.tar.gz | cut -d ' ' -f 3`

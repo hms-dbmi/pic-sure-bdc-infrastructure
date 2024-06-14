@@ -21,7 +21,7 @@ s3_copy() {
   done
 }
 
-s3_copy s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-hpds-dictionary-resource.tar.gz /home/centos/pic-sure-hpds-dictionary-resource.tar.gz
+s3_copy s3://${stack_s3_bucket}/releases/pic-sure-hpds-dictionary-resource.tar.gz /home/centos/pic-sure-hpds-dictionary-resource.tar.gz
 
 s3_copy s3://${stack_s3_bucket}/data/${dataset_s3_object_key}/fence_mapping.json /home/centos/fence_mapping.json
 echo "pulled fence mapping"
