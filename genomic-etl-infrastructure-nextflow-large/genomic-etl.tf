@@ -16,16 +16,37 @@ data "template_file" "genomic-user_data" {
 }
 
 locals {
+    subid = (var.genomic-etl-subnet-1f-id)
     instanceList = [
      {
-    "subnetId" = (var.genomic-etl-subnet-1f-id)
+    "subnetId" = (subid)
     "type" =  "r5.12xlarge"
-  },  {
-    "subnetId" = (var.genomic-etl-subnet-1f-id)
+  }, /*  {
+    "subnetId" = (subid)
     "type" =  "m5.12xlarge"
-  }, 
+  },  */
     {
-    "subnetId" = (var.genomic-etl-subnet-1f-id)
+    "subnetId" = (subid)
+    "type" =  "r5a.8xlarge"
+  },
+    {
+    "subnetId" = (subid)
+    "type" =  "r5a.12xlarge"
+  },
+    {
+    "subnetId" = (subid)
+    "type" =  "r5n.8xlarge"
+  },
+   {
+    "subnetId" = (subid)
+    "type" =  "r5d.8xlarge"
+  },
+   {
+    "subnetId" = (subid)
+    "type" =  "r5b.8xlarge"
+  },
+    {
+    "subnetId" = (subid)
     "type" = "r5.8xlarge"
   }
 ]
