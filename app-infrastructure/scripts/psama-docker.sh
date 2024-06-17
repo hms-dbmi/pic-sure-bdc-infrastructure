@@ -15,7 +15,7 @@ s3_copy "s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash
 
 # This script is responsible for starting or updating the psama container
 PSAMA_IMAGE=`sudo docker load < /home/centos/psama.tar.gz | cut -d ' ' -f 3`
-PSAMA_OPTS="-Xms2g -Xmx26g -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=1024m -Djava.net.preferIPv4Stack=true"
+PSAMA_OPTS="-Xms1g -Xmx2g -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=512m -Djava.net.preferIPv4Stack=true"
 
 # Stop and remove the existing psama container if it exists
 sudo docker stop psama || true
