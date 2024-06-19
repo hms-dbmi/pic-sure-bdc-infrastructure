@@ -19,6 +19,7 @@ data "template_file" "genomic_etl_variables_template" {
     study_id = var.study_id
     consent_group_tag = var.consent_group_tag
     chrom_number=var.chrom_number
+    freeze_number=var.freeze_number
   }
 }
 
