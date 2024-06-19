@@ -12,6 +12,7 @@ data "template_file" "genomic-user_data" {
     consent_group_tag = var.consent_group_tag
     deployment_githash = var.deployment_githash
     s3_role =  var.s3_role
+    freeze_number = var.freeze_number
   }
 }
 
