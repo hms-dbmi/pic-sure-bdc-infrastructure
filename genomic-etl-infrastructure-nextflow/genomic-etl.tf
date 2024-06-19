@@ -17,8 +17,8 @@ data "template_file" "genomic-user_data" {
 }
 
 locals {
-  subid = (var.genomic-etl-subnet-1f-id)
-    az = "us-east-1f"
+  subid = (var.genomic-etl-subnet-1c-id)
+    az = "us-east-1c"
     instanceList = [
        {
     "subnetId" = (local.subid)
