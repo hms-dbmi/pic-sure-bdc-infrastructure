@@ -17,3 +17,6 @@ variable "study_name"{
 variable "s3_role"{
   type = string
 }
+variable "freeze_number"{
+  type = string
+}
