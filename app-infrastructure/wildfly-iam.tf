@@ -44,6 +44,27 @@ resource "aws_iam_role_policy" "wildfly-deployment-sm-policy" {
 EOF
 }
 
+resource "aws_iam_role_policy" "wildfly-deployment-paramstore-policy" {
+    name   = "wildfly-deployment-paramstore-policy-${var.target_stack}-${local.uniq_name}"
+    role   = aws_iam_role.wildfly-deployment-role.id
+    policy = <<EOF
+    {
+	"Version": "2012-10-17",
+	"Statement": [
+		{
+        "Effect": "Allow",
+        "Action": [
+                "ssm:GetParametersByPath",
+                "ssm:GetParameter",
+                "ssm:GetParameters"
+          ],
+        "Resource": "arn:aws:ssm:${data.aws_region.current.name}:${var.app_acct_id}:parameter/pic-sure-auth-micro-service_${var.environment_prefix}/${var.environment_name}/*"
+        }
+    ]
+  }
+EOF
+}
+
 resource "aws_iam_role_policy_attachment" "attach-cloudwatch-server-policy-to-sm-role" {
   role       = aws_iam_role.wildfly-deployment-role.name
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
@@ -63,7 +84,7 @@ resource "aws_iam_role_policy_attachment" "attach-cloudwatch-ssm-policy-to-sm-ro
 #        "s3:GetObject"
 #      ],
 #      "Effect": "Allow",
-#      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/*"
+#      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/*"
 #    }
 
 resource "aws_iam_role_policy" "wildfly-deployment-s3-policy" {
