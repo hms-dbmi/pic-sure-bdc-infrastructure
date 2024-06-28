@@ -1,27 +1,27 @@
 # We have migrated our naming convention away from "FENCE_" to a more generalized "MANAGED_".
 -- Update roles table
-UPDATE roles
+UPDATE role
 SET name = REPLACE(name, 'FENCE', 'MANAGED')
 WHERE name LIKE 'FENCE%';
 
-UPDATE roles
+UPDATE role
 SET description = REPLACE(description, 'FENCE', 'MANAGED')
 WHERE description LIKE '%FENCE%';
 
 -- Update privileges table
-UPDATE privileges
+UPDATE privilege
 SET name = REPLACE(name, 'PRIV_FENCE', 'PRIV_MANAGED')
 WHERE name LIKE 'PRIV_FENCE%';
 
-UPDATE privileges
+UPDATE privilege
 SET description = REPLACE(description, 'FENCE', 'MANAGED')
 WHERE description LIKE '%FENCE%';
 
 -- Update access rules table
-UPDATE access_rules
+UPDATE access_rule
 SET name = REPLACE(name, 'FENCE', 'MANAGED')
 WHERE name LIKE 'FENCE%';
 
-UPDATE access_rules
+UPDATE access_rule
 SET description = REPLACE(description, 'FENCE', 'MANAGED')
 WHERE description LIKE '%FENCE%';
