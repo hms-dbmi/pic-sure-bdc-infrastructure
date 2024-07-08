@@ -596,7 +596,7 @@
                 </host>
             </server>
             <servlet-container name="default">
-                <session-cookie name="JSESSIONID" path="/" http-only="true" secure="true"/>
+                <session-cookie name="JSESSIONID" http-only="true" secure="true"/>
                 <jsp-config/>
             </servlet-container>
             <filters>
