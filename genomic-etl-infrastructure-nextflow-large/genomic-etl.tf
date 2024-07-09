@@ -17,16 +17,24 @@ data "template_file" "genomic-user_data" {
 }
 
 locals {
-    subid = (var.genomic-etl-subnet-1a-id)
+    subid = (var.genomic-etl-subnet-1b-id)
     az = "us-east-1a"
     instanceList = [
      {
     "subnetId" = (local.subid)
     "type" =  "r5.12xlarge"
-  }, /*  {
+  },   {
     "subnetId" = (local.subid)
     "type" =  "m5.12xlarge"
-  },  */
+  },  
+{
+    "subnetId" = (local.subid)
+    "type" =  "r5d.4xlarge"
+  },  
+  {
+    "subnetId" = (local.subid)
+    "type" =  "r5b.4xlarge"
+  },  
     {
     "subnetId" = (local.subid)
     "type" =  "r5a.8xlarge"
