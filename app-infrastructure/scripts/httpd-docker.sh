@@ -31,4 +31,3 @@ sudo docker run --name=httpd \
                 -v /usr/local/docker-config/cert:/usr/local/apache2/cert/ \
                 -v /usr/local/docker-config/httpd-vhosts.conf:/usr/local/apache2/conf/extra/httpd-vhosts.conf \
                 -p 443:443 -d $HTTPD_IMAGE
-
