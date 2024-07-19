@@ -36,8 +36,8 @@ sudo docker network create picsure
 sudo mkdir /var/log/{wildfly-docker-logs,wildfly-docker-os-logs}
 
 # Download the wildfly and psama docker scripts
-s3_copy s3://${stack_s3_bucket}/configs/wildfly-docker.sh /home/centos/wildfly-docker.sh
-s3_copy s3://${stack_s3_bucket}/configs/psama-docker.sh /home/centos/psama-docker.sh
+s3_copy s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/wildfly-docker.sh /home/centos/wildfly-docker.sh
+s3_copy s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/psama-docker.sh /home/centos/psama-docker.sh
 
 sudo chmod +x /home/centos/wildfly-docker.sh
 sudo chmod +x /home/centos/psama-docker.sh

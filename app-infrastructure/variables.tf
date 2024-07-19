@@ -92,15 +92,6 @@ variable "picsure_token_introspection_token" {
   default = ""
 }
 
-variable "picsure_client_secret" {
-  type    = string
-  default = ""
-}
-
-variable "fence_client_secret" {
-  type    = string
-  default = ""
-}
 variable "fence_client_id" {
   type    = string
   default = ""
@@ -156,11 +147,6 @@ variable "client_id" {
   description = "Service Provider Client ID"
 }
 
-variable "sp_client_secret" {
-  default = ""
-  type = string
-  description = "Service Provider Client Secret"
-}
 variable "connection_label" {
   default = "FENCE"
   type = string
