@@ -42,14 +42,14 @@ resource "aws_iam_role_policy" "wildfly-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/releases/jenkins_pipeline_build_${var.stack_githash_long}/pic-sure-wildfly.tar.gz"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/releases/pic-sure-wildfly.tar.gz"
     },
     {
       "Action": [
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/jenkins_pipeline_build_${var.stack_githash_long}/visualization-resource.properties"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/visualization-resource.properties"
     },
     {
       "Action": [
@@ -63,28 +63,28 @@ resource "aws_iam_role_policy" "wildfly-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/jenkins_pipeline_build_${var.stack_githash_long}/standalone.xml"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/standalone.xml"
     },
     {
       "Action": [
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/jenkins_pipeline_build_${var.stack_githash_long}/pic-sure-schema.sql"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/pic-sure-schema.sql"
     },
     {
       "Action": [
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/jenkins_pipeline_build_${var.stack_githash_long}/aggregate-resource.properties"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/aggregate-resource.properties"
     },
     {
       "Action": [
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/jenkins_pipeline_build_${var.stack_githash_long}/visualization-resource.properties"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/visualization-resource.properties"
     },
     {
       "Action": [
@@ -186,7 +186,7 @@ resource "aws_iam_role_policy" "httpd-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/releases/jenkins_pipeline_build_${var.stack_githash_long}/pic-sure-ui.tar.gz"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/releases/pic-sure-ui.tar.gz"
     },{
       "Action": [
         "s3:GetObject"
@@ -228,19 +228,19 @@ resource "aws_iam_role_policy" "httpd-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/jenkins_pipeline_build_${var.stack_githash_long}/httpd-vhosts.conf"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/httpd-vhosts.conf"
     },{
       "Action": [
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/jenkins_pipeline_build_${var.stack_githash_long}/picsureui_settings.json"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/picsureui_settings.json"
     },{
       "Action": [
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/jenkins_pipeline_build_${var.stack_githash_long}/banner_config.json"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/banner_config.json"
     },{
       "Action": [
         "s3:GetObject"
@@ -340,7 +340,7 @@ resource "aws_iam_role_policy" "auth-hpds-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/releases/jenkins_pipeline_build_${var.stack_githash_long}/pic-sure-hpds.tar.gz"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/releases/pic-sure-hpds.tar.gz"
     },
     {
       "Action": [
@@ -375,7 +375,7 @@ resource "aws_iam_role_policy" "auth-hpds-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/jenkins_pipeline_build_${var.stack_githash_long}/hpds-log4j.properties"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/hpds-log4j.properties"
     },
     {
       "Action": [
@@ -470,7 +470,7 @@ resource "aws_iam_role_policy" "open-hpds-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/releases/jenkins_pipeline_build_${var.stack_githash_long}/pic-sure-hpds.tar.gz"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/releases/pic-sure-hpds.tar.gz"
     },
     {
       "Action": [
@@ -484,7 +484,7 @@ resource "aws_iam_role_policy" "open-hpds-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/jenkins_pipeline_build_${var.stack_githash_long}/hpds-log4j.properties"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/hpds-log4j.properties"
     },
     {
       "Action": [
@@ -580,7 +580,7 @@ resource "aws_iam_role_policy" "dictionary-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/releases/jenkins_pipeline_build_${var.stack_githash_long}/pic-sure-hpds-dictionary-resource.tar.gz"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/releases/pic-sure-hpds-dictionary-resource.tar.gz"
     }, {
       "Action": [
         "s3:GetObject"
