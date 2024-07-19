@@ -30,3 +30,6 @@ stack_s3_bucket="${stack_s3_bucket}"
 dataset_s3_object_key="${dataset_s3_object_key}"
 
 sudo /home/centos/dictionary-docker.sh "$stack_s3_bucket" "$dataset_s3_object_key"
+
+INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)
+sudo /usr/bin/aws --region=us-east-1 ec2 create-tags --resources $${INSTANCE_ID} --tags Key=InitComplete,Value=true
