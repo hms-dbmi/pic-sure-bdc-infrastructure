@@ -16,7 +16,7 @@ sourcetype = hms_app_logs
 source = wildfly_logs
 index=hms_aws_${gss_prefix}
 " | sudo tee -a /opt/splunkforwarder/etc/system/local/inputs.conf
-sudo systemctl restart SplunkForwarder || true
+/opt/splunkforwarder/bin/splunk enable boot-start -systemd-managed 1 -user splunk && sudo systemctl restart SplunkForwarder || true
 
 echo "user-data progress starting update"
 sudo yum -y update
