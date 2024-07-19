@@ -78,13 +78,13 @@ resource "aws_iam_role_policy" "wildfly-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/releases/jenkins_pipeline_build_${var.stack_githash_long}/pic-sure-wildfly.tar.gz"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/releases/pic-sure-wildfly.tar.gz"
     },{
       "Action": [
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/jenkins_pipeline_build_${var.stack_githash_long}/visualization-resource.properties"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/visualization-resource.properties"
     },{
       "Action": [
         "s3:GetObject"
@@ -96,19 +96,19 @@ resource "aws_iam_role_policy" "wildfly-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/jenkins_pipeline_build_${var.stack_githash_long}/standalone.xml"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/standalone.xml"
     },{
       "Action": [
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/jenkins_pipeline_build_${var.stack_githash_long}/aggregate-resource.properties"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/aggregate-resource.properties"
     },{
       "Action": [
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/jenkins_pipeline_build_${var.stack_githash_long}/aggregate-resource.properties"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/aggregate-resource.properties"
     },{
       "Action": [
         "s3:ListBucket"
@@ -118,7 +118,7 @@ resource "aws_iam_role_policy" "wildfly-deployment-s3-policy" {
       "Condition": {
         "StringLike": {
           "s3:prefix": [
-            "releases/jenkins_pipeline_build_${var.stack_githash_long}/*",
+            "releases/*",
             "configs/jenkins_pipeline_build_${var.stack_githash_long}*",
             "modules/*",
             "data/${var.dataset_s3_object_key}/*"
@@ -148,13 +148,13 @@ resource "aws_iam_role_policy" "wildfly-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/jenkins_pipeline_build_${var.stack_githash_long}/psama-docker.sh"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/psama-docker.sh"
     },{
       "Action": [
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/jenkins_pipeline_build_${var.stack_githash_long}/wildfly-docker.sh"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/wildfly-docker.sh"
     }
   ]
 }

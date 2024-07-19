@@ -92,7 +92,7 @@ resource "aws_iam_role_policy" "httpd-deployment-s3-policy" {
       "Condition": {
         "StringLike": {
           "s3:prefix": [
-            "releases/jenkins_pipeline_build_${var.stack_githash_long}/*",
+            "releases/*",
             "configs/jenkins_pipeline_build_${var.stack_githash_long}*",
             "certs/httpd/*",
             "data/${var.dataset_s3_object_key}/*"
