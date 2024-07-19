@@ -54,18 +54,6 @@ resource "aws_iam_role_policy_attachment" "attach-cloudwatch-ssm-policy-to-sm-ro
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
-# If you want to deploy PSAMA incrementally you will likely need to add the following policy.
-# We need to discuss removing the versioning from the jenkins pipeline build folder.
-# It should not be needed as we currently never delete or use the old versions. We tend to either create a new version
-# or replace the existing version.
-# {
-#      "Action": [
-#        "s3:GetObject"
-#      ],
-#      "Effect": "Allow",
-#      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/*"
-#    }
-
 resource "aws_iam_role_policy" "wildfly-deployment-s3-policy" {
   name   = "wildfly-deployment-s3-policy-${var.target_stack}-${local.uniq_name}"
   role   = aws_iam_role.wildfly-deployment-role.id
