@@ -1,8 +1,6 @@
 #!/bin/bash
 
-stack_githash=$1
-stack_s3_bucket=$2
-destigmatized_dataset_s3_object_key=$3
+stack_s3_bucket=$1
 
 s3_copy() {
   for i in {1..5}; do
@@ -11,11 +9,6 @@ s3_copy() {
 }
 
 s3_copy s3://${stack_s3_bucket}/releases/pic-sure-hpds.tar.gz /home/centos/pic-sure-hpds.tar.gz
-s3_copy s3://${stack_s3_bucket}/data/${destigmatized_dataset_s3_object_key}/destigmatized_javabins_rekeyed.tar.gz /opt/local/hpds/destigmatized_javabins_rekeyed.tar.gz
-
-cd /opt/local/hpds
-tar -xvzf destigmatized_javabins_rekeyed.tar.gz
-cd ~
 
 CONTAINER_NAME="open-hpds"
 

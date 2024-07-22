@@ -32,13 +32,16 @@ CONTAINER_NAME="auth-hpds"
 
 # Download the hpds docker script
 s3_copy s3://${stack_s3_bucket}/configs/auth-hpds-docker.sh /home/centos/auth-hpds-docker.sh
+s3_copy s3://${stack_s3_bucket}/configs/auth-hpds-data.sh /home/centos/auth-hpds-data.sh
 
 sudo chmod +x /home/centos/auth-hpds-docker.sh
+sudo chmod +x /home/centos/auth-hpds-data.sh
 
 stack_s3_bucket="${stack_s3_bucket}"
 dataset_s3_object_key="${dataset_s3_object_key}"
 genomic_dataset_s3_object_key="${genomic_dataset_s3_object_key}"
 
+sudo /home/centos/auth-hpds-data.sh "$stack_s3_bucket" "$dataset_s3_object_key" "$genomic_dataset_s3_object_key"
 sudo /home/centos/auth-hpds-docker.sh "$stack_s3_bucket" "$dataset_s3_object_key" "$genomic_dataset_s3_object_key"
 
 echo "Waiting for container to initialize"

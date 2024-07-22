@@ -24,13 +24,14 @@ s3_copy() {
 
 # Waiting for application to finish initialization
 INIT_MESSAGE="WebApplicationContext: initialization completed"
-INIT_TIMEOUT_SEX=2400  # Set your desired timeout in seconds
+INIT_TIMEOUT_SECS=2400  # Set your desired timeout in seconds
 INIT_START_TIME=$(date +%s)
 
 CONTAINER_NAME="open-hpds"
 
 # Copy the HPDS docker script
 s3_copy s3://${stack_s3_bucket}/configs/open-hpds-docker.sh /home/centos/open-hpds-docker.sh
+s3_copy s3://${stack_s3_bucket}/configs/open-hpds-data.sh /home/centos/open-hpds-data.sh
 
 sudo chmod +x /home/centos/open-hpds-docker.sh
 
@@ -40,6 +41,7 @@ destigmatized_dataset_s3_object_key="${destigmatized_dataset_s3_object_key}"
 
 # Run the HPDS docker script
 sudo /home/centos/open-hpds-docker.sh "$stack_githash" "$stack_s3_bucket" "$destigmatized_dataset_s3_object_key"
+sudo /home/centos/open-hpds-data.sh "$stack_githash" "$stack_s3_bucket" "$destigmatized_dataset_s3_object_key"
 
 echo "Waiting for container to initialize"
 while true; do
