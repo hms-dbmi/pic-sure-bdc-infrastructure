@@ -17,11 +17,6 @@ cd /opt/local/hpds
 tar -xvzf destigmatized_javabins_rekeyed.tar.gz
 cd ~
 
-# Waiting for application to finish initialization
-INIT_MESSAGE="WebApplicationContext: initialization completed"
-INIT_TIMEOUT_SEX=2400  # Set your desired timeout in seconds
-INIT_START_TIME=$(date +%s)
-
 CONTAINER_NAME="open-hpds"
 
 HPDS_IMAGE=`sudo docker load < /home/centos/pic-sure-hpds.tar.gz | cut -d ' ' -f 3`

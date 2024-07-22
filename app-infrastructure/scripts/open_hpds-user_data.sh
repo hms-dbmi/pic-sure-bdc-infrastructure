@@ -22,6 +22,13 @@ s3_copy() {
   done
 }
 
+# Waiting for application to finish initialization
+INIT_MESSAGE="WebApplicationContext: initialization completed"
+INIT_TIMEOUT_SEX=2400  # Set your desired timeout in seconds
+INIT_START_TIME=$(date +%s)
+
+CONTAINER_NAME="open-hpds"
+
 # Copy the HPDS docker script
 s3_copy s3://${stack_s3_bucket}/configs/open-hpds-docker.sh /home/centos/open-hpds-docker.sh
 

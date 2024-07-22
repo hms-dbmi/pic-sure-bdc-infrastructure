@@ -19,12 +19,6 @@ cd /opt/local/hpds
 tar -xvzf javabins_rekeyed.tar.gz
 cd ~
 
-# Load and run docker container.  Then wait for initialization before tagging instance as init complete.
-echo "Loading and running docker container"
-INIT_MESSAGE="WebApplicationContext: initialization completed"
-INIT_TIMEOUT_SECS=2400  # Set your desired timeout in seconds
-INIT_START_TIME=$(date +%s)
-
 CONTAINER_NAME="auth-hpds"
 
 HPDS_IMAGE=`sudo docker load < /home/centos/pic-sure-hpds.tar.gz | cut -d ' ' -f 3`

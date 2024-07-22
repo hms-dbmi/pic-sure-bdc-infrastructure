@@ -22,6 +22,14 @@ s3_copy() {
   done
 }
 
+# Load and run docker container.  Then wait for initialization before tagging instance as init complete.
+echo "Loading and running docker container"
+INIT_MESSAGE="WebApplicationContext: initialization completed"
+INIT_TIMEOUT_SECS=2400  # Set your desired timeout in seconds
+INIT_START_TIME=$(date +%s)
+
+CONTAINER_NAME="auth-hpds"
+
 # Download the hpds docker script
 s3_copy s3://${stack_s3_bucket}/configs/auth-hpds-docker.sh /home/centos/auth-hpds-docker.sh
 
