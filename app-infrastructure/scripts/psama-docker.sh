@@ -2,6 +2,7 @@
 
 stack_s3_bucket=$1
 enable_debug=$2
+stack_githash=$3
 
 s3_copy() {
   for i in {1..5}; do
@@ -9,8 +10,8 @@ s3_copy() {
   done
 }
 
-s3_copy "s3://${stack_s3_bucket}/configs/psama/psama.env" "/home/centos/psama.env"
-s3_copy "s3://${stack_s3_bucket}/releases/psama/psama.tar.gz" "/home/centos/psama.tar.gz"
+s3_copy "s3://${stack_s3_bucket}/configs/psama.env" "/home/centos/psama.env"
+s3_copy "s3://${stack_s3_bucket}/releases/releases/jenkins_pipeline_build_${stack_githash}/psama.tar.gz" "/home/centos/psama.tar.gz"
 
 # This script is responsible for starting or updating the psama container
 PSAMA_IMAGE=$(sudo docker load < /home/centos/psama.tar.gz | cut -d ' ' -f 3)

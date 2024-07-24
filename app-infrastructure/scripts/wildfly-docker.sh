@@ -5,6 +5,7 @@ target_stack=$1
 env_private_dns_name=$2
 stack_s3_bucket=$3
 dataset_s3_object_key=$4
+stack_githash=$5
 
 s3_copy() {
   for i in {1..5}; do
@@ -12,7 +13,7 @@ s3_copy() {
   done
 }
 
-s3_copy "s3://${stack_s3_bucket}/releases/pic-sure-wildfly.tar.gz" "/home/centos/pic-sure-wildfly.tar.gz"
+s3_copy "s3://${stack_s3_bucket}/releases/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-wildfly.tar.gz" "/home/centos/pic-sure-wildfly.tar.gz"
 s3_copy "s3://${stack_s3_bucket}/configs/standalone.xml" "/home/centos/standalone.xml"
 s3_copy "s3://${stack_s3_bucket}/data/${dataset_s3_object_key}/fence_mapping.json" "/home/centos/fence_mapping.json"
 s3_copy "s3://${stack_s3_bucket}/configs/aggregate-resource.properties" "/home/centos/aggregate-resource.properties"

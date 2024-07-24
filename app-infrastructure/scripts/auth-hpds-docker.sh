@@ -1,6 +1,7 @@
 #!/bin/bash
 
 stack_s3_bucket=$1
+stack_githash=$2
 
 s3_copy() {
   for i in {1..5}; do
@@ -9,7 +10,7 @@ s3_copy() {
 }
 
 mkdir -p /opt/local/hpds/all
-s3_copy s3://${stack_s3_bucket}/releases/pic-sure-hpds.tar.gz /home/centos/pic-sure-hpds.tar.gz
+s3_copy s3://${stack_s3_bucket}/releases/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-hpds.tar.gz /home/centos/pic-sure-hpds.tar.gz
 
 CONTAINER_NAME="auth-hpds"
 

@@ -40,8 +40,8 @@ stack_s3_bucket="${stack_s3_bucket}"
 destigmatized_dataset_s3_object_key="${destigmatized_dataset_s3_object_key}"
 
 # Run the HPDS docker script
-sudo /home/centos/open-hpds-docker.sh "$stack_githash" "$stack_s3_bucket" "$destigmatized_dataset_s3_object_key"
-sudo /home/centos/open-hpds-data.sh "$stack_githash" "$stack_s3_bucket" "$destigmatized_dataset_s3_object_key"
+sudo /home/centos/open-hpds-docker.sh "$stack_s3_bucket" "$stack_githash"
+sudo /home/centos/open-hpds-data.sh "$stack_s3_bucket" "$destigmatized_dataset_s3_object_key"
 
 echo "Waiting for container to initialize"
 while true; do

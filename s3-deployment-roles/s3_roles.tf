@@ -42,7 +42,7 @@ resource "aws_iam_role_policy" "wildfly-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/releases/pic-sure-wildfly.tar.gz"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/releases/*/pic-sure-wildfly.tar.gz"
     },
     {
       "Action": [
@@ -186,7 +186,7 @@ resource "aws_iam_role_policy" "httpd-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/releases/pic-sure-ui.tar.gz"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/releases/*/pic-sure-ui.tar.gz"
     },{
       "Action": [
         "s3:GetObject"
@@ -340,7 +340,7 @@ resource "aws_iam_role_policy" "auth-hpds-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/releases/pic-sure-hpds.tar.gz"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/releases/*/pic-sure-hpds.tar.gz"
     },
     {
       "Action": [
@@ -470,7 +470,7 @@ resource "aws_iam_role_policy" "open-hpds-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/releases/pic-sure-hpds.tar.gz"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/releases/*/pic-sure-hpds.tar.gz"
     },
     {
       "Action": [
@@ -580,7 +580,7 @@ resource "aws_iam_role_policy" "dictionary-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/releases/pic-sure-hpds-dictionary-resource.tar.gz"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/releases/*/pic-sure-hpds-dictionary-resource.tar.gz"
     }, {
       "Action": [
         "s3:GetObject"

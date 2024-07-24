@@ -2,6 +2,7 @@
 
 stack_s3_bucket=$1
 dataset_s3_object_key=$2
+stack_githash=$3
 
 s3_copy() {
   for i in {1..5}; do
@@ -9,7 +10,7 @@ s3_copy() {
   done
 }
 
-s3_copy s3://${stack_s3_bucket}/releases/pic-sure-ui.tar.gz /home/centos/pic-sure-ui.tar.gz
+s3_copy s3://${stack_s3_bucket}/releases/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-ui.tar.gz /home/centos/pic-sure-ui.tar.gz
 s3_copy s3://${stack_s3_bucket}/configs/httpd-vhosts.conf /usr/local/docker-config/httpd-vhosts.conf
 s3_copy s3://${stack_s3_bucket}/certs/httpd/ /usr/local/docker-config/cert/ --recursive
 s3_copy s3://${stack_s3_bucket}/configs/picsureui_settings.json /usr/local/docker-config/picsureui_settings.json

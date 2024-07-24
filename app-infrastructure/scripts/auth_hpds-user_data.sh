@@ -40,8 +40,9 @@ sudo chmod +x /home/centos/auth-hpds-data.sh
 stack_s3_bucket="${stack_s3_bucket}"
 dataset_s3_object_key="${dataset_s3_object_key}"
 genomic_dataset_s3_object_key="${genomic_dataset_s3_object_key}"
+stack_githash="${stack_githash}"
 
-sudo /home/centos/auth-hpds-data.sh "$stack_s3_bucket" "$dataset_s3_object_key" "$genomic_dataset_s3_object_key"
+sudo /home/centos/auth-hpds-data.sh "$stack_s3_bucket" "$stack_githash"
 sudo /home/centos/auth-hpds-docker.sh "$stack_s3_bucket" "$dataset_s3_object_key" "$genomic_dataset_s3_object_key"
 
 echo "Waiting for container to initialize"
