@@ -4,8 +4,7 @@
 target_stack=$1
 env_private_dns_name=$2
 stack_s3_bucket=$3
-stack_githash=$4
-dataset_s3_object_key=$5
+dataset_s3_object_key=$4
 
 s3_copy() {
   for i in {1..5}; do
