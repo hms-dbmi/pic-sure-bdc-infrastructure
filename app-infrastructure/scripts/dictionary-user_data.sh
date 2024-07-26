@@ -20,16 +20,6 @@ s3_copy() {
     sudo /usr/bin/aws --region us-east-1 s3 cp $* && break || sleep 30
   done
 }
-## temp - Installing docker
-sudo yum update -y
-sudo yum install -y yum-utils
-sudo yum-config-manager --add-repo https://download.docker.com/linux/rhel/docker-ce.repo
-sudo yum remove docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-sudo yum install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-sudo systemctl enable docker
-sudo systemctl start docker
-docker --version
-####
 
 s3_copy s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-hpds-dictionary-resource.tar.gz /opt/picsure/pic-sure-hpds-dictionary-resource.tar.gz
 
