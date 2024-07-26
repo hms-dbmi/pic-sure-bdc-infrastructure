@@ -1,5 +1,5 @@
 #Lookup latest AMI
-data "aws_ami" "centos" {
+data "aws_ami" "this" {
   most_recent = true
   owners      = ["752463128620"]
   name_regex  = "^srce-rhel9-golden-*"
@@ -79,7 +79,7 @@ data "aws_subnet" "public" {
 # better off explicitly setting this so we can deploy any project's resources in an environment.
 # won't be able to look up correct vpc tags otherwise
 locals {
-  ami_id               = data.aws_ami.centos.id
+  ami_id               = data.aws_ami.this.id
   target_vpc           = data.aws_vpc.target_vpc.id
   alb_vpc              = data.aws_vpc.alb_vpc.id
   private1_subnet_ids  = data.aws_subnets.private1.ids

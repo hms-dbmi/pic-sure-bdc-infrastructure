@@ -22,7 +22,7 @@ s3_copy() {
   done
 }
 
-s3_copy s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-hpds.tar.gz /home/centos/pic-sure-hpds.tar.gz
+s3_copy s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-hpds.tar.gz /opt/picsure/pic-sure-hpds.tar.gz
 
 s3_copy s3://${stack_s3_bucket}/data/${destigmatized_dataset_s3_object_key}/destigmatized_javabins_rekeyed.tar.gz /opt/local/hpds/destigmatized_javabins_rekeyed.tar.gz
 
@@ -37,7 +37,7 @@ INIT_START_TIME=$(date +%s)
 
 CONTAINER_NAME="open-hpds"
 
-HPDS_IMAGE=`sudo docker load < /home/centos/pic-sure-hpds.tar.gz | cut -d ' ' -f 3`
+HPDS_IMAGE=`sudo docker load < /opt/picsure/pic-sure-hpds.tar.gz | cut -d ' ' -f 3`
 sudo docker run --name=$CONTAINER_NAME \
                 --restart unless-stopped \
                 --log-driver syslog --log-opt tag=open-hpds \
