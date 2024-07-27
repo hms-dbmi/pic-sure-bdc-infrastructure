@@ -2,7 +2,7 @@
 data "aws_ami" "this" {
   most_recent = true
   owners      = ["752463128620"]
-  name_regex  = "^srce-rhel9-with-docker-golden-*"
+  name_regex  = "^srce-centos7-golden-*"
 }
 
 # Random string to use for dynamic names.
