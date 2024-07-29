@@ -15,6 +15,16 @@ index=hms_aws_${gss_prefix}
 sourcetype = hms_app_logs
 source = wildfly_logs
 index=hms_aws_${gss_prefix}
+
+[monitor:///var/log/psama-docker-logs]
+sourcetype = hms_app_logs
+source = wildfly_logs
+index=hms_aws_${gss_prefix}
+
+[monitor:///var/log/psama-docker-os-logs]
+sourcetype = hms_app_logs
+source = wildfly_logs
+index=hms_aws_${gss_prefix}
 " | sudo tee -a /opt/splunkforwarder/etc/system/local/inputs.conf
 /opt/splunkforwarder/bin/splunk enable boot-start -systemd-managed 1 -user splunk && sudo systemctl restart SplunkForwarder || true
 
@@ -33,7 +43,7 @@ sleep 300
 
 # make picsure network
 sudo docker network create picsure
-sudo mkdir /var/log/{wildfly-docker-logs,wildfly-docker-os-logs}
+sudo mkdir /var/log/{wildfly-docker-logs,wildfly-docker-os-logs,psama-docker-logs,psama-docker-os-logs}
 
 # Download the wildfly and psama docker scripts
 s3_copy s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/wildfly-docker.sh /home/centos/wildfly-docker.sh

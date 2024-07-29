@@ -20,7 +20,10 @@ sudo docker stop psama || true
 sudo docker rm psama || true
 sudo docker run -u root --name=psama --restart always --network=picsure \
 --env-file /home/centos/psama.env \
+-v /var/log/psama-docker-os-logs/:/var/log/ \
+-v /var/log/psama-docker-logs/:/opt/psama/logs/ \
 -e JAVA_OPTS="$PSAMA_OPTS" \
+--log-driver syslog --log-opt tag=wildfly \
 -v /home/centos/fence_mapping.json:/config/fence_mapping.json \
 -p 8090:8090 \
 -d $PSAMA_IMAGE
