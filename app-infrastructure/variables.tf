@@ -190,3 +190,22 @@ variable "app_user_secret_name" {
     type = string
     description = "The secret name for the application user"
 }
+
+# ras_idp_provider_uri          = var.ras_idp_provider_uri
+# ras_client_id                 = var.ras_client_id
+# ras_okta_idp_id               = var.ras_okta_idp_id
+
+variable "ras_idp_provider_uri" {
+    type = string
+    description = "The idp provider uri for the ras. An OKTA Domain."
+}
+
+variable "ras_client_id" {
+    type = string
+    description = "The client id for the ras."
+}
+
+variable "ras_okta_idp_id" {
+    type = string
+    description = "The okta ras idp id."
+}
