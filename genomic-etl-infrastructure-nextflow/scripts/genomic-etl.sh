@@ -214,7 +214,7 @@ fi
 
 yum install -y java-11-openjdk &
 wait
-update-alternatives --set java /usr/lib/jvm/java-11-openjdk-11.0.23.0.9-3.el8.x86_64/bin/java
+update-alternatives --set java /usr/lib/jvm/java-11-openjdk*/bin/java
 
 
 if [ $ActiveState == 'Annotating' ]
