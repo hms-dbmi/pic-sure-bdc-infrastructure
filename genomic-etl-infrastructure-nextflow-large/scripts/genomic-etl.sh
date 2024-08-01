@@ -245,9 +245,9 @@ fi
 if [ $ActiveState == 'Uploading' ]
 then
 echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} output stage
-aws s3 cp /annotation_pipeline/anno/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.annotated_remove_modifiers.hpds.vcf.gz s3://${output_s3_bucket}/genomic-etl/hpds_vcfs/modifiers_removed/ &
-aws s3 cp /annotation_pipeline/anno/ensembl-vep/outdir/${study_id}${consent_group_tag}.chr${chrom_number}.normalized_VEP.vcf.gz s3://${output_s3_bucket}/genomic-etl/vep_vcf_output/ &
-aws s3 cp /annotation_pipeline/anno/ensembl-vep/${study_name}_${study_id}_TOPMed_WGS_freeze.${freeze_number}b.chr${chrom_number}.hg38${consent_group_tag}.vcf.gz s3://${output_s3_bucket}/genomic-etl/original_vcfs/${study_id}${consent_group_tag}.chr${chrom_number}.original.vcf.gz &
+aws s3 cp /annotation_pipeline/anno/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.annotated_remove_modifiers.hpds.vcf.gz s3://${output_s3_bucket}/genomic-etl/hpds_vcfs/modifiers_removed/${freeze_number}/ &
+aws s3 cp /annotation_pipeline/anno/ensembl-vep/outdir/${study_id}${consent_group_tag}.chr${chrom_number}.normalized_VEP.vcf.gz s3://${output_s3_bucket}/genomic-etl/vep_vcf_output/${freeze_number}/ &
+aws s3 cp /annotation_pipeline/anno/ensembl-vep/${study_name}_${study_id}_TOPMed_WGS_freeze.${freeze_number}b.chr${chrom_number}.hg38${consent_group_tag}.vcf.gz s3://${output_s3_bucket}/genomic-etl/original_vcfs/${freeze_number}/${study_id}${consent_group_tag}.chr${chrom_number}.original.vcf.gz &
 
 wait
 
