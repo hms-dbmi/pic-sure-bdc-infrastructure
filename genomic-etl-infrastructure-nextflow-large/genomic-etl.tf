@@ -28,10 +28,6 @@ locals {
     "subnetId" = (local.subid)
     "type" =  "m5a.12xlarge"
   },  
-  {
-    "subnetId" = (local.subid)
-    "type" =  "m5d.12xlarge"
-  },  
 {
     "subnetId" = (local.subid)
     "type" =  "m5n.12xlarge"
@@ -39,10 +35,6 @@ locals {
    {
     "subnetId" = (local.subid)
     "type" =  "r5.12xlarge"
-  }, 
-{
-    "subnetId" = (local.subid)
-    "type" =  "r5d.12xlarge"
   },  
   {
     "subnetId" = (local.subid)
@@ -67,10 +59,6 @@ locals {
     {
     "subnetId" = (local.subid)
     "type" =  "r5n.8xlarge"
-  },
-   {
-    "subnetId" = (local.subid)
-    "type" =  "r5d.8xlarge"
   },
    {
     "subnetId" = (local.subid)

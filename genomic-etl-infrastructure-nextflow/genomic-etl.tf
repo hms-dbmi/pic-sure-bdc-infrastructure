@@ -34,10 +34,6 @@ locals {
   },
    {
     "subnetId" = (local.subid)
-    "type" =  "r5d.4xlarge"
-  },
-   {
-    "subnetId" = (local.subid)
     "type" =  "r5b.4xlarge"
   }
 ]
