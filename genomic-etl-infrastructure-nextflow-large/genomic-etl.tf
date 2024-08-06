@@ -82,7 +82,7 @@ data "template_cloudinit_config" "genomic-user-data" {
   availability_zone = local.az
   snapshot_id = "snap-0a0957538f16a171b"
   type="gp3"
-  size=2500
+  size=3500
   tags = {
     label = "${var.study_id}${var.consent_group_tag}.chr${var.chrom_number}"
   }
