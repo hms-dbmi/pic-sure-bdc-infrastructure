@@ -32,10 +32,6 @@ locals {
     "subnetId" = (local.subid)
     "type" =  "m5d.12xlarge"
   },  
-  {
-    "subnetId" = (local.subid)
-    "type" =  "m5b.12xlarge"
-  },  
 {
     "subnetId" = (local.subid)
     "type" =  "m5n.12xlarge"
