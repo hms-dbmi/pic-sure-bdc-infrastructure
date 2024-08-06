@@ -99,7 +99,7 @@ data "template_cloudinit_config" "genomic-user-data" {
   availability_zone = local.az
   snapshot_id = "snap-0a0957538f16a171b"
   type="gp3"
-  size=5000
+  size=3500
   tags = {
     label = "${var.study_id}${var.consent_group_tag}.chr${var.chrom_number}"
   }
@@ -134,7 +134,7 @@ resource "aws_spot_fleet_request" "genomic-etl-ec2"{
       root_block_device {
         delete_on_termination = true
         encrypted             = true
-        volume_size           = 1000
+        volume_size           = 1500
       }
 
       tags = {
