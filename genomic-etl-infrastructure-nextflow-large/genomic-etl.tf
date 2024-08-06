@@ -17,16 +17,33 @@ data "template_file" "genomic-user_data" {
 }
 
 locals {
-    subid = (var.genomic-etl-subnet-1f-id)
-    az = "us-east-1f"
+    subid = (var.genomic-etl-subnet-1a-id)
+    az = "us-east-1a"
     instanceList = [
-     {
-    "subnetId" = (local.subid)
-    "type" =  "r5.12xlarge"
-  },   {
+  {
     "subnetId" = (local.subid)
     "type" =  "m5.12xlarge"
   },  
+  {
+    "subnetId" = (local.subid)
+    "type" =  "m5a.12xlarge"
+  },  
+  {
+    "subnetId" = (local.subid)
+    "type" =  "m5d.12xlarge"
+  },  
+  {
+    "subnetId" = (local.subid)
+    "type" =  "m5b.12xlarge"
+  },  
+{
+    "subnetId" = (local.subid)
+    "type" =  "m5n.12xlarge"
+  },  
+   {
+    "subnetId" = (local.subid)
+    "type" =  "r5.12xlarge"
+  }, 
 {
     "subnetId" = (local.subid)
     "type" =  "r5d.12xlarge"
@@ -39,6 +56,10 @@ locals {
     "subnetId" = (local.subid)
     "type" =  "r5a.12xlarge"
   },  
+   {
+    "subnetId" = (local.subid)
+    "type" =  "r5n.12xlarge"
+  },
     {
     "subnetId" = (local.subid)
     "type" =  "r5a.8xlarge"
@@ -82,7 +103,7 @@ data "template_cloudinit_config" "genomic-user-data" {
   availability_zone = local.az
   snapshot_id = "snap-0a0957538f16a171b"
   type="gp3"
-  size=3500
+  size=5000
   tags = {
     label = "${var.study_id}${var.consent_group_tag}.chr${var.chrom_number}"
   }
