@@ -29,11 +29,15 @@ locals {
   },  
 {
     "subnetId" = (local.subid)
-    "type" =  "r5d.4xlarge"
+    "type" =  "r5d.12xlarge"
   },  
   {
     "subnetId" = (local.subid)
-    "type" =  "r5b.4xlarge"
+    "type" =  "r5b.12xlarge"
+  },  
+    {
+    "subnetId" = (local.subid)
+    "type" =  "r5a.12xlarge"
   },  
     {
     "subnetId" = (local.subid)
