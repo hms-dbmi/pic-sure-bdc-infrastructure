@@ -36,10 +36,6 @@ locals {
     "subnetId" = (local.subid)
     "type" =  "r5.12xlarge"
   },  
-  {
-    "subnetId" = (local.subid)
-    "type" =  "r5b.12xlarge"
-  },  
     {
     "subnetId" = (local.subid)
     "type" =  "r5a.12xlarge"
@@ -59,10 +55,6 @@ locals {
     {
     "subnetId" = (local.subid)
     "type" =  "r5n.8xlarge"
-  },
-   {
-    "subnetId" = (local.subid)
-    "type" =  "r5b.8xlarge"
   },
     {
     "subnetId" = (local.subid)
