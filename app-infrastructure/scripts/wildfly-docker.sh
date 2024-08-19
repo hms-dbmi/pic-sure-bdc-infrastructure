@@ -23,7 +23,7 @@ s3_copy "s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}
 WILDFLY_IMAGE=`sudo docker load < /opt/picsure/pic-sure-wildfly.tar.gz | cut -d ' ' -f 3`
 JAVA_OPTS="-Xms2g -Xmx24g -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=1024m -Djava.net.preferIPv4Stack=true -DTARGET_STACK=${target_stack}.${env_private_dns_name}"
 
-sudo docker run -u root --name=wildfly --network=picsure \
+sudo docker run -u root --name=wildfly \
                         --restart unless-stopped \
                         --log-driver syslog --log-opt tag=wildfly \
                         -v /var/log/wildfly-docker-logs/:/opt/jboss/wildfly/standalone/log/ \
