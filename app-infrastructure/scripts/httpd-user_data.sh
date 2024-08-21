@@ -37,7 +37,7 @@ for i in 1 2 3 4 5; do echo "confirming wildfly resolvable" && sudo curl --conne
 
 sudo mkdir -p /var/log/httpd-docker-logs
 
-HTTPD_IMAGE=`sudo docker load < /home/centos/pic-sure-ui.tar.gz | cut -d ' ' -f 3`
+HTTPD_IMAGE=`sudo docker load < /home/centos/pic-sure-frontend.tar.gz | cut -d ' ' -f 3`
 sudo docker run --name=httpd \
                 --restart unless-stopped \
                 --log-driver syslog --log-opt tag=httpd \
