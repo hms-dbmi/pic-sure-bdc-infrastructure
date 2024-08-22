@@ -24,13 +24,16 @@ touch .env
 
 sudo docker run \
       --name dictionary-api \
+      --restart always \
       --env-file=.env \
       --network picsure \
+      --log-driver syslog --log-opt tag=dictionary-api \
       --restart always \
       -d $DICTIONARY_API_IMAGE
 
 sudo docker run \
-      --rm \
+      --restart always \
+      --name dictionary-weights \
       --env-file=.env \
       --network picsure \
       --log-driver syslog --log-opt tag=dictionary-weights \
