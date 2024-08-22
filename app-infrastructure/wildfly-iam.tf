@@ -66,6 +66,18 @@ resource "aws_iam_role_policy" "wildfly-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/containers/application/dictionary-api.tar.gz"
+    },{
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/containers/application/dictionary-weights.tar.gz"
+    },{
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
       "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/releases/jenkins_pipeline_build_${var.stack_githash_long}/pic-sure-wildfly.tar.gz"
     },{
       "Action": [
@@ -109,7 +121,8 @@ resource "aws_iam_role_policy" "wildfly-deployment-s3-policy" {
             "releases/jenkins_pipeline_build_${var.stack_githash_long}/*",
             "configs/jenkins_pipeline_build_${var.stack_githash_long}*",
             "modules/*",
-            "data/${var.dataset_s3_object_key}/*"
+            "data/${var.dataset_s3_object_key}/*",
+            "containers/application/*"
           ]
         }
       }
@@ -136,7 +149,19 @@ resource "aws_iam_role_policy" "wildfly-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/dictionary/weights.csv"
+    },{
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
       "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/jenkins_pipeline_build_${var.stack_githash_long}/psama-docker.sh"
+    },{
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/jenkins_pipeline_build_${var.stack_githash_long}/dictionary-docker.sh"
     },{
       "Action": [
         "s3:GetObject"
