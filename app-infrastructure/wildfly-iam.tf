@@ -121,7 +121,8 @@ resource "aws_iam_role_policy" "wildfly-deployment-s3-policy" {
             "releases/jenkins_pipeline_build_${var.stack_githash_long}/*",
             "configs/jenkins_pipeline_build_${var.stack_githash_long}*",
             "modules/*",
-            "data/${var.dataset_s3_object_key}/*"
+            "data/${var.dataset_s3_object_key}/*",
+            "containers/application/*"
           ]
         }
       }
