@@ -31,15 +31,18 @@ resource "aws_iam_role_policy" "wildfly-deployment-sm-policy" {
 {
   "Version": "2012-10-17",
   "Statement": [
-      {
+    {
       "Action": [
-          "secretsmanager:GetSecretValue",
-          "secretsmanager:DescribeSecret"
+        "secretsmanager:GetSecretValue",
+        "secretsmanager:DescribeSecret"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:secretsmanager:${data.aws_region.current.name}:${var.app_acct_id}:secret:${var.app_user_secret_name}-*"
-      }
-    ]
+      "Resource": [
+        "arn:aws:secretsmanager:${data.aws_region.current.name}:${var.app_acct_id}:secret:${var.app_user_secret_name}-*",
+        "arn:aws:secretsmanager:${data.aws_region.current.name}:${var.app_acct_id}:secret:${var.app_psql_user_secret_name}-*"
+      ]
+    }
+  ]
 }
 EOF
 }
