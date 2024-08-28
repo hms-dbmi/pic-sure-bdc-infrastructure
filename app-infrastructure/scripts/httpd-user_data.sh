@@ -40,6 +40,17 @@ for i in 1 2 3 4 5; do echo "confirming wildfly resolvable" && sudo curl --conne
 
 sudo mkdir -p /var/log/httpd-docker-logs
 
+# NFT Rules and File permissions
+sudo nft add rule ip filter INPUT tcp dport 443 accept
+sudo nft add rule ip filter OUTPUT tcp sport 443 accept
+sudo nft add rule ip filter INPUT tcp dport 8080 accept
+sudo nft add rule ip filter OUTPUT tcp sport 8080 accept
+
+sudo chmod 644 /usr/local/docker-config/picsureui_settings.json
+sudo chmod 644 /usr/local/docker-config/banner_config.json
+sudo chmod 644 /opt/picsure/fence_mapping.json
+
+
 HTTPD_IMAGE=`sudo docker load < /opt/picsure/pic-sure-ui.tar.gz | cut -d ' ' -f 3`
 sudo docker run --name=httpd \
                 --restart unless-stopped \

@@ -31,6 +31,10 @@ cd /opt/local/hpds
 tar -xvzf javabins_rekeyed.tar.gz
 cd ~
 
+# NFT Rules
+sudo nft add rule ip filter INPUT tcp dport 8080 accept
+sudo nft add rule ip filter OUTPUT tcp sport 8080 accept
+
 # Load and run docker container.  Then wait for initialization before tagging instance as init complete.
 echo "Loading and running docker container"
 INIT_MESSAGE="WebApplicationContext: initialization completed"

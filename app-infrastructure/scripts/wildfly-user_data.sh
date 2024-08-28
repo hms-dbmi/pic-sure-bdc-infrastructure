@@ -32,8 +32,40 @@ s3_copy() {
 echo "waiting for terraform to render files"
 sleep 300
 
-# make picsure network
-sudo docker network create picsure
+# NFT Rules
+sudo nft add rule ip filter INPUT tcp dport 8080 accept
+sudo nft add rule ip filter OUTPUT tcp sport 8080 accept
+
+sudo nft add rule ip filter INPUT tcp dport 8090 accept
+sudo nft add rule ip filter OUTPUT tcp sport 8090 accept
+
+sudo nft add rule ip filter INPUT tcp dport 5432 accept
+sudo nft add rule ip filter OUTPUT tcp sport 5432 accept
+
+sudo nft add rule ip filter INPUT tcp dport 3306 accept
+sudo nft add rule ip filter OUTPUT tcp sport 3306 accept
+
+# Creating network for wildfly
+docker network create \
+  --driver=bridge \
+  --subnet=172.18.0.0/16 \
+  --gateway=172.18.0.1 \
+  --opt com.docker.network.bridge.name=docker1 \
+  picsure
+
+# NFT Rules for the picsure network
+sudo nft add rule ip filter INPUT iifname "docker1" accept
+sudo nft add rule ip filter FORWARD oifname "docker1" ct state established,related accept
+sudo nft add rule ip filter FORWARD oifname "docker1" jump DOCKER
+sudo nft add rule ip filter FORWARD iifname "docker1" oifname != "docker1" accept
+sudo nft add rule ip filter FORWARD iifname "docker1" oifname "docker1" accept
+sudo nft add rule ip filter OUTPUT oifname "docker1" accept
+sudo nft add rule ip filter DOCKER-ISOLATION-STAGE-1 iifname "docker1" oifname != "docker1" jump DOCKER-ISOLATION-STAGE-2
+sudo nft add rule ip filter DOCKER-ISOLATION-STAGE-2 oifname "docker1" drop
+sudo nft add rule ip nat POSTROUTING oifname != "docker1" ip saddr 172.18.0.0/16 masquerade
+sudo nft add rule ip nat DOCKER iifname "docker1" return
+
+
 sudo mkdir /var/log/{wildfly-docker-logs,wildfly-docker-os-logs}
 
 # Download the wildfly and psama docker scripts

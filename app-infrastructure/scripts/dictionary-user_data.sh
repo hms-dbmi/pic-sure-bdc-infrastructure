@@ -24,7 +24,10 @@ s3_copy() {
 s3_copy s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-hpds-dictionary-resource.tar.gz /opt/picsure/pic-sure-hpds-dictionary-resource.tar.gz
 
 s3_copy s3://${stack_s3_bucket}/data/${dataset_s3_object_key}/fence_mapping.json /opt/picsure/fence_mapping.json
-echo "pulled fence mapping"
+
+# NFT Rules
+sudo nft add rule ip filter INPUT tcp dport 8080 accept
+sudo nft add rule ip filter OUTPUT tcp sport 8080 accept
 
 sudo mkdir -p /usr/local/docker-config/search/
 sudo mkdir -p /var/log/dictionary-docker-logs
