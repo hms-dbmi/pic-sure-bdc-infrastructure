@@ -18,9 +18,11 @@ PSAMA_OPTS="-Xms1g -Xmx2g -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=512m -Djava
 # Stop and remove the existing psama container if it exists
 sudo docker stop psama || true
 sudo docker rm psama || true
+
 sudo docker run -u root --name=psama --restart always \
---env-file /opt/picsure/psama.env \
--e JAVA_OPTS="$PSAMA_OPTS" \
--v /opt/picsure/fence_mapping.json:/config/fence_mapping.json \
--p 8090:8090 \
--d $PSAMA_IMAGE
+  --env-file /opt/picsure/psama.env \
+  -e JAVA_OPTS="$PSAMA_OPTS" \
+  -v /opt/picsure/fence_mapping.json:/config/fence_mapping.json \
+  --network picsure \
+  -p 8090:8090 \
+  -d $PSAMA_IMAGE

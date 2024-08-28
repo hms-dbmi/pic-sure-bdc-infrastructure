@@ -50,6 +50,8 @@ sudo chmod 644 /usr/local/docker-config/picsureui_settings.json
 sudo chmod 644 /usr/local/docker-config/banner_config.json
 sudo chmod 644 /opt/picsure/fence_mapping.json
 
+# Add new rules to the nftables.rules so they propagate on service restarts
+sudo nft list ruleset > /etc/nftables/nftables.rules
 
 HTTPD_IMAGE=`sudo docker load < /opt/picsure/pic-sure-ui.tar.gz | cut -d ' ' -f 3`
 sudo docker run --name=httpd \

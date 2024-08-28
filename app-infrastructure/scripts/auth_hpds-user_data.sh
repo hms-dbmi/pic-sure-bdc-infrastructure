@@ -35,6 +35,9 @@ cd ~
 sudo nft add rule ip filter INPUT tcp dport 8080 accept
 sudo nft add rule ip filter OUTPUT tcp sport 8080 accept
 
+# Add new rules to the nftables.rules so they propagate on service restarts
+sudo nft list ruleset > /etc/nftables/nftables.rules
+
 # Load and run docker container.  Then wait for initialization before tagging instance as init complete.
 echo "Loading and running docker container"
 INIT_MESSAGE="WebApplicationContext: initialization completed"

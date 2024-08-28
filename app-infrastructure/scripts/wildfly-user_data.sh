@@ -65,6 +65,8 @@ sudo nft add rule ip filter DOCKER-ISOLATION-STAGE-2 oifname "docker1" drop
 sudo nft add rule ip nat POSTROUTING oifname != "docker1" ip saddr 172.18.0.0/16 masquerade
 sudo nft add rule ip nat DOCKER iifname "docker1" return
 
+# Add new rules to the nftables.rules so they propagate on service restarts
+sudo nft list ruleset > /etc/nftables/nftables.rules
 
 sudo mkdir /var/log/{wildfly-docker-logs,wildfly-docker-os-logs}
 
