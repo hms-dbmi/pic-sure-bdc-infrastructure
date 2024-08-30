@@ -21,8 +21,10 @@ sudo docker rm psama || true
 
 sudo docker run -u root --name=psama --restart always \
   --env-file /opt/picsure/psama.env \
+  -v /var/log/psama-docker-os-logs/:/var/log/ \
+  -v /var/log/psama-docker-logs/:/opt/psama/logs/ \
   -e JAVA_OPTS="$PSAMA_OPTS" \
+  --log-driver syslog --log-opt tag=wildfly \
   -v /opt/picsure/fence_mapping.json:/config/fence_mapping.json \
-  --network picsure \
   -p 8090:8090 \
   -d $PSAMA_IMAGE
