@@ -11,6 +11,7 @@ resource "random_string" "random" {
   length  = 6
   special = false
 }
+
 locals {
   uniq_name = random_string.random.result
 }

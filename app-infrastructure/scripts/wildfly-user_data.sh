@@ -27,8 +27,6 @@ s3_copy() {
   done
 }
 
-# sleep for awhile because as these files are could still be in the process of being rendered.
-# containerize already.
 echo "waiting for terraform to render files"
 sleep 300
 
