@@ -28,13 +28,13 @@ VALUES (unhex(@uuidAR_NAMED_DATASET),
         'AR_NAMED_DATASET',
         'Allow access to named dataset',
         '$.[\'Target Service\']',
-        4,
+        11,
         '^/dataset/named/([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})?$',
         0,
         1,
         NULL,
         0,
-        1);
+        0);
 
 -- Create a privilege for metadata access
 SET @uuidPriv = REPLACE(UUID(),'-','');
