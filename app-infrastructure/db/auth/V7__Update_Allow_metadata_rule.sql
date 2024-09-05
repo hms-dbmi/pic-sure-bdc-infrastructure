@@ -34,7 +34,7 @@ VALUES (unhex(@uuidAR_NAMED_DATASET),
         1,
         NULL,
         0,
-        0);
+        1);
 
 -- Create a privilege for metadata access
 SET @uuidPriv = REPLACE(UUID(),'-','');
