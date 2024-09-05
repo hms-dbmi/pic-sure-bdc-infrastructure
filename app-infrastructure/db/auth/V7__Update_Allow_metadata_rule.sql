@@ -1,6 +1,6 @@
 -- Update the access rule for metadata access to use the 'Target Service' field instead of 'path'
 UPDATE access_rule
-SET rule = '$.path', type = 11, checkMapKeyOnly = 0, value = '^/query/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})/metadata$'
+SET rule = '$.path', type = 11, checkMapKeyOnly = 0, value = '^/query/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})/metadata$',
     checkMapNode = 0, isEvaluateOnlyByGates = 0, isGateAnyRelation = 0, name = 'AR_ALLOW_METADATA_ACCESS'
 WHERE name = 'ALLOW_METADATA_ACCESS';
 
