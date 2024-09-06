@@ -105,8 +105,10 @@
   "analyticsId": "${analytics_id}",
   "tagManagerId": "${tag_manager_id}",
   "client_id": "${client_id}",
+  "include_bdc_specific_filters": true,
+  "loginRedirect": "${login_redirect_uri}",
   "ras_client_id": "${ras_client_id}",
   "ras_idp_id": "${ras_okta_idp_id}",
   "ras_idp_provider_uri": "${ras_idp_provider_uri}",
-  "include_bdc_specific_filters": true
+  "ras_session_logout_uri": "${ras_session_logout_uri}"
 }
