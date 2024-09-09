@@ -166,6 +166,13 @@ resource "aws_iam_role_policy" "auth-hpds-deployment-s3-policy" {
       "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/data/${var.genomic_dataset_s3_object_key}/all/*"
     },{
       "Action": [
+        "s3:GetObject",
+        "s3:PutObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::pic-sure-auth-${var.environment_name}-data-export/*"
+    },{
+      "Action": [
         "s3:ListBucket"
       ],
       "Effect": "Allow",
