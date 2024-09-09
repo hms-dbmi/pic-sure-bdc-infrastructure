@@ -190,3 +190,8 @@ variable "app_user_secret_name" {
     type = string
     description = "The secret name for the application user"
 }
+
+variable "app_psql_user_secret_name" {
+    type = string
+    description = "The secret name for the application psql user"
+}
