@@ -15,7 +15,7 @@ resource "aws_iam_role_policy" "httpd-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/releases/jenkins_pipeline_build_${var.stack_githash_long}/pic-sure-frontend.tar.gz"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/releases/jenkins_pipeline_build_*/pic-sure-frontend.tar.gz"
     },{
       "Action": [
         "s3:GetObject"
@@ -86,8 +86,8 @@ resource "aws_iam_role_policy" "httpd-deployment-s3-policy" {
       "Condition": {
         "StringLike": {
           "s3:prefix": [
-            "releases/jenkins_pipeline_build_${var.stack_githash_long}/*",
-            "configs/jenkins_pipeline_build_${var.stack_githash_long}*",
+            "releases/jenkins_pipeline_build_*/*",
+            "configs/jenkins_pipeline_build_*/*",
             "certs/httpd/*",
             "data/${var.dataset_s3_object_key}/*"
           ]
