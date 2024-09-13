@@ -10,7 +10,7 @@ INTO access_rule (
 )    VALUES (
                 @allowDictionaryRequests, 'ALLOW_DICTIONARY_REQUESTS', 'Permit requests to dictionary endpoints',
                 '$.[\'Target Service\']', 6, '/proxy/dictionary-api/facets/',
-             0x00, 0x00, NULL, 0x00, 0x00
+             0x00, 0x01, NULL, 0x00, 0x00
             );
 -- Add that access rule to the PIC_SURE_ANY_QUERY privilege
 SET @uuidPriv = (SELECT uuid FROM privilege WHERE name = 'MANAGED_PRIV_DICTIONARY'); -- FENCE_ was previously replaced with MANAGED_
