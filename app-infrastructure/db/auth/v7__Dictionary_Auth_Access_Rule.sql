@@ -9,7 +9,7 @@ INTO access_rule (
     subAccessRuleParent_uuid, isGateAnyRelation, isEvaluateOnlyByGates
 )    VALUES (
                 @allowDictionaryRequests, 'ALLOW_DICTIONARY_REQUESTS', 'Permit requests to dictionary endpoints',
-                '$.[\'Target Service\']', 11, '^/proxy/dictionary-api.*$',
+                '$.[\'Target Service\']', 6, '/proxy/dictionary-api/facets/',
              0x00, 0x00, NULL, 0x00, 0x00
             );
 -- Add that access rule to the PIC_SURE_ANY_QUERY privilege
