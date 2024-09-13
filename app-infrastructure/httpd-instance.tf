@@ -93,6 +93,11 @@ data "template_file" "picsureui_settings" {
     client_id                     = var.client_id
     pdf_link                      = var.pdf_link
     pic_sure_resource_id          = var.pic_sure_resource_id
+    ras_idp_provider_uri          = var.ras_idp_provider_uri
+    ras_client_id                 = var.ras_client_id
+    ras_okta_idp_id               = var.ras_okta_idp_id
+    login_redirect_uri            = var.login_redirect_uri
+    ras_session_logout_uri        = var.ras_session_logout_uri
   }
 }
 
