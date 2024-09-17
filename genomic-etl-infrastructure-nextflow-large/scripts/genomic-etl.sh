@@ -1,10 +1,4 @@
 #!/bin/bash
-sudo yum install wget -y
-sudo yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
-sudo systemctl enable amazon-ssm-agent
-sudo systemctl start amazon-ssm-agent
-wget https://s3.amazonaws.com/amazoncloudwatch-agent/centos/amd64/latest/amazon-cloudwatch-agent.rpm
-sudo rpm -U amazon-cloudwatch-agent.rpm
 sudo touch /opt/aws/amazon-cloudwatch-agent/etc/custom_config.json
 echo "
 
