@@ -199,24 +199,29 @@ variable "app_psql_user_secret_name" {
 variable "ras_idp_provider_uri" {
   type = string
   description = "The idp provider uri for the ras. An OKTA Domain."
+  default = "false"
 }
 
 variable "ras_client_id" {
   type = string
   description = "The client id for the ras."
+  default = "false"
 }
 
 variable "ras_okta_idp_id" {
   type = string
   description = "The okta ras idp id."
+  default = "false"
 }
 
 variable "login_redirect_uri" {
   type = string
-  default = "Where you will be redirected after logout. The login page."
+  description = "Where you will be redirected after logout. The login page."
+  default = "false"
 }
 
 variable "ras_session_logout_uri" {
   type = string
-  default = "The logout uri for RAS. This is the URI that will be used to end the user's RAS session."
+  description = "The logout uri for RAS. This is the URI that will be used to end the user's RAS session."
+  default = "false"
 }
