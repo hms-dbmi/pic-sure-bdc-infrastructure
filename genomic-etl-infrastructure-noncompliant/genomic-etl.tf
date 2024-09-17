@@ -6,107 +6,29 @@ data "template_file" "genomic-user_data" {
     study_id = var.study_id
     chrom_number = var.chrom_number
     study_name = var.study_name
-    study_consent_group = var.study_consent_group
-    consent_group_tag = var.consent_group_tag
-    deployment_githash = var.deployment_githash
     s3_role =  var.s3_role
   }
 }
 
 locals {
+  subid = (var.genomic-etl-subnet-1b-id)
+    az = "us-east-1b"
     instanceList = [
-  {
-    "subnetId" = (var.genomic-etl-subnet-1a-id)
-    "type" = "r5.2xlarge"
-  },
-  {
-    "subnetId" = (var.genomic-etl-subnet-1a-id)
-    "type" = "c5.2xlarge"
-  },
-    {
-    "subnetId" = (var.genomic-etl-subnet-1a-id)
-    "type" =  "c5.4xlarge"
-  },
-    {
-    "subnetId" = (var.genomic-etl-subnet-1a-id)
-    "type" = "m5.2xlarge"
-  },
-    {
-    "subnetId" = (var.genomic-etl-subnet-1a-id)
-    "type" =  "m5.4xlarge"
-  },
-
-    {
-    "subnetId" = (var.genomic-etl-subnet-1b-id)
-    "type" = "r5.2xlarge"
+       {
+    "subnetId" = (local.subid)
+    "type" =  "r5.4xlarge"
   },
       {
-    "subnetId" = (var.genomic-etl-subnet-1b-id)
-    "type" = "c5.2xlarge"
-  },
-      {
-    "subnetId" = (var.genomic-etl-subnet-1b-id)
-    "type" = "c5.4xlarge"
-  },
-      {
-    "subnetId" = (var.genomic-etl-subnet-1b-id)
-    "type" = "m5.2xlarge"
+    "subnetId" = (local.subid)
+    "type" =  "r5a.4xlarge"
   },
     {
-    "subnetId" = (var.genomic-etl-subnet-1c-id)
-    "type" = "r5.2xlarge"
+    "subnetId" = (local.subid)
+    "type" =  "r5n.4xlarge"
   },
-      {
-    "subnetId" = (var.genomic-etl-subnet-1c-id)
-    "type" =  "c5.2xlarge"
-  },
-      {
-    "subnetId" = (var.genomic-etl-subnet-1c-id)
-    "type" = "c5.4xlarge"
-  },
-      {
-    "subnetId" = (var.genomic-etl-subnet-1c-id)
-    "type" = "m5.2xlarge"
-  },
-      {
-    "subnetId" = (var.genomic-etl-subnet-1c-id)
-    "type" = "m5.4xlarge"
-  },
-    {
-    "subnetId" = (var.genomic-etl-subnet-1d-id)
-    "type" = "r5.2xlarge"
-  },
-      {
-    "subnetId" = (var.genomic-etl-subnet-1d-id)
-    "type" = "c5.2xlarge"
-  },
-      {
-    "subnetId" = (var.genomic-etl-subnet-1d-id)
-    "type" =  "m5.2xlarge"
-  },
-      {
-    "subnetId" = (var.genomic-etl-subnet-1d-id)
-    "type" =  "m5.4xlarge"
-  },
-  {
-    "subnetId" = (var.genomic-etl-subnet-1f-id)
-    "type" = "r5.2xlarge"
-  },
-    {
-    "subnetId" = (var.genomic-etl-subnet-1f-id)
-    "type" = "c5.2xlarge"
-  },
-    {
-    "subnetId" = (var.genomic-etl-subnet-1f-id)
-    "type" = "c5.4xlarge"
-  },
-    {
-    "subnetId" = (var.genomic-etl-subnet-1f-id)
-    "type" = "m5.2xlarge"
-  },
-    {
-    "subnetId" = (var.genomic-etl-subnet-1f-id)
-    "type" = "m5.4xlarge"
+   {
+    "subnetId" = (local.subid)
+    "type" =  "r5b.4xlarge"
   }
 ]
 }
@@ -122,6 +44,15 @@ data "template_cloudinit_config" "genomic-user-data" {
   }
 
 }
+
+resource "aws_ebs_volume" "genomic-etl-volume"{
+  availability_zone = local.az
+  snapshot_id = "snap-0a0957538f16a171b"
+  type="gp3"
+  tags = {
+    label = "${var.study_id}.chr${var.chrom_number}"
+  }
+} 
 
 resource "aws_spot_fleet_request" "genomic-etl-ec2"{
   iam_fleet_role = "arn:aws:iam::900561893673:role/aws-service-role/spotfleet.amazonaws.com/AWSServiceRoleForEC2SpotFleet"
@@ -158,7 +89,7 @@ resource "aws_spot_fleet_request" "genomic-etl-ec2"{
       tags = {
         Owner       = "Avillach_Lab"
         Environment = "development"
-        Name        = "Genomic ETL Annotation Pipeline - ${var.study_id}${var.consent_group_tag} Chromosome ${var.chrom_number}"
+        Name        = "Genomic ETL Annotation Pipeline - ${var.study_id} Chromosome ${var.chrom_number}"
         automaticPatches = "1"
       }
       }
