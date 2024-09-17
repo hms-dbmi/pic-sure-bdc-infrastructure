@@ -484,6 +484,8 @@
                 <simple name="java:global/token_introspection_url"
                         value="http://psama:8090/auth/token/inspect"/>
                 <simple name="java:global/token_introspection_token" value="${picsure_token_introspection_token}"/>
+                <simple name="java:global/openAccessEnabled" value="${include_open_hpds}"/>
+                <simple name="java:global/openAccessValidateUrl" value="http://psama:8090/auth/open/validate"/>
 
                 <simple name="java:global/fence_standard_access_rules"
                         value="AR_ONLY_INFO,AR_ONLY_SEARCH,AR_INFO_COLUMN_LISTING"/>
