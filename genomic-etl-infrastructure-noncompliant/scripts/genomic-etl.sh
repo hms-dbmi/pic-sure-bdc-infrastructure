@@ -94,7 +94,7 @@ mkdir -p /var/log/genomic-docker-logs/ssl_mutex
 INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)
 sudo /usr/local/bin/aws --region=us-east-1 ec2 create-tags --resources $${INSTANCE_ID} --tags Key=InitComplete,Value=true
 
-export VOLUME_ID=$(/usr/local/bin/aws ec2 describe-volumes --filters Name='tag:label',Values=${study_id}${consent_group_tag}.chr${chrom_number} --query "Volumes[*].VolumeId" --output text)
+export VOLUME_ID=$(/usr/local/bin/aws ec2 describe-volumes --filters Name='tag:label',Values=${study_id}.chr${chrom_number} --query "Volumes[*].VolumeId" --output text)
 aws ec2 attach-volume --volume-id $VOLUME_ID --device /dev/sdb --instance-id $INSTANCE_ID --region us-east-1 &
 wait
 mkdir /annotation_pipeline
@@ -156,7 +156,7 @@ fi
 
 if [ $ActiveState == 'Normalizing' ]; then
    /usr/local/bin/bcftools norm --threads 40 -m -any -f /annotation_pipeline/anno/fasta/Homo_sapiens_assembly38.fasta -o /annotation_pipeline/anno/ensembl-vep/${study_id}.chr${chrom_number}.normalized.vcf.gz /annotation_pipeline/anno/ensembl-vep/${study_id}.chr${chrom_number}.renamed.vcf.gz &
-   echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} normalize stage
+   echo $(date +%T) started ${study_id}.chr${chrom_number} normalize stage
 
    wait
 
@@ -210,10 +210,10 @@ if [ $ActiveState == 'Scripting' ]; then
 fi
 
 if [ $ActiveState == 'Uploading' ]; then
-   echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} output stage
-   aws s3 cp /annotation_pipeline/anno/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.annotated_remove_modifiers.hpds.vcf.gz s3://${output_s3_bucket}/genomic-etl/hpds_vcfs/modifiers_removed/10/ &
-   aws s3 cp /annotation_pipeline/anno/ensembl-vep/outdir/${study_id}${consent_group_tag}.chr${chrom_number}.normalized_VEP.vcf.gz s3://${output_s3_bucket}/genomic-etl/vep_vcf_output/10/ &
-   aws s3 cp /annotation_pipeline/anno/ensembl-vep/1kGP_high_coverage_Illumina.chr${chrom_number}.filtered.SNV_INDEL_SV_phased_panel.vcf.gz s3://${output_s3_bucket}/genomic-etl/original_vcfs/10/${study_id}${consent_group_tag}.chr${chrom_number}.original.vcf.gz &
+   echo $(date +%T) started ${study_id}.chr${chrom_number} output stage
+   aws s3 cp /annotation_pipeline/anno/ensembl-vep/${study_id}.chr${chrom_number}.annotated_remove_modifiers.hpds.vcf.gz s3://${output_s3_bucket}/genomic-etl/hpds_vcfs/modifiers_removed/10/ &
+   aws s3 cp /annotation_pipeline/anno/ensembl-vep/outdir/${study_id}.chr${chrom_number}.normalized_VEP.vcf.gz s3://${output_s3_bucket}/genomic-etl/vep_vcf_output/10/ &
+   aws s3 cp /annotation_pipeline/anno/ensembl-vep/1kGP_high_coverage_Illumina.chr${chrom_number}.filtered.SNV_INDEL_SV_phased_panel.vcf.gz s3://${output_s3_bucket}/genomic-etl/original_vcfs/10/${study_id}.chr${chrom_number}.original.vcf.gz &
 
    wait
 
