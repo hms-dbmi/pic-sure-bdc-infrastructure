@@ -28,7 +28,6 @@ s3_copy() {
 echo "waiting for terraform to render files"
 sleep 600
 
-s3_copy s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-frontend.tar.gz /home/centos/pic-sure-frontend.tar.gz
 s3_copy s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/httpd-vhosts.conf /usr/local/docker-config/httpd-vhosts.conf
 s3_copy s3://${stack_s3_bucket}/certs/httpd/ /usr/local/docker-config/cert/ --recursive
 s3_copy s3://${stack_s3_bucket}/data/${dataset_s3_object_key}/fence_mapping.json /home/centos/fence_mapping.json
@@ -37,15 +36,8 @@ for i in 1 2 3 4 5; do echo "confirming wildfly resolvable" && sudo curl --conne
 
 sudo mkdir -p /var/log/httpd-docker-logs
 
-HTTPD_IMAGE=`sudo docker load < /home/centos/pic-sure-frontend.tar.gz | cut -d ' ' -f 3`
-sudo docker run --name=httpd \
-                --restart unless-stopped \
-                --log-driver syslog --log-opt tag=httpd \
-                -v /var/log/httpd-docker-logs/:/usr/local/apache2/logs/ \
-                -v /home/centos/fence_mapping.json:/usr/local/apache2/htdocs/picsureui/studyAccess/studies-data.json \
-                -v /usr/local/docker-config/cert:/usr/local/apache2/cert/ \
-                -v /usr/local/docker-config/httpd-vhosts.conf:/usr/local/apache2/conf/extra/httpd-vhosts.conf \
-                -p 443:443 -d $HTTPD_IMAGE
+sudo chmod +x /home/centos/psama-docker.sh
+sudo /home/centos/psama-docker.sh "${stack_s3_bucket}" "${stack_githash}"
 
 INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)
 sudo /usr/bin/aws --region=us-east-1 ec2 create-tags --resources $${INSTANCE_ID} --tags Key=InitComplete,Value=true
