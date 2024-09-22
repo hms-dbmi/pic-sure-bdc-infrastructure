@@ -11,10 +11,10 @@ sourcetype = hms_app_logs
 source = hpds_logs
 index=hms_aws_${gss_prefix}
 " | sudo tee -a /opt/splunkforwarder/etc/system/local/inputs.conf
-/opt/splunkforwarder/bin/splunk enable boot-start -systemd-managed 1 -user splunk && sudo systemctl restart SplunkForwarder || true
 
-echo "user-data progress starting update"
-sudo yum -y update
+sudo systemctl stop SplunkForwarder
+
+/opt/splunkforwarder/bin/splunk enable boot-start -systemd-managed 1 -user splunk && sudo systemctl restart SplunkForwarder || true
 
 s3_copy() {
   for i in {1..5}; do
@@ -69,3 +69,6 @@ while true; do
     fi
   fi
 done
+
+echo "user-data progress starting update"
+sudo yum -y update
