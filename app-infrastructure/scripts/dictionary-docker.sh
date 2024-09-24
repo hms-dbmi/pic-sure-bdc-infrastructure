@@ -8,6 +8,7 @@ s3_copy() {
 }
 
 ## pull configs and images from s3
+s3_copy "s3://${stack_s3_bucket}/configs/picsure-dictionary/picsure-dictionary.env" "/home/centos/picsure-dictionary.env"
 s3_copy "s3://${stack_s3_bucket}/containers/application/dictionary-api.tar.gz" "/home/centos/dictionary-api.tar.gz"
 
 # load docker images
@@ -16,6 +17,7 @@ DICTIONARY_API_IMAGE=`sudo docker load < /home/centos/dictionary-api.tar.gz | cu
 sudo docker stop dictionary-api
 sudo docker rm dictionary-api
 sudo docker run \
+      --env-file /home/centos/picsure-dictionary.env \
       --name dictionary-api \
       --restart always \
       --network picsure \
