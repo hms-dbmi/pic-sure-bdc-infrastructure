@@ -6,9 +6,17 @@ variable "study_id"{
   type = string
   default = "PHS_NUMBER_FOR STUDY"
 }
+variable "consent_group_tag"{
+  type = string
+  default = "CONSENT_GROUP_-1_IF_NONE"
+}
 variable "chrom_number"{
   type = string
   default = "CHROMOSOME_NUMBER"
+}
+variable "freeze_number"{
+  type = string
+  default = "FREEZE_NUMBER"
 }
 variable "study_name"{
   type = string
