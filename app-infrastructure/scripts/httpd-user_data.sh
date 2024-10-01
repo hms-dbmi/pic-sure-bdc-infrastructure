@@ -14,7 +14,7 @@ index=hms_aws_${gss_prefix}
 
 sudo systemctl stop SplunkForwarder
 
-/opt/splunkforwarder/bin/splunk enable boot-start -systemd-managed 1 -user splunk && sudo systemctl restart SplunkForwarder || true
+/opt/splunkforwarder/bin/splunk enable boot-start -systemd-managed 1 -user splunk || true
 
 
 mkdir -p /usr/local/docker-config/cert
@@ -44,5 +44,8 @@ sudo /home/centos/httpd-docker.sh "${stack_s3_bucket}" "${stack_githash}"
 INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)
 sudo /usr/bin/aws --region=us-east-1 ec2 create-tags --resources $${INSTANCE_ID} --tags Key=InitComplete,Value=true
 
+
+echo "Restart splunkforwarder service"
+sudo systemctl restart SplunkForwarder
 echo "user-data progress starting update"
 sudo yum -y update
