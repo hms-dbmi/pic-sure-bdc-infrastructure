@@ -14,7 +14,7 @@ index=hms_aws_${gss_prefix}
 
 sudo systemctl stop SplunkForwarder
 
-/opt/splunkforwarder/bin/splunk enable boot-start -systemd-managed 1 -user splunk && sudo systemctl restart SplunkForwarder || true
+/opt/splunkforwarder/bin/splunk enable boot-start -systemd-managed 1 -user splunk || true
 
 echo "user-data progress starting update"
 
@@ -74,4 +74,8 @@ while true; do
   fi
 done
 
+
+echo "Restart splunkforwarder service"
+sudo systemctl restart SplunkForwarder
+echo "user-data progress starting update"
 sudo yum -y update
