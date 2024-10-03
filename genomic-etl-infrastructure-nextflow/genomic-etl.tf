@@ -27,32 +27,38 @@ locals {
      
   instanceList = [
        {
-        "subnetId" = (local.subid)
         "type" =  "m6i.4xlarge"
       },
-      {
-        "subnetId" = (local.subid)
-        "type" =  "m7i.4xlarge"
-      }, 
        {
-        "subnetId" = (local.subid)
         "type" =  "c6i.4xlarge"
-      },
-      {
-        "subnetId" = (local.subid)
-        "type" =  "c7i.4xlarge"
       }, {
-        "subnetId" = (local.subid)
         "type" =  "r6i.4xlarge"
       },
       {
-        "subnetId" = (local.subid)
-        "type" =  "r7i.4xlarge"
+        "type" =  "r6i.2xlarge"
       },
       {
-        "subnetId" = (local.subid)
+        "type" =  "r5n.2xlarge"
+      },
+      {
+        "type" =  "r5.2xlarge"
+      },
+      {
+        "type" =  "c5.4xlarge"
+      },
+      {
+        "type" =  "m5n.4xlarge"
+      },
+      {
+        "type" =  "c5n.4xlarge"
+      },
+      {
+        "type" =  "m5.4xlarge"
+      },
+      {
         "type" =  "r5.4xlarge"
       }
+
 ]
 }
 
@@ -88,7 +94,7 @@ resource "aws_spot_fleet_request" "genomic-etl-ec2"{
 
   dynamic "launch_specification" {
     for_each = [for s in local.instanceList :{
-        subnet_id = s.subnetId
+        subnet_id = local.subid
         instance_type = s.type
     }]
     content {
