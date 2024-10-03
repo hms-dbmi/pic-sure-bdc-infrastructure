@@ -17,21 +17,11 @@ data "template_file" "genomic-user_data" {
 }
 
 locals {
-  if (var.az == "us-east-1a"){
-    subid = (var.genomic-etl-subnet-1a-id)
-  }
-  else if (var.az == "us-east-1b"){
-    subid = (var.genomic-etl-subnet-1b-id)
-  }
-  else if (var.az == "us-east-1c"){
-    subid = (var.genomic-etl-subnet-1c-id)
-  }
-  else if (var.az == "us-east-1d"){
-    subid = (var.genomic-etl-subnet-1d-id)
-  }
-   else if (var.az == "us-east-1f"){
-    subid = (var.genomic-etl-subnet-1f-id)
-  }
+  subid = var.az == "us-east-1a" ? (var.genomic-etl-subnet-1a-id) : 
+   var.az == "us-east-1b" ? (var.genomic-etl-subnet-1b-id) :
+    var.az == "us-east-1c" ? (var.genomic-etl-subnet-1c-id) :
+    var.az == "us-east-1d" ? (var.genomic-etl-subnet-1d-id) :
+     var.az == "us-east-1f" ? (var.genomic-etl-subnet-1f-id)
    instanceList = [
        {
         "subnetId" = (local.subid)
