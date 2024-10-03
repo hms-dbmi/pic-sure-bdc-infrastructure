@@ -27,8 +27,10 @@ variable "input_s3_account"{
 variable "study_consent_group"{
   type = string
 }
-    
-    
+     
 variable "consent_group_tag"{
+  type = string
+}
+variable "az"{
   type = string
 }
