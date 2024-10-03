@@ -17,11 +17,11 @@ data "template_file" "genomic-user_data" {
 }
 
 locals {
-  az1 = ${var.az == "us-east-1a" ? (var.genomic-etl-subnet-1a-id) : ""}
-  az2 = ${var.az == "us-east-1b" ? (var.genomic-etl-subnet-1b-id) : ""}
-  az3 = ${var.az == "us-east-1c" ? (var.genomic-etl-subnet-1c-id) : ""}
-  az4 = ${var.az == "us-east-1d" ? (var.genomic-etl-subnet-1d-id) : ""}
-  az5 = ${var.az == "us-east-1f" ? (var.genomic-etl-subnet-1f-id) : ""}
+  az1 = "${var.az == "us-east-1a" ? (var.genomic-etl-subnet-1a-id) : ""}"
+  az2 = "${var.az == "us-east-1b" ? (var.genomic-etl-subnet-1b-id) : ""}"
+  az3 = "${var.az == "us-east-1c" ? (var.genomic-etl-subnet-1c-id) : ""}"
+  az4 = "${var.az == "us-east-1d" ? (var.genomic-etl-subnet-1d-id) : ""}"
+  az5 = "${var.az == "us-east-1f" ? (var.genomic-etl-subnet-1f-id) : ""}"
 
   subid =  ${coalesce(local.az1,local.az2, local.az3, local.az4, local.az5)}
      
