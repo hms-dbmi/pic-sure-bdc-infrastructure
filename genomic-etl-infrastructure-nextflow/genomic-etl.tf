@@ -23,7 +23,7 @@ locals {
   az4 = "${var.az == "us-east-1d" ? (var.genomic-etl-subnet-1d-id) : ""}"
   az5 = "${var.az == "us-east-1f" ? (var.genomic-etl-subnet-1f-id) : ""}"
 
-  subid =  ${coalesce(local.az1,local.az2, local.az3, local.az4, local.az5)}
+  subid =  "${coalesce(local.az1,local.az2, local.az3, local.az4, local.az5)}"
      
   instanceList = [
        {
