@@ -28,6 +28,21 @@ locals {
   instanceList = [
        {
         "subnetId" = (local.subid)
+        "type" =  "m6i.4xlarge"
+      },
+      {
+        "subnetId" = (local.subid)
+        "type" =  "m7i.4xlarge"
+      }, 
+       {
+        "subnetId" = (local.subid)
+        "type" =  "c6i.4xlarge"
+      },
+      {
+        "subnetId" = (local.subid)
+        "type" =  "c7i.4xlarge"
+      }, {
+        "subnetId" = (local.subid)
         "type" =  "r6i.4xlarge"
       },
       {
@@ -37,10 +52,6 @@ locals {
       {
         "subnetId" = (local.subid)
         "type" =  "r5.4xlarge"
-      },
-      {
-        "subnetId" = (local.subid)
-        "type" =  "r5n.4xlarge"
       }
 ]
 }
@@ -73,6 +84,7 @@ resource "aws_spot_fleet_request" "genomic-etl-ec2"{
   fleet_type = "maintain"
   wait_for_fulfillment = "false"
   terminate_instances_with_expiration = "false"
+  replace_unhealthy_instances = "true"
 
   dynamic "launch_specification" {
     for_each = [for s in local.instanceList :{
@@ -94,7 +106,6 @@ resource "aws_spot_fleet_request" "genomic-etl-ec2"{
       ]
       root_block_device {
         delete_on_termination = true
-        encrypted             = true
         volume_size           = 1000
       }
 
