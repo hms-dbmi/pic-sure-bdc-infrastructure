@@ -164,7 +164,7 @@
                 </datasource>
                 <datasource jndi-name="java:jboss/datasources/PicsureDS" pool-name="PicsureDS" use-java-context="true">
                     <connection-url>
-                        jdbc-secretsmanager:mysql://${picsure-db-host}/picsure?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true&amp;autoReconnectForPools=true
+                        jdbc-secretsmanager:mysql://${picsure-db-host}/picsure2?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true&amp;autoReconnectForPools=true
                     </connection-url>
                     <driver>aws-secretsmanager-mysql</driver>
                     <pool>
