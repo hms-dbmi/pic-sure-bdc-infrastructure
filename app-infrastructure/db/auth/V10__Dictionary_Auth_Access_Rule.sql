@@ -1,5 +1,5 @@
 # Simple rule to allow routing to the dictionary
-use auth;
+use auth2;
 
 SET @allowDictionaryRequests = unhex(REPLACE(UUID(),'-',''));
 -- Access rule for allowing requests to the uploader via proxy
