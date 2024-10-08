@@ -31,15 +31,18 @@ resource "aws_iam_role_policy" "wildfly-deployment-sm-policy" {
 {
   "Version": "2012-10-17",
   "Statement": [
-      {
+    {
       "Action": [
-          "secretsmanager:GetSecretValue",
-          "secretsmanager:DescribeSecret"
+        "secretsmanager:GetSecretValue",
+        "secretsmanager:DescribeSecret"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:secretsmanager:${data.aws_region.current.name}:${var.app_acct_id}:secret:${var.app_user_secret_name}-*"
-      }
-    ]
+      "Resource": [
+        "arn:aws:secretsmanager:${data.aws_region.current.name}:${var.app_acct_id}:secret:${var.app_user_secret_name}-*",
+        "arn:aws:secretsmanager:${data.aws_region.current.name}:${var.app_acct_id}:secret:${var.app_psql_user_secret_name}-*"
+      ]
+    }
+  ]
 }
 EOF
 }
@@ -62,6 +65,18 @@ resource "aws_iam_role_policy" "wildfly-deployment-s3-policy" {
   "Version": "2012-10-17",
   "Statement": [
     {
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/containers/application/dictionary-api.tar.gz"
+    },{
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/containers/application/dictionary-weights.tar.gz"
+    },{
       "Action": [
         "s3:GetObject"
       ],
@@ -109,7 +124,8 @@ resource "aws_iam_role_policy" "wildfly-deployment-s3-policy" {
             "releases/jenkins_pipeline_build_${var.stack_githash_long}/*",
             "configs/jenkins_pipeline_build_${var.stack_githash_long}*",
             "modules/*",
-            "data/${var.dataset_s3_object_key}/*"
+            "data/${var.dataset_s3_object_key}/*",
+            "containers/application/*"
           ]
         }
       }
@@ -136,7 +152,25 @@ resource "aws_iam_role_policy" "wildfly-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/picsure-dictionary/picsure-dictionary.env"
+    },{
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/dictionary/weights.csv"
+    },{
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
       "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/jenkins_pipeline_build_${var.stack_githash_long}/psama-docker.sh"
+    },{
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/jenkins_pipeline_build_${var.stack_githash_long}/dictionary-docker.sh"
     },{
       "Action": [
         "s3:GetObject"
