@@ -1,5 +1,5 @@
 USE
-`picsure`;
+`picsure2`;
 
 --
 -- Table structure for table `user`

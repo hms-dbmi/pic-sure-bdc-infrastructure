@@ -1,5 +1,5 @@
 USE
-`auth`;
+`auth2`;
 --
 -- Table structure for table `application`
 --
