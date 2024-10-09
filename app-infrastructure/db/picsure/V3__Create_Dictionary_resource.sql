@@ -1,4 +1,4 @@
-use picsure;
+use picsure2;
 
 SET @dictResourceUUID = unhex(REPLACE(UUID(), '-', ''));
 
