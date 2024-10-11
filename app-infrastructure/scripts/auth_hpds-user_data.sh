@@ -26,11 +26,11 @@ s3_copy() {
 
 mkdir -p /opt/local/hpds/all
 s3_copy s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-hpds.tar.gz /home/centos/pic-sure-hpds.tar.gz
-s3_copy s3://${stack_s3_bucket}/data/${dataset_s3_object_key}/javabins_rekeyed.tar.gz /opt/local/hpds/javabins_rekeyed.tar.gz
+s3_copy s3://${stack_s3_bucket}/data/${dataset_s3_object_key}/javabins_rekeyed.tar /opt/local/hpds/javabins_rekeyed.tar
 s3_copy s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/ /opt/local/hpds/all/ --recursive
 
 cd /opt/local/hpds
-tar -xvzf javabins_rekeyed.tar.gz
+tar -xvf javabins_rekeyed.tar
 cd ~
 
 # Load and run docker container.  Then wait for initialization before tagging instance as init complete.
