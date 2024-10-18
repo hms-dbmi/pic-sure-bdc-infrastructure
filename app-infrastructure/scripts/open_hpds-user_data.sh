@@ -24,10 +24,10 @@ s3_copy() {
 
 s3_copy s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-hpds.tar.gz /home/centos/pic-sure-hpds.tar.gz
 
-s3_copy s3://${stack_s3_bucket}/data/${destigmatized_dataset_s3_object_key}/destigmatized_javabins_rekeyed.tar.gz /opt/local/hpds/destigmatized_javabins_rekeyed.tar.gz
+s3_copy s3://${stack_s3_bucket}/data/${destigmatized_dataset_s3_object_key}/destigmatized_javabins_rekeyed.tar /opt/local/hpds/destigmatized_javabins_rekeyed.tar
 
 cd /opt/local/hpds
-tar -xvzf destigmatized_javabins_rekeyed.tar.gz
+tar -xvf destigmatized_javabins_rekeyed.tar
 cd ~
 
 # Waiting for application to finish initialization
