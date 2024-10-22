@@ -29,9 +29,7 @@ locals {
        {
         "type" =  "m6i.4xlarge"
       },
-       {
-        "type" =  "c6i.4xlarge"
-      }, {
+      {
         "type" =  "r6i.4xlarge"
       },
       {
@@ -44,16 +42,13 @@ locals {
         "type" =  "r5.2xlarge"
       },
       {
-        "type" =  "c5.4xlarge"
-      },
-      {
         "type" =  "m5n.4xlarge"
       },
       {
-        "type" =  "c5n.4xlarge"
+        "type" =  "m5.4xlarge"
       },
       {
-        "type" =  "m5.4xlarge"
+        "type" =  "r5n.4xlarge"
       },
       {
         "type" =  "r5.4xlarge"
