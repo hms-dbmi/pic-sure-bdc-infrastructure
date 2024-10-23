@@ -26,13 +26,13 @@ locals {
   subid =  "${coalesce(local.az1,local.az2, local.az3, local.az4, local.az5)}"
      
   instanceList = [
-/*        {
+       {
         "type" =  "m6i.4xlarge"
-      }, */
+      },
       {
         "type" =  "r6i.4xlarge"
       },
-/*       {
+      {
         "type" =  "r6i.2xlarge"
       },
       {
@@ -46,7 +46,7 @@ locals {
       }, 
       {
         "type" =  "m5.4xlarge"
-      },*/
+      },
       {
         "type" =  "m5.8xlarge"
       },
