@@ -186,36 +186,38 @@ if [ $ActiveState == 'Annotating' ]; then
    echo 'ActiveState=Scripting' >/annotation_pipeline/anno/ensembl-vep/ActiveState.var
    . /annotation_pipeline/anno/ensembl-vep/ActiveState.var
    echo $(date +%T) finished ${study_id}.chr${chrom_number} vep stage
+   aws --region=us-east-1 ec2 create-tags --resources $${INSTANCE_ID} --tags Key=VEPComplete,Value=true
 fi
 
-if [ $ActiveState == 'Scripting' ]; then
-   python3 /annotation_pipeline/anno/ensembl-vep/hpds_annotation/transform_csq.v3.py \
-      -R /annotation_pipeline/anno/ensembl-vep/fasta/Homo_sapiens_assembly38.fasta \
-      --vep-gnomad-af gnomADg_AF \
-      --cds \
-      /annotation_pipeline/anno/ensembl-vep/outdir/${study_id}$.chr${chrom_number}.normalized_VEP.vcf.gz \
-      /annotation_pipeline/anno/ensembl-vep/${study_id}.chr${chrom_number}.annotated_remove_modifiers.hpds.vcf.gz &
-   echo $(date +%T) started ${study_id}.chr${chrom_number} python stage
-   wait
+# if [ $ActiveState == 'Scripting' ]; then
 
-   echo 'ActiveState=Uploading' >/annotation_pipeline/anno/ensembl-vep/ActiveState.var
-   . /annotation_pipeline/anno/ensembl-vep/ActiveState.var
-   echo $(date +%T) finished ${study_id}.chr${chrom_number} python stage
-fi
+#    python3 /annotation_pipeline/anno/ensembl-vep/hpds_annotation/transform_csq.v3.py \
+#       -R /annotation_pipeline/anno/ensembl-vep/fasta/Homo_sapiens_assembly38.fasta \
+#       --vep-gnomad-af gnomADg_AF \
+#       --cds \
+#       /annotation_pipeline/anno/ensembl-vep/outdir/${study_id}$.chr${chrom_number}.normalized_VEP.vcf.gz \
+#       /annotation_pipeline/anno/ensembl-vep/${study_id}.chr${chrom_number}.annotated_remove_modifiers.hpds.vcf.gz &
+#    echo $(date +%T) started ${study_id}.chr${chrom_number} python stage
+#    wait
 
-if [ $ActiveState == 'Uploading' ]; then
-   echo $(date +%T) started ${study_id}.chr${chrom_number} output stage
-   aws s3 cp /annotation_pipeline/anno/ensembl-vep/${study_id}.chr${chrom_number}.annotated_remove_modifiers.hpds.vcf.gz s3://${output_s3_bucket}/genomic-etl/hpds_vcfs/modifiers_removed/10/ &
-   aws s3 cp /annotation_pipeline/anno/ensembl-vep/outdir/${study_id}.chr${chrom_number}.normalized_VEP.vcf.gz s3://${output_s3_bucket}/genomic-etl/vep_vcf_output/10/ &
-   aws s3 cp /annotation_pipeline/anno/ensembl-vep/1kGP_high_coverage_Illumina.chr${chrom_number}.filtered.SNV_INDEL_SV_phased_panel.vcf.gz s3://${output_s3_bucket}/genomic-etl/original_vcfs/10/${study_id}.chr${chrom_number}.original.vcf.gz &
+#    echo 'ActiveState=Uploading' >/annotation_pipeline/anno/ensembl-vep/ActiveState.var
+#    . /annotation_pipeline/anno/ensembl-vep/ActiveState.var
+#    echo $(date +%T) finished ${study_id}.chr${chrom_number} python stage
+# fi
 
-   wait
+# if [ $ActiveState == 'Uploading' ]; then
+#    echo $(date +%T) started ${study_id}.chr${chrom_number} output stage
+#    aws s3 cp /annotation_pipeline/anno/ensembl-vep/${study_id}.chr${chrom_number}.annotated_remove_modifiers.hpds.vcf.gz s3://${output_s3_bucket}/genomic-etl/hpds_vcfs/modifiers_removed/10/ &
+#    aws s3 cp /annotation_pipeline/anno/ensembl-vep/outdir/${study_id}.chr${chrom_number}.normalized_VEP.vcf.gz s3://${output_s3_bucket}/genomic-etl/vep_vcf_output/10/ &
+#    aws s3 cp /annotation_pipeline/anno/ensembl-vep/1kGP_high_coverage_Illumina.chr${chrom_number}.filtered.SNV_INDEL_SV_phased_panel.vcf.gz s3://${output_s3_bucket}/genomic-etl/original_vcfs/10/${study_id}.chr${chrom_number}.original.vcf.gz &
 
-   echo 'ActiveState=Done' >/annotation_pipeline/anno/ensembl-vep/ActiveState.var
-   . /annotation_pipeline/anno/ensembl-vep/ActiveState.var
-   echo $(date +%T) finished ${study_id}.chr${chrom_number} upload stage
-fi
+#    wait
 
-if [ $ActiveState == 'Done' ]; then
-   aws --region=us-east-1 ec2 create-tags --resources $${INSTANCE_ID} --tags Key=AnnotationComplete,Value=true
-fi
+#    echo 'ActiveState=Done' >/annotation_pipeline/anno/ensembl-vep/ActiveState.var
+#    . /annotation_pipeline/anno/ensembl-vep/ActiveState.var
+#    echo $(date +%T) finished ${study_id}.chr${chrom_number} upload stage
+# fi
+
+# if [ $ActiveState == 'Done' ]; then
+#    aws --region=us-east-1 ec2 create-tags --resources $${INSTANCE_ID} --tags Key=AnnotationComplete,Value=true
+# fi
