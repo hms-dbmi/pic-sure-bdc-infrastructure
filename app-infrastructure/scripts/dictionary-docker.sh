@@ -13,7 +13,7 @@ s3_copy "s3://${stack_s3_bucket}/containers/application/dictionary-api.tar.gz" "
 
 # load docker images
 DICTIONARY_API_IMAGE=`sudo docker load < /home/centos/dictionary-api.tar.gz | cut -d ' ' -f 3`
-JAVA_OPTS=" -Xmx16g -XX:+PrintFlagsFinal "
+JAVA_OPTS=" -Xmx24g "
 
 sudo docker stop dictionary-api
 sudo docker rm dictionary-api
