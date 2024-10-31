@@ -18,7 +18,7 @@ JAVA_OPTS=" -Xmx24g "
 sudo docker stop dictionary-api
 sudo docker rm dictionary-api
 sudo docker run \
-      -e $JAVA_OPTS \
+      -e JAVA_OPTS="$JAVA_OPTS" \
       --env-file /home/centos/picsure-dictionary.env \
       --name dictionary-api \
       --restart always \
