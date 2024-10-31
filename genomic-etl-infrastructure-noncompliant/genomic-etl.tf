@@ -74,7 +74,7 @@ data "template_cloudinit_config" "genomic-user-data" {
   snapshot_id = "snap-0a0957538f16a171b"
   type="gp3"
   tags = {
-    label = "${var.study_id}${var.consent_group_tag}.chr${var.chrom_number}"
+    label = "${var.study_id}.chr${var.chrom_number}"
   }
 }  
 
