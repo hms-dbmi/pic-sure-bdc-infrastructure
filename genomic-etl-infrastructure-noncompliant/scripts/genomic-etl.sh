@@ -1,89 +1,4 @@
 #!/bin/bash
-sudo touch /opt/aws/amazon-cloudwatch-agent/etc/custom_config.json
-echo "
-
-{
-	\"metrics\": {
-		
-		\"metrics_collected\": {
-			\"cpu\": {
-				\"measurement\": [
-					\"cpu_usage_idle\",
-					\"cpu_usage_user\",
-					\"cpu_usage_system\"
-				],
-				\"metrics_collection_interval\": 100,
-				\"totalcpu\": false
-			},
-			\"disk\": {
-				\"measurement\": [
-					\"used_percent\"
-				],
-				\"metrics_collection_interval\": 100,
-				\"resources\": [
-					\"*\"
-				]
-			},
-			\"mem\": {
-				\"measurement\": [
-					\"mem_used_percent\",
-                                        \"mem_available\",
-                                        \"mem_available_percent\",
-                                       \"mem_total\",
-                                        \"mem_used\"
-                                        
-				],
-				\"metrics_collection_interval\": 100
-			}
-		}
-	},
-	\"logs\":{
-   \"logs_collected\":{
-      \"files\":{
-         \"collect_list\":[
-            {
-               \"file_path\":\"/var/log/secure\",
-               \"log_group_name\":\"secure\",
-               \"log_stream_name\":\"{instance_id} secure\",
-               \"timestamp_format\":\"UTC\"
-            },
-            {
-               \"file_path\":\"/var/log/messages\",
-               \"log_group_name\":\"messages\",
-               \"log_stream_name\":\"{instance_id} messages\",
-               \"timestamp_format\":\"UTC\"
-            },
-						{
-               \"file_path\":\"/var/log/audit/audit.log\",
-               \"log_group_name\":\"audit.log\",
-               \"log_stream_name\":\"{instance_id} audit.log\",
-               \"timestamp_format\":\"UTC\"
-            },
-						{
-               \"file_path\":\"/var/log/yum.log\",
-               \"log_group_name\":\"yum.log\",
-               \"log_stream_name\":\"{instance_id} yum.log\",
-               \"timestamp_format\":\"UTC\"
-            },
-            {
-               \"file_path\":\"/var/log/genomic-docker-logs/*\",
-               \"log_group_name\":\"genomic-logs\",
-               \"log_stream_name\":\"{instance_id} genomic-app-logs\",
-               \"timestamp_format\":\"UTC\"
-            }
-         ]
-      }
-		}
-	}
-
-
-}
-
-" >/opt/aws/amazon-cloudwatch-agent/etc/custom_config.json
-sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/etc/custom_config.json -s
-
-mkdir -p /usr/local/docker-config/cert
-mkdir -p /var/log/genomic-docker-logs/ssl_mutex
 
 INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)
 sudo /usr/local/bin/aws --region=us-east-1 ec2 create-tags --resources $${INSTANCE_ID} --tags Key=InitComplete,Value=true
@@ -117,7 +32,7 @@ cd /annotation_pipeline/anno/ensembl-vep/
 if [ $ActiveState == 'Downloading' ]; then
    echo ${chrom_number} chr${chrom_number} >/annotation_pipeline/anno/ensembl-vep/chrm_rename.txt
 
-   wget -P /annotation_pipeline/anno/ensembl-vep/ http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/1000G_2504_high_coverage/working/20220422_3202_phased_SNV_INDEL_SV/1kGP_high_coverage_Illumina.chr${chrom_number}.filtered.SNV_INDEL_SV_phased_panel.vcf.gz &
+   wget -P /annotation_pipeline/anno/ensembl-vep/ ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/1000_genomes_project/release/20190312_biallelic_SNV_and_INDEL/ALL.chr${chrom_number}.shapeit2_integrated_snvindels_v2a_27022019.GRCh38.phased.vcf.gz &
 
    wait
 
@@ -127,7 +42,7 @@ if [ $ActiveState == 'Downloading' ]; then
 fi
 
 if [ $ActiveState == 'Filtering' ]; then
-   /usr/local/bin/bcftools view -Oz --threads 40 -f PASS,. /annotation_pipeline/anno/ensembl-vep/1kGP_high_coverage_Illumina.chr${chrom_number}.filtered.SNV_INDEL_SV_phased_panel.vcf.gz >/annotation_pipeline/anno/ensembl-vep/${study_id}.chr${chrom_number}.filtered.vcf.gz &
+   /usr/local/bin/bcftools view -Oz --threads 40 -f PASS,. /annotation_pipeline/anno/ensembl-vep/ALL.chr${chrom_number}.shapeit2_integrated_snvindels_v2a_27022019.GRCh38.phased.vcf.gz >/annotation_pipeline/anno/ensembl-vep/${study_id}.chr${chrom_number}.filtered.vcf.gz &
    echo $(date +%T) started ${study_id}.chr${chrom_number} filter stage
 
    wait
@@ -176,6 +91,7 @@ wait
 update-alternatives --set java /usr/lib/jvm/java-11-openjdk*/bin/java
 
 if [ $ActiveState == 'Annotating' ]; then
+
    echo $(date +%T) started ${study_id}.chr${chrom_number} vep stage
    nextflow run -resume /annotation_pipeline/anno/ensembl-vep/nextflow/workflows/run_vep.nf \
       --vcf /annotation_pipeline/anno/ensembl-vep/${study_id}.chr${chrom_number}.normalized.vcf.gz \
@@ -189,35 +105,35 @@ if [ $ActiveState == 'Annotating' ]; then
    aws --region=us-east-1 ec2 create-tags --resources $${INSTANCE_ID} --tags Key=VEPComplete,Value=true
 fi
 
-# if [ $ActiveState == 'Scripting' ]; then
+if [ $ActiveState == 'Scripting' ]; then
 
-#    python3 /annotation_pipeline/anno/ensembl-vep/hpds_annotation/transform_csq.v3.py \
-#       -R /annotation_pipeline/anno/ensembl-vep/fasta/Homo_sapiens_assembly38.fasta \
-#       --vep-gnomad-af gnomADg_AF \
-#       --cds \
-#       /annotation_pipeline/anno/ensembl-vep/outdir/${study_id}$.chr${chrom_number}.normalized_VEP.vcf.gz \
-#       /annotation_pipeline/anno/ensembl-vep/${study_id}.chr${chrom_number}.annotated_remove_modifiers.hpds.vcf.gz &
-#    echo $(date +%T) started ${study_id}.chr${chrom_number} python stage
-#    wait
+   python3 /annotation_pipeline/anno/ensembl-vep/hpds_annotation/transform_csq.v3.py \
+      -R /annotation_pipeline/anno/ensembl-vep/fasta/Homo_sapiens_assembly38.fasta \
+      --vep-gnomad-af gnomADg_AF \
+      --cds \
+      /annotation_pipeline/anno/ensembl-vep/outdir/${study_id}$.chr${chrom_number}.normalized_VEP.vcf.gz \
+      /annotation_pipeline/anno/ensembl-vep/${study_id}.chr${chrom_number}.annotated_remove_modifiers.hpds.vcf.gz &
+   echo $(date +%T) started ${study_id}.chr${chrom_number} python stage
+   wait
 
-#    echo 'ActiveState=Uploading' >/annotation_pipeline/anno/ensembl-vep/ActiveState.var
-#    . /annotation_pipeline/anno/ensembl-vep/ActiveState.var
-#    echo $(date +%T) finished ${study_id}.chr${chrom_number} python stage
-# fi
+   echo 'ActiveState=Uploading' >/annotation_pipeline/anno/ensembl-vep/ActiveState.var
+   . /annotation_pipeline/anno/ensembl-vep/ActiveState.var
+   echo $(date +%T) finished ${study_id}.chr${chrom_number} python stage
+fi
 
-# if [ $ActiveState == 'Uploading' ]; then
-#    echo $(date +%T) started ${study_id}.chr${chrom_number} output stage
-#    aws s3 cp /annotation_pipeline/anno/ensembl-vep/${study_id}.chr${chrom_number}.annotated_remove_modifiers.hpds.vcf.gz s3://${output_s3_bucket}/genomic-etl/hpds_vcfs/modifiers_removed/10/ &
-#    aws s3 cp /annotation_pipeline/anno/ensembl-vep/outdir/${study_id}.chr${chrom_number}.normalized_VEP.vcf.gz s3://${output_s3_bucket}/genomic-etl/vep_vcf_output/10/ &
-#    aws s3 cp /annotation_pipeline/anno/ensembl-vep/1kGP_high_coverage_Illumina.chr${chrom_number}.filtered.SNV_INDEL_SV_phased_panel.vcf.gz s3://${output_s3_bucket}/genomic-etl/original_vcfs/10/${study_id}.chr${chrom_number}.original.vcf.gz &
+if [ $ActiveState == 'Uploading' ]; then
+   echo $(date +%T) started ${study_id}.chr${chrom_number} output stage
+   aws s3 cp /annotation_pipeline/anno/ensembl-vep/${study_id}.chr${chrom_number}.annotated_remove_modifiers.hpds.vcf.gz s3://${output_s3_bucket}/genomic-etl/hpds_vcfs/modifiers_removed/10/ &
+   aws s3 cp /annotation_pipeline/anno/ensembl-vep/outdir/${study_id}.chr${chrom_number}.normalized_VEP.vcf.gz s3://${output_s3_bucket}/genomic-etl/vep_vcf_output/10/ &
+   aws s3 cp /annotation_pipeline/anno/ensembl-vep/1kGP_high_coverage_Illumina.chr${chrom_number}.filtered.SNV_INDEL_SV_phased_panel.vcf.gz s3://${output_s3_bucket}/genomic-etl/original_vcfs/10/${study_id}.chr${chrom_number}.original.vcf.gz &
 
-#    wait
+   wait
 
-#    echo 'ActiveState=Done' >/annotation_pipeline/anno/ensembl-vep/ActiveState.var
-#    . /annotation_pipeline/anno/ensembl-vep/ActiveState.var
-#    echo $(date +%T) finished ${study_id}.chr${chrom_number} upload stage
-# fi
+   echo 'ActiveState=Done' >/annotation_pipeline/anno/ensembl-vep/ActiveState.var
+   . /annotation_pipeline/anno/ensembl-vep/ActiveState.var
+   echo $(date +%T) finished ${study_id}.chr${chrom_number} upload stage
+fi
 
-# if [ $ActiveState == 'Done' ]; then
-#    aws --region=us-east-1 ec2 create-tags --resources $${INSTANCE_ID} --tags Key=AnnotationComplete,Value=true
-# fi
+if [ $ActiveState == 'Done' ]; then
+   aws --region=us-east-1 ec2 create-tags --resources $${INSTANCE_ID} --tags Key=AnnotationComplete,Value=true
+fi

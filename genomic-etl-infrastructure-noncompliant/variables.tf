@@ -8,3 +8,6 @@ variable "environment_name" {
   type        = string
   default     = "genomic etl"
 }
+variable "az"{
+  type = string
+}

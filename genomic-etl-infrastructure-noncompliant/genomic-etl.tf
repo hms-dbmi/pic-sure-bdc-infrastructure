@@ -11,25 +11,49 @@ data "template_file" "genomic-user_data" {
 }
 
 locals {
-  subid = (var.genomic-etl-subnet-1b-id)
-    az = "us-east-1b"
-    instanceList = [
+  az1 = "${var.az == "us-east-1a" ? (var.genomic-etl-subnet-1a-id) : ""}"
+  az2 = "${var.az == "us-east-1b" ? (var.genomic-etl-subnet-1b-id) : ""}"
+  az3 = "${var.az == "us-east-1c" ? (var.genomic-etl-subnet-1c-id) : ""}"
+  az4 = "${var.az == "us-east-1d" ? (var.genomic-etl-subnet-1d-id) : ""}"
+  az5 = "${var.az == "us-east-1f" ? (var.genomic-etl-subnet-1f-id) : ""}"
+
+  subid =  "${coalesce(local.az1,local.az2, local.az3, local.az4, local.az5)}"
+     
+  instanceList = [
        {
-    "subnetId" = (local.subid)
-    "type" =  "r5.4xlarge"
-  },
+        "type" =  "m6i.4xlarge"
+      },
       {
-    "subnetId" = (local.subid)
-    "type" =  "r5a.4xlarge"
-  },
-    {
-    "subnetId" = (local.subid)
-    "type" =  "r5n.4xlarge"
-  },
-   {
-    "subnetId" = (local.subid)
-    "type" =  "r5b.4xlarge"
-  }
+        "type" =  "r6i.4xlarge"
+      },
+      {
+        "type" =  "r6i.2xlarge"
+      },
+      {
+        "type" =  "r5n.2xlarge"
+      },
+      {
+        "type" =  "r5.2xlarge"
+      }, 
+      {
+        "type" =  "m5n.4xlarge"
+      }, 
+      {
+        "type" =  "m5.4xlarge"
+      },
+      {
+        "type" =  "m5.8xlarge"
+      },
+      {
+        "type" =  "r5.8xlarge"
+      },
+      {
+        "type" =  "r5n.4xlarge"
+      },
+      {
+        "type" =  "r5.4xlarge"
+      }
+
 ]
 }
 
@@ -45,14 +69,14 @@ data "template_cloudinit_config" "genomic-user-data" {
 
 }
 
-resource "aws_ebs_volume" "genomic-etl-volume"{
-  availability_zone = local.az
+ resource "aws_ebs_volume" "genomic-etl-volume"{
+  availability_zone = var.az
   snapshot_id = "snap-0a0957538f16a171b"
   type="gp3"
   tags = {
-    label = "${var.study_id}.chr${var.chrom_number}"
+    label = "${var.study_id}${var.consent_group_tag}.chr${var.chrom_number}"
   }
-} 
+}  
 
 resource "aws_spot_fleet_request" "genomic-etl-ec2"{
   iam_fleet_role = "arn:aws:iam::900561893673:role/aws-service-role/spotfleet.amazonaws.com/AWSServiceRoleForEC2SpotFleet"
@@ -61,10 +85,11 @@ resource "aws_spot_fleet_request" "genomic-etl-ec2"{
   fleet_type = "maintain"
   wait_for_fulfillment = "false"
   terminate_instances_with_expiration = "false"
+  replace_unhealthy_instances = "true"
 
   dynamic "launch_specification" {
     for_each = [for s in local.instanceList :{
-        subnet_id = s.subnetId
+        subnet_id = local.subid
         instance_type = s.type
     }]
     content {
@@ -82,7 +107,6 @@ resource "aws_spot_fleet_request" "genomic-etl-ec2"{
       ]
       root_block_device {
         delete_on_termination = true
-        encrypted             = true
         volume_size           = 1000
       }
 
