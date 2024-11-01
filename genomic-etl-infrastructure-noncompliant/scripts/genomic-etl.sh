@@ -97,7 +97,7 @@ if [ $ActiveState == 'Annotating' ]; then
       --vcf /annotation_pipeline/anno/ensembl-vep/${study_id}.chr${chrom_number}.normalized.vcf.gz \
       --skip_check 1 \
       --vep_config /annotation_pipeline/anno/ensembl-vep/nextflow/vep_config/vep.ini \
-      --bin_size 75000
+      --bin_size 25000
 
    echo 'ActiveState=Scripting' >/annotation_pipeline/anno/ensembl-vep/ActiveState.var
    . /annotation_pipeline/anno/ensembl-vep/ActiveState.var
@@ -110,7 +110,7 @@ if [ $ActiveState == 'Scripting' ]; then
    python3 /annotation_pipeline/anno/ensembl-vep/hpds_annotation/transform_csq.v3.py \
       -R /annotation_pipeline/anno/ensembl-vep/fasta/Homo_sapiens_assembly38.fasta \
       --vep-gnomad-af gnomADg_AF \
-      --cds \
+      --mode cds_only \
       /annotation_pipeline/anno/ensembl-vep/outdir/${study_id}$.chr${chrom_number}.normalized_VEP.vcf.gz \
       /annotation_pipeline/anno/ensembl-vep/${study_id}.chr${chrom_number}.annotated_remove_modifiers.hpds.vcf.gz &
    echo $(date +%T) started ${study_id}.chr${chrom_number} python stage
