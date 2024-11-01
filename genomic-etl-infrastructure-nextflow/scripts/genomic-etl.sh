@@ -1,91 +1,4 @@
 #!/bin/bash
-sudo touch /opt/aws/amazon-cloudwatch-agent/etc/custom_config.json
-echo "
-
-{
-	\"metrics\": {
-		
-		\"metrics_collected\": {
-			\"cpu\": {
-				\"measurement\": [
-					\"cpu_usage_idle\",
-					\"cpu_usage_user\",
-					\"cpu_usage_system\"
-				],
-				\"metrics_collection_interval\": 100,
-				\"totalcpu\": false
-			},
-			\"disk\": {
-				\"measurement\": [
-					\"used_percent\"
-				],
-				\"metrics_collection_interval\": 100,
-				\"resources\": [
-					\"*\"
-				]
-			},
-			\"mem\": {
-				\"measurement\": [
-					\"mem_used_percent\",
-                                        \"mem_available\",
-                                        \"mem_available_percent\",
-                                       \"mem_total\",
-                                        \"mem_used\"
-                                        
-				],
-				\"metrics_collection_interval\": 100
-			}
-		}
-	},
-	\"logs\":{
-   \"logs_collected\":{
-      \"files\":{
-         \"collect_list\":[
-            {
-               \"file_path\":\"/var/log/secure\",
-               \"log_group_name\":\"secure\",
-               \"log_stream_name\":\"{instance_id} secure\",
-               \"timestamp_format\":\"UTC\"
-            },
-            {
-               \"file_path\":\"/var/log/messages\",
-               \"log_group_name\":\"messages\",
-               \"log_stream_name\":\"{instance_id} messages\",
-               \"timestamp_format\":\"UTC\"
-            },
-						{
-               \"file_path\":\"/var/log/audit/audit.log\",
-               \"log_group_name\":\"audit.log\",
-               \"log_stream_name\":\"{instance_id} audit.log\",
-               \"timestamp_format\":\"UTC\"
-            },
-						{
-               \"file_path\":\"/var/log/yum.log\",
-               \"log_group_name\":\"yum.log\",
-               \"log_stream_name\":\"{instance_id} yum.log\",
-               \"timestamp_format\":\"UTC\"
-            },
-            {
-               \"file_path\":\"/var/log/genomic-docker-logs/*\",
-               \"log_group_name\":\"genomic-logs\",
-               \"log_stream_name\":\"{instance_id} ${deployment_githash} genomic-app-logs\",
-               \"timestamp_format\":\"UTC\"
-            }
-         ]
-      }
-		}
-	}
-
-
-}
-
-" >/opt/aws/amazon-cloudwatch-agent/etc/custom_config.json
-sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/etc/custom_config.json -s
-
-#!/bin/bash
-
-mkdir -p /usr/local/docker-config/cert
-mkdir -p /var/log/genomic-docker-logs/ssl_mutex
 
 INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)
 sudo /usr/local/bin/aws --region=us-east-1 ec2 create-tags --resources $${INSTANCE_ID} --tags Key=InitComplete,Value=true
@@ -136,9 +49,6 @@ if [ $ActiveState == 'Downloading' ]; then
    echo 'ActiveState=Filtering' >/annotation_pipeline/anno/ensembl-vep/ActiveState.var
    . /annotation_pipeline/anno/ensembl-vep/ActiveState.var
    echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} download stage
-else
-   echo 'Download already completed, moving to filter'
-
 fi
 
 if [ $ActiveState == 'Filtering' ]; then
@@ -207,7 +117,7 @@ if [ $ActiveState == 'Scripting' ]; then
    python3 /annotation_pipeline/anno/ensembl-vep/hpds_annotation/transform_csq.v3.py \
       -R /annotation_pipeline/anno/ensembl-vep/fasta/Homo_sapiens_assembly38.fasta \
       --vep-gnomad-af gnomADg_AF \
-      --cds \
+      --mode cds_only \
       /annotation_pipeline/anno/ensembl-vep/outdir/${study_id}${consent_group_tag}.chr${chrom_number}.normalized_VEP.vcf.gz \
       /annotation_pipeline/anno/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.annotated_remove_modifiers.hpds.vcf.gz &
    echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} python stage
