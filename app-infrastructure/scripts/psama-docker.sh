@@ -15,7 +15,7 @@ s3_copy "s3://${stack_s3_bucket}/releases/psama/psama.tar.gz" "/home/centos/psam
 
 # This script is responsible for starting or updating the psama container
 PSAMA_IMAGE=$(sudo docker load < /home/centos/psama.tar.gz | cut -d ' ' -f 3)
-PSAMA_OPTS="-Xms1g -Xmx2g -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=512m -Djava.net.preferIPv4Stack=true"
+PSAMA_OPTS="-Xms2g -Xmx8g -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=512m -Djava.net.preferIPv4Stack=true"
 
 # Add remote debugging options if enabled.
 # To enable remote debugging, set the second script argument to true.
