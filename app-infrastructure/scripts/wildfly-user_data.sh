@@ -41,6 +41,12 @@ s3_copy() {
 echo "waiting for terraform to render files"
 sleep 300
 
+# Add swap space
+sudo dd if=/dev/zero of=/swapfile count=15360 bs=1MiB
+sudo chmod 600 /swapfile
+sudo mkswap /swapfile
+sudo swapon /swapfile
+
 # make picsure network
 sudo docker network create picsure
 sudo mkdir /var/log/{wildfly-docker-logs,wildfly-docker-os-logs,psama-docker-logs,psama-docker-os-logs}
