@@ -125,7 +125,7 @@ if [ $ActiveState == 'Uploading' ]; then
    echo $(date +%T) started ${study_id}.chr${chrom_number} output stage
    aws s3 cp /annotation_pipeline/anno/ensembl-vep/${study_id}.chr${chrom_number}.annotated_remove_modifiers.hpds.vcf.gz s3://${output_s3_bucket}/genomic-etl/hpds_vcfs/modifiers_removed/10/ &
    aws s3 cp /annotation_pipeline/anno/ensembl-vep/outdir/${study_id}.chr${chrom_number}.normalized_VEP.vcf.gz s3://${output_s3_bucket}/genomic-etl/vep_vcf_output/10/ &
-   aws s3 cp /annotation_pipeline/anno/ensembl-vep/1kGP_high_coverage_Illumina.chr${chrom_number}.filtered.SNV_INDEL_SV_phased_panel.vcf.gz s3://${output_s3_bucket}/genomic-etl/original_vcfs/10/${study_id}.chr${chrom_number}.original.vcf.gz &
+   aws s3 cp /annotation_pipeline/anno/ensembl-vep/ALL.chr${chrom_number}.shapeit2_integrated_snvindels_v2a_27022019.GRCh38.phased.vcf.gz s3://${output_s3_bucket}/genomic-etl/original_vcfs/noncom/
 
    wait
 
