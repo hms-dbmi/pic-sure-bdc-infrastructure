@@ -78,7 +78,7 @@ data "template_cloudinit_config" "genomic-user-data" {
 }
 
  resource "aws_ebs_volume" "genomic-etl-volume"{
-  availability_zone = local.az
+  availability_zone = var.az
   snapshot_id = "snap-0dc69479afe5b7409"
   type="gp3"
   size=2500
