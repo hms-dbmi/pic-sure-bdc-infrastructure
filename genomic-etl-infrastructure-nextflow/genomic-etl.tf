@@ -117,7 +117,7 @@ resource "aws_spot_fleet_request" "genomic-etl-ec2"{
   wait_for_fulfillment = "false"
   terminate_instances_with_expiration = "false"
   replace_unhealthy_instances = "true"
-  spot_price = "0.55"
+  spot_price = "0.6"
 
   dynamic "launch_specification" {
     for_each = [for s in local.instanceList :{
