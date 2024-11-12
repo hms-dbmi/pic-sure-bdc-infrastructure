@@ -26,39 +26,64 @@ locals {
   subid =  "${coalesce(local.az1,local.az2, local.az3, local.az4, local.az5)}"
      
   instanceList = [
-       {
-        "type" =  "m6i.4xlarge"
-      },
-      {
-        "type" =  "r6i.4xlarge"
-      },
-      {
-        "type" =  "r6i.2xlarge"
-      },
-      {
-        "type" =  "r5n.2xlarge"
-      },
-      {
-        "type" =  "r5.2xlarge"
-      }, 
-      {
-        "type" =  "m5n.4xlarge"
-      }, 
-      {
-        "type" =  "m5.4xlarge"
-      },
-      {
-        "type" =  "m5.8xlarge"
-      },
-      {
-        "type" =  "r5.8xlarge"
-      },
-      {
-        "type" =  "r5n.4xlarge"
-      },
-      {
-        "type" =  "r5.4xlarge"
-      }
+      { "type" = "r5a.2xlarge" }, 
+      { "type" = "r6a.2xlarge" }, 
+      { "type" = "r5.2xlarge" }, 
+      { "type" = "r6i.2xlarge" }, 
+      { "type" = "r5ad.2xlarge" }, 
+      { "type" = "r5d.2xlarge" }, 
+      { "type" = "r5n.2xlarge" }, 
+      { "type" = "r6id.2xlarge" }, 
+      { "type" = "r5dn.2xlarge" }, 
+      { "type" = "m5a.4xlarge" }, 
+      { "type" = "m6a.4xlarge" }, 
+      { "type" = "r6in.2xlarge" }, 
+      { "type" = "m5.4xlarge" }, 
+      { "type" = "m6i.4xlarge" }, 
+      { "type" = "r6idn.2xlarge" }, 
+      { "type" = "m5ad.4xlarge" }, 
+      { "type" = "m5d.4xlarge" }, 
+      { "type" = "r5a.4xlarge" }, 
+      { "type" = "r6a.4xlarge" }, 
+      { "type" = "m6id.4xlarge" }, 
+      { "type" = "m5n.4xlarge" }, 
+      { "type" = "r5.4xlarge" }, 
+      { "type" = "r6i.4xlarge" }, 
+      { "type" = "r5ad.4xlarge" }, 
+      { "type" = "m5dn.4xlarge" }, 
+      { "type" = "m6in.4xlarge" }, 
+      { "type" = "r5d.4xlarge" }, 
+      { "type" = "r5n.4xlarge" }, 
+      { "type" = "r6id.4xlarge" }, 
+      { "type" = "c6a.8xlarge" }, 
+      { "type" = "c5a.8xlarge" }, 
+      { "type" = "m6idn.4xlarge" }, 
+      { "type" = "r5dn.4xlarge" }, 
+      { "type" = "c6i.8xlarge" }, 
+      { "type" = "c5ad.8xlarge" }, 
+      { "type" = "m5a.8xlarge" }, 
+      { "type" = "m6a.8xlarge" }, 
+      { "type" = "r6in.4xlarge" }, 
+      { "type" = "c5.9xlarge" }, 
+      { "type" = "m5.8xlarge" }, 
+      { "type" = "m6i.8xlarge" }, 
+      { "type" = "r6idn.4xlarge" }, 
+      { "type" = "c6id.8xlarge" }, 
+      { "type" = "m5ad.8xlarge" }, 
+      { "type" = "x2iedn.2xlarge" }, 
+      { "type" = "c5d.9xlarge" }, 
+      { "type" = "m5d.8xlarge" }, 
+      { "type" = "r5a.8xlarge" }, 
+      { "type" = "c6in.8xlarge" }, 
+      { "type" = "r6a.8xlarge" }, 
+      { "type" = "c6a.12xlarge" }, 
+      { "type" = "c5a.12xlarge" }, 
+      { "type" = "m6id.8xlarge" }, 
+      { "type" = "m5n.8xlarge" }, 
+      { "type" = "c5n.9xlarge" }, 
+      { "type" = "m5zn.6xlarge" }, 
+      { "type" = "r5.8xlarge" }, 
+      { "type" = "r6i.8xlarge" }
 
 ]
 }
@@ -92,6 +117,7 @@ resource "aws_spot_fleet_request" "genomic-etl-ec2"{
   wait_for_fulfillment = "false"
   terminate_instances_with_expiration = "false"
   replace_unhealthy_instances = "true"
+  spot_price = "0.55"
 
   dynamic "launch_specification" {
     for_each = [for s in local.instanceList :{
