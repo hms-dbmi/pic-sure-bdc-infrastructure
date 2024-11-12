@@ -118,6 +118,9 @@ resource "aws_spot_fleet_request" "genomic-etl-ec2"{
   terminate_instances_with_expiration = "false"
   replace_unhealthy_instances = "true"
   spot_price = "0.6"
+  tags = {
+      Name   = "Genomic ETL Annotation Pipeline - ${var.study_id}${var.consent_group_tag} Chromosome ${var.chrom_number}"
+  }
 
   dynamic "launch_specification" {
     for_each = [for s in local.instanceList :{
@@ -150,4 +153,5 @@ resource "aws_spot_fleet_request" "genomic-etl-ec2"{
       }
       }
     }
+
   }
