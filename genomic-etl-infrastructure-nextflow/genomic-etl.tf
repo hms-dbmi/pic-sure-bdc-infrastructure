@@ -37,7 +37,6 @@ locals {
       { "type" = "r5dn.2xlarge" }, 
       { "type" = "m5a.4xlarge" }, 
       { "type" = "m6a.4xlarge" }, 
-      { "type" = "r6in.2xlarge" }, 
       { "type" = "m5.4xlarge" }, 
       { "type" = "m6i.4xlarge" }, 
       { "type" = "r6idn.2xlarge" }, 
