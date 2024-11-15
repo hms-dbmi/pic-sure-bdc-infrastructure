@@ -7,6 +7,7 @@ data "template_file" "auth_hpds-user_data" {
     stack_s3_bucket               = var.stack_s3_bucket
     target_stack                  = var.target_stack
     gss_prefix          = "${var.environment_prefix}_${var.env_is_open_access ? "open" : "auth"}_${var.environment_name}"
+    environment_name = var.environment_name
   }
 }
 
