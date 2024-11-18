@@ -31,6 +31,7 @@ sudo mkdir -p /var/log/dictionary-docker-logs
 
 DICTIONARY_IMAGE=`sudo docker load < /home/centos/pic-sure-hpds-dictionary-resource.tar.gz | cut -d ' ' -f 3`
 sudo docker run --name=dictionary \
+                --restart on-failure:10 \
                 --log-driver syslog --log-opt tag=dictionary \
                 -v /var/log/dictionary-docker-logs/:/usr/local/tomcat/logs/ \
                 -v /home/centos/fence_mapping.json:/usr/local/docker-config/search/fence_mapping.json \

@@ -7,6 +7,11 @@ data "template_file" "auth_hpds-user_data" {
     stack_s3_bucket               = var.stack_s3_bucket
     target_stack                  = var.target_stack
     gss_prefix          = "${var.environment_prefix}_${var.env_is_open_access ? "open" : "auth"}_${var.environment_name}"
+<<<<<<< Updated upstream
+=======
+    environment_name = var.environment_name
+    env_private_dns_name  = var.env_private_dns_name
+>>>>>>> Stashed changes
   }
 }
 
