@@ -7,12 +7,22 @@ export VOLUME_ID=$(/usr/local/bin/aws ec2 describe-volumes --filters Name='tag:l
 aws ec2 attach-volume --volume-id $VOLUME_ID --device /dev/sdb --instance-id $INSTANCE_ID --region us-east-1 &
 wait
 mkdir /annotation_pipeline
-
-while [ ! -d /annotation_pipeline/anno/ ]; do
-   echo 'checking mount'
-   mount /dev/nvme1n1 /annotation_pipeline
+export mount=0
+while [ $mount == 0 ]; do
+   echo 'Checking nvme1n1 device'
+   mount /dev/nvme1n1 /annotation_pipeline 
+   if grep -qs '/annotation_pipeline' /proc/mounts; then
+    echo "It's mounted."
+    export mount=1
+   else
+    echo "Checking nvme2n1 device"
+    mount /dev/nvme2n1 /annotation_pipeline
+    if grep -qs '/annotation_pipeline' /proc/mounts; then
+      echo "It's mounted."
+      export mount=1
+    fi
+   fi
 done
-echo 'Mount done'
 
 echo 'Init complete, moving to annotation'
 
