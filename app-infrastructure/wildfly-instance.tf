@@ -33,7 +33,8 @@ resource "aws_instance" "wildfly-ec2" {
 
   vpc_security_group_ids = [
     aws_security_group.outbound-to-internet.id,
-    aws_security_group.inbound-wildfly-from-httpd.id
+    aws_security_group.inbound-wildfly-from-httpd.id,
+    aws_security_group.inbound-wildfly-from-hpds.id
   ]
 
   root_block_device {
