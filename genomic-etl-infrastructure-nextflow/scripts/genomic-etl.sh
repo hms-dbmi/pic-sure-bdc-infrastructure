@@ -11,17 +11,17 @@ mkdir /annotation_pipeline
 export mount=0
 while [ $mount == 0 ]; do
    echo 'Checking nvme1n1 device'
-   mount /dev/nvme1n1 /annotation_pipeline 
+   mount /dev/nvme1n1 /annotation_pipeline
    if grep -qs '/annotation_pipeline' /proc/mounts; then
-    echo "It's mounted."
-    export mount=1
-   else
-    echo "Checking nvme2n1 device"
-    mount /dev/nvme2n1 /annotation_pipeline
-    if grep -qs '/annotation_pipeline' /proc/mounts; then
       echo "It's mounted."
       export mount=1
-    fi
+   else
+      echo "Checking nvme2n1 device"
+      mount /dev/nvme2n1 /annotation_pipeline
+      if grep -qs '/annotation_pipeline' /proc/mounts; then
+         echo "It's mounted."
+         export mount=1
+      fi
    fi
 done
 
@@ -153,5 +153,5 @@ if [ $ActiveState == 'Uploading' ]; then
 fi
 
 if [ $ActiveState == 'Done' ]; then
-   aws --region=us-east-1 ec2 create-tags --resources $${INSTANCE_ID} --tags Key=AnnotationComplete,Value=true
+   aws --region=us-east-1 ec2 create-tags --resources $${INSTANCE_ID} $${VOLUME_ID} --tags Key=AnnotationComplete,Value=true
 fi

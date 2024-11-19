@@ -146,5 +146,5 @@ if [ $ActiveState == 'Uploading' ]; then
 fi
 
 if [ $ActiveState == 'Done' ]; then
-   aws --region=us-east-1 ec2 create-tags --resources $${INSTANCE_ID} --tags Key=AnnotationComplete,Value=true
+   aws --region=us-east-1 ec2 create-tags --resources $${INSTANCE_ID} $${VOLUME_ID} --tags Key=AnnotationComplete,Value=true
 fi
