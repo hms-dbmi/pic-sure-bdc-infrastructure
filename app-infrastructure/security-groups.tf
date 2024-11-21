@@ -65,6 +65,25 @@ resource "aws_security_group" "inbound-hpds-from-wildfly" {
   }
 }
 
+resource "aws_security_group" "inbound-wildfly-from-hpds" {
+  name        = "allow_inbound_from_hpds_to_wildfly_${local.uniq_name}"
+  description = "Allow inbound traffic from hpds on port 8080 for wildfly"
+  vpc_id      = local.target_vpc
+
+  ingress {
+    from_port       = 8080
+    to_port         = 8080
+    protocol        = "tcp"
+    security_groups = [aws_security_group.inbound-hpds-from-wildfly.id]
+  }
+
+  tags = {
+    Owner       = "Avillach_Lab"
+    Environment = var.environment_name
+    Name        = "inbound-hpds Security Group - ${var.target_stack} - ${local.uniq_name}"
+  }
+}
+
 
 resource "aws_security_group" "inbound-dictionary-from-wildfly" {
   name        = "allow_inbound_from_dictionary_to_hpds_${local.uniq_name}"

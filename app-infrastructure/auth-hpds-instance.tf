@@ -8,6 +8,7 @@ data "template_file" "auth_hpds-user_data" {
     target_stack                  = var.target_stack
     gss_prefix          = "${var.environment_prefix}_${var.env_is_open_access ? "open" : "auth"}_${var.environment_name}"
     environment_name = var.environment_name
+    env_private_dns_name  = var.env_private_dns_name
   }
 }
 
@@ -37,7 +38,7 @@ resource "aws_instance" "auth-hpds-ec2" {
 
   vpc_security_group_ids = [
     aws_security_group.outbound-to-internet.id,
-    aws_security_group.inbound-hpds-from-wildfly.id,
+    aws_security_group.inbound-hpds-from-wildfly.id
   ]
 
   root_block_device {
