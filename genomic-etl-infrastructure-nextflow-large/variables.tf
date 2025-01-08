@@ -35,6 +35,3 @@ variable "consent_group_tag"{
 variable "az"{
   type = string
 }
-variable "freeze_number"{
-  type=string
-}
