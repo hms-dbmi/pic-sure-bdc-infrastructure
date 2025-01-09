@@ -5,17 +5,12 @@ target_stack=$1
 env_private_dns_name=$2
 stack_s3_bucket=$3
 stack_githash=$4
-dataset_s3_object_key=$5
 
 # Parse named arguments
 while [[ $# -gt 0 ]]; do
   case $1 in
     --stack_s3_bucket)
       stack_s3_bucket="$2"
-      shift 2
-      ;;
-    --dataset_s3_object_key)
-      dataset_s3_object_key="$2"
       shift 2
       ;;
     --target_stack)
@@ -37,7 +32,6 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-# Validate required arguments
 if [[ -z "$stack_s3_bucket" || -z "$stack_githash" || -z "$target_stack" || -z "$env_private_dns_name" ]]; then
   echo "Error: --stack_s3_bucket, --stack_githash, --target_stack, and --env_private_dns_name are required."
   exit 1

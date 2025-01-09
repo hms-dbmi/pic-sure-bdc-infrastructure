@@ -34,9 +34,6 @@ s3_copy() {
 }
 
 mkdir -p /opt/local/hpds/all
-s3_copy "s3://$stack_s3_bucket/releases/jenkins_pipeline_build_$stack_githash/pic-sure-hpds.tar.gz" "/home/centos/pic-sure-hpds.tar.gz"
-s3_copy "s3://$stack_s3_bucket/data/$dataset_s3_object_key/javabins_rekeyed.tar" "/opt/local/hpds/javabins_rekeyed.tar"
-s3_copy "s3://$stack_s3_bucket/data/$genomic_dataset_s3_object_key/all/" "/opt/local/hpds/all/" --recursive
 
 cd /opt/local/hpds || exit 1
 tar -xvf javabins_rekeyed.tar
@@ -48,18 +45,19 @@ INIT_MESSAGE="WebApplicationContext: initialization completed"
 INIT_TIMEOUT_SECS=2400  # Set your desired timeout in seconds
 INIT_START_TIME=$(date +%s)
 
-CONTAINER_NAME="auth-hpds"
-
-HPDS_IMAGE=$(sudo docker load < /home/centos/pic-sure-hpds.tar.gz | cut -d ' ' -f 3)
-sudo docker run --name=$CONTAINER_NAME \
-                --restart unless-stopped \
-                --log-driver syslog --log-opt tag=auth-hpds \
-                -v /opt/local/hpds:/opt/local/hpds \
-                -p 8080:8080 \
-                -e JAVA_OPTS=" -XX:+UseParallelGC -XX:SurvivorRatio=250 -Xms10g -Xmx128g -Dserver.port=8080 -Dspring.profiles.active=bdc-auth-$environment_name -DTARGET_STACK=${target_stack}.${env_private_dns_name} -DCACHE_SIZE=2500 -DID_BATCH_SIZE=5000 -DALL_IDS_CONCEPT=NONE -DID_CUBE_NAME=NONE "  \
-                -d "$HPDS_IMAGE"
+s3_copy "s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/deploy-auth-hpds.sh" "/home/centos/deploy-auth-hpds.sh"
+sudo chmod +x /home/centos/deploy-auth-hpds.sh
+sudo /home/centos/deploy-auth-hpds.sh \
+--stack_s3_bucket "${stack_s3_bucket}" \
+--stack_githash "${stack_githash}" \
+--genomic_dataset_s3_object_key "${genomic_dataset_s3_object_key}" \
+--environment_name "${environment_name}" \
+--target_stack "${target_stack}" \
+--env_private_dns_name "${env_private_dns_name}"
 
 echo "Waiting for container to initialize"
+
+CONTAINER_NAME="auth-hpds"
 while true; do
   status=$(docker logs "$CONTAINER_NAME" 2>&1 | grep "$INIT_MESSAGE")
 

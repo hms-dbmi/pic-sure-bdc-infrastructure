@@ -69,8 +69,7 @@ sudo chmod +x /home/centos/deploy-dictionary.sh
 sudo /home/centos/deploy-wildfly.sh --target_stack "$target_stack" \
 --env_private_dns_name "$env_private_dns_name" \
 --stack_s3_bucket "$stack_s3_bucket" \
---stack_githash "$stack_githash" \
---dataset_s3_object_key "$dataset_s3_object_key"
+--stack_githash "$stack_githash"
 
 sudo /home/centos/deploy-psama.sh --stack_s3_bucket "$stack_s3_bucket"
 sudo /home/centos/deploy-dictionary.sh --stack_s3_bucket "$stack_s3_bucket" --stack_githash "$stack_githash"

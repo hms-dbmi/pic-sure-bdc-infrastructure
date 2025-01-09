@@ -29,7 +29,6 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-# Validate required arguments
 if [[ -z "$stack_s3_bucket" || -z "$dataset_s3_object_key" ]]; then
   echo "Error: --stack_s3_bucket and --dataset_s3_object_key are required."
   exit 1
@@ -62,7 +61,6 @@ else
   PSAMA_OPTS="$PSAMA_OPTS -Dspring.profiles.active=$spring_profile"
 fi
 
-# Stop and remove the existing psama container if it exists
 sudo docker stop psama || true
 sudo docker rm psama || true
 sudo docker run -u root --name=psama --restart always --network=picsure \

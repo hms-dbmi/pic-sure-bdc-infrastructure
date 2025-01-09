@@ -18,7 +18,6 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-# Validate required arguments
 if [[ -z "$stack_s3_bucket" || -z "$stack_githash" ]]; then
   echo "Error: --stack_s3_bucket and --dataset_s3_object_key are required."
   exit 1
