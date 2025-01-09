@@ -1,8 +1,39 @@
 #!/bin/bash
 
-stack_s3_bucket=$1
-enable_debug=${2:-false}
-spring_profile=${3:-prod}
+enable_debug=false
+spring_profile="prod"
+
+# Parse named arguments
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --stack_s3_bucket)
+      stack_s3_bucket="$2"
+      shift 2
+      ;;
+    --dataset_s3_object_key)
+      dataset_s3_object_key="$2"
+      shift 2
+      ;;
+    --enable_debug)
+      enable_debug="$2"
+      shift 2
+      ;;
+    --spring_profile)
+      spring_profile="$2"
+      shift 2
+      ;;
+    *)
+      echo "Unknown argument: $1"
+      exit 1
+      ;;
+  esac
+done
+
+# Validate required arguments
+if [[ -z "$stack_s3_bucket" || -z "$dataset_s3_object_key" ]]; then
+  echo "Error: --stack_s3_bucket and --dataset_s3_object_key are required."
+  exit 1
+fi
 
 s3_copy() {
   for i in {1..5}; do
@@ -12,6 +43,7 @@ s3_copy() {
 
 s3_copy "s3://${stack_s3_bucket}/configs/psama/psama.env" "/home/centos/psama.env"
 s3_copy "s3://${stack_s3_bucket}/releases/psama/psama.tar.gz" "/home/centos/psama.tar.gz"
+s3_copy "s3://${stack_s3_bucket}/data/${dataset_s3_object_key}/fence_mapping.json" "/home/centos/fence_mapping.json"
 
 # This script is responsible for starting or updating the psama container
 PSAMA_IMAGE=$(sudo docker load < /home/centos/psama.tar.gz | cut -d ' ' -f 3)
@@ -40,5 +72,5 @@ sudo docker run -u root --name=psama --restart always --network=picsure \
 -e JAVA_OPTS="$PSAMA_OPTS" \
 --log-driver syslog --log-opt tag=wildfly \
 -v /home/centos/fence_mapping.json:/config/fence_mapping.json \
-$PSAMA_PORTS \
--d $PSAMA_IMAGE
+"$PSAMA_PORTS" \
+-d "$PSAMA_IMAGE"

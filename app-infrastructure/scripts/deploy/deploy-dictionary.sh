@@ -1,5 +1,24 @@
 #!/bin/bash
-stack_s3_bucket=$1
+
+# TODO: Use stack githash to version the uploads.
+
+# Parse named arguments
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --stack_s3_bucket)
+      stack_s3_bucket="$2"
+      shift 2
+      ;;
+    --stack_githash)
+      stack_githash="$2"
+      shift 2
+      ;;
+    *)
+      echo "Unknown argument: $1"
+      exit 1
+      ;;
+  esac
+done
 
 s3_copy() {
   for i in {1..5}; do
@@ -7,12 +26,10 @@ s3_copy() {
   done
 }
 
-## pull configs and images from s3
 s3_copy "s3://${stack_s3_bucket}/configs/picsure-dictionary/picsure-dictionary.env" "/home/centos/picsure-dictionary.env"
 s3_copy "s3://${stack_s3_bucket}/containers/application/dictionary-api.tar.gz" "/home/centos/dictionary-api.tar.gz"
 
-# load docker images
-DICTIONARY_API_IMAGE=`sudo docker load < /home/centos/dictionary-api.tar.gz | cut -d ' ' -f 3`
+DICTIONARY_API_IMAGE=$(sudo docker load < /home/centos/dictionary-api.tar.gz | cut -d ' ' -f 3)
 JAVA_OPTS=" -Xmx8g "
 
 sudo docker stop dictionary-api
@@ -25,4 +42,4 @@ sudo docker run \
       --network picsure \
       --log-driver syslog --log-opt tag=dictionary-api \
       --restart always \
-      -d $DICTIONARY_API_IMAGE
+      -d "$DICTIONARY_API_IMAGE"
