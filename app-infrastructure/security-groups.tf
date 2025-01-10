@@ -84,27 +84,6 @@ resource "aws_security_group" "inbound-wildfly-from-hpds" {
   }
 }
 
-
-resource "aws_security_group" "inbound-dictionary-from-wildfly" {
-  name        = "allow_inbound_from_dictionary_to_hpds_${local.uniq_name}"
-  description = "Allow inbound traffic from private-subnets on port 8080 for hpds"
-  vpc_id      = local.target_vpc
-
-  ingress {
-    from_port       = 8080
-    to_port         = 8080
-    protocol        = "tcp"
-    security_groups = [aws_security_group.inbound-wildfly-from-httpd.id]
-  }
-
-  tags = {
-    Owner       = "Avillach_Lab"
-    Environment = var.environment_name
-    Name        = "inbound-wildfly Security Group - ${var.target_stack} - ${local.uniq_name}"
-  }
-}
-
-
 resource "aws_security_group" "inbound-mysql-from-wildfly" {
   name        = "allow_inbound_from_wildfly_to_mysql_${local.uniq_name}"
   description = "Allow inbound traffic from wildfly to mysql on port 3306"
