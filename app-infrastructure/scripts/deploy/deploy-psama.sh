@@ -22,6 +22,10 @@ while [[ $# -gt 0 ]]; do
       spring_profile="$2"
       shift 2
       ;;
+    --target_stack)
+      target_stack="$2"
+      shift 2
+      ;;
     *)
       echo "Unknown argument: $1"
       exit 1
@@ -40,9 +44,9 @@ s3_copy() {
   done
 }
 
-s3_copy "s3://${stack_s3_bucket}/configs/psama/psama.env" "/home/centos/psama.env"
-s3_copy "s3://${stack_s3_bucket}/releases/psama/psama.tar.gz" "/home/centos/psama.tar.gz"
-s3_copy "s3://${stack_s3_bucket}/data/${dataset_s3_object_key}/fence_mapping.json" "/home/centos/fence_mapping.json"
+s3_copy "s3://${stack_s3_bucket}/${target_stack}/configs/psama/psama.env" "/home/centos/psama.env"
+s3_copy "s3://${stack_s3_bucket}/${target_stack}/containers/psama.tar.gz" "/home/centos/psama.tar.gz"
+s3_copy "s3://${stack_s3_bucket}/${target_stack}/data/${dataset_s3_object_key}/fence_mapping.json" "/home/centos/fence_mapping.json"
 
 # This script is responsible for starting or updating the psama container
 PSAMA_IMAGE=$(sudo docker load < /home/centos/psama.tar.gz | cut -d ' ' -f 3)

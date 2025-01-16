@@ -45,7 +45,7 @@ INIT_MESSAGE="WebApplicationContext: initialization completed"
 INIT_TIMEOUT_SECS=2400  # Set your desired timeout in seconds
 INIT_START_TIME=$(date +%s)
 
-s3_copy "s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/deploy-auth-hpds.sh" "/home/centos/deploy-auth-hpds.sh"
+s3_copy "s3://${stack_s3_bucket}/${target_stack}/scripts/deploy-auth-hpds.sh" "/home/centos/deploy-auth-hpds.sh"
 sudo chmod +x /home/centos/deploy-auth-hpds.sh
 sudo /home/centos/deploy-auth-hpds.sh \
 --stack_s3_bucket "${stack_s3_bucket}" \

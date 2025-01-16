@@ -1,16 +1,13 @@
 #!/bin/bash
 
-# TODO: Use stack githash to version the uploads.
-
-# Parse named arguments
 while [[ $# -gt 0 ]]; do
   case $1 in
     --stack_s3_bucket)
       stack_s3_bucket="$2"
       shift 2
       ;;
-    --stack_githash)
-      stack_githash="$2"
+    --target_stack)
+      target_stack="$2"
       shift 2
       ;;
     *)
@@ -26,8 +23,8 @@ s3_copy() {
   done
 }
 
-s3_copy "s3://${stack_s3_bucket}/configs/picsure-dictionary/picsure-dictionary.env" "/home/centos/picsure-dictionary.env"
-s3_copy "s3://${stack_s3_bucket}/containers/application/dictionary-api.tar.gz" "/home/centos/dictionary-api.tar.gz"
+s3_copy "s3://${stack_s3_bucket}/${target_stack}/configs/dictionary/picsure-dictionary.env" "/home/centos/picsure-dictionary.env"
+s3_copy "s3://${stack_s3_bucket}/${target_stack}/containers/dictionary-api.tar.gz" "/home/centos/dictionary-api.tar.gz"
 
 DICTIONARY_API_IMAGE=$(sudo docker load < /home/centos/dictionary-api.tar.gz | cut -d ' ' -f 3)
 JAVA_OPTS=" -Xmx8g "

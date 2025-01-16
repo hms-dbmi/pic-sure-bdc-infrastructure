@@ -48,9 +48,9 @@ s3_copy() {
   done
 }
 
-s3_copy "s3://$stack_s3_bucket/releases/jenkins_pipeline_build_$stack_githash/pic-sure-hpds.tar.gz" "/home/centos/pic-sure-hpds.tar.gz"
-s3_copy "s3://$stack_s3_bucket/data/$dataset_s3_object_key/javabins_rekeyed.tar" "/opt/local/hpds/javabins_rekeyed.tar"
-s3_copy "s3://$stack_s3_bucket/data/$genomic_dataset_s3_object_key/all/" "/opt/local/hpds/all/" --recursive
+s3_copy "s3://${stack_s3_bucket}/${target_stack}/containers/pic-sure-hpds.tar.gz" "/home/centos/pic-sure-hpds.tar.gz"
+s3_copy "s3://${stack_s3_bucket}/${target_stack}/data/${dataset_s3_object_key}/javabins_rekeyed.tar" "/opt/local/hpds/javabins_rekeyed.tar"
+s3_copy "s3://${stack_s3_bucket}/${target_stack}/data/${genomic_dataset_s3_object_key}/all/" "/opt/local/hpds/all/" --recursive
 
 HPDS_IMAGE=$(sudo docker load < /home/centos/pic-sure-hpds.tar.gz | cut -d ' ' -f 3)
 sudo docker stop auth-hpds || true

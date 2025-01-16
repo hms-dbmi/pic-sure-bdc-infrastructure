@@ -31,12 +31,13 @@ INIT_MESSAGE="WebApplicationContext: initialization completed"
 INIT_TIMEOUT_SEX=2400  # Set your desired timeout in seconds
 INIT_START_TIME=$(date +%s)
 
-s3_copy "s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/deploy-open-hpds.sh" "/home/centos/deploy-open-hpds.sh"
+s3_copy "s3://${stack_s3_bucket}/${target_stack}/scripts/deploy-open-hpds.sh" "/home/centos/deploy-open-hpds.sh"
 sudo chmod +x /home/centos/deploy-open-hpds.sh
 sudo /home/centos/deploy-open-hpds.sh \
 --stack_s3_bucket "${stack_s3_bucket}" \
 --stack_githash "${stack_githash}" \
---destigmatized_dataset_s3_object_key "${destigmatized_dataset_s3_object_key}"
+--destigmatized_dataset_s3_object_key "${destigmatized_dataset_s3_object_key}" \
+--target_stack "${target_stack}"
 
 echo "Waiting for container to initialize"
 CONTAINER_NAME="open-hpds"

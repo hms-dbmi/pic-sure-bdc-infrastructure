@@ -43,10 +43,10 @@ s3_copy() {
   done
 }
 
-s3_copy "s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-wildfly.tar.gz" "/home/centos/pic-sure-wildfly.tar.gz"
-s3_copy "s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/standalone.xml" "/home/centos/standalone.xml"
-s3_copy "s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/aggregate-resource.properties" "/home/centos/aggregate-resource.properties"
-s3_copy "s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/visualization-resource.properties" "/home/centos/visualization-resource.properties"
+s3_copy "s3://${stack_s3_bucket}/${target_stack}/containers/pic-sure-wildfly.tar.gz" "/home/centos/pic-sure-wildfly.tar.gz"
+s3_copy "s3://${stack_s3_bucket}/${target_stack}/configs/wildfly/standalone.xml" "/home/centos/standalone.xml"
+s3_copy "s3://${stack_s3_bucket}/${target_stack}/configs/wildfly/aggregate-resource.properties" "/home/centos/aggregate-resource.properties"
+s3_copy "s3://${stack_s3_bucket}/${target_stack}/configs/wildfly/visualization-resource.properties" "/home/centos/visualization-resource.properties"
 
 WILDFLY_IMAGE=$(sudo docker load < /home/centos/pic-sure-wildfly.tar.gz | cut -d ' ' -f 3)
 JAVA_OPTS="-Xms2g -Xmx24g -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=1024m -Djava.net.preferIPv4Stack=true -DTARGET_STACK=${target_stack}.${env_private_dns_name}"

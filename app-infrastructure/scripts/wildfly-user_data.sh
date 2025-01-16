@@ -54,25 +54,25 @@ sudo chmod 600 /swapfile
 sudo mkswap /swapfile
 sudo swapon /swapfile
 
-# make picsure network
 sudo docker network create picsure
 sudo mkdir /var/log/{wildfly-docker-logs,wildfly-docker-os-logs,psama-docker-logs,psama-docker-os-logs}
 
-s3_copy "s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/deploy-wildfly.sh" "/home/centos/deploy-wildfly.sh"
-s3_copy "s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/deploy-psama.sh" "/home/centos/deploy-psama.sh"
-s3_copy "s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/deploy-dictionary.sh" "/home/centos/deploy-dictionary.sh"
+s3_copy "s3://${stack_s3_bucket}/${target_stack}/scripts/deploy-wildfly.sh" "/home/centos/deploy-wildfly.sh"
+s3_copy "s3://${stack_s3_bucket}/${target_stack}/scripts/deploy-psama.sh" "/home/centos/deploy-psama.sh"
+s3_copy "s3://${stack_s3_bucket}/${target_stack}/scripts/deploy-dictionary.sh" "/home/centos/deploy-dictionary.sh"
 
 sudo chmod +x /home/centos/deploy-wildfly.sh
 sudo chmod +x /home/centos/deploy-psama.sh
 sudo chmod +x /home/centos/deploy-dictionary.sh
 
-sudo /home/centos/deploy-wildfly.sh --target_stack "$target_stack" \
---env_private_dns_name "$env_private_dns_name" \
---stack_s3_bucket "$stack_s3_bucket" \
---stack_githash "$stack_githash"
+sudo /home/centos/deploy-wildfly.sh \
+--env_private_dns_name "${env_private_dns_name}" \
+--stack_s3_bucket "${stack_s3_bucket}" \
+--stack_githash "${stack_githash}" \
+--target_stack "${target_stack}"
 
-sudo /home/centos/deploy-psama.sh --stack_s3_bucket "$stack_s3_bucket"
-sudo /home/centos/deploy-dictionary.sh --stack_s3_bucket "$stack_s3_bucket" --stack_githash "$stack_githash"
+sudo /home/centos/deploy-psama.sh --stack_s3_bucket "${stack_s3_bucket}" --target_stack "${target_stack}"
+sudo /home/centos/deploy-dictionary.sh --stack_s3_bucket "${stack_s3_bucket}" --stack_githash "$stack_githash" --target_stack "${target_stack}"
 
 INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)
 sudo /usr/bin/aws --region=us-east-1 ec2 create-tags --resources "$INSTANCE_ID" --tags Key=InitComplete,Value=true

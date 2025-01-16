@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# Parse named arguments
 while [[ $# -gt 0 ]]; do
   case $1 in
     --stack_s3_bucket)
@@ -9,6 +8,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --stack_githash)
       stack_githash="$2"
+      shift 2
+      ;;
+   --target_stack)
+      target_stack="$2"
       shift 2
       ;;
     *)
@@ -29,7 +32,9 @@ s3_copy() {
   done
 }
 
-s3_copy "s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-frontend.tar.gz" "/home/centos/pic-sure-frontend.tar.gz"
+s3_copy "s3://${stack_s3_bucket}/${target_stack}/containers/pic-sure-frontend.tar.gz" "/home/centos/pic-sure-frontend.tar.gz"
+s3_copy "s3://${stack_s3_bucket}/${target_stack}/configs/httpd-vhosts.conf" "/usr/local/docker-config/httpd-vhosts.conf"
+s3_copy "s3://${stack_s3_bucket}/${target_stack}/certs/httpd/" "/usr/local/docker-config/cert/" --recursive
 
 sudo docker stop httpd || true
 sudo docker rm httpd || true
