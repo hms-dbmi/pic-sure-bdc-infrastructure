@@ -33,7 +33,7 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-if [[ -z "$stack_s3_bucket" || -z "$dataset_s3_object_key" ]]; then
+if [[ -z "$stack_s3_bucket" || -z "$dataset_s3_object_key" || -z "$target_stack" ]]; then
   echo "Error: --stack_s3_bucket and --dataset_s3_object_key are required."
   exit 1
 fi
@@ -48,12 +48,10 @@ s3_copy "s3://${stack_s3_bucket}/${target_stack}/configs/psama/psama.env" "/home
 s3_copy "s3://${stack_s3_bucket}/${target_stack}/containers/psama.tar.gz" "/home/centos/psama.tar.gz"
 s3_copy "s3://${stack_s3_bucket}/${target_stack}/data/${dataset_s3_object_key}/fence_mapping.json" "/home/centos/fence_mapping.json"
 
-# This script is responsible for starting or updating the psama container
 PSAMA_IMAGE=$(sudo docker load < /home/centos/psama.tar.gz | cut -d ' ' -f 3)
 PSAMA_OPTS="-Xms1g -Xmx2g -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=512m -Djava.net.preferIPv4Stack=true"
 
 # Add remote debugging options if enabled.
-# To enable remote debugging, set the second script argument to true.
 if [ "$enable_debug" = true ]; then
   PSAMA_OPTS="$PSAMA_OPTS -agentlib:jdwp=transport=dt_socket,address=*:9000,server=y,suspend=n"
   PSAMA_PORTS="-p 8090:8090 -p 9000:9000 -p 8000:8000"
