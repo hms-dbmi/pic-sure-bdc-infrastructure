@@ -1,9 +1,12 @@
 #!/bin/bash
 
 stack_s3_bucket="${stack_s3_bucket}"
-stack_githash="${stack_githash}"
 gss_prefix="${gss_prefix}"
 target_stack="${target_stack}"
+
+echo "export STACK_S3_BUCKET=$stack_s3_bucket" /etc/environment
+echo "export GSS_PREFIX=$gss_prefix" >> /etc/environment
+echo "export TARGET_STACK=$target_stack" >> /etc/environment
 
 echo "SPLUNK_INDEX=hms_aws_${gss_prefix}" | sudo tee /opt/srce/startup.config
 echo "NESSUS_GROUP=${gss_prefix}_${target_stack}" | sudo tee -a /opt/srce/startup.config
@@ -41,11 +44,10 @@ for i in 1 2 3 4 5; do echo "confirming wildfly resolvable" && sudo curl --conne
 
 sudo mkdir -p /var/log/httpd-docker-logs
 sudo chmod +x /home/centos/deploy-httpd.sh
-sudo /home/centos/deploy-httpd.sh --stack_s3_bucket "${stack_s3_bucket}" --stack_githash "${stack_githash}" --target_stack "${target_stack}"
+sudo /home/centos/deploy-httpd.sh --stack_s3_bucket "${stack_s3_bucket}" --target_stack "${target_stack}"
 
 INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)
 sudo /usr/bin/aws --region=us-east-1 ec2 create-tags --resources "$INSTANCE_ID" --tags Key=InitComplete,Value=true
-
 
 echo "Restart splunkforwarder service"
 sudo systemctl restart SplunkForwarder

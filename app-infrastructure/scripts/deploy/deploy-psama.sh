@@ -3,7 +3,6 @@
 enable_debug=false
 spring_profile="prod"
 
-# Parse named arguments
 while [[ $# -gt 0 ]]; do
   case $1 in
     --stack_s3_bucket)
@@ -32,6 +31,10 @@ while [[ $# -gt 0 ]]; do
       ;;
   esac
 done
+
+stack_s3_bucket=${stack_s3_bucket:-STACK_S3_BUCKET}
+dataset_s3_object_key=${dataset_s3_object_key:-DATASET_S3_OBJECT_KEY}
+target_stack=${target_stack:-TARGET_STACK}
 
 if [[ -z "$stack_s3_bucket" || -z "$dataset_s3_object_key" || -z "$target_stack" ]]; then
   echo "Error: --stack_s3_bucket and --dataset_s3_object_key are required."

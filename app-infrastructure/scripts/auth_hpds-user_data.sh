@@ -1,13 +1,21 @@
 #!/bin/bash
 
 stack_s3_bucket="${stack_s3_bucket}"
-stack_githash="${stack_githash}"
 dataset_s3_object_key="${dataset_s3_object_key}"
 genomic_dataset_s3_object_key="${genomic_dataset_s3_object_key}"
 environment_name="${environment_name}"
 env_private_dns_name="${env_private_dns_name}"
 gss_prefix="${gss_prefix}"
 target_stack="${target_stack}"
+
+echo "export STACK_S3_BUCKET=$stack_s3_bucket" >> /etc/environment
+echo "export DATASET_S3_OBJECT_KEY=$dataset_s3_object_key" >> /etc/environment
+echo "export GENOMIC_DATASET_S3_OBJECT_KEY=$genomic_dataset_s3_object_key" >> /etc/environment
+echo "export ENVIRONMENT_NAME=$environment_name" >> /etc/environment
+echo "export ENV_PRIVATE_DNS_NAME=$env_private_dns_name" >> /etc/environment
+echo "export GSS_PREFIX=$gss_prefix" >> /etc/environment
+echo "export TARGET_STACK=$target_stack" >> /etc/environment
+
 
 echo "SPLUNK_INDEX=hms_aws_$gss_prefix" | sudo tee /opt/srce/startup.config
 echo "NESSUS_GROUP=${gss_prefix}_${target_stack}" | sudo tee -a /opt/srce/startup.config
@@ -49,11 +57,12 @@ s3_copy "s3://${stack_s3_bucket}/${target_stack}/scripts/deploy-auth-hpds.sh" "/
 sudo chmod +x /home/centos/deploy-auth-hpds.sh
 sudo /home/centos/deploy-auth-hpds.sh \
 --stack_s3_bucket "${stack_s3_bucket}" \
---stack_githash "${stack_githash}" \
 --genomic_dataset_s3_object_key "${genomic_dataset_s3_object_key}" \
+--dataset_s3_object_key "${dataset_s3_object_key}" \
 --environment_name "${environment_name}" \
 --target_stack "${target_stack}" \
---env_private_dns_name "${env_private_dns_name}"
+--env_private_dns_name "${env_private_dns_name}" \
+
 
 echo "Waiting for container to initialize"
 

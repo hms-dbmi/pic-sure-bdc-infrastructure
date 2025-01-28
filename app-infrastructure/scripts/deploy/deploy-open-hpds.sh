@@ -6,10 +6,6 @@ while [[ $# -gt 0 ]]; do
       stack_s3_bucket="$2"
       shift 2
       ;;
-    --stack_githash)
-      stack_githash="$2"
-      shift 2
-      ;;
     --destigmatized_dataset_s3_object_key)
       destigmatized_dataset_s3_object_key="$2"
       shift 2
@@ -25,7 +21,11 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-if [[ -z "$stack_s3_bucket" || -z "$stack_githash" || -z "$destigmatized_dataset_s3_object_key" ]]; then
+stack_s3_bucket=${stack_s3_bucket:-STACK_S3_BUCKET}
+destigmatized_dataset_s3_object_key=${destigmatized_dataset_s3_object_key:-DESTIGMATIZED_DATASET_S3_OBJECT_KEY}
+target_stack=${target_stack:-TARGET_STACK}
+
+if [[ -z "$stack_s3_bucket" || -z "$destigmatized_dataset_s3_object_key" || -z "$target_stack" ]]; then
   echo "Error: --stack_s3_bucket, --stack_githash and --destigmatized_dataset_s3_object_key are required"
   exit 1
 fi

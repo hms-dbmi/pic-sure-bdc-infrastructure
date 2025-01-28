@@ -1,12 +1,5 @@
 #!/bin/bash
 
-# except values for target_stack and env_private_dns_name as $1 and $2
-target_stack=$1
-env_private_dns_name=$2
-stack_s3_bucket=$3
-stack_githash=$4
-
-# Parse named arguments
 while [[ $# -gt 0 ]]; do
   case $1 in
     --stack_s3_bucket)
@@ -21,10 +14,6 @@ while [[ $# -gt 0 ]]; do
       env_private_dns_name="$2"
       shift 2
       ;;
-    --stack_githash)
-      stack_githash="$2"
-      shift 2
-      ;;
     *)
       echo "Unknown argument: $1"
       exit 1
@@ -32,7 +21,11 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-if [[ -z "$stack_s3_bucket" || -z "$stack_githash" || -z "$target_stack" || -z "$env_private_dns_name" ]]; then
+stack_s3_bucket=${stack_s3_bucket:-STACK_S3_BUCKET}
+env_private_dns_name=${env_private_dns_name:-ENV_PRIVATE_DNS_NAME}
+target_stack=${target_stack:-TARGET_STACK}
+
+if [[ -z "$stack_s3_bucket" || -z "$env_private_dns_name" || -z "$target_stack" ]]; then
   echo "Error: --stack_s3_bucket, --stack_githash, --target_stack, and --env_private_dns_name are required."
   exit 1
 fi

@@ -7,6 +7,16 @@ stack_githash="${stack_githash}"
 dataset_s3_object_key="${dataset_s3_object_key}"
 gss_prefix="${gss_prefix}"
 
+# This is added to our /etc/environment to make them available to our deploy script
+# when executed by our ssm command. Doing this allows us to make values optional.
+# If they haven't changed since our last deployment we don't need to pass them to the script(s).
+echo "export TARGET_STACK=$target_stack" >> /etc/environment
+echo "export ENV_PRIVATE_DNS_NAME=$env_private_dns_name" >> /etc/environment
+echo "export STACK_S3_BUCKET=$stack_s3_bucket" >> /etc/environment
+echo "export STACK_GITHASH=$stack_githash" >> /etc/environment
+echo "export DATASET_S3_OBJECT_KEY=$dataset_s3_object_key" >> /etc/environment
+echo "export GSS_PREFIX=$gss_prefix" >> /etc/environment
+
 echo "SPLUNK_INDEX=hms_aws_${gss_prefix}" | sudo tee /opt/srce/startup.config
 echo "NESSUS_GROUP=${gss_prefix}_${target_stack}" | sudo tee -a /opt/srce/startup.config
 

@@ -1,7 +1,6 @@
 #!/bin/bash
 
 stack_s3_bucket="${stack_s3_bucket}"
-stack_githash="${stack_githash}"
 gss_prefix="${gss_prefix}"
 destigmatized_dataset_s3_object_key="${destigmatized_dataset_s3_object_key}"
 target_stack="${target_stack}"
@@ -35,7 +34,6 @@ s3_copy "s3://${stack_s3_bucket}/${target_stack}/scripts/deploy-open-hpds.sh" "/
 sudo chmod +x /home/centos/deploy-open-hpds.sh
 sudo /home/centos/deploy-open-hpds.sh \
 --stack_s3_bucket "${stack_s3_bucket}" \
---stack_githash "${stack_githash}" \
 --destigmatized_dataset_s3_object_key "${destigmatized_dataset_s3_object_key}" \
 --target_stack "${target_stack}"
 

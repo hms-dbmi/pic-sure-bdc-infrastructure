@@ -6,10 +6,6 @@ while [[ $# -gt 0 ]]; do
       stack_s3_bucket="$2"
       shift 2
       ;;
-    --stack_githash)
-      stack_githash="$2"
-      shift 2
-      ;;
    --dataset_s3_object_key)
       dataset_s3_object_key="$2"
       shift 2
@@ -37,7 +33,14 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-if [[ -z "$stack_s3_bucket" || -z "$stack_githash" || -z "$genomic_dataset_s3_object_key" || -z "$dataset_s3_object_key" || -z "$environment_name" || -z "$target_stack" || -z "$env_private_dns_name" ]]; then
+stack_s3_bucket=${stack_s3_bucket:-STACK_S3_BUCKET}
+dataset_s3_object_key=${dataset_s3_object_key:-DATASET_S3_OBJECT_KEY}
+genomic_dataset_s3_object_key=${genomic_dataset_s3_object_key:-GENOMIC_DATASET_S3_OBJECT_KEY}
+target_stack=${target_stack:-TARGET_STACK}
+environment_name=${environment_name:-ENVIRONMENT_NAME}
+env_private_dns_name=${env_private_dns_name:-ENV_PRIVATE_DNS_NAME}
+
+if [[ -z "$stack_s3_bucket" || -z "$genomic_dataset_s3_object_key" || -z "$dataset_s3_object_key" || -z "$environment_name" || -z "$target_stack" || -z "$env_private_dns_name" ]]; then
   echo "Error: --stack_s3_bucket, --stack_githash, --genomic_dataset_s3_object_key, --dataset_s3_object_key, --environment_name, --target_stack, and --env_private_dns_name are required"
   exit 1
 fi
