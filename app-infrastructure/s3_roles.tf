@@ -15,7 +15,7 @@ resource "aws_iam_role_policy" "httpd-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/containers/pic-sure-frontend.tar.gz"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/${var.target_stack}/containers/pic-sure-frontend.tar.gz"
     },{
       "Action": [
         "s3:GetObject"
