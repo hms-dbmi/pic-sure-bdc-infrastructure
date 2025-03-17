@@ -31,10 +31,8 @@ locals {
       { "type" = "r5.2xlarge" }, 
       { "type" = "r6i.2xlarge" }, 
       { "type" = "r5ad.2xlarge" }, 
-      { "type" = "r5d.2xlarge" }, 
-      { "type" = "r5n.2xlarge" }, 
-      { "type" = "r6id.2xlarge" }, 
-      { "type" = "r5dn.2xlarge" }, 
+      { "type" = "r5d.2xlarge" },
+      { "type" = "r6id.2xlarge" },
       { "type" = "m5a.4xlarge" }, 
       { "type" = "m6a.4xlarge" }, 
       { "type" = "m5.4xlarge" }, 
@@ -116,7 +114,7 @@ resource "aws_spot_fleet_request" "genomic-etl-ec2"{
   wait_for_fulfillment = "false"
   terminate_instances_with_expiration = "false"
   replace_unhealthy_instances = "true"
-  spot_price = "0.75"
+  spot_price = "0.9"
   tags = {
       Name   = "Genomic ETL Annotation Pipeline - ${var.study_id}${var.consent_group_tag} Chromosome ${var.chrom_number}"
   }
