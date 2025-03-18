@@ -15,7 +15,6 @@ s3_copy() {
 }
 
 s3_copy s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-hpds.tar.gz /home/centos/pic-sure-hpds.tar.gz
-
 s3_copy s3://${stack_s3_bucket}/data/${destigmatized_dataset_s3_object_key}/destigmatized_javabins_rekeyed.tar /opt/local/hpds/destigmatized_javabins_rekeyed.tar
 
 cd /opt/local/hpds
@@ -28,6 +27,8 @@ INIT_TIMEOUT_SEX=2400  # Set your desired timeout in seconds
 INIT_START_TIME=$(date +%s)
 
 CONTAINER_NAME="open-hpds"
+
+mkdir -p /var/log/open-hpds/
 
 HPDS_IMAGE=`sudo docker load < /home/centos/pic-sure-hpds.tar.gz | cut -d ' ' -f 3`
 sudo docker run --name=$CONTAINER_NAME \

@@ -25,7 +25,7 @@ sudo swapon /swapfile
 
 # make picsure network
 sudo docker network create picsure
-sudo mkdir /var/log/{wildfly-docker-logs,wildfly-docker-os-logs,psama-docker-logs,psama-docker-os-logs}
+sudo mkdir -p /var/log/{wildfly,psama}
 
 # Download the wildfly and psama docker scripts
 s3_copy s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/wildfly-docker.sh /home/centos/wildfly-docker.sh
