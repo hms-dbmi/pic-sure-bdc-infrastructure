@@ -8,8 +8,8 @@ sudo systemctl stop SplunkForwarder
 /opt/splunkforwarder/bin/splunk enable boot-start -systemd-managed 1 -user splunk || true
 
 mkdir -p /usr/local/docker-config/cert
-mkdir -p /var/log/httpd/
-mkdir -p /var/log/httpd-docker-logs/ssl_mutex
+sudo mkdir -p /var/log/httpd/
+sudo mkdir -p /var/log/httpd/ssl_mutex
 
 s3_copy() {
   for i in {1..5}; do
