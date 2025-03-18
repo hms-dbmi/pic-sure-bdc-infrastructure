@@ -4,18 +4,8 @@ echo "SPLUNK_INDEX=hms_aws_${gss_prefix}" | sudo tee /opt/srce/startup.config
 echo "NESSUS_GROUP=${gss_prefix}_${target_stack}" | sudo tee -a /opt/srce/startup.config
 
 sudo sh /opt/srce/scripts/start-gsstools.sh
-
-echo "
-[monitor:///var/log/httpd-docker-logs/]
-sourcetype = hms_app_logs
-source = httpd_logs
-index=hms_aws_${gss_prefix}
-" | sudo tee -a /opt/splunkforwarder/etc/system/local/inputs.conf
-
 sudo systemctl stop SplunkForwarder
-
 /opt/splunkforwarder/bin/splunk enable boot-start -systemd-managed 1 -user splunk || true
-
 
 mkdir -p /usr/local/docker-config/cert
 mkdir -p /var/log/httpd-docker-logs/ssl_mutex

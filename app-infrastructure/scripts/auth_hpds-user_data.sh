@@ -4,14 +4,6 @@ echo "SPLUNK_INDEX=hms_aws_${gss_prefix}" | sudo tee /opt/srce/startup.config
 echo "NESSUS_GROUP=${gss_prefix}_${target_stack}" | sudo tee -a /opt/srce/startup.config
 
 sudo sh /opt/srce/scripts/start-gsstools.sh
-
-echo "
-[monitor:///var/log/hpds-docker-logs]
-sourcetype = hms_app_logs
-source = hpds_logs
-index=hms_aws_${gss_prefix}
-" | sudo tee -a /opt/splunkforwarder/etc/system/local/inputs.conf
-
 sudo systemctl stop SplunkForwarder
 
 /opt/splunkforwarder/bin/splunk enable boot-start -systemd-managed 1 -user splunk || true
@@ -44,7 +36,8 @@ CONTAINER_NAME="auth-hpds"
 HPDS_IMAGE=`sudo docker load < /home/centos/pic-sure-hpds.tar.gz | cut -d ' ' -f 3`
 sudo docker run --name=$CONTAINER_NAME \
                 --restart unless-stopped \
-                --log-driver syslog --log-opt tag=auth-hpds \
+                -v /var/log/auth-hpds/:/var/log/ \
+                --log-opt tag=auth-hpds \
                 -v /opt/local/hpds:/opt/local/hpds \
                 -p 8080:8080 \
                 -e JAVA_OPTS=" -XX:+UseParallelGC -XX:SurvivorRatio=250 -Xms10g -Xmx128g -Dserver.port=8080 -Dspring.profiles.active=bdc-auth-${environment_name} -DTARGET_STACK=${target_stack}.${env_private_dns_name} -DCACHE_SIZE=2500 -DID_BATCH_SIZE=5000 -DALL_IDS_CONCEPT=NONE -DID_CUBE_NAME=NONE "  \

@@ -25,11 +25,10 @@ JAVA_OPTS="-Xms2g -Xmx24g -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=1024m -Djav
 
 sudo docker run -u root --name=wildfly --network=picsure \
                         --restart unless-stopped \
-                        --log-driver syslog --log-opt tag=wildfly \
-                        -v /var/log/wildfly-docker-logs/:/opt/jboss/wildfly/standalone/log/ \
+                        --log-opt tag=wildfly \
+                        -v /var/log/wildfly/:/opt/jboss/wildfly/standalone/log/ \
                         -v /home/centos/standalone.xml:/opt/jboss/wildfly/standalone/configuration/standalone.xml \
                         -v /home/centos/fence_mapping.json:/usr/local/docker-config/fence_mapping.json \
                         -v /home/centos/aggregate-resource.properties:/opt/jboss/wildfly/standalone/configuration/aggregate-data-sharing/pic-sure-aggregate-resource/resource.properties \
-                        -v /var/log/wildfly-docker-os-logs/:/var/log/ \
                         -v /home/centos/visualization-resource.properties:/opt/jboss/wildfly/standalone/configuration/visualization/pic-sure-visualization-resource/resource.properties \
                         -p 8080:8080 -e JAVA_OPTS="$JAVA_OPTS" -d $WILDFLY_IMAGE

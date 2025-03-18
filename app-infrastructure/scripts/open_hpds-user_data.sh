@@ -4,14 +4,6 @@ echo "SPLUNK_INDEX=hms_aws_${gss_prefix}" | sudo tee /opt/srce/startup.config
 echo "NESSUS_GROUP=${gss_prefix}_${target_stack}" | sudo tee -a /opt/srce/startup.config
 
 sudo sh /opt/srce/scripts/start-gsstools.sh
-
-echo "
-[monitor:///var/log/hpds-docker-logs]
-sourcetype = hms_app_logs
-source = hpds_logs
-index=hms_aws_${gss_prefix}
-" | sudo tee -a /opt/splunkforwarder/etc/system/local/inputs.conf
-
 sudo systemctl stop SplunkForwarder
 
 /opt/splunkforwarder/bin/splunk enable boot-start -systemd-managed 1 -user splunk || true
@@ -40,7 +32,8 @@ CONTAINER_NAME="open-hpds"
 HPDS_IMAGE=`sudo docker load < /home/centos/pic-sure-hpds.tar.gz | cut -d ' ' -f 3`
 sudo docker run --name=$CONTAINER_NAME \
                 --restart unless-stopped \
-                --log-driver syslog --log-opt tag=open-hpds \
+                -v /var/log/open-hpds/:/var/log/ \
+                --log-opt tag=open-hpds \
                 -v /opt/local/hpds:/opt/local/hpds \
                 -p 8080:8080 \
                 -e JAVA_OPTS=" -XX:+UseParallelGC -XX:SurvivorRatio=250 -Xms10g -Xmx40g -Dserver.port=8080 -Dspring.profiles.active=open -DCACHE_SIZE=2500 -DSMALL_TASK_THREADS=1 -DLARGE_TASK_THREADS=1 -DSMALL_JOB_LIMIT=100 -DID_BATCH_SIZE=5000 " \
