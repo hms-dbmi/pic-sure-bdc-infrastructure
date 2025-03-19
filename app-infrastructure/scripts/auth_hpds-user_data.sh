@@ -4,10 +4,6 @@ echo "SPLUNK_INDEX=hms_aws_${gss_prefix}" | sudo tee /opt/srce/startup.config
 echo "NESSUS_GROUP=${gss_prefix}_${target_stack}" | sudo tee -a /opt/srce/startup.config
 
 sudo sh /opt/srce/scripts/start-gsstools.sh
-sudo systemctl stop SplunkForwarder
-
-/opt/splunkforwarder/bin/splunk enable boot-start -systemd-managed 1 -user splunk || true
-
 echo "user-data progress starting update"
 
 s3_copy() {
@@ -17,7 +13,7 @@ s3_copy() {
 }
 
 mkdir -p /opt/local/hpds/all
-sudo mkdir -p /var/log/auth-hpds/
+sudo mkdir -p /var/log/picsure/auth-hpds/
 
 s3_copy s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-hpds.tar.gz /home/centos/pic-sure-hpds.tar.gz
 s3_copy s3://${stack_s3_bucket}/data/${dataset_s3_object_key}/javabins_rekeyed.tar /opt/local/hpds/javabins_rekeyed.tar
@@ -38,7 +34,7 @@ CONTAINER_NAME="auth-hpds"
 HPDS_IMAGE=`sudo docker load < /home/centos/pic-sure-hpds.tar.gz | cut -d ' ' -f 3`
 sudo docker run --name=$CONTAINER_NAME \
                 --restart unless-stopped \
-                -v /var/log/auth-hpds/:/var/log/ \
+                -v /var/log/picsure/auth-hpds/:/var/log/ \
                 --log-opt tag=auth-hpds \
                 -v /opt/local/hpds:/opt/local/hpds \
                 -p 8080:8080 \
@@ -69,8 +65,5 @@ while true; do
   fi
 done
 
-
-echo "Restart splunkforwarder service"
-sudo systemctl restart SplunkForwarder
 echo "user-data progress starting update"
 sudo yum -y update

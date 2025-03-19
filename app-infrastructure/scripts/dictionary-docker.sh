@@ -18,7 +18,7 @@ JAVA_OPTS=" -Xmx8g "
 sudo docker stop dictionary-api
 sudo docker rm dictionary-api
 sudo docker run \
-      -v /var/log/dictionary/:/var/log/ \
+      -v /var/log/picsure/dictionary/:/var/log/ \
       --log-opt tag=dictionary-api \
       -e JAVA_OPTS="$JAVA_OPTS" \
       --env-file /home/centos/picsure-dictionary.env \

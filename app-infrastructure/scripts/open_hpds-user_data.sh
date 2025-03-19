@@ -4,9 +4,6 @@ echo "SPLUNK_INDEX=hms_aws_${gss_prefix}" | sudo tee /opt/srce/startup.config
 echo "NESSUS_GROUP=${gss_prefix}_${target_stack}" | sudo tee -a /opt/srce/startup.config
 
 sudo sh /opt/srce/scripts/start-gsstools.sh
-sudo systemctl stop SplunkForwarder
-
-/opt/splunkforwarder/bin/splunk enable boot-start -systemd-managed 1 -user splunk || true
 
 s3_copy() {
   for i in {1..5}; do
@@ -28,12 +25,12 @@ INIT_START_TIME=$(date +%s)
 
 CONTAINER_NAME="open-hpds"
 
-sudo mkdir -p /var/log/open-hpds/
+sudo mkdir -p /var/log/picsure/open-hpds/
 
 HPDS_IMAGE=`sudo docker load < /home/centos/pic-sure-hpds.tar.gz | cut -d ' ' -f 3`
 sudo docker run --name=$CONTAINER_NAME \
                 --restart unless-stopped \
-                -v /var/log/open-hpds/:/var/log/ \
+                -v /var/log/picsure/open-hpds/:/var/log/ \
                 --log-opt tag=open-hpds \
                 -v /opt/local/hpds:/opt/local/hpds \
                 -p 8080:8080 \
@@ -64,8 +61,5 @@ while true; do
   fi
 done
 
-
-echo "Restart splunkforwarder service"
-sudo systemctl restart SplunkForwarder
 echo "user-data progress starting update"
 sudo yum -y update
