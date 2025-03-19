@@ -17,7 +17,7 @@ s3_copy() {
 }
 
 mkdir -p /opt/local/hpds/all
-mkdir -p /var/log/auth-hpds/
+sudo mkdir -p /var/log/auth-hpds/
 
 s3_copy s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-hpds.tar.gz /home/centos/pic-sure-hpds.tar.gz
 s3_copy s3://${stack_s3_bucket}/data/${dataset_s3_object_key}/javabins_rekeyed.tar /opt/local/hpds/javabins_rekeyed.tar
