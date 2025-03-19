@@ -28,7 +28,7 @@ INIT_START_TIME=$(date +%s)
 
 CONTAINER_NAME="open-hpds"
 
-mkdir -p /var/log/open-hpds/
+sudo mkdir -p /var/log/open-hpds/
 
 HPDS_IMAGE=`sudo docker load < /home/centos/pic-sure-hpds.tar.gz | cut -d ' ' -f 3`
 sudo docker run --name=$CONTAINER_NAME \
