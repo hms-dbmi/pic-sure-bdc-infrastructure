@@ -18,11 +18,12 @@ JAVA_OPTS=" -Xmx8g "
 sudo docker stop dictionary-api
 sudo docker rm dictionary-api
 sudo docker run \
+      -v /var/log/picsure/dictionary/:/var/log/ \
+      --log-opt tag=dictionary-api \
       -e JAVA_OPTS="$JAVA_OPTS" \
       --env-file /home/centos/picsure-dictionary.env \
       --name dictionary-api \
       --restart always \
       --network picsure \
-      --log-driver syslog --log-opt tag=dictionary-api \
       --restart always \
       -d $DICTIONARY_API_IMAGE
