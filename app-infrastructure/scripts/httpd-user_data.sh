@@ -4,21 +4,12 @@ echo "SPLUNK_INDEX=hms_aws_${gss_prefix}" | sudo tee /opt/srce/startup.config
 echo "NESSUS_GROUP=${gss_prefix}_${target_stack}" | sudo tee -a /opt/srce/startup.config
 
 sudo sh /opt/srce/scripts/start-gsstools.sh
-
-echo "
-[monitor:///var/log/httpd-docker-logs/]
-sourcetype = hms_app_logs
-source = httpd_logs
-index=hms_aws_${gss_prefix}
-" | sudo tee -a /opt/splunkforwarder/etc/system/local/inputs.conf
-
 sudo systemctl stop SplunkForwarder
-
 /opt/splunkforwarder/bin/splunk enable boot-start -systemd-managed 1 -user splunk || true
 
-
 mkdir -p /usr/local/docker-config/cert
-mkdir -p /var/log/httpd-docker-logs/ssl_mutex
+sudo mkdir -p /var/log/picsure/httpd/
+sudo mkdir -p /var/log/picsure/httpd/ssl_mutex
 
 s3_copy() {
   for i in {1..5}; do
@@ -35,8 +26,6 @@ s3_copy s3://${stack_s3_bucket}/data/${dataset_s3_object_key}/fence_mapping.json
 s3_copy s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/httpd-docker.sh /home/centos/httpd-docker.sh
 
 for i in 1 2 3 4 5; do echo "confirming wildfly resolvable" && sudo curl --connect-timeout 1 $(grep -A30 preprod /usr/local/docker-config/httpd-vhosts.conf | grep wildfly | grep api | cut -d "\"" -f 2 | sed 's/pic-sure-api-2.*//') || if [ $? = 6 ]; then (exit 1); fi && break || sleep 60; done
-
-sudo mkdir -p /var/log/httpd-docker-logs
 
 sudo chmod +x /home/centos/httpd-docker.sh
 sudo /home/centos/httpd-docker.sh "${stack_s3_bucket}" "${stack_githash}"

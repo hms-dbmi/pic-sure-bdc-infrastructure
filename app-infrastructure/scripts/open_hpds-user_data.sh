@@ -5,17 +5,6 @@ echo "NESSUS_GROUP=${gss_prefix}_${target_stack}" | sudo tee -a /opt/srce/startu
 
 sudo sh /opt/srce/scripts/start-gsstools.sh
 
-echo "
-[monitor:///var/log/hpds-docker-logs]
-sourcetype = hms_app_logs
-source = hpds_logs
-index=hms_aws_${gss_prefix}
-" | sudo tee -a /opt/splunkforwarder/etc/system/local/inputs.conf
-
-sudo systemctl stop SplunkForwarder
-
-/opt/splunkforwarder/bin/splunk enable boot-start -systemd-managed 1 -user splunk || true
-
 s3_copy() {
   for i in {1..5}; do
     sudo /usr/bin/aws --region us-east-1 s3 cp $* && break || sleep 30
@@ -23,7 +12,6 @@ s3_copy() {
 }
 
 s3_copy s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-hpds.tar.gz /home/centos/pic-sure-hpds.tar.gz
-
 s3_copy s3://${stack_s3_bucket}/data/${destigmatized_dataset_s3_object_key}/destigmatized_javabins_rekeyed.tar /opt/local/hpds/destigmatized_javabins_rekeyed.tar
 
 cd /opt/local/hpds
@@ -37,10 +25,13 @@ INIT_START_TIME=$(date +%s)
 
 CONTAINER_NAME="open-hpds"
 
+sudo mkdir -p /var/log/picsure/open-hpds/
+
 HPDS_IMAGE=`sudo docker load < /home/centos/pic-sure-hpds.tar.gz | cut -d ' ' -f 3`
 sudo docker run --name=$CONTAINER_NAME \
                 --restart unless-stopped \
-                --log-driver syslog --log-opt tag=open-hpds \
+                -v /var/log/picsure/open-hpds/:/var/log/ \
+                --log-opt tag=open-hpds \
                 -v /opt/local/hpds:/opt/local/hpds \
                 -p 8080:8080 \
                 -e JAVA_OPTS=" -XX:+UseParallelGC -XX:SurvivorRatio=250 -Xms10g -Xmx40g -Dserver.port=8080 -Dspring.profiles.active=open -DCACHE_SIZE=2500 -DSMALL_TASK_THREADS=1 -DLARGE_TASK_THREADS=1 -DSMALL_JOB_LIMIT=100 -DID_BATCH_SIZE=5000 " \
@@ -70,8 +61,5 @@ while true; do
   fi
 done
 
-
-echo "Restart splunkforwarder service"
-sudo systemctl restart SplunkForwarder
 echo "user-data progress starting update"
 sudo yum -y update
