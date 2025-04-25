@@ -37,6 +37,7 @@ CONTAINER_NAME=psama
 podman rm -f $CONTAINER_NAME || true
 
 podman run -u root --privileged --name=$CONTAINER_NAME --network=picsure \
+    --dns=10.89.0.1 \
     --env-file /opt/picsure/psama.env \
     -v /var/log/picsure/psama/:/var/log/:Z \
     -e JAVA_OPTS="$PSAMA_OPTS" \

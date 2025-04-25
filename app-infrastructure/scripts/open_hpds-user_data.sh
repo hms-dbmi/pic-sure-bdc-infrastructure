@@ -22,11 +22,16 @@ cd ~
 INIT_MESSAGE="WebApplicationContext: initialization completed"
 INIT_TIMEOUT_SEX=2400  # Set your desired timeout in seconds
 INIT_START_TIME=$(date +%s)
-HPDS_IMAGE=`podman load < /home/centos/pic-sure-hpds.tar.gz | cut -d ' ' -f 3`
+HPDS_IMAGE=`podman load < /opt/picsure/pic-sure-hpds.tar.gz | cut -d ' ' -f 3`
 
 CONTAINER_NAME="open-hpds"
 
 mkdir -p /var/log/picsure/open-hpds/
+
+chmod 644 /opt/local/hpds/*
+chmod 644 /opt/local/hpds/all/*
+chmod 644 /opt/picsure/*
+
 
 podman run --name=$CONTAINER_NAME \
                 -v /var/log/picsure/open-hpds/:/var/log/:Z \

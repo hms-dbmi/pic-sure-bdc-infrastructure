@@ -20,6 +20,7 @@ JAVA_OPTS=" -Xmx8g "
 podman rm -f $CONTAINER_NAME | true
 
 podman run --privileged --name=$CONTAINER_NAME \
+      --dns=10.89.0.1 \
       --log-opt tag=$CONTAINER_NAME \
       --env-file /opt/picsure/picsure-dictionary.env \
       --name dictionary-api \
