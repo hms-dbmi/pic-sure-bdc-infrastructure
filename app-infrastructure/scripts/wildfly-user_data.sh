@@ -1,5 +1,5 @@
 #!/bin/bash
-
+echo "ENABLE_PODMAN=true" | sudo tee -a /opt/srce/startup.config
 echo "SPLUNK_INDEX=hms_aws_${gss_prefix}" | sudo tee /opt/srce/startup.config
 echo "NESSUS_GROUP=${gss_prefix}_${target_stack}" | sudo tee -a /opt/srce/startup.config
 
@@ -22,17 +22,17 @@ sudo mkswap /swapfile
 sudo swapon /swapfile
 
 # make picsure network
-sudo docker network create picsure
+# podman network create picsure
 sudo mkdir -p /var/log/picsure/{wildfly,psama}
 
 # Download the wildfly and psama docker scripts
-s3_copy s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/wildfly-docker.sh /home/centos/wildfly-docker.sh
-s3_copy s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/psama-docker.sh /home/centos/psama-docker.sh
-s3_copy s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/dictionary-docker.sh /home/centos/dictionary-docker.sh
+s3_copy s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/wildfly-docker.sh /opt/picsure/wildfly-docker.sh
+s3_copy s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/psama-docker.sh /opt/picsure/psama-docker.sh
+s3_copy s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/dictionary-docker.sh /opt/picsure/dictionary-docker.sh
 
-sudo chmod +x /home/centos/wildfly-docker.sh
-sudo chmod +x /home/centos/psama-docker.sh
-sudo chmod +x /home/centos/dictionary-docker.sh
+sudo chmod +x /opt/picsure/wildfly-docker.sh
+sudo chmod +x /opt/picsure/psama-docker.sh
+sudo chmod +x /opt/picsure/dictionary-docker.sh
 
 target_stack="${target_stack}"
 env_private_dns_name="${env_private_dns_name}"
@@ -40,9 +40,9 @@ stack_s3_bucket="${stack_s3_bucket}"
 stack_githash="${stack_githash}"
 dataset_s3_object_key="${dataset_s3_object_key}"
 
-sudo /home/centos/wildfly-docker.sh "$target_stack" "$env_private_dns_name" "$stack_s3_bucket" "$stack_githash" "$dataset_s3_object_key"
-sudo /home/centos/psama-docker.sh "$stack_s3_bucket"
-sudo /home/centos/dictionary-docker.sh "$stack_s3_bucket"
+sudo /opt/picsure/wildfly-docker.sh "$target_stack" "$env_private_dns_name" "$stack_s3_bucket" "$stack_githash" "$dataset_s3_object_key"
+sudo /opt/picsure/psama-docker.sh "$stack_s3_bucket"
+sudo /opt/picsure/dictionary-docker.sh "$stack_s3_bucket"
 
 INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)
 sudo /usr/bin/aws --region=us-east-1 ec2 create-tags --resources $${INSTANCE_ID} --tags Key=InitComplete,Value=true

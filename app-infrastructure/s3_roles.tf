@@ -105,6 +105,18 @@ resource "aws_iam_role_policy" "httpd-deployment-s3-policy" {
       ],
       "Effect": "Allow",
       "Resource": "arn:aws:ec2:*:*:instance/*"
+    },
+    {
+        "Sid": "SharedParameterAccess",
+        "Effect": "Allow",
+        "Action": [
+            "ssm:GetParameter",
+            "kms:Decrypt"
+        ],
+        "Resource": [
+            "arn:aws:ssm:us-east-1:752463128620:parameter/org/srce/*",
+            "arn:aws:kms:us-east-1:752463128620:key/3379fd31-06ba-45fc-bbb1-903665775ef8"
+        ]
     }
   ]
 }
@@ -204,6 +216,18 @@ resource "aws_iam_role_policy" "auth-hpds-deployment-s3-policy" {
       ],
       "Effect": "Allow",
       "Resource": "arn:aws:ec2:*:*:instance/*"
+    },
+    {
+        "Sid": "SharedParameterAccess",
+        "Effect": "Allow",
+        "Action": [
+            "ssm:GetParameter",
+            "kms:Decrypt"
+        ],
+        "Resource": [
+            "arn:aws:ssm:us-east-1:752463128620:parameter/org/srce/*",
+            "arn:aws:kms:us-east-1:752463128620:key/3379fd31-06ba-45fc-bbb1-903665775ef8"
+        ]
     }
   ]
 }
@@ -290,6 +314,18 @@ resource "aws_iam_role_policy" "open-hpds-deployment-s3-policy" {
       ],
       "Effect": "Allow",
       "Resource": "arn:aws:ec2:*:*:instance/*"
+    },
+    {
+        "Sid": "SharedParameterAccess",
+        "Effect": "Allow",
+        "Action": [
+            "ssm:GetParameter",
+            "kms:Decrypt"
+        ],
+        "Resource": [
+            "arn:aws:ssm:us-east-1:752463128620:parameter/org/srce/*",
+            "arn:aws:kms:us-east-1:752463128620:key/3379fd31-06ba-45fc-bbb1-903665775ef8"
+        ]
     }
   ]
 }

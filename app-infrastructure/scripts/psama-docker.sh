@@ -10,11 +10,11 @@ s3_copy() {
   done
 }
 
-s3_copy "s3://${stack_s3_bucket}/configs/psama/psama.env" "/home/centos/psama.env"
-s3_copy "s3://${stack_s3_bucket}/releases/psama/psama.tar.gz" "/home/centos/psama.tar.gz"
+s3_copy "s3://${stack_s3_bucket}/configs/psama/psama.env" "/opt/picsure/psama.env"
+s3_copy "s3://${stack_s3_bucket}/releases/psama/psama.tar.gz" "/opt/picsure/psama.tar.gz"
 
 # This script is responsible for starting or updating the psama container
-PSAMA_IMAGE=$(sudo docker load < /home/centos/psama.tar.gz | cut -d ' ' -f 3)
+PSAMA_IMAGE=$(podman load < /opt/picsure/psama.tar.gz | cut -d ' ' -f 3)
 PSAMA_OPTS="-Xms1g -Xmx2g -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=512m -Djava.net.preferIPv4Stack=true"
 
 # Add remote debugging options if enabled.
@@ -30,14 +30,32 @@ else
   PSAMA_OPTS="$PSAMA_OPTS -Dspring.profiles.active=$spring_profile"
 fi
 
-# Stop and remove the existing psama container if it exists
-sudo docker stop psama || true
-sudo docker rm psama || true
-sudo docker run -u root --name=psama --restart always --network=picsure \
---env-file /home/centos/psama.env \
--v /var/log/picsure/psama/:/var/log/ \
--e JAVA_OPTS="$PSAMA_OPTS" \
---log-opt tag=psama \
--v /home/centos/fence_mapping.json:/config/fence_mapping.json \
-$PSAMA_PORTS \
--d $PSAMA_IMAGE
+CONTAINER_NAME=psama
+
+podman rm -f $CONTAINER_NAME || true
+
+podman run -u root --name=$CONTAINER_NAME --network=podman \
+    --env-file /opt/picsure/psama.env:Z \
+    -v /var/log/picsure/psama/:/var/log/:Z \
+    -e JAVA_OPTS="$PSAMA_OPTS" \
+    --log-opt tag=$CONTAINER_NAME \
+    -v /opt/picsure/fence_mapping.json:/config/fence_mapping.json:z \
+    $PSAMA_PORTS \
+    -d $PSAMA_IMAGE
+
+# systemd setup.
+podman generate systemd --name $CONTAINER_NAME --restart-policy=always --files
+
+sudo mv container-$CONTAINER_NAME.service /etc/systemd/system/
+
+sudo restorecon -v /etc/systemd/system/container-$CONTAINER_NAME.service
+
+sudo mv container-$CONTAINER_NAME.service /etc/systemd/system/
+sudo systemctl daemon-reexec
+sudo systemctl daemon-reload
+sudo systemctl enable container-$CONTAINER_NAME.service
+sudo systemctl restart container-$CONTAINER_NAME.service
+
+echo "Verifying container-$CONTAINER_NAME.service status..."
+sudo systemctl is-enabled container-$CONTAINER_NAME.service
+sudo systemctl status container-$CONTAINER_NAME.service --no-pager
