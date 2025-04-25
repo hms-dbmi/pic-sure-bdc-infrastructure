@@ -22,6 +22,8 @@ sudo mkswap /swapfile
 sudo swapon /swapfile
 
 # podman network create picsure
+# explicit subnet and gateway to ensure networking works
+# enable dns resolution so containers on the network can resolve one another.
 podman network create \
   --driver=bridge \
   --subnet=10.89.0.0/24 \
