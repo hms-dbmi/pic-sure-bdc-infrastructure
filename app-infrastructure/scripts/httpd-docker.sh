@@ -5,7 +5,7 @@ stack_githash=$2
 
 s3_copy() {
   for i in {1..5}; do
-    sudo /usr/bin/aws --region us-east-1 s3 cp $* && break || sleep 30
+    sudo /usr/bin/aws --region us-east-1 s3 cp "$@" --no-progress && break || sleep 30
   done
 }
 

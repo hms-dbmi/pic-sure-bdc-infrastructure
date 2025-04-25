@@ -7,13 +7,9 @@ sudo sh /opt/srce/scripts/start-gsstools.sh
 
 s3_copy() {
   for i in {1..5}; do
-    sudo /usr/bin/aws --region us-east-1 s3 cp $* && break || sleep 30
+    sudo /usr/bin/aws --region us-east-1 s3 cp "$@" --no-progress && break || sleep 30
   done
 }
-# sleep for awhile because as these files are could still be in the process of being rendered.
-# containerize already.
-echo "waiting for terraform to render files"
-sleep 60
 
 # Add swap space
 sudo dd if=/dev/zero of=/swapfile count=15360 bs=1MiB

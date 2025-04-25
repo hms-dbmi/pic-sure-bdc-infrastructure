@@ -13,12 +13,9 @@ sudo mkdir -p /var/log/picsure/httpd/ssl_mutex
 
 s3_copy() {
   for i in {1..5}; do
-    sudo /usr/bin/aws --region us-east-1 s3 cp $* && break || sleep 30
+    sudo /usr/bin/aws --region us-east-1 s3 cp "$@" --no-progress && break || sleep 30
   done
 }
-# sleep for awhile as these files could still be in the process of being rendered.
-echo "waiting for terraform to render files"
-sleep 60
 
 s3_copy s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/httpd-vhosts.conf /usr/local/docker-config/httpd-vhosts.conf
 s3_copy s3://${stack_s3_bucket}/certs/httpd/ /usr/local/docker-config/cert/ --recursive
