@@ -26,7 +26,7 @@ CONTAINER_NAME=wildfly
 
 podman rm -f $CONTAINER_NAME
 
-podman run -u root --name=$CONTAINER_NAME --network=podman \
+podman run -u root --name=$CONTAINER_NAME --network=picsure \
     --log-opt tag=$CONTAINER_NAME \
     -v /var/log/picsure/wildfly/:/opt/jboss/wildfly/standalone/log/:Z \
     -v /opt/picsure/standalone.xml:/opt/jboss/wildfly/standalone/configuration/standalone.xml:Z \

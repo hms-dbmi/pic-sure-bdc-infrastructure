@@ -41,7 +41,6 @@ CONTAINER_NAME="auth-hpds"
 podman rm -f $CONTAINER_NAME || true
 
 podman run -u root --privileged --name=$CONTAINER_NAME \
-
                 -v /var/log/picsure/auth-hpds/:/var/log/:Z \
                 --log-opt tag=auth-hpds \
                 -v /opt/local/hpds:/opt/local/hpds:Z \

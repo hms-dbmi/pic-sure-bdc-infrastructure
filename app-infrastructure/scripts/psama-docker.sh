@@ -13,6 +13,8 @@ s3_copy() {
 s3_copy "s3://${stack_s3_bucket}/configs/psama/psama.env" "/opt/picsure/psama.env"
 s3_copy "s3://${stack_s3_bucket}/releases/psama/psama.tar.gz" "/opt/picsure/psama.tar.gz"
 
+chmod 644 "/opt/picsure/psama.env"
+chmod 644 "/opt/picsure/psama.tar.gz"
 # This script is responsible for starting or updating the psama container
 PSAMA_IMAGE=$(podman load < /opt/picsure/psama.tar.gz | cut -d ' ' -f 3)
 PSAMA_OPTS="-Xms1g -Xmx2g -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=512m -Djava.net.preferIPv4Stack=true"
@@ -34,8 +36,8 @@ CONTAINER_NAME=psama
 
 podman rm -f $CONTAINER_NAME || true
 
-podman run -u root --name=$CONTAINER_NAME --network=podman \
-    --env-file /opt/picsure/psama.env:Z \
+podman run -u root --privileged --name=$CONTAINER_NAME --network=picsure \
+    --env-file /opt/picsure/psama.env \
     -v /var/log/picsure/psama/:/var/log/:Z \
     -e JAVA_OPTS="$PSAMA_OPTS" \
     --log-opt tag=$CONTAINER_NAME \
