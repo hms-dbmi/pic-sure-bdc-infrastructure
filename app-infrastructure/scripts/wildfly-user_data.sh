@@ -28,7 +28,6 @@ podman network create \
   --driver=bridge \
   --subnet=10.89.0.0/24 \
   --gateway=10.89.0.1 \
-  --opt dns_enabled=true \
   picsure
 
 PODMAN_IFNAME=$(podman network inspect picsure | jq -r '.[0].network_interface')
