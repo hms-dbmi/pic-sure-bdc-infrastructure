@@ -26,8 +26,8 @@ podman network create picsure
 
 PODMAN_IFNAME=$(podman network inspect picsure | jq -r '.[0].network_interface')
 
-nft add rule inet filter forward iifname "${PODMAN_IFNAME}" accept
-nft add rule inet filter forward oifname "${PODMAN_IFNAME}" accept
+nft add rule inet filter forward iifname "$${PODMAN_IFNAME}" accept
+nft add rule inet filter forward oifname "$${PODMAN_IFNAME}" accept
 
 nft list ruleset > /etc/nftables/nftables.rules
 systemctl restart nftables
