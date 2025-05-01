@@ -1,17 +1,17 @@
 #!/bin/bash
-
-echo "SPLUNK_INDEX=hms_aws_${gss_prefix}" | sudo tee /opt/srce/startup.config
+echo "ENABLE_PODMAN=true" | sudo tee -a /opt/srce/startup.config
+echo "SPLUNK_INDEX=hms_aws_${gss_prefix}" | sudo tee -a /opt/srce/startup.config
 echo "NESSUS_GROUP=${gss_prefix}_${target_stack}" | sudo tee -a /opt/srce/startup.config
 
 sudo sh /opt/srce/scripts/start-gsstools.sh
 
 s3_copy() {
   for i in {1..5}; do
-    sudo /usr/bin/aws --region us-east-1 s3 cp $* && break || sleep 30
+    sudo /usr/bin/aws --region us-east-1 s3 cp "$@" --no-progress && break || sleep 30
   done
 }
 
-s3_copy s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-hpds.tar.gz /home/centos/pic-sure-hpds.tar.gz
+s3_copy s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-hpds.tar.gz /opt/picsure/pic-sure-hpds.tar.gz
 s3_copy s3://${stack_s3_bucket}/data/${destigmatized_dataset_s3_object_key}/destigmatized_javabins_rekeyed.tar /opt/local/hpds/destigmatized_javabins_rekeyed.tar
 
 cd /opt/local/hpds
@@ -22,20 +22,40 @@ cd ~
 INIT_MESSAGE="WebApplicationContext: initialization completed"
 INIT_TIMEOUT_SEX=2400  # Set your desired timeout in seconds
 INIT_START_TIME=$(date +%s)
+HPDS_IMAGE=`podman load < /opt/picsure/pic-sure-hpds.tar.gz | cut -d ' ' -f 3`
 
 CONTAINER_NAME="open-hpds"
 
-sudo mkdir -p /var/log/picsure/open-hpds/
+mkdir -p /var/log/picsure/open-hpds/
 
-HPDS_IMAGE=`sudo docker load < /home/centos/pic-sure-hpds.tar.gz | cut -d ' ' -f 3`
-sudo docker run --name=$CONTAINER_NAME \
-                --restart unless-stopped \
-                -v /var/log/picsure/open-hpds/:/var/log/ \
+chmod 644 /opt/local/hpds/*
+chmod 644 /opt/local/hpds/all/*
+chmod 644 /opt/picsure/*
+
+
+podman run --name=$CONTAINER_NAME \
+                -v /var/log/picsure/open-hpds/:/var/log/:Z \
                 --log-opt tag=open-hpds \
-                -v /opt/local/hpds:/opt/local/hpds \
+                -v /opt/local/hpds:/opt/local/hpds:Z \
                 -p 8080:8080 \
                 -e JAVA_OPTS=" -XX:+UseParallelGC -XX:SurvivorRatio=250 -Xms10g -Xmx40g -Dserver.port=8080 -Dspring.profiles.active=open -DCACHE_SIZE=2500 -DSMALL_TASK_THREADS=1 -DLARGE_TASK_THREADS=1 -DSMALL_JOB_LIMIT=100 -DID_BATCH_SIZE=5000 " \
                 -d $HPDS_IMAGE
+
+# systemd setup.
+podman generate systemd --name $CONTAINER_NAME --restart-policy=always --files
+
+sudo mv container-$CONTAINER_NAME.service /etc/systemd/system/
+
+sudo restorecon -v /etc/systemd/system/container-$CONTAINER_NAME.service
+
+sudo systemctl daemon-reexec
+sudo systemctl daemon-reload
+sudo systemctl enable container-$CONTAINER_NAME.service
+sudo systemctl restart container-$CONTAINER_NAME.service
+
+echo "Verifying container-$CONTAINER_NAME.service status..."
+sudo systemctl is-enabled container-$CONTAINER_NAME.service
+sudo systemctl status container-$CONTAINER_NAME.service --no-pager
 
 echo "Waiting for container to initialize"
 while true; do

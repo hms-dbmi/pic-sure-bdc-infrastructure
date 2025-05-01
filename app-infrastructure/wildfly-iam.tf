@@ -177,6 +177,18 @@ resource "aws_iam_role_policy" "wildfly-deployment-s3-policy" {
       ],
       "Effect": "Allow",
       "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/jenkins_pipeline_build_${var.stack_githash_long}/wildfly-docker.sh"
+    },
+    {
+        "Sid": "SharedParameterAccess",
+        "Effect": "Allow",
+        "Action": [
+            "ssm:GetParameter",
+            "kms:Decrypt"
+        ],
+        "Resource": [
+            "arn:aws:ssm:us-east-1:752463128620:parameter/org/srce/*",
+            "arn:aws:kms:us-east-1:752463128620:key/3379fd31-06ba-45fc-bbb1-903665775ef8"
+        ]
     }
   ]
 }

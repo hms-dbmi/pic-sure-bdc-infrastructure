@@ -9,26 +9,46 @@ dataset_s3_object_key=$5
 
 s3_copy() {
   for i in {1..5}; do
-    sudo /usr/bin/aws --region us-east-1 s3 cp $* && break || sleep 30
+    sudo /usr/bin/aws --region us-east-1 s3 cp "$@" --no-progress && break || sleep 30
   done
 }
 
-s3_copy "s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-wildfly.tar.gz" "/home/centos/pic-sure-wildfly.tar.gz"
-s3_copy "s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/standalone.xml" "/home/centos/standalone.xml"
-s3_copy "s3://${stack_s3_bucket}/data/${dataset_s3_object_key}/fence_mapping.json" "/home/centos/fence_mapping.json"
-s3_copy "s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/aggregate-resource.properties" "/home/centos/aggregate-resource.properties"
-s3_copy "s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/visualization-resource.properties" "/home/centos/visualization-resource.properties"
+s3_copy "s3://${stack_s3_bucket}/releases/jenkins_pipeline_build_${stack_githash}/pic-sure-wildfly.tar.gz" "/opt/picsure/pic-sure-wildfly.tar.gz"
+s3_copy "s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/standalone.xml" "/opt/picsure/standalone.xml"
+s3_copy "s3://${stack_s3_bucket}/data/${dataset_s3_object_key}/fence_mapping.json" "/opt/picsure/fence_mapping.json"
+s3_copy "s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/aggregate-resource.properties" "/opt/picsure/aggregate-resource.properties"
+s3_copy "s3://${stack_s3_bucket}/configs/jenkins_pipeline_build_${stack_githash}/visualization-resource.properties" "/opt/picsure/visualization-resource.properties"
 
 
-WILDFLY_IMAGE=`sudo docker load < /home/centos/pic-sure-wildfly.tar.gz | cut -d ' ' -f 3`
+WILDFLY_IMAGE=`podman load < /opt/picsure/pic-sure-wildfly.tar.gz | cut -d ' ' -f 3`
 JAVA_OPTS="-Xms2g -Xmx24g -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=1024m -Djava.net.preferIPv4Stack=true -DTARGET_STACK=${target_stack}.${env_private_dns_name}"
+CONTAINER_NAME=wildfly
 
-sudo docker run -u root --name=wildfly --network=picsure \
-                        --restart unless-stopped \
-                        --log-opt tag=wildfly \
-                        -v /var/log/picsure/wildfly/:/opt/jboss/wildfly/standalone/log/ \
-                        -v /home/centos/standalone.xml:/opt/jboss/wildfly/standalone/configuration/standalone.xml \
-                        -v /home/centos/fence_mapping.json:/usr/local/docker-config/fence_mapping.json \
-                        -v /home/centos/aggregate-resource.properties:/opt/jboss/wildfly/standalone/configuration/aggregate-data-sharing/pic-sure-aggregate-resource/resource.properties \
-                        -v /home/centos/visualization-resource.properties:/opt/jboss/wildfly/standalone/configuration/visualization/pic-sure-visualization-resource/resource.properties \
-                        -p 8080:8080 -e JAVA_OPTS="$JAVA_OPTS" -d $WILDFLY_IMAGE
+podman rm -f $CONTAINER_NAME
+
+podman run -u root --name=$CONTAINER_NAME --network=picsure \
+    --dns=10.89.0.1 \
+    --log-opt tag=$CONTAINER_NAME \
+    -v /var/log/picsure/wildfly/:/opt/jboss/wildfly/standalone/log/:Z \
+    -v /opt/picsure/standalone.xml:/opt/jboss/wildfly/standalone/configuration/standalone.xml:Z \
+    -v /opt/picsure/fence_mapping.json:/usr/local/docker-config/fence_mapping.json:z \
+    -v /opt/picsure/aggregate-resource.properties:/opt/jboss/wildfly/standalone/configuration/aggregate-data-sharing/pic-sure-aggregate-resource/resource.properties:Z \
+    -v /opt/picsure/visualization-resource.properties:/opt/jboss/wildfly/standalone/configuration/visualization/pic-sure-visualization-resource/resource.properties:Z \
+    -p 8080:8080 -e JAVA_OPTS="$JAVA_OPTS" -d $WILDFLY_IMAGE
+
+# systemd setup.
+podman generate systemd --name $CONTAINER_NAME --restart-policy=always --files
+
+sudo mv container-$CONTAINER_NAME.service /etc/systemd/system/
+
+sudo restorecon -v /etc/systemd/system/container-$CONTAINER_NAME.service
+
+sudo mv container-$CONTAINER_NAME.service /etc/systemd/system/
+sudo systemctl daemon-reexec
+sudo systemctl daemon-reload
+sudo systemctl enable container-$CONTAINER_NAME.service
+sudo systemctl restart container-$CONTAINER_NAME.service
+
+echo "Verifying container-$CONTAINER_NAME.service status..."
+sudo systemctl is-enabled container-$CONTAINER_NAME.service
+sudo systemctl status container-$CONTAINER_NAME.service --no-pager
