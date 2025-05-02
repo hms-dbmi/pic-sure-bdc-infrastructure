@@ -26,10 +26,30 @@ sudo systemctl stop SplunkForwarder
 
 /opt/splunkforwarder/bin/splunk enable boot-start -systemd-managed 1 -user splunk  || true
 
+# Check if S3 object exists before attempting to copy it
+check_s3_exists() {
+  sudo /usr/bin/aws --region us-east-1 s3 ls "$1" >/dev/null 2>&1
+}
+
+# Copy S3 objects in parallel
+s3_copy_parallel() {
+  local src="$1"
+  local dest="$2"
+  shift 2
+  if check_s3_exists "$src"; then
+    sudo /usr/bin/aws --region us-east-1 s3 cp "$src" "$dest" --no-progress "$@" &
+  else
+    echo "Warning: $src does not exist, retrying..."
+    return 1
+  fi
+}
+
+# Main S3 copy function with retries
 s3_copy() {
   for i in {1..5}; do
-    sudo /usr/bin/aws --region us-east-1 s3 cp "$@" --no-progress && break || sleep 30
+    s3_copy_parallel "$@" && break || sleep 10
   done
+  wait
 }
 
 # Add swap space
