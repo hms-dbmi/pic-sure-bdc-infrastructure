@@ -39,7 +39,7 @@ sudo mkswap /swapfile
 sudo swapon /swapfile
 
 sudo docker network create picsure
-sudo mkdir /var/log/{wildfly-docker-logs,wildfly-docker-os-logs,psama-docker-logs,psama-docker-os-logs}
+sudo mkdir -p /var/log/picsure/{wildfly,psama,dictionary}
 
 s3_copy "s3://${stack_s3_bucket}/${target_stack}/scripts/deploy-wildfly.sh" "/opt/picsure/deploy-wildfly.sh"
 s3_copy "s3://${stack_s3_bucket}/${target_stack}/scripts/deploy-psama.sh" "/opt/picsure/deploy-psama.sh"

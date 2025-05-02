@@ -16,7 +16,8 @@ sudo systemctl stop SplunkForwarder
 /opt/splunkforwarder/bin/splunk enable boot-start -systemd-managed 1 -user splunk || true
 
 mkdir -p /usr/local/docker-config/cert
-mkdir -p /var/log/httpd-docker-logs/ssl_mutex
+sudo mkdir -p /var/log/picsure/httpd/
+sudo mkdir -p /var/log/picsure/httpd/ssl_mutex
 
 s3_copy() {
   for i in {1..5}; do
@@ -28,7 +29,6 @@ s3_copy "s3://${stack_s3_bucket}/${target_stack}/scripts/deploy-httpd.sh" "/opt/
 
 for i in 1 2 3 4 5; do echo "confirming wildfly resolvable" && sudo curl --connect-timeout 1 "$(grep -A30 preprod /usr/local/docker-config/httpd-vhosts.conf | grep wildfly | grep api | cut -d "\"" -f 2 | sed 's/pic-sure-api-2.*//')" || if [ $? = 6 ]; then (exit 1); fi && break || sleep 60; done
 
-sudo mkdir -p /var/log/httpd-docker-logs
 sudo chmod +x /opt/picsure/deploy-httpd.sh
 sudo /opt/picsure/deploy-httpd.sh --stack_s3_bucket "${stack_s3_bucket}" --target_stack "${target_stack}"
 

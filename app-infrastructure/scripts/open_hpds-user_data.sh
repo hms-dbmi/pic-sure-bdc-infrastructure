@@ -23,6 +23,8 @@ INIT_MESSAGE="WebApplicationContext: initialization completed"
 INIT_TIMEOUT_SEX=2400  # Set your desired timeout in seconds
 INIT_START_TIME=$(date +%s)
 
+sudo mkdir -p /var/log/picsure/open-hpds/
+
 s3_copy "s3://${stack_s3_bucket}/${target_stack}/scripts/deploy-open-hpds.sh" "/opt/picsure/deploy-open-hpds.sh"
 sudo chmod +x /opt/picsure/deploy-open-hpds.sh
 sudo /opt/picsure/deploy-open-hpds.sh \
