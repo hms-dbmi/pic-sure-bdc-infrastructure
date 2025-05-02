@@ -9,9 +9,9 @@ echo "user-data progress finished docker install enabling docker service"
 sudo systemctl enable docker
 echo "user-data progress finished enabling docker service starting docker"
 sudo service docker start
-sudo mkdir /home/centos/wildfly
+sudo mkdir /opt/picsure/wildfly
 sudo chown centos:centos -R /home/centos
-cd /home/centos/wildfly
+cd /opt/picsure/wildfly
 sudo yum -y install python3-pip
 sudo pip3 install --no-input awscli --upgrade
 # not sure why the binary was installing without exec privileges

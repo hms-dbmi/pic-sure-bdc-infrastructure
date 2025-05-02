@@ -16,19 +16,11 @@ echo "export ENV_PRIVATE_DNS_NAME=$env_private_dns_name" >> /etc/environment
 echo "export GSS_PREFIX=$gss_prefix" >> /etc/environment
 echo "export TARGET_STACK=$target_stack" >> /etc/environment
 
-
-echo "SPLUNK_INDEX=hms_aws_$gss_prefix" | sudo tee /opt/srce/startup.config
+echo "ENABLE_PODMAN=true" | sudo tee -a /opt/srce/startup.config
+echo "SPLUNK_INDEX=hms_aws_$gss_prefix" | sudo tee -a /opt/srce/startup.config
 echo "NESSUS_GROUP=${gss_prefix}_${target_stack}" | sudo tee -a /opt/srce/startup.config
 
 sudo sh /opt/srce/scripts/start-gsstools.sh
-
-echo "
-[monitor:///var/log/hpds-docker-logs]
-sourcetype = hms_app_logs
-source = hpds_logs
-index=hms_aws_${gss_prefix}
-" | sudo tee -a /opt/splunkforwarder/etc/system/local/inputs.conf
-
 sudo systemctl stop SplunkForwarder
 
 /opt/splunkforwarder/bin/splunk enable boot-start -systemd-managed 1 -user splunk || true
@@ -37,7 +29,7 @@ echo "user-data progress starting update"
 
 s3_copy() {
   for i in {1..5}; do
-    sudo /usr/bin/aws --region us-east-1 s3 cp $* && break || sleep 30
+    sudo /usr/bin/aws --region us-east-1 s3 cp "$@" --no-progress && break || sleep 30
   done
 }
 
@@ -53,9 +45,10 @@ INIT_MESSAGE="WebApplicationContext: initialization completed"
 INIT_TIMEOUT_SECS=2400  # Set your desired timeout in seconds
 INIT_START_TIME=$(date +%s)
 
-s3_copy "s3://${stack_s3_bucket}/${target_stack}/scripts/deploy-auth-hpds.sh" "/home/centos/deploy-auth-hpds.sh"
-sudo chmod +x /home/centos/deploy-auth-hpds.sh
-sudo /home/centos/deploy-auth-hpds.sh \
+s3_copy "s3://${stack_s3_bucket}/${target_stack}/scripts/deploy-auth-hpds.sh" "/opt/picsure/deploy-auth-hpds.sh"
+
+sudo chmod +x /opt/picsure/deploy-auth-hpds.sh
+sudo /opt/picsure/deploy-auth-hpds.sh \
 --stack_s3_bucket "${stack_s3_bucket}" \
 --genomic_dataset_s3_object_key "${genomic_dataset_s3_object_key}" \
 --dataset_s3_object_key "${dataset_s3_object_key}" \
@@ -63,12 +56,11 @@ sudo /home/centos/deploy-auth-hpds.sh \
 --target_stack "${target_stack}" \
 --env_private_dns_name "${env_private_dns_name}" \
 
-
 echo "Waiting for container to initialize"
 
 CONTAINER_NAME="auth-hpds"
 while true; do
-  status=$(docker logs "$CONTAINER_NAME" 2>&1 | grep "$INIT_MESSAGE")
+  status=$(podman logs "$CONTAINER_NAME" 2>&1 | grep "$INIT_MESSAGE")
 
   if [ -z $status ];then
     echo "$CONTAINER_NAME container has initialized."

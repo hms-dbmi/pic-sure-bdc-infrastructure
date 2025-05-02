@@ -45,23 +45,66 @@ if [[ -z "$stack_s3_bucket" || -z "$genomic_dataset_s3_object_key" || -z "$datas
   exit 1
 fi
 
-s3_copy() {
-  for i in {1..5}; do
-    sudo /usr/bin/aws --region us-east-1 s3 cp $* && break || sleep 30
-  done
+# Testing a new approach to downloading files from S3 in parallel
+# using a function to check if the S3 object exists before attempting to copy it.
+# This should help to reduce deployment time and avoid unnecessary retries.
+check_s3_exists() {
+    sudo /usr/bin/aws --region us-east-1 s3 ls "$1" >/dev/null 2>&1
 }
 
-s3_copy "s3://${stack_s3_bucket}/${target_stack}/containers/pic-sure-hpds.tar.gz" "/home/centos/pic-sure-hpds.tar.gz"
-s3_copy "s3://${stack_s3_bucket}/${target_stack}/data/${dataset_s3_object_key}/javabins_rekeyed.tar" "/opt/local/hpds/javabins_rekeyed.tar"
-s3_copy "s3://${stack_s3_bucket}/${target_stack}/data/${genomic_dataset_s3_object_key}/all/" "/opt/local/hpds/all/" --recursive
+s3_copy_parallel() {
+    local src="$1"
+    local dest="$2"
+    shift 2
+    if check_s3_exists "$src"; then
+        sudo /usr/bin/aws --region us-east-1 s3 cp "$src" "$dest" --no-progress "$@" &
+    else
+        echo "Warning: $src does not exist, retrying..."
+        return 1
+    fi
+}
 
-HPDS_IMAGE=$(sudo docker load < /home/centos/pic-sure-hpds.tar.gz | cut -d ' ' -f 3)
-sudo docker stop auth-hpds || true
-sudo docker rm auth-hpds || true
-sudo docker run --name=auth-hpds \
-                --restart unless-stopped \
-                --log-driver syslog --log-opt tag=auth-hpds \
-                -v /opt/local/hpds:/opt/local/hpds \
+s3_copy() {
+    for i in {1..5}; do
+        s3_copy_parallel "$@" && break || sleep 10
+    done
+    wait
+}
+
+echo "Starting parallel downloads..."
+s3_copy "s3://${stack_s3_bucket}/${target_stack}/containers/pic-sure-hpds.tar.gz" "/opt/picsure/pic-sure-hpds.tar.gz" &
+s3_copy "s3://${stack_s3_bucket}/${target_stack}/data/${dataset_s3_object_key}/javabins_rekeyed.tar" "/opt/local/hpds/javabins_rekeyed.tar" &
+s3_copy "s3://${stack_s3_bucket}/${target_stack}/data/${genomic_dataset_s3_object_key}/all/" "/opt/local/hpds/all/" --recursive &
+wait
+echo "All downloads completed"
+
+chmod 644 /opt/local/hpds/*
+chmod 644 /opt/local/hpds/all/*
+chmod 644 /opt/picsure/*
+
+echo "Loading and running container"
+CONTAINER_NAME="auth-hpds"
+HPDS_IMAGE=$(podman load < /opt/picsure/pic-sure-hpds.tar.gz | cut -d ' ' -f 3)
+
+podman rm -f $CONTAINER_NAME || true
+podman run --privileged --name=$CONTAINER_NAME \
+                -v /var/log/picsure/auth-hpds/:/var/log/:Z \
+                -v /opt/local/hpds:/opt/local/hpds:Z \
+                --log-opt tag=$CONTAINER_NAME \
                 -p 8080:8080 \
                 -e JAVA_OPTS=" -XX:+UseParallelGC -XX:SurvivorRatio=250 -Xms10g -Xmx128g -Dserver.port=8080 -Dspring.profiles.active=bdc-auth-${environment_name} -DTARGET_STACK=${target_stack}.${env_private_dns_name} -DCACHE_SIZE=2500 -DID_BATCH_SIZE=5000 -DALL_IDS_CONCEPT=NONE -DID_CUBE_NAME=NONE "  \
                 -d "$HPDS_IMAGE"
+
+# systemd setup.
+podman generate systemd --name $CONTAINER_NAME --restart-policy=always --files
+sudo mv container-$CONTAINER_NAME.service /etc/systemd/system/
+sudo restorecon -v /etc/systemd/system/container-$CONTAINER_NAME.service
+
+sudo systemctl daemon-reexec
+sudo systemctl daemon-reload
+sudo systemctl enable container-$CONTAINER_NAME.service
+sudo systemctl restart container-$CONTAINER_NAME.service
+
+echo "Verifying container-$CONTAINER_NAME.service status..."
+sudo systemctl is-enabled container-$CONTAINER_NAME.service
+sudo systemctl status container-$CONTAINER_NAME.service --no-pager

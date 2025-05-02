@@ -5,18 +5,11 @@ gss_prefix="${gss_prefix}"
 destigmatized_dataset_s3_object_key="${destigmatized_dataset_s3_object_key}"
 target_stack="${target_stack}"
 
-echo "SPLUNK_INDEX=hms_aws_${gss_prefix}" | sudo tee /opt/srce/startup.config
+echo "ENABLE_PODMAN=true" | sudo tee -a /opt/srce/startup.config
+echo "SPLUNK_INDEX=hms_aws_${gss_prefix}" | sudo tee -a /opt/srce/startup.config
 echo "NESSUS_GROUP=${gss_prefix}_${target_stack}" | sudo tee -a /opt/srce/startup.config
 
 sudo sh /opt/srce/scripts/start-gsstools.sh
-
-echo "
-[monitor:///var/log/hpds-docker-logs]
-sourcetype = hms_app_logs
-source = hpds_logs
-index=hms_aws_${gss_prefix}
-" | sudo tee -a /opt/splunkforwarder/etc/system/local/inputs.conf
-
 sudo systemctl stop SplunkForwarder
 
 /opt/splunkforwarder/bin/splunk enable boot-start -systemd-managed 1 -user splunk || true
@@ -30,9 +23,9 @@ INIT_MESSAGE="WebApplicationContext: initialization completed"
 INIT_TIMEOUT_SEX=2400  # Set your desired timeout in seconds
 INIT_START_TIME=$(date +%s)
 
-s3_copy "s3://${stack_s3_bucket}/${target_stack}/scripts/deploy-open-hpds.sh" "/home/centos/deploy-open-hpds.sh"
-sudo chmod +x /home/centos/deploy-open-hpds.sh
-sudo /home/centos/deploy-open-hpds.sh \
+s3_copy "s3://${stack_s3_bucket}/${target_stack}/scripts/deploy-open-hpds.sh" "/opt/picsure/deploy-open-hpds.sh"
+sudo chmod +x /opt/picsure/deploy-open-hpds.sh
+sudo /opt/picsure/deploy-open-hpds.sh \
 --stack_s3_bucket "${stack_s3_bucket}" \
 --destigmatized_dataset_s3_object_key "${destigmatized_dataset_s3_object_key}" \
 --target_stack "${target_stack}"
@@ -40,7 +33,7 @@ sudo /home/centos/deploy-open-hpds.sh \
 echo "Waiting for container to initialize"
 CONTAINER_NAME="open-hpds"
 while true; do
-  status=$(docker logs "$CONTAINER_NAME" 2>&1 | grep "$INIT_MESSAGE")
+  status=$(podman logs "$CONTAINER_NAME" 2>&1 | grep "$INIT_MESSAGE")
 
   if [ -z $status ];then
     echo "$CONTAINER_NAME container has initialized."
