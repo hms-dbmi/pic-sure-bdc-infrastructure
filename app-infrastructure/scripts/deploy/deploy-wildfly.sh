@@ -26,7 +26,7 @@ env_private_dns_name=${env_private_dns_name:-ENV_PRIVATE_DNS_NAME}
 target_stack=${target_stack:-TARGET_STACK}
 
 if [[ -z "$stack_s3_bucket" || -z "$env_private_dns_name" || -z "$target_stack" ]]; then
-  echo "Error: --stack_s3_bucket, --stack_githash, --target_stack, and --env_private_dns_name are required."
+  echo "Error: --stack_s3_bucket, --target_stack, and --env_private_dns_name are required."
   exit 1
 fi
 
