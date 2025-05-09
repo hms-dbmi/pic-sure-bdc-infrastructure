@@ -52,8 +52,6 @@ s3_copy() {
 mkdir -p /opt/local/hpds/all
 sudo mkdir -p /var/log/picsure/auth-hpds/
 
-
-
 # Load and run docker container.  Then wait for initialization before tagging instance as init complete.
 echo "Loading and running docker container"
 INIT_MESSAGE="WebApplicationContext: initialization completed"
