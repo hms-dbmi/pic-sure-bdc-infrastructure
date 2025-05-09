@@ -52,7 +52,7 @@ s3_copy() {
 }
 
 s3_copy "s3://${stack_s3_bucket}/${target_stack}/containers/pic-sure-frontend.tar.gz" "/opt/picsure/pic-sure-frontend.tar.gz"
-s3_copy "s3://${stack_s3_bucket}/${target_stack}/configs/httpd-vhosts.conf" "/usr/local/docker-config/httpd-vhosts.conf"
+s3_copy "s3://${stack_s3_bucket}/${target_stack}/configs/httpd/httpd-vhosts.conf" "/usr/local/docker-config/httpd-vhosts.conf"
 s3_copy "s3://${stack_s3_bucket}/${target_stack}/certs/httpd/" "/usr/local/docker-config/cert/" --recursive
 
 CONTAINER_NAME=httpd
@@ -72,7 +72,6 @@ HTTPD_IMAGE=$(podman load < /opt/picsure/pic-sure-frontend.tar.gz | cut -d ' ' -
 podman run --privileged -u root --name=$CONTAINER_NAME \
 --log-opt tag=$CONTAINER_NAME \
 -v /var/log/picsure/httpd/:/usr/local/apache2/logs/:Z \
--v /opt/picsure/fence_mapping.json:/usr/local/apache2/htdocs/picsureui/studyAccess/studies-data.json:Z \
 -v /usr/local/docker-config/cert:/usr/local/apache2/cert/:Z \
 -v /usr/local/docker-config/httpd-vhosts.conf:/usr/local/apache2/conf/extra/httpd-vhosts.conf:Z \
 -p 443:443 -d "$HTTPD_IMAGE"
