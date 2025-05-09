@@ -48,8 +48,7 @@ sudo chmod +x /opt/picsure/deploy-psama.sh
 sudo chmod +x /opt/picsure/deploy-dictionary.sh
 
 sudo /opt/picsure/deploy-wildfly.sh --env_private_dns_name "${env_private_dns_name}" --stack_s3_bucket "${stack_s3_bucket}" --stack_githash "${stack_githash}" --target_stack "${target_stack}"
-
-sudo /opt/picsure/deploy-psama.sh --stack_s3_bucket "${stack_s3_bucket}" --target_stack "${target_stack}"
+sudo /opt/picsure/deploy-psama.sh --stack_s3_bucket "${stack_s3_bucket}" --target_stack "${target_stack}" --dataset_s3_object_key "${dataset_s3_object_key}"
 sudo /opt/picsure/deploy-dictionary.sh --stack_s3_bucket "${stack_s3_bucket}" --stack_githash "$stack_githash" --target_stack "${target_stack}"
 
 INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)
