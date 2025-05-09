@@ -176,13 +176,13 @@ resource "aws_iam_role_policy" "auth-hpds-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/${var.target_stack}/data/*/javabins_rekeyed*"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/data/*/javabins_rekeyed*"
     },{
       "Action": [
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/${var.target_stack}/data/*/all/*"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/data/*/all/*"
     },{
       "Action": [
         "s3:GetObject",
@@ -294,7 +294,7 @@ resource "aws_iam_role_policy" "open-hpds-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/${var.target_stack}/data/*/destigmatized_javabins*"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/data/*/destigmatized_javabins*"
     },{
       "Action": [
         "s3:GetObject"

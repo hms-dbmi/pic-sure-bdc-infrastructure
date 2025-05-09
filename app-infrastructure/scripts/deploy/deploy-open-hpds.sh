@@ -38,7 +38,7 @@ s3_copy() {
 }
 
 s3_copy "s3://${stack_s3_bucket}/${target_stack}/containers/pic-sure-hpds.tar.gz" "/opt/picsure/pic-sure-hpds.tar.gz"
-s3_copy "s3://${stack_s3_bucket}/${target_stack}/data/${destigmatized_dataset_s3_object_key}/destigmatized_javabins_rekeyed.tar" "/opt/local/hpds/destigmatized_javabins_rekeyed.tar"
+s3_copy "s3://${stack_s3_bucket}/data/${destigmatized_dataset_s3_object_key}/destigmatized_javabins_rekeyed.tar" "/opt/local/hpds/destigmatized_javabins_rekeyed.tar"
 
 cd /opt/local/hpds || exit
 tar -xvf destigmatized_javabins_rekeyed.tar
