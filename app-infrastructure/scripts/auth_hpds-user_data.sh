@@ -52,9 +52,7 @@ s3_copy() {
 mkdir -p /opt/local/hpds/all
 sudo mkdir -p /var/log/picsure/auth-hpds/
 
-cd /opt/local/hpds || exit 1
-tar -xvf javabins_rekeyed.tar
-cd ~ || exit 1
+
 
 # Load and run docker container.  Then wait for initialization before tagging instance as init complete.
 echo "Loading and running docker container"

@@ -78,6 +78,10 @@ s3_copy "s3://${stack_s3_bucket}/${target_stack}/data/${genomic_dataset_s3_objec
 wait
 echo "All downloads completed"
 
+cd /opt/local/hpds || exit 1
+tar -xvf javabins_rekeyed.tar
+cd ~ || exit 1
+
 chmod 644 /opt/local/hpds/*
 chmod 644 /opt/local/hpds/all/*
 chmod 644 /opt/picsure/*
