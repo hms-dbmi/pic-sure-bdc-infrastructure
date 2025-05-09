@@ -37,16 +37,21 @@ s3_copy() {
   done
 }
 
+echo "Downloading Files"
 s3_copy "s3://${stack_s3_bucket}/${target_stack}/containers/pic-sure-hpds.tar.gz" "/opt/picsure/pic-sure-hpds.tar.gz"
 s3_copy "s3://${stack_s3_bucket}/data/${destigmatized_dataset_s3_object_key}/destigmatized_javabins_rekeyed.tar" "/opt/local/hpds/destigmatized_javabins_rekeyed.tar"
 
+echo "Unpacking destigmatized_javabins_rekeyed.tar"
 cd /opt/local/hpds || exit
 tar -xvf destigmatized_javabins_rekeyed.tar
 cd ~ || exit
+echo "Completed unpacking destigmatized_javabins_rekeyed.tar"
 
 CONTAINER_NAME=open-hpds
-HPDS_IMAGE=$(sudo docker load < /opt/picsure/pic-sure-hpds.tar.gz | cut -d ' ' -f 3)
-sudo docker run --name=$CONTAINER_NAME \
+
+echo "Creating $CONTAINER_NAME"
+HPDS_IMAGE=$(sudo podman load < /opt/picsure/pic-sure-hpds.tar.gz | cut -d ' ' -f 3)
+sudo podman run --name=$CONTAINER_NAME \
 --restart unless-stopped \
 --log-opt tag=$CONTAINER_NAME \
 -v /opt/local/hpds:/opt/local/hpds:Z \
@@ -54,7 +59,9 @@ sudo docker run --name=$CONTAINER_NAME \
 -p 8080:8080 \
 -e JAVA_OPTS=" -XX:+UseParallelGC -XX:SurvivorRatio=250 -Xms10g -Xmx40g -Dserver.port=8080 -Dspring.profiles.active=open -DCACHE_SIZE=2500 -DSMALL_TASK_THREADS=1 -DLARGE_TASK_THREADS=1 -DSMALL_JOB_LIMIT=100 -DID_BATCH_SIZE=5000 " \
 -d "$HPDS_IMAGE"
+echo "Container created."
 
+echo "Setting up podman for $CONTAINER_NAME"
 # systemd setup.
 podman generate systemd --name $CONTAINER_NAME --restart-policy=always --files
 sudo mv container-$CONTAINER_NAME.service /etc/systemd/system/
@@ -68,3 +75,4 @@ sudo systemctl restart container-$CONTAINER_NAME.service
 echo "Verifying container-$CONTAINER_NAME.service status..."
 sudo systemctl is-enabled container-$CONTAINER_NAME.service
 sudo systemctl status container-$CONTAINER_NAME.service --no-pager
+echo "Completed podman setup for $CONTAINER_NAME"

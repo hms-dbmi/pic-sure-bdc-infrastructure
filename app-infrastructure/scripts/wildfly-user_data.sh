@@ -36,7 +36,26 @@ sudo chmod 600 /swapfile
 sudo mkswap /swapfile
 sudo swapon /swapfile
 
-sudo docker network create picsure
+# podman network create picsure
+# explicit subnet and gateway to ensure networking works
+# enable dns resolution so containers on the network can resolve one another.
+podman network create \
+  --driver=bridge \
+  --subnet=10.89.0.0/24 \
+  --gateway=10.89.0.1 \
+  picsure
+
+PODMAN_IFNAME=$(podman network inspect picsure | jq -r '.[0].network_interface')
+
+nft add rule inet filter forward iifname "$${PODMAN_IFNAME}" accept
+nft add rule inet filter forward oifname "$${PODMAN_IFNAME}" accept
+nft add rule inet filter input udp dport 53 accept
+
+nft list ruleset > /etc/nftables/nftables.rules
+systemctl restart nftables
+
+systemctl enable --now podman
+
 sudo mkdir -p /var/log/picsure/{wildfly,psama,dictionary}
 
 s3_copy "s3://${stack_s3_bucket}/${target_stack}/scripts/deploy-wildfly.sh" "/opt/picsure/deploy-wildfly.sh"
