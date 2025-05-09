@@ -192,6 +192,12 @@ resource "aws_iam_role_policy" "auth-hpds-deployment-s3-policy" {
       "Resource": "arn:aws:s3:::pic-sure-auth-${var.environment_name}-data-export/*"
     },{
       "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/${var.target_stack}/scripts/deploy-auth-hpds.sh"
+    },{
+      "Action": [
         "s3:ListBucket"
       ],
       "Effect": "Allow",
@@ -201,7 +207,8 @@ resource "aws_iam_role_policy" "auth-hpds-deployment-s3-policy" {
           "s3:prefix": [
             "${var.target_stack}/data/*",
             "${var.target_stack}/configs/*",
-            "${var.target_stack}/containers/*"
+            "${var.target_stack}/containers/*",
+            "${var.target_stack}/scripts/*"
           ]
         }
       }
@@ -296,6 +303,12 @@ resource "aws_iam_role_policy" "open-hpds-deployment-s3-policy" {
       "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/${var.target_stack}/configs/hpds/hpds-log4j.properties"
     },{
       "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/${var.target_stack}/scripts/deploy-open-hpds.sh"
+    },{
+      "Action": [
         "s3:ListBucket"
       ],
       "Effect": "Allow",
@@ -305,7 +318,8 @@ resource "aws_iam_role_policy" "open-hpds-deployment-s3-policy" {
           "s3:prefix": [
             "${var.target_stack}/data/*",
             "${var.target_stack}/containers/*",
-            "${var.target_stack}/configs/*"
+            "${var.target_stack}/configs/*",
+            "${var.target_stack}/scripts/*"
           ]
         }
       }
