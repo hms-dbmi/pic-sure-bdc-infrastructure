@@ -25,30 +25,11 @@ if [[ -z "$stack_s3_bucket" || -z "$target_stack" ]]; then
   exit 1
 fi
 
-# Check if S3 object exists before attempting to copy it
-check_s3_exists() {
-  sudo /usr/bin/aws --region us-east-1 s3 ls "$1" >/dev/null 2>&1
-}
-
-# Copy S3 objects in parallel
-s3_copy_parallel() {
-  local src="$1"
-  local dest="$2"
-  shift 2
-  if check_s3_exists "$src"; then
-    sudo /usr/bin/aws --region us-east-1 s3 cp "$src" "$dest" --no-progress "$@" &
-  else
-    echo "Warning: $src does not exist, retrying..."
-    return 1
-  fi
-}
-
 # Main S3 copy function with retries
 s3_copy() {
   for i in {1..5}; do
-    s3_copy_parallel "$@" && break || sleep 10
+    sudo /usr/bin/aws --region us-east-1 s3 cp "$@" --no-progress && break || sleep 30
   done
-  wait
 }
 
 s3_copy "s3://${stack_s3_bucket}/${target_stack}/configs/dictionary/picsure-dictionary.env" "/opt/picsure/picsure-dictionary.env"
