@@ -47,7 +47,7 @@ s3_copy() {
   done
 }
 
-s3_copy "s3://${stack_s3_bucket}/${target_stack}/configs/psama/psama.env" "/opt/picsure/psama.env"
+s3_copy "s3://${stack_s3_bucket}/configs/psama/psama.env" "/opt/picsure/psama.env"
 s3_copy "s3://${stack_s3_bucket}/${target_stack}/containers/psama.tar.gz" "/opt/picsure/psama.tar.gz"
 s3_copy "s3://${stack_s3_bucket}/data/${dataset_s3_object_key}/fence_mapping.json" "/opt/picsure/fence_mapping.json"
 

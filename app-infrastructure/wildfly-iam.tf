@@ -117,13 +117,13 @@ resource "aws_iam_role_policy" "wildfly-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/${var.target_stack}/configs/dictionary/picsure-dictionary.env"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/dictionary/picsure-dictionary.env"
     },{
       "Action": [
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/${var.target_stack}/configs/dictionary/weights.csv"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/dictionary/weights.csv"
     },{
       "Action": [
         "s3:GetObject"
