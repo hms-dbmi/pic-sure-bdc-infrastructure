@@ -111,7 +111,7 @@ resource "aws_iam_role_policy" "wildfly-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/${var.target_stack}/configs/psama/psama.env"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/psama/psama.env"
     },{
       "Action": [
         "s3:GetObject"
