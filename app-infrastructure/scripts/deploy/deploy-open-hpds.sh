@@ -30,7 +30,7 @@ if [[ -z "$stack_s3_bucket" || -z "$destigmatized_dataset_s3_object_key" || -z "
   exit 1
 fi
 
-# Main S3 copy function with retries
+
 s3_copy() {
   for i in {1..5}; do
     sudo /usr/bin/aws --region us-east-1 s3 cp "$@" --no-progress && break || sleep 30

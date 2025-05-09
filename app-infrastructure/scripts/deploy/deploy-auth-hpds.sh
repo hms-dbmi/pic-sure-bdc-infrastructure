@@ -45,37 +45,15 @@ if [[ -z "$stack_s3_bucket" || -z "$genomic_dataset_s3_object_key" || -z "$datas
   exit 1
 fi
 
-# Testing a new approach to downloading files from S3 in parallel
-# using a function to check if the S3 object exists before attempting to copy it.
-# This should help to reduce deployment time and avoid unnecessary retries.
-check_s3_exists() {
-    sudo /usr/bin/aws --region us-east-1 s3 ls "$1" >/dev/null 2>&1
-}
-
-s3_copy_parallel() {
-    local src="$1"
-    local dest="$2"
-    shift 2
-    if check_s3_exists "$src"; then
-        sudo /usr/bin/aws --region us-east-1 s3 cp "$src" "$dest" --no-progress "$@" &
-    else
-        echo "Warning: $src does not exist, retrying..."
-        return 1
-    fi
-}
-
 s3_copy() {
-    for i in {1..5}; do
-        s3_copy_parallel "$@" && break || sleep 10
-    done
-    wait
+  for i in {1..5}; do
+    sudo /usr/bin/aws --region us-east-1 s3 cp "$@" --no-progress && break || sleep 30
+  done
 }
 
-echo "Starting parallel downloads..."
 s3_copy "s3://${stack_s3_bucket}/${target_stack}/containers/pic-sure-hpds.tar.gz" "/opt/picsure/pic-sure-hpds.tar.gz" &
 s3_copy "s3://${stack_s3_bucket}/${target_stack}/data/${dataset_s3_object_key}/javabins_rekeyed.tar" "/opt/local/hpds/javabins_rekeyed.tar" &
 s3_copy "s3://${stack_s3_bucket}/${target_stack}/data/${genomic_dataset_s3_object_key}/all/" "/opt/local/hpds/all/" --recursive &
-wait
 echo "All downloads completed"
 
 cd /opt/local/hpds || exit 1

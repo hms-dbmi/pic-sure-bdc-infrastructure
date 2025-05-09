@@ -18,7 +18,7 @@ INIT_START_TIME=$(date +%s)
 
 sudo mkdir -p /var/log/picsure/open-hpds/
 
-# Main S3 copy function with retries
+
 s3_copy() {
   for i in {1..5}; do
     sudo /usr/bin/aws --region us-east-1 s3 cp "$@" --no-progress && break || sleep 30
