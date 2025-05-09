@@ -76,7 +76,7 @@ resource "aws_iam_role_policy" "httpd-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/${var.target_stack}/data/*/fence_mapping.json"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/data/*/fence_mapping.json"
     },{
       "Action": [
         "s3:GetObject"
