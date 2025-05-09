@@ -160,7 +160,8 @@ resource "aws_iam_role_policy" "wildfly-deployment-s3-policy" {
         "StringLike": {
           "s3:prefix": [
             "${var.target_stack}/configs/*",
-            "${var.target_stack}/data/*",
+            "configs/*",
+            "data/*",
             "${var.target_stack}/containers/*"
           ]
         }

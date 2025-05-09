@@ -52,9 +52,8 @@ s3_copy() {
 }
 
 s3_copy "s3://${stack_s3_bucket}/${target_stack}/containers/pic-sure-hpds.tar.gz" "/opt/picsure/pic-sure-hpds.tar.gz"
-s3_copy "s3://${stack_s3_bucket}/${target_stack}/data/${dataset_s3_object_key}/javabins_rekeyed.tar" "/opt/local/hpds/javabins_rekeyed.tar"
-s3_copy "s3://${stack_s3_bucket}/${target_stack}/data/${genomic_dataset_s3_object_key}/all/" "/opt/local/hpds/all/" --recursive
-echo "All downloads completed"
+s3_copy "s3://${stack_s3_bucket}/data/${dataset_s3_object_key}/javabins_rekeyed.tar" "/opt/local/hpds/javabins_rekeyed.tar"
+s3_copy "s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/" "/opt/local/hpds/all/" --recursive
 
 cd /opt/local/hpds || exit 1
 tar -xvf javabins_rekeyed.tar

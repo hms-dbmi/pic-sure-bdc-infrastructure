@@ -94,8 +94,9 @@ resource "aws_iam_role_policy" "httpd-deployment-s3-policy" {
           "s3:prefix": [
             "${var.target_stack}/releases/*",
             "${var.target_stack}/configs/*",
+            "configs/*",
             "${var.target_stack}/certs/httpd/*",
-            "${var.target_stack}/data/*",
+            "data/*",
             "${var.target_stack}/scripts/*"
           ]
         }
@@ -205,8 +206,9 @@ resource "aws_iam_role_policy" "auth-hpds-deployment-s3-policy" {
       "Condition": {
         "StringLike": {
           "s3:prefix": [
-            "${var.target_stack}/data/*",
+            "data/*",
             "${var.target_stack}/configs/*",
+            "configs/*",
             "${var.target_stack}/containers/*",
             "${var.target_stack}/scripts/*"
           ]
@@ -316,9 +318,10 @@ resource "aws_iam_role_policy" "open-hpds-deployment-s3-policy" {
       "Condition": {
         "StringLike": {
           "s3:prefix": [
-            "${var.target_stack}/data/*",
+            "data/*",
             "${var.target_stack}/containers/*",
             "${var.target_stack}/configs/*",
+            "configs/*",
             "${var.target_stack}/scripts/*"
           ]
         }
