@@ -32,7 +32,7 @@ s3_copy() {
   done
 }
 
-s3_copy "s3://${stack_s3_bucket}/${target_stack}/configs/dictionary/picsure-dictionary.env" "/opt/picsure/picsure-dictionary.env"
+s3_copy "s3://${stack_s3_bucket}/configs/picsure-dictionary/picsure-dictionary.env" "/opt/picsure/picsure-dictionary.env"
 s3_copy "s3://${stack_s3_bucket}/${target_stack}/containers/dictionary-api.tar.gz" "/opt/picsure/dictionary-api.tar.gz"
 
 DICTIONARY_API_IMAGE=$(podman load < /opt/picsure/dictionary-api.tar.gz | cut -d ' ' -f 3)
