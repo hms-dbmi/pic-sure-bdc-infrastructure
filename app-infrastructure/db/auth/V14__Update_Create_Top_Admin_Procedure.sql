@@ -2,32 +2,38 @@
 -- Create Super Admin and admin roles and privileges with upsert logic
 --
 
--- Get existing privilege UUIDs from database
-SELECT uuid INTO @superAdminPrivilegeUUID FROM privilege WHERE name = 'SUPER_ADMIN';
-SELECT uuid INTO @adminPrivilegeUUID FROM privilege WHERE name = 'ADMIN';
+-- Set specific UUIDs for consistency across environments
+SET @superAdminPrivilegeUUID = UNHEX('7044061AF65B425F86CE73A1BF7F4402');
+SET @adminPrivilegeUUID = UNHEX('AD08212E096F414CBA8D1BAE09415DAB');
 
--- Verify privileges exist, if not throw error
-IF @superAdminPrivilegeUUID IS NULL THEN
-    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'SUPER_ADMIN privilege not found in database';
+-- Check if privileges exist and create them if they don't
+SELECT COUNT(*) INTO @superAdminPrivExists FROM privilege WHERE uuid = @superAdminPrivilegeUUID;
+SELECT COUNT(*) INTO @adminPrivExists FROM privilege WHERE uuid = @adminPrivilegeUUID;
+
+IF @superAdminPrivExists = 0 THEN
+    INSERT INTO privilege (uuid, description, name, application_id, queryTemplate, queryScope) VALUES
+        (@superAdminPrivilegeUUID,'PIC-SURE Auth super admin for managing roles/privileges/application/connections','SUPER_ADMIN',NULL,'[]',NULL);
 END IF;
 
-IF @adminPrivilegeUUID IS NULL THEN
-    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'ADMIN privilege not found in database';
+IF @adminPrivExists = 0 THEN
+    INSERT INTO privilege (uuid, description, name, application_id, queryTemplate, queryScope) VALUES
+        (@adminPrivilegeUUID,'PIC-SURE Auth admin for managing users.','ADMIN',NULL,'[]',NULL);
 END IF;
 
--- Get existing role UUIDs from database or create them if they don't exist
-SELECT uuid INTO @superAdminRoleUUID FROM role WHERE name = 'PIC-SURE Top Admin';
-SELECT uuid INTO @adminRoleUUID FROM role WHERE name = 'Admin';
+-- Set specific role UUIDs for consistency
+SET @superAdminRoleUUID = UNHEX('002DC366B0D8420F998F885D0ED797FD');
+SET @adminRoleUUID = UNHEX('8F885D0ED797FD002DC366B0D8420F99');
 
--- Create roles if they don't exist
-IF @superAdminRoleUUID IS NULL THEN
-    SET @superAdminRoleUUID = UNHEX(REPLACE(UUID(), '-', ''));
+-- Check if roles exist and create them if they don't
+SELECT COUNT(*) INTO @superAdminRoleExists FROM role WHERE uuid = @superAdminRoleUUID;
+SELECT COUNT(*) INTO @adminRoleExists FROM role WHERE uuid = @adminRoleUUID;
+
+IF @superAdminRoleExists = 0 THEN
     INSERT INTO role (uuid, name, description) VALUES
         (@superAdminRoleUUID,'PIC-SURE Top Admin','PIC-SURE Auth Micro App Top admin including Admin and super Admin, can manage roles and privileges directly');
 END IF;
 
-IF @adminRoleUUID IS NULL THEN
-    SET @adminRoleUUID = UNHEX(REPLACE(UUID(), '-', ''));
+IF @adminRoleExists = 0 THEN
     INSERT INTO role (uuid, name, description) VALUES
         (@adminRoleUUID,'Admin','Normal admin users, can manage other users including assignment of roles and privileges');
 END IF;
