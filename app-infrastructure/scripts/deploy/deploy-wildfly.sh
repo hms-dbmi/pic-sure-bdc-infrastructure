@@ -41,12 +41,13 @@ s3_copy "s3://${stack_s3_bucket}/${target_stack}/containers/pic-sure-wildfly.tar
 s3_copy "s3://${stack_s3_bucket}/${target_stack}/configs/wildfly/standalone.xml" "/opt/picsure/standalone.xml"
 s3_copy "s3://${stack_s3_bucket}/${target_stack}/configs/wildfly/aggregate-resource.properties" "/opt/picsure/aggregate-resource.properties"
 s3_copy "s3://${stack_s3_bucket}/${target_stack}/configs/wildfly/visualization-resource.properties" "/opt/picsure/visualization-resource.properties"
+s3_copy "s3://${stack_s3_bucket}/data/*/fence_mapping.json" "/opt/picsure/fence_mapping.json"
 
-CONTAINER_WILDFLY="wildfly"
+CONTAINER_NAME="wildfly"
 WILDFLY_IMAGE=$(podman load < /opt/picsure/pic-sure-wildfly.tar.gz | cut -d ' ' -f 3)
 JAVA_OPTS="-Xms2g -Xmx24g -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=1024m -Djava.net.preferIPv4Stack=true -DTARGET_STACK=${target_stack}.${env_private_dns_name}"
 
-podman rm -f $CONTAINER_NAME
+podman rm -f $CONTAINER_NAME || true
 
 podman run -u root --name=$CONTAINER_NAME --network=picsure \
     --dns=10.89.0.1 \
@@ -64,8 +65,6 @@ podman generate systemd --name $CONTAINER_NAME --restart-policy=always --files
 sudo mv container-$CONTAINER_NAME.service /etc/systemd/system/
 
 sudo restorecon -v /etc/systemd/system/container-$CONTAINER_NAME.service
-
-sudo mv container-$CONTAINER_NAME.service /etc/systemd/system/
 sudo systemctl daemon-reexec
 sudo systemctl daemon-reload
 sudo systemctl enable container-$CONTAINER_NAME.service

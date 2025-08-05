@@ -21,7 +21,7 @@ stack_s3_bucket=${stack_s3_bucket:-STACK_S3_BUCKET}
 target_stack=${target_stack:-TARGET_STACK}
 
 if [[ -z "$stack_s3_bucket" || -z "$target_stack" ]]; then
-  echo "Error: --stack_s3_bucket and --dataset_s3_object_key are required."
+  echo "Error: --stack_s3_bucket and --target_stack are required."
   exit 1
 fi
 

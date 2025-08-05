@@ -26,7 +26,7 @@ destigmatized_dataset_s3_object_key=${destigmatized_dataset_s3_object_key:-DESTI
 target_stack=${target_stack:-TARGET_STACK}
 
 if [[ -z "$stack_s3_bucket" || -z "$destigmatized_dataset_s3_object_key" || -z "$target_stack" ]]; then
-  echo "Error: --stack_s3_bucket, --stack_githash and --destigmatized_dataset_s3_object_key are required"
+  echo "Error: --stack_s3_bucket, --target_stack and --destigmatized_dataset_s3_object_key are required"
   exit 1
 fi
 

@@ -41,7 +41,7 @@ environment_name=${environment_name:-ENVIRONMENT_NAME}
 env_private_dns_name=${env_private_dns_name:-ENV_PRIVATE_DNS_NAME}
 
 if [[ -z "$stack_s3_bucket" || -z "$genomic_dataset_s3_object_key" || -z "$dataset_s3_object_key" || -z "$environment_name" || -z "$target_stack" || -z "$env_private_dns_name" ]]; then
-  echo "Error: --stack_s3_bucket, --stack_githash, --genomic_dataset_s3_object_key, --dataset_s3_object_key, --environment_name, --target_stack, and --env_private_dns_name are required"
+  echo "Error: --stack_s3_bucket, --genomic_dataset_s3_object_key, --dataset_s3_object_key, --environment_name, --target_stack, and --env_private_dns_name are required"
   exit 1
 fi
 

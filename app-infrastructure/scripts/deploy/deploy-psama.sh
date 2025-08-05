@@ -87,8 +87,6 @@ podman generate systemd --name $CONTAINER_NAME --restart-policy=always --files
 sudo mv container-$CONTAINER_NAME.service /etc/systemd/system/
 
 sudo restorecon -v /etc/systemd/system/container-$CONTAINER_NAME.service
-
-sudo mv container-$CONTAINER_NAME.service /etc/systemd/system/
 sudo systemctl daemon-reexec
 sudo systemctl daemon-reload
 sudo systemctl enable container-$CONTAINER_NAME.service
