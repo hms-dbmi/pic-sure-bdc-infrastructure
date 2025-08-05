@@ -97,6 +97,7 @@ resource "aws_iam_role_policy" "httpd-deployment-s3-policy" {
             "configs/*",
             "${var.target_stack}/certs/httpd/*",
             "data/*",
+            "certs/httpd/*",
             "${var.target_stack}/scripts/*"
           ]
         }
@@ -193,6 +194,12 @@ resource "aws_iam_role_policy" "auth-hpds-deployment-s3-policy" {
       "Resource": "arn:aws:s3:::pic-sure-auth-${var.environment_name}-data-export/*"
     },{
       "Action": [
+        "s3:ListBucket"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::pic-sure-auth-${var.environment_name}-data-export"
+    },{
+      "Action": [
         "s3:GetObject"
       ],
       "Effect": "Allow",
@@ -206,11 +213,13 @@ resource "aws_iam_role_policy" "auth-hpds-deployment-s3-policy" {
       "Condition": {
         "StringLike": {
           "s3:prefix": [
-            "data/*",
             "${var.target_stack}/configs/*",
             "configs/*",
+            "data/*",
             "${var.target_stack}/containers/*",
-            "${var.target_stack}/scripts/*"
+            "${var.target_stack}/scripts/*",
+            "certs/hpds/*",
+            "${var.target_stack}/certs/hpds/*"
           ]
         }
       }
@@ -220,6 +229,12 @@ resource "aws_iam_role_policy" "auth-hpds-deployment-s3-policy" {
       ],
       "Effect": "Allow",
       "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/hpds/hpds-log4j.properties"
+    },{
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/${var.target_stack}/configs/hpds/hpds-log4j.properties"
     },{
       "Action": [
         "ec2:CreateTags"
@@ -314,15 +329,17 @@ resource "aws_iam_role_policy" "open-hpds-deployment-s3-policy" {
         "s3:ListBucket"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/*",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}",
       "Condition": {
         "StringLike": {
           "s3:prefix": [
-            "data/*",
-            "${var.target_stack}/containers/*",
             "${var.target_stack}/configs/*",
             "configs/*",
-            "${var.target_stack}/scripts/*"
+            "data/*",
+            "${var.target_stack}/containers/*",
+            "${var.target_stack}/scripts/*",
+            "certs/hpds/*",
+            "${var.target_stack}/certs/hpds/*"
           ]
         }
       }

@@ -156,7 +156,10 @@ resource "aws_iam_role_policy" "wildfly-deployment-s3-policy" {
             "${var.target_stack}/configs/*",
             "configs/*",
             "data/*",
-            "${var.target_stack}/containers/*"
+            "${var.target_stack}/containers/*",
+            "${var.target_stack}/scripts/*",
+            "certs/wildfly/*",
+            "${var.target_stack}/certs/wildfly/*"
           ]
         }
       }
