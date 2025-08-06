@@ -14,6 +14,10 @@ while [[ $# -gt 0 ]]; do
       env_private_dns_name="$2"
       shift 2
       ;;
+    --dataset_s3_object_key)
+      dataset_s3_object_key="$2"
+      shift 2
+      ;;
     *)
       echo "Unknown argument: $1"
       exit 1
@@ -24,9 +28,10 @@ done
 stack_s3_bucket=${stack_s3_bucket:-STACK_S3_BUCKET}
 env_private_dns_name=${env_private_dns_name:-ENV_PRIVATE_DNS_NAME}
 target_stack=${target_stack:-TARGET_STACK}
+dataset_s3_object_key=${dataset_s3_object_key:-DATASET_S3_OBJECT_KEY}
 
-if [[ -z "$stack_s3_bucket" || -z "$env_private_dns_name" || -z "$target_stack" ]]; then
-  echo "Error: --stack_s3_bucket, --target_stack, and --env_private_dns_name are required."
+if [[ -z "$stack_s3_bucket" || -z "$env_private_dns_name" || -z "$target_stack" || -z "$dataset_s3_object_key" ]]; then
+  echo "Error: --stack_s3_bucket, --target_stack, --env_private_dns_name, and dataset_s3_object_key are required."
   exit 1
 fi
 
@@ -41,7 +46,7 @@ s3_copy "s3://${stack_s3_bucket}/${target_stack}/containers/pic-sure-wildfly.tar
 s3_copy "s3://${stack_s3_bucket}/${target_stack}/configs/wildfly/standalone.xml" "/opt/picsure/standalone.xml"
 s3_copy "s3://${stack_s3_bucket}/${target_stack}/configs/wildfly/aggregate-resource.properties" "/opt/picsure/aggregate-resource.properties"
 s3_copy "s3://${stack_s3_bucket}/${target_stack}/configs/wildfly/visualization-resource.properties" "/opt/picsure/visualization-resource.properties"
-s3_copy "s3://${stack_s3_bucket}/data/*/fence_mapping.json" "/opt/picsure/fence_mapping.json"
+s3_copy "s3://${stack_s3_bucket}/data/${dataset_s3_object_key}/fence_mapping.json" "/opt/picsure/fence_mapping.json"
 
 CONTAINER_NAME="wildfly"
 WILDFLY_IMAGE=$(podman load < /opt/picsure/pic-sure-wildfly.tar.gz | cut -d ' ' -f 3)
