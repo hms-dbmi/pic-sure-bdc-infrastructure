@@ -40,10 +40,21 @@ target_stack=${target_stack:-TARGET_STACK}
 environment_name=${environment_name:-ENVIRONMENT_NAME}
 env_private_dns_name=${env_private_dns_name:-ENV_PRIVATE_DNS_NAME}
 
+
+
 if [[ -z "$stack_s3_bucket" || -z "$genomic_dataset_s3_object_key" || -z "$dataset_s3_object_key" || -z "$environment_name" || -z "$target_stack" || -z "$env_private_dns_name" ]]; then
   echo "Error: --stack_s3_bucket, --genomic_dataset_s3_object_key, --dataset_s3_object_key, --environment_name, --target_stack, and --env_private_dns_name are required"
   exit 1
 fi
+
+cat << EOF > /opt/picsure/deploy-script-last-execution-values.txt
+export stack_s3_bucket="${stack_s3_bucket}"
+export dataset_s3_object_key="${dataset_s3_object_key}"
+export genomic_dataset_s3_object_key="${genomic_dataset_s3_object_key}"
+export environment_name="${environment_name}"
+export target_stack="${target_stack}"
+export env_private_dns_name="${env_private_dns_name}"
+EOF
 
 s3_copy() {
   for i in {1..5}; do
