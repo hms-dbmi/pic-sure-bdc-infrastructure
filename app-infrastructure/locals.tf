@@ -84,8 +84,6 @@ locals {
   public_subnet_cidrs  = values(data.aws_subnet.public).*.cidr_block
   project              = var.env_project
 
-  # db subnet group name needs to be more elastic
-  # let's leverage the project variable to dynamically set set the requried name for now
   open_subnet_group_name = local.project == "Open PIC-SURE" ? "open-pic-sure-${var.environment_name}-${var.target_stack}": ""
   auth_subnet_group_name = local.project == "Auth PIC-SURE" ? "auth-pic-sure-${var.environment_name}-${var.target_stack}": ""
   picsure_subnet_group_name = local.project == "PIC-SURE" ? "pic-sure-${var.environment_name}-${var.target_stack}": ""
