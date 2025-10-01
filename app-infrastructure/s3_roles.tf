@@ -15,7 +15,7 @@ resource "aws_iam_role_policy" "httpd-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/releases/jenkins_pipeline_build_*/pic-sure-frontend.tar.gz"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/${var.target_stack}/containers/pic-sure-frontend.tar.gz"
     },{
       "Action": [
         "s3:GetObject"
@@ -57,32 +57,32 @@ resource "aws_iam_role_policy" "httpd-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/jenkins_pipeline_build_${var.stack_githash_long}/httpd-vhosts.conf"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/${var.target_stack}/configs/httpd/httpd-vhosts.conf"
     },{
       "Action": [
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/jenkins_pipeline_build_${var.stack_githash_long}/picsureui_settings.json"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/${var.target_stack}/configs/httpd/picsureui_settings.json"
     },{
       "Action": [
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/jenkins_pipeline_build_${var.stack_githash_long}/banner_config.json"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/${var.target_stack}/configs/httpd/banner_config.json"
     },
     {
       "Action": [
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/data/${var.dataset_s3_object_key}/fence_mapping.json"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/data/*/fence_mapping.json"
     },{
       "Action": [
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/jenkins_pipeline_build_${var.stack_githash_long}/httpd-docker.sh"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/${var.target_stack}/scripts/deploy-httpd.sh"
     },{
       "Action": [
         "s3:ListBucket"
@@ -92,10 +92,13 @@ resource "aws_iam_role_policy" "httpd-deployment-s3-policy" {
       "Condition": {
         "StringLike": {
           "s3:prefix": [
-            "releases/jenkins_pipeline_build_*/*",
-            "configs/jenkins_pipeline_build_*/*",
+            "${var.target_stack}/releases/*",
+            "${var.target_stack}/configs/*",
+            "configs/*",
+            "${var.target_stack}/certs/httpd/*",
+            "data/*",
             "certs/httpd/*",
-            "data/${var.dataset_s3_object_key}/*"
+            "${var.target_stack}/scripts/*"
           ]
         }
       }
@@ -107,7 +110,7 @@ resource "aws_iam_role_policy" "httpd-deployment-s3-policy" {
       "Resource": "arn:aws:ec2:*:*:instance/*"
     },
     {
-        "Sid": "SharedParameterAccess",
+      "Sid": "SharedParameterAccess",
         "Effect": "Allow",
         "Action": [
             "ssm:GetParameter",
@@ -169,19 +172,19 @@ resource "aws_iam_role_policy" "auth-hpds-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/releases/jenkins_pipeline_build_${var.stack_githash_long}/pic-sure-hpds.tar.gz"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/${var.target_stack}/containers/pic-sure-hpds.tar.gz"
     },{
       "Action": [
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/data/${var.dataset_s3_object_key}/javabins_rekeyed*"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/data/*/javabins_rekeyed*"
     },{
       "Action": [
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/data/${var.genomic_dataset_s3_object_key}/all/*"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/data/*/all/*"
     },{
       "Action": [
         "s3:GetObject",
@@ -194,13 +197,29 @@ resource "aws_iam_role_policy" "auth-hpds-deployment-s3-policy" {
         "s3:ListBucket"
       ],
       "Effect": "Allow",
+      "Resource": "arn:aws:s3:::pic-sure-auth-${var.environment_name}-data-export"
+    },{
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/${var.target_stack}/scripts/deploy-auth-hpds.sh"
+    },{
+      "Action": [
+        "s3:ListBucket"
+      ],
+      "Effect": "Allow",
       "Resource": "arn:aws:s3:::${var.stack_s3_bucket}",
       "Condition": {
         "StringLike": {
           "s3:prefix": [
-            "data/${var.genomic_dataset_s3_object_key}/*",
-            "data/${var.dataset_s3_object_key}/*",
-            "releases/jenkins_pipeline_build_${var.stack_githash_long}/*"
+            "${var.target_stack}/configs/*",
+            "configs/*",
+            "data/*",
+            "${var.target_stack}/containers/*",
+            "${var.target_stack}/scripts/*",
+            "certs/hpds/*",
+            "${var.target_stack}/certs/hpds/*"
           ]
         }
       }
@@ -209,7 +228,13 @@ resource "aws_iam_role_policy" "auth-hpds-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/jenkins_pipeline_build_${var.stack_githash_long}/hpds-log4j.properties"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/hpds/hpds-log4j.properties"
+    },{
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/${var.target_stack}/configs/hpds/hpds-log4j.properties"
     },{
       "Action": [
         "ec2:CreateTags"
@@ -218,7 +243,7 @@ resource "aws_iam_role_policy" "auth-hpds-deployment-s3-policy" {
       "Resource": "arn:aws:ec2:*:*:instance/*"
     },
     {
-        "Sid": "SharedParameterAccess",
+      "Sid": "SharedParameterAccess",
         "Effect": "Allow",
         "Action": [
             "ssm:GetParameter",
@@ -280,31 +305,41 @@ resource "aws_iam_role_policy" "open-hpds-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/releases/jenkins_pipeline_build_${var.stack_githash_long}/pic-sure-hpds.tar.gz"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/${var.target_stack}/containers/pic-sure-hpds.tar.gz"
     },{
       "Action": [
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/data/${var.destigmatized_dataset_s3_object_key}/destigmatized_javabins*"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/data/*/destigmatized_javabins*"
     },{
       "Action": [
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/jenkins_pipeline_build_${var.stack_githash_long}/hpds-log4j.properties"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/${var.target_stack}/configs/hpds/hpds-log4j.properties"
+    },{
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/${var.target_stack}/scripts/deploy-open-hpds.sh"
     },{
       "Action": [
         "s3:ListBucket"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/*",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}",
       "Condition": {
         "StringLike": {
           "s3:prefix": [
-            "data/${var.destigmatized_dataset_s3_object_key}/*",
-            "releases/jenkins_pipeline_build_${var.stack_githash_long}/*",
-            "configs/jenkins_pipeline_build_${var.stack_githash_long}/*"
+            "${var.target_stack}/configs/*",
+            "configs/*",
+            "data/*",
+            "${var.target_stack}/containers/*",
+            "${var.target_stack}/scripts/*",
+            "certs/hpds/*",
+            "${var.target_stack}/certs/hpds/*"
           ]
         }
       }
@@ -316,7 +351,7 @@ resource "aws_iam_role_policy" "open-hpds-deployment-s3-policy" {
       "Resource": "arn:aws:ec2:*:*:instance/*"
     },
     {
-        "Sid": "SharedParameterAccess",
+      "Sid": "SharedParameterAccess",
         "Effect": "Allow",
         "Action": [
             "ssm:GetParameter",
