@@ -14,8 +14,6 @@ VALUES (unhex(@uuidAR_OPEN_QUERIES),
         0,
         0);
 
-set @open_priv_uuid = select uuid from privilege where name = 'FENCE_PRIV_OPEN_ACCESS';
-
 INSERT INTO accessRule_privilege (privilege_id, accessRule_id)
-VALUES (unhex(@open_priv_uuid),
+VALUES ((select uuid from privilege where name = 'FENCE_PRIV_OPEN_ACCESS'),
         unhex(@uuidAR_OPEN_QUERIES));
