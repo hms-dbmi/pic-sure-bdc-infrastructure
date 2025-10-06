@@ -15,5 +15,5 @@ VALUES (unhex(@uuidAR_OPEN_QUERIES),
         0);
 
 INSERT INTO accessRule_privilege (privilege_id, accessRule_id)
-VALUES ((select uuid from privilege where name = 'FENCE_PRIV_OPEN_ACCESS'),
+VALUES ((select uuid from privilege where name = 'MANAGED_PRIV_OPEN_ACCESS'),
         unhex(@uuidAR_OPEN_QUERIES));
