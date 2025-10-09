@@ -6,7 +6,7 @@ VALUES (unhex(@uuidAR_OPEN_QUERIES),
         'AR_ALLOW_OPEN_ACCESS_V3',
         'allow access to open hpds resource',
         '$.query.resourceUUID',
-        9,
+        9, -- TypeNaming.ALL_EQUALS_IGNORE_CASE
         'ac004461-1b47-4832-80e2-22a4aecabe39',
         0,
         0,
