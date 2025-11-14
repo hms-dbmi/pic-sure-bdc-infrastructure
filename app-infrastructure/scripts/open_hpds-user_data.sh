@@ -5,6 +5,28 @@ gss_prefix="${gss_prefix}"
 destigmatized_dataset_s3_object_key="${destigmatized_dataset_s3_object_key}"
 target_stack="${target_stack}"
 
+# Persist configuration in a dedicated env file for deploy scripts and services
+upsert_env_var() {
+  local file="$1" key="$2" value="$3"
+
+  sudo mkdir -p "$(dirname "$file")"
+  sudo touch "$file"
+
+  # Replace if exists, else append
+  if ! sudo grep -q "^${key}=" "$file"; then
+    echo "${key}=${value}" | sudo tee -a "$file" >/dev/null
+  else
+    sudo sed -i "s|^${key}=.*|${key}=${value}|" "$file"
+  fi
+
+  sudo chmod 600 "$file"
+}
+CONF_FILE=/etc/picsure/picsure.env
+upsert_env_var "$CONF_FILE" STACK_S3_BUCKET "$stack_s3_bucket"
+upsert_env_var "$CONF_FILE" GSS_PREFIX "$gss_prefix"
+upsert_env_var "$CONF_FILE" TARGET_STACK "$target_stack"
+upsert_env_var "$CONF_FILE" DESTIGMATIZED_DATASET_S3_OBJECT_KEY "$destigmatized_dataset_s3_object_key"
+
 echo "ENABLE_PODMAN=true" | sudo tee -a /opt/srce/startup.config
 echo "SPLUNK_INDEX=hms_aws_${gss_prefix}" | sudo tee -a /opt/srce/startup.config
 echo "NESSUS_GROUP=${gss_prefix}_${target_stack}" | sudo tee -a /opt/srce/startup.config
@@ -13,7 +35,7 @@ sudo sh /opt/srce/scripts/start-gsstools.sh
 
 # Waiting for application to finish initialization
 INIT_MESSAGE="WebApplicationContext: initialization completed"
-INIT_TIMEOUT_SEX=2400  # Set your desired timeout in seconds
+INIT_TIMEOUT_SECS=2400  # Set your desired timeout in seconds
 INIT_START_TIME=$(date +%s)
 
 sudo mkdir -p /var/log/picsure/open-hpds/
