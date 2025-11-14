@@ -8,13 +8,30 @@ env_private_dns_name="${env_private_dns_name}"
 gss_prefix="${gss_prefix}"
 target_stack="${target_stack}"
 
-echo "export STACK_S3_BUCKET=$stack_s3_bucket" >> /etc/environment
-echo "export DATASET_S3_OBJECT_KEY=$dataset_s3_object_key" >> /etc/environment
-echo "export GENOMIC_DATASET_S3_OBJECT_KEY=$genomic_dataset_s3_object_key" >> /etc/environment
-echo "export ENVIRONMENT_NAME=$environment_name" >> /etc/environment
-echo "export ENV_PRIVATE_DNS_NAME=$env_private_dns_name" >> /etc/environment
-echo "export GSS_PREFIX=$gss_prefix" >> /etc/environment
-echo "export TARGET_STACK=$target_stack" >> /etc/environment
+# Persist configuration in a dedicated env file for deploy scripts and services
+upsert_env_var() {
+  local file="$1" key="$2" value="$3"
+
+  sudo mkdir -p "$(dirname "$file")"
+  sudo touch "$file"
+
+  # Replace if exists, else append
+  if ! sudo grep -q "^${key}=" "$file"; then
+    echo "${key}=${value}" | sudo tee -a "$file" >/dev/null
+  else
+    sudo sed -i "s|^${key}=.*|${key}=${value}|" "$file"
+  fi
+
+  sudo chmod 600 "$file"
+}
+CONF_FILE=/etc/picsure/picsure.env
+upsert_env_var "$CONF_FILE" STACK_S3_BUCKET "$stack_s3_bucket"
+upsert_env_var "$CONF_FILE" DATASET_S3_OBJECT_KEY "$dataset_s3_object_key"
+upsert_env_var "$CONF_FILE" GENOMIC_DATASET_S3_OBJECT_KEY "$genomic_dataset_s3_object_key"
+upsert_env_var "$CONF_FILE" ENVIRONMENT_NAME "$environment_name"
+upsert_env_var "$CONF_FILE" ENV_PRIVATE_DNS_NAME "$env_private_dns_name"
+upsert_env_var "$CONF_FILE" GSS_PREFIX "$gss_prefix"
+upsert_env_var "$CONF_FILE" TARGET_STACK "$target_stack"
 
 echo "ENABLE_PODMAN=true" | sudo tee -a /opt/srce/startup.config
 echo "SPLUNK_INDEX=hms_aws_$gss_prefix" | sudo tee -a /opt/srce/startup.config
