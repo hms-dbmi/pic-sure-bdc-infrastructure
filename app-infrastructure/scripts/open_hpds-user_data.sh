@@ -54,7 +54,6 @@ while true; do
       break
     fi
 
-    # Optional: Add a sleep to prevent hammering the CPU/Log loop
     sleep 5
   fi
 done
