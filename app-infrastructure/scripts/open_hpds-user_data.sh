@@ -36,7 +36,6 @@ CONTAINER_NAME="open-hpds"
 while true; do
   status=$(podman logs "$CONTAINER_NAME" 2>&1 | grep "$INIT_MESSAGE")
 
-  # FIXED: Quoted variable and changed -z (is empty) to -n (is NOT empty)
   if [ -n "$status" ]; then
     echo "$CONTAINER_NAME container has initialized."
 
