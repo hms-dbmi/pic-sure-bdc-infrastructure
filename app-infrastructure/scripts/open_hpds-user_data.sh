@@ -56,7 +56,7 @@ while true; do
     fi
 
     # Optional: Add a sleep to prevent hammering the CPU/Log loop
-    sleep 10
+    sleep 5
   fi
 done
 
