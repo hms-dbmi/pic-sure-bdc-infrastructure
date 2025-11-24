@@ -6,7 +6,7 @@ target_stack="${target_stack}"
 dataset_s3_object_key="${dataset_s3_object_key}"
 
 echo "ENABLE_PODMAN=true" | sudo tee -a /opt/srce/startup.config
-echo "export STACK_S3_BUCKET=$stack_s3_bucket" /etc/environment
+echo "export STACK_S3_BUCKET=$stack_s3_bucket" >> /etc/environment
 echo "export GSS_PREFIX=$gss_prefix" >> /etc/environment
 echo "export TARGET_STACK=$target_stack" >> /etc/environment
 echo "NESSUS_GROUP=${gss_prefix}_${target_stack}" | sudo tee -a /opt/srce/startup.config

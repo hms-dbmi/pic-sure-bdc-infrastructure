@@ -48,7 +48,7 @@ sudo /opt/picsure/deploy-auth-hpds.sh \
 --dataset_s3_object_key "${dataset_s3_object_key}" \
 --environment_name "${environment_name}" \
 --target_stack "${target_stack}" \
---env_private_dns_name "${env_private_dns_name}" \
+--env_private_dns_name "${env_private_dns_name}"
 
 echo "Waiting for container to initialize"
 
@@ -56,7 +56,7 @@ CONTAINER_NAME="auth-hpds"
 while true; do
   status=$(podman logs "$CONTAINER_NAME" 2>&1 | grep "$INIT_MESSAGE")
 
-  if [ -z $status ];then
+  if [ -n "$status" ]; then
     echo "$CONTAINER_NAME container has initialized."
 
     INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)
@@ -73,6 +73,8 @@ while true; do
 
       break
     fi
+
+    sleep 5
   fi
 done
 

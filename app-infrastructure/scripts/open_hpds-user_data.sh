@@ -13,7 +13,7 @@ sudo sh /opt/srce/scripts/start-gsstools.sh
 
 # Waiting for application to finish initialization
 INIT_MESSAGE="WebApplicationContext: initialization completed"
-INIT_TIMEOUT_SEX=2400  # Set your desired timeout in seconds
+INIT_TIMEOUT_SECS=2400
 INIT_START_TIME=$(date +%s)
 
 sudo mkdir -p /var/log/picsure/open-hpds/
@@ -36,7 +36,7 @@ CONTAINER_NAME="open-hpds"
 while true; do
   status=$(podman logs "$CONTAINER_NAME" 2>&1 | grep "$INIT_MESSAGE")
 
-  if [ -z $status ];then
+  if [ -n "$status" ]; then
     echo "$CONTAINER_NAME container has initialized."
 
     INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)
@@ -53,6 +53,8 @@ while true; do
 
       break
     fi
+
+    sleep 5
   fi
 done
 
