@@ -25,7 +25,7 @@ resource "aws_instance" "open-hpds-ec2" {
   count = var.include_open_hpds ? 1 : 0
 
   ami           = local.ami_id
-  instance_type = "m5.2xlarge"
+  instance_type = "m5.4xlarge"
 
   subnet_id = local.private2_subnet_ids[0]
 
