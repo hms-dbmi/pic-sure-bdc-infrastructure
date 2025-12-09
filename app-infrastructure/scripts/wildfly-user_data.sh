@@ -61,6 +61,8 @@ sudo mkdir -p /var/log/picsure/{wildfly,psama,dictionary}
 s3_copy "s3://${stack_s3_bucket}/${target_stack}/scripts/deploy-wildfly.sh" "/opt/picsure/deploy-wildfly.sh"
 s3_copy "s3://${stack_s3_bucket}/${target_stack}/scripts/deploy-psama.sh" "/opt/picsure/deploy-psama.sh"
 s3_copy "s3://${stack_s3_bucket}/${target_stack}/scripts/deploy-dictionary.sh" "/opt/picsure/deploy-dictionary.sh"
+s3_copy "s3://${stack_s3_bucket}/${target_stack}/scripts/restart-dictionary-service.sh" "/opt/picsure/restart-dictionary-service.sh"
+
 
 sudo chmod +x /opt/picsure/deploy-wildfly.sh
 sudo chmod +x /opt/picsure/deploy-psama.sh
