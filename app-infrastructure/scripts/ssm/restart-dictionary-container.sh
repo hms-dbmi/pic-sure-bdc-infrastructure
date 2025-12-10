@@ -2,14 +2,13 @@
 set -euo pipefail
 
 # Optional: allow override via env or first arg
-CONTAINER_NAME="${CONTAINER_NAME:-${1:-dictionary-api}}"
-SERVICE_NAME="container-${CONTAINER_NAME}.service"
+SERVICE_NAME="${SERVICE_NAME:-container-dictionary-api}.service"
 
 echo "Restarting ${SERVICE_NAME}..."
 
 # Sanity check: does the unit exist?
-if ! systemctl list-unit-files | grep -q "^${SERVICE_NAME}"; then
-  echo "ERROR: ${SERVICE_NAME} does not exist. Aborting."
+if ! systemctl status "$SERVICE_NAME" >/dev/null 2>&1; then
+  echo "ERROR: $SERVICE_NAME does not exist or is not loaded. Aborting."
   exit 1
 fi
 
