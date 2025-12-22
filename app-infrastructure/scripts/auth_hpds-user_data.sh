@@ -16,10 +16,10 @@ upsert_env_var() {
   sudo touch "$file"
 
   # Replace if exists, else append
-  if ! sudo grep -q "^${key}=" "$file"; then
-    echo "${key}=${value}" | sudo tee -a "$file" >/dev/null
+  if ! sudo grep -q "^$key=" "$file"; then
+    echo "$key=$value" | sudo tee -a "$file" >/dev/null
   else
-    sudo sed -i "s|^${key}=.*|${key}=${value}|" "$file"
+    sudo sed -i "s|^$key=.*|$key=$value|" "$file"
   fi
 
   sudo chmod 600 "$file"
