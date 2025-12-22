@@ -58,7 +58,7 @@ CONTAINER_NAME="open-hpds"
 while true; do
   status=$(podman logs "$CONTAINER_NAME" 2>&1 | grep "$INIT_MESSAGE")
 
-  if [ -z $status ];then
+  if [ -n "$status" ]; then
     echo "$CONTAINER_NAME container has initialized."
 
     INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)
