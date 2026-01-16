@@ -50,7 +50,7 @@ s3_copy "s3://${stack_s3_bucket}/data/${dataset_s3_object_key}/fence_mapping.jso
 
 CONTAINER_NAME="wildfly"
 WILDFLY_IMAGE=$(podman load < /opt/picsure/pic-sure-wildfly.tar.gz | cut -d ' ' -f 3)
-JAVA_OPTS="-Xms2g -Xmx24g -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=1024m -Djava.net.preferIPv4Stack=true -DTARGET_STACK=${target_stack}.${env_private_dns_name}"
+JAVA_OPTS="-Xms2g -Xmx18g -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=1024m -Djava.net.preferIPv4Stack=true -DTARGET_STACK=${target_stack}.${env_private_dns_name}"
 
 podman rm -f $CONTAINER_NAME || true
 
