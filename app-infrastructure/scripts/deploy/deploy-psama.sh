@@ -1,4 +1,18 @@
 #!/bin/bash
+set -euo pipefail
+
+# Load optional defaults from a standard env file if present
+load_env() {
+  for f in /etc/picsure/picsure.env /etc/sysconfig/picsure /opt/picsure/.env; do
+    if [ -f "$f" ]; then
+      set -a
+      . "$f"
+      set +a
+      break
+    fi
+  done
+}
+load_env
 
 enable_debug=false
 spring_profile="prod"
@@ -32,12 +46,18 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-stack_s3_bucket=${stack_s3_bucket:-STACK_S3_BUCKET}
-dataset_s3_object_key=${dataset_s3_object_key:-DATASET_S3_OBJECT_KEY}
-target_stack=${target_stack:-TARGET_STACK}
+# Resolve from CLI args, then env vars (uppercase) as fallbacks
+stack_s3_bucket="${stack_s3_bucket:-${STACK_S3_BUCKET:-}}"
+dataset_s3_object_key="${dataset_s3_object_key:-${DATASET_S3_OBJECT_KEY:-}}"
+target_stack="${target_stack:-${TARGET_STACK:-}}"
 
-if [[ -z "$stack_s3_bucket" || -z "$dataset_s3_object_key" || -z "$target_stack" ]]; then
-  echo "Error: --stack_s3_bucket, --target_stack and --dataset_s3_object_key are required."
+# Validate required values
+missing=()
+[[ -z "$stack_s3_bucket" ]] && missing+=("--stack_s3_bucket or STACK_S3_BUCKET")
+[[ -z "$dataset_s3_object_key" ]] && missing+=("--dataset_s3_object_key or DATASET_S3_OBJECT_KEY")
+[[ -z "$target_stack" ]] && missing+=("--target_stack or TARGET_STACK")
+if ((${#missing[@]})); then
+  echo "Error: Missing required values: ${missing[*]}"
   exit 1
 fi
 
