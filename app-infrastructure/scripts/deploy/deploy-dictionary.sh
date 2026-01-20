@@ -36,7 +36,7 @@ s3_copy "s3://${stack_s3_bucket}/configs/picsure-dictionary/picsure-dictionary.e
 s3_copy "s3://${stack_s3_bucket}/${target_stack}/containers/dictionary-api.tar.gz" "/opt/picsure/dictionary-api.tar.gz"
 
 DICTIONARY_API_IMAGE=$(podman load < /opt/picsure/dictionary-api.tar.gz | cut -d ' ' -f 3)
-JAVA_OPTS=" -Xmx8g "
+JAVA_OPTS=" -Xmx10g "
 CONTAINER_NAME=dictionary-api
 
 podman rm -f $CONTAINER_NAME || true
