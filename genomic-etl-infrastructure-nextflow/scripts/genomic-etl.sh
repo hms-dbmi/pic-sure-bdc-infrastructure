@@ -97,10 +97,11 @@ if [ $ActiveState == 'Normalizing' ]; then
    wait
    echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} normalize stage
      echo 'ActiveState=Rezipping' >/annotation_pipeline/anno/ensembl-vep/ActiveState.var
+       . /annotation_pipeline/anno/ensembl-vep/ActiveState.var
 fi
 
 if [ $ActiveState == 'Rezipping' ]; then
-   bgzip -d /annotation_pipeline/anno/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.normalized.vcf.gz &
+   bgzip -dk /annotation_pipeline/anno/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.normalized.vcf.gz &
    echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} rezipping stage
    wait
 
@@ -108,8 +109,10 @@ if [ $ActiveState == 'Rezipping' ]; then
 
    wait
    echo 'ActiveState=Tabix' >/annotation_pipeline/anno/ensembl-vep/ActiveState.var
+     . /annotation_pipeline/anno/ensembl-vep/ActiveState.var
       echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} rezipping stage
 fi
+
 if [ $ActiveState == 'Tabix' ]; then
    tabix /annotation_pipeline/anno/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.rezipped.vcf.gz &
    echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} tabix stage
