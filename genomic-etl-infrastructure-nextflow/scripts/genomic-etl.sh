@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)
 sudo /usr/local/bin/aws --region=us-east-1 ec2 create-tags --resources $${INSTANCE_ID} --tags Key=InitComplete,Value=true
 
@@ -25,7 +26,11 @@ while [ $mount == 0 ]; do
    fi
 done
 
+LOG_FILE="/annotation_pipeline/anno/ensembl-vep/genomic-etl.log"
+exec >$LOG_FILE 2>&1
 echo 'Init complete, moving to annotation'
+
+
 
 export KENT_SRC=/annotation_pipeline/anno/kent-335_base/src
 export MACHTYPE=$(uname -m)
@@ -76,7 +81,6 @@ fi
 if [ $ActiveState == 'Renaming' ]; then
    /usr/local/bin/bcftools annotate --threads 40 --rename-chrs /annotation_pipeline/anno/ensembl-vep/chrm_rename.txt /annotation_pipeline/anno/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.filtered.vcf.gz | /annotation_pipeline/anno/htslib/bgzip >/annotation_pipeline/anno/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.renamed.vcf.gz &
    echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} rename stage
-
    wait
 
    echo 'ActiveState=Normalizing' >/annotation_pipeline/anno/ensembl-vep/ActiveState.var
@@ -85,26 +89,35 @@ if [ $ActiveState == 'Renaming' ]; then
 fi
 
 if [ $ActiveState == 'Normalizing' ]; then
+  rm -f /annotation_pipeline/anno/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.normalized.vcf.gz
+
    /usr/local/bin/bcftools norm --threads 40 -m -any -f /annotation_pipeline/anno/fasta/Homo_sapiens_assembly38.fasta -o /annotation_pipeline/anno/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.normalized.vcf.gz /annotation_pipeline/anno/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.renamed.vcf.gz &
    echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} normalize stage
 
    wait
+   echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} normalize stage
+     echo 'ActiveState=Rezipping' >/annotation_pipeline/anno/ensembl-vep/ActiveState.var
+fi
 
-   bgzip -d /annotation_pipeline/anno/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.normalized.vcf.gz &
-
+if [ $ActiveState == 'Rezipping' ]; then
+   bgzip -dk /annotation_pipeline/anno/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.normalized.vcf.gz &
+   echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} rezipping stage
    wait
 
-   bgzip -f /annotation_pipeline/anno/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.normalized.vcf &
+   bgzip -f /annotation_pipeline/anno/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.normalized.vcf -o /annotation_pipeline/anno/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.rezipped.vcf &
 
    wait
-
-   tabix /annotation_pipeline/anno/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.normalized.vcf.gz &
-
+   echo 'ActiveState=Tabix' >/annotation_pipeline/anno/ensembl-vep/ActiveState.var
+      echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} rezipping stage
+fi
+if [ $ActiveState == 'Tabix' ]; then
+   tabix /annotation_pipeline/anno/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.rezipped.vcf.gz &
+   echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} tabix stage
    wait
 
    echo 'ActiveState=Annotating' >/annotation_pipeline/anno/ensembl-vep/ActiveState.var
    . /annotation_pipeline/anno/ensembl-vep/ActiveState.var
-   echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} normalize stage
+   echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} tabix stage
 fi
 
 yum install -y java-11-openjdk &
@@ -114,7 +127,7 @@ update-alternatives --set java /usr/lib/jvm/java-11-openjdk*/bin/java
 if [ $ActiveState == 'Annotating' ]; then
    echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} vep stage
    nextflow run -resume /annotation_pipeline/anno/ensembl-vep/nextflow/workflows/run_vep.nf \
-      --vcf /annotation_pipeline/anno/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.normalized.vcf.gz \
+      --vcf /annotation_pipeline/anno/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.rezipped.vcf.gz \
       --skip_check 1 \
       --vep_config /annotation_pipeline/anno/ensembl-vep/nextflow/vep_config/vep.ini \
       --bin_size 25000
