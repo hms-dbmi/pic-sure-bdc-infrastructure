@@ -145,7 +145,7 @@ if [ $ActiveState == 'Scripting' ]; then
       -R /annotation_pipeline/anno/ensembl-vep/fasta/Homo_sapiens_assembly38.fasta \
       --vep-gnomad-af gnomADg_AF \
       --mode cds_only \
-      /annotation_pipeline/anno/ensembl-vep/outdir/${study_id}${consent_group_tag}.chr${chrom_number}.normalized_VEP.vcf.gz \
+      /annotation_pipeline/anno/ensembl-vep/outdir/${study_id}${consent_group_tag}.chr${chrom_number}.rezipped_VEP.vcf.gz \
       /annotation_pipeline/anno/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.annotated_remove_modifiers.hpds.vcf.gz &
    echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} python stage
    wait
