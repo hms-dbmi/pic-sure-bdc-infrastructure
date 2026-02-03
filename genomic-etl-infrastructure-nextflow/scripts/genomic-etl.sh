@@ -101,7 +101,7 @@ if [ $ActiveState == 'Normalizing' ]; then
 fi
 
 if [ $ActiveState == 'Rezipping' ]; then
-   bgzip -dk /annotation_pipeline/anno/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.normalized.vcf.gz &
+   bgzip -dk /annotation_pipeline/anno/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.normalized.vcf.gz -o /annotation_pipeline/anno/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.normalized.vcf &
    echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} rezipping stage
    wait
 
