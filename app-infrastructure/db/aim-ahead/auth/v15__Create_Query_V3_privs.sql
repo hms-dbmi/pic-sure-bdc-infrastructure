@@ -3,7 +3,7 @@ SET @uuidAuthRole = REPLACE(UUID(),'-','');
 insert into role(uuid, name, description)
 values (unhex(@uuidAuthRole),
         'MANUAL_ROLE_AUTH_ACCESS',
-        'This role will allow users to query auth HPDS based on their consents')
+        'This role will allow users to query auth HPDS based on their consents');
 
 SET @uuidAuthPriv = REPLACE(UUID(),'-','');
 INSERT INTO privilege (uuid, name, description, application_id, queryScope)
@@ -34,4 +34,4 @@ VALUES (unhex(@uuidAuthRole),
 
 INSERT INTO accessRule_privilege (privilege_id, accessRule_id)
 values (unhex(@uuidAuthPriv),
-        unhex(@uuidGateQuery))
+        unhex(@uuidGateQuery));
