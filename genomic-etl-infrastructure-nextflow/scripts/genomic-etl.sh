@@ -118,26 +118,22 @@ if [ $ActiveState == 'Tabix' ]; then
    echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} tabix stage
    wait
 
-   echo 'ActiveState=Annotating' >/annotation_pipeline/anno/ensembl-vep/ActiveState.var
+  echo 'ActiveState=Annotating' >/annotation_pipeline/anno/ensembl-vep/ActiveState.var
    . /annotation_pipeline/anno/ensembl-vep/ActiveState.var
    echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} tabix stage
 fi
 
-yum install -y java-11-openjdk &
-wait
-update-alternatives --set java /usr/lib/jvm/java-11-openjdk*/bin/java
 
 if [ $ActiveState == 'Annotating' ]; then
+ rm -f /var/lib/rpm/.rpm.lock && yum install -y java-11-openjdk && update-alternatives --set java /usr/lib/jvm/java-11-openjdk*/bin/java &
+ wait
    echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} vep stage
    nextflow run -resume /annotation_pipeline/anno/ensembl-vep/nextflow/workflows/run_vep.nf \
       --vcf /annotation_pipeline/anno/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.rezipped.vcf.gz \
       --skip_check 1 \
       --vep_config /annotation_pipeline/anno/ensembl-vep/nextflow/vep_config/vep.ini \
-      --bin_size 25000
+      --bin_size 25000 && echo 'ActiveState=Scripting' >/annotation_pipeline/anno/ensembl-vep/ActiveState.var && . /annotation_pipeline/anno/ensembl-vep/ActiveState.var && echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} vep stage
 
-   echo 'ActiveState=Scripting' >/annotation_pipeline/anno/ensembl-vep/ActiveState.var
-   . /annotation_pipeline/anno/ensembl-vep/ActiveState.var
-   echo $(date +%T) finished ${study_id}${consent_group_tag}.chr${chrom_number} vep stage
 fi
 
 if [ $ActiveState == 'Scripting' ]; then
@@ -158,7 +154,7 @@ fi
 if [ $ActiveState == 'Uploading' ]; then
    echo $(date +%T) started ${study_id}${consent_group_tag}.chr${chrom_number} output stage
    aws s3 cp /annotation_pipeline/anno/ensembl-vep/${study_id}${consent_group_tag}.chr${chrom_number}.annotated_remove_modifiers.hpds.vcf.gz s3://${output_s3_bucket}/genomic-etl/hpds_vcfs/modifiers_removed/${freeze_number}/ &
-   aws s3 cp /annotation_pipeline/anno/ensembl-vep/outdir/${study_id}${consent_group_tag}.chr${chrom_number}.normalized_VEP.vcf.gz s3://${output_s3_bucket}/genomic-etl/vep_vcf_output/${freeze_number}/ &
+   aws s3 cp /annotation_pipeline/anno/ensembl-vep/outdir/${study_id}${consent_group_tag}.chr${chrom_number}.rezipped_VEP.vcf.gz s3://${output_s3_bucket}/genomic-etl/vep_vcf_output/${freeze_number}/ &
    aws s3 cp /annotation_pipeline/anno/ensembl-vep/${study_name}_${study_id}_TOPMed_WGS_freeze.${freeze_number}b.chr${chrom_number}.hg38${consent_group_tag}.vcf.gz s3://${output_s3_bucket}/genomic-etl/original_vcfs/${freeze_number}/${study_id}${consent_group_tag}.chr${chrom_number}.original.vcf.gz &
 
    wait
