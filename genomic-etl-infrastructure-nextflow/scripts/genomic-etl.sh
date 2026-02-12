@@ -10,6 +10,7 @@ wait
 mkdir /annotation_pipeline
 
 export mount=0
+#TODO: find better way to do this - sometimes its getting attached weird
 while [ $mount == 0 ]; do
    echo 'Checking nvme1n1 device'
    mount /dev/nvme1n1 /annotation_pipeline
@@ -22,6 +23,20 @@ while [ $mount == 0 ]; do
       if grep -qs '/annotation_pipeline' /proc/mounts; then
          echo "It's mounted."
          export mount=1
+      else
+          echo "Checking nvme3n1 device"
+          mount /dev/nvme3n1 /annotation_pipeline
+          if grep -qs '/annotation_pipeline' /proc/mounts; then
+             echo "It's mounted."
+             export mount=1
+          else
+              echo "Checking nvme4n1 device"
+              mount /dev/nvme4n1 /annotation_pipeline
+              if grep -qs '/annotation_pipeline' /proc/mounts; then
+                 echo "It's mounted."
+                 export mount=1
+              fi
+          fi
       fi
    fi
 done
