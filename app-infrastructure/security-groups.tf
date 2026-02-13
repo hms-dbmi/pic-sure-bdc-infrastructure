@@ -11,6 +11,13 @@ resource "aws_security_group" "inbound-httpd-from-alb" {
     cidr_blocks = local.public_subnet_cidrs
   }
 
+  ingress {
+    from_port   = 4443
+    to_port     = 4443
+    protocol    = "tcp"
+    cidr_blocks = local.public_subnet_cidrs
+  }
+
   tags = {
     Owner       = "Avillach_Lab"
     Environment = var.environment_name
@@ -32,9 +39,9 @@ resource "aws_security_group" "inbound-wildfly-from-httpd" {
   }
 
   ingress {
-    from_port = 8090
-    to_port   = 8090
-    protocol  = "tcp"
+    from_port       = 8090
+    to_port         = 8090
+    protocol        = "tcp"
     security_groups = [aws_security_group.inbound-httpd-from-alb.id]
   }
 

@@ -24,7 +24,7 @@ data "aws_lb_target_group" "tg_name" {
 resource "aws_lb_target_group_attachment" "stack_lb_tga" {
   target_group_arn  = data.aws_lb_target_group.tg_name.arn
   target_id         = aws_instance.httpd-ec2.private_ip
-  port              = 443
+  port              = local.tg_port
   availability_zone = "all"
 }
 
@@ -33,7 +33,7 @@ resource "aws_lb_target_group_attachment" "stack_lb_tga" {
 # this should only be set to true when promoting staging to live.
 
 variable "is_promote_tga" {
-  type	  =	bool
+  type    = bool
   default = false
 }
 
@@ -54,9 +54,10 @@ variable "live_tg_name" {
 
 locals {
   lb_target_stack = var.is_promote_tga ? var.env_live_subdomain : var.env_staging_subdomain
-  is_live         = var.is_promote_tga ? true: false
-  
+  is_live         = var.is_promote_tga ? true : false
+
   # for use to support not having tags remove when provider is updated
-  tg_name         = var.is_promote_tga ? var.live_tg_name: var.staging_tg_name
-  
+  tg_name = var.is_promote_tga ? var.live_tg_name : var.staging_tg_name
+  tg_port = var.is_promote_tga ? 443 : 4443
+
 }

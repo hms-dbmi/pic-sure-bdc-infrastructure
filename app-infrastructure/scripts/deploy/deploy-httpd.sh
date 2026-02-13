@@ -61,7 +61,8 @@ podman run --privileged -u root --name=$CONTAINER_NAME \
 -v /opt/picsure/fence_mapping.json:/usr/local/apache2/htdocs/picsureui/studyAccess/studies-data.json:Z \
 -v /usr/local/docker-config/cert:/usr/local/apache2/cert/:Z \
 -v /usr/local/docker-config/httpd-vhosts.conf:/usr/local/apache2/conf/extra/httpd-vhosts.conf:Z \
--p 443:443 -d "$HTTPD_IMAGE"
+-p 443:443 \
+-p 4443:4443 -d "$HTTPD_IMAGE"
 
 # systemd setup.
 podman generate systemd --name $CONTAINER_NAME --restart-policy=always --files
