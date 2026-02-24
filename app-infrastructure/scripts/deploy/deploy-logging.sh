@@ -41,6 +41,7 @@ podman rm -f $CONTAINER_NAME || true
 podman run --privileged --name=$CONTAINER_NAME \
       --dns=10.89.0.1 \
       --env-file /opt/picsure/logging.env \
+      -e LOG_DIR=/app/logs \
       -v /var/log/picsure/logging/:/app/logs \
       --network picsure \
       --log-opt tag=$CONTAINER_NAME \
