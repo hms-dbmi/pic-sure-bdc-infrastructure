@@ -50,7 +50,7 @@ podman rm -f $CONTAINER_NAME || true
 podman run --privileged --name=$CONTAINER_NAME \
       --dns=10.89.0.1 \
       --env-file /opt/picsure/picsure-dictionary.env \
-       -v /var/log/picsure/dictionary/:/var/log/ \
+       -v /var/log/picsure/dictionary/:/var/log/:Z \
       --network picsure \
       --log-opt tag=$CONTAINER_NAME \
       -e JAVA_OPTS="$JAVA_OPTS" \
@@ -61,7 +61,6 @@ podman generate systemd --name $CONTAINER_NAME --restart-policy=always --files
 sudo mv container-$CONTAINER_NAME.service /etc/systemd/system/
 sudo restorecon -v /etc/systemd/system/container-$CONTAINER_NAME.service
 
-sudo systemctl daemon-reexec
 sudo systemctl daemon-reload
 sudo systemctl enable container-$CONTAINER_NAME.service
 sudo systemctl restart container-$CONTAINER_NAME.service

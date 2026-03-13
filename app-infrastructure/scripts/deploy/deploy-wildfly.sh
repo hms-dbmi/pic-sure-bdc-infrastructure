@@ -38,7 +38,7 @@ target_stack=${target_stack:-$TARGET_STACK}
 dataset_s3_object_key=${dataset_s3_object_key:-$DATASET_S3_OBJECT_KEY}
 
 if [[ -z "$stack_s3_bucket" || -z "$env_private_dns_name" || -z "$target_stack" || -z "$dataset_s3_object_key" ]]; then
-  echo "Error: --stack_s3_bucket, --target_stack, --env_private_dns_name, and dataset_s3_object_key are required."
+  echo "Error: --stack_s3_bucket, --target_stack, --env_private_dns_name, and --dataset_s3_object_key are required."
   exit 1
 fi
 
@@ -77,7 +77,6 @@ podman generate systemd --name $CONTAINER_NAME --restart-policy=always --files
 sudo mv container-$CONTAINER_NAME.service /etc/systemd/system/
 
 sudo restorecon -v /etc/systemd/system/container-$CONTAINER_NAME.service
-sudo systemctl daemon-reexec
 sudo systemctl daemon-reload
 sudo systemctl enable container-$CONTAINER_NAME.service
 sudo systemctl restart container-$CONTAINER_NAME.service
