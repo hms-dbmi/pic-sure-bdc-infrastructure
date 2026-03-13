@@ -60,7 +60,7 @@ resource "aws_instance" "httpd-ec2" {
 }
 
 data "template_file" "httpd-vhosts-conf" {
-  template = file("configs/httpd-vhosts.conf")
+  template = file("configs/httpd-vhosts-${var.environment_prefix}.conf")
   vars     = {
 
     wildfly-base-url            = "http://${aws_instance.wildfly-ec2.private_ip}:8080"
