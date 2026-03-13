@@ -33,12 +33,19 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-stack_s3_bucket=${stack_s3_bucket:-STACK_S3_BUCKET}
-dataset_s3_object_key=${dataset_s3_object_key:-DATASET_S3_OBJECT_KEY}
-genomic_dataset_s3_object_key=${genomic_dataset_s3_object_key:-GENOMIC_DATASET_S3_OBJECT_KEY}
-target_stack=${target_stack:-TARGET_STACK}
-environment_name=${environment_name:-ENVIRONMENT_NAME}
-env_private_dns_name=${env_private_dns_name:-ENV_PRIVATE_DNS_NAME}
+# Source /etc/environment for fallback values (set during initial provisioning)
+if [[ -f /etc/environment ]]; then
+  set -a
+  source /etc/environment
+  set +a
+fi
+
+stack_s3_bucket=${stack_s3_bucket:-$STACK_S3_BUCKET}
+dataset_s3_object_key=${dataset_s3_object_key:-$DATASET_S3_OBJECT_KEY}
+genomic_dataset_s3_object_key=${genomic_dataset_s3_object_key:-$GENOMIC_DATASET_S3_OBJECT_KEY}
+target_stack=${target_stack:-$TARGET_STACK}
+environment_name=${environment_name:-$ENVIRONMENT_NAME}
+env_private_dns_name=${env_private_dns_name:-$ENV_PRIVATE_DNS_NAME}
 
 
 
@@ -65,6 +72,7 @@ s3_copy() {
 s3_copy "s3://${stack_s3_bucket}/${target_stack}/containers/pic-sure-hpds.tar.gz" "/opt/picsure/pic-sure-hpds.tar.gz"
 s3_copy "s3://${stack_s3_bucket}/data/${dataset_s3_object_key}/javabins_rekeyed.tar" "/opt/local/hpds/javabins_rekeyed.tar"
 s3_copy "s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/" "/opt/local/hpds/all/" --recursive
+s3_copy "s3://${stack_s3_bucket}/configs/hpds/${target_stack}/auth-hpds.env" "/opt/picsure/auth-hpds.env"
 
 cd /opt/local/hpds || exit 1
 tar -xvf javabins_rekeyed.tar
@@ -84,7 +92,7 @@ podman run --privileged --name=$CONTAINER_NAME \
                 -v /opt/local/hpds:/opt/local/hpds:Z \
                 --log-opt tag=$CONTAINER_NAME \
                 -p 8080:8080 \
-                -e JAVA_OPTS=" -XX:+UseParallelGC -XX:SurvivorRatio=250 -Xms10g -Xmx128g -Dserver.port=8080 -Dspring.profiles.active=bdc-auth-${environment_name} -DTARGET_STACK=${target_stack}.${env_private_dns_name} -DCACHE_SIZE=2500 -DID_BATCH_SIZE=5000 -DALL_IDS_CONCEPT=NONE -DID_CUBE_NAME=NONE "  \
+                --env-file /opt/picsure/auth-hpds.env \
                 -d "$HPDS_IMAGE"
 
 # systemd setup.

@@ -17,8 +17,15 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-stack_s3_bucket=${stack_s3_bucket:-STACK_S3_BUCKET}
-target_stack=${target_stack:-TARGET_STACK}
+# Source /etc/environment for fallback values (set during initial provisioning)
+if [[ -f /etc/environment ]]; then
+  set -a
+  source /etc/environment
+  set +a
+fi
+
+stack_s3_bucket=${stack_s3_bucket:-$STACK_S3_BUCKET}
+target_stack=${target_stack:-$TARGET_STACK}
 
 if [[ -z "$stack_s3_bucket" || -z "$target_stack" ]]; then
   echo "Error: --stack_s3_bucket and --target_stack are required."

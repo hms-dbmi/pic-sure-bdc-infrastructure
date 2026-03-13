@@ -21,8 +21,15 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-stack_s3_bucket=${stack_s3_bucket:-STACK_S3_BUCKET}
-target_stack=${target_stack:-TARGET_STACK}
+# Source /etc/environment for fallback values (set during initial provisioning)
+if [[ -f /etc/environment ]]; then
+  set -a
+  source /etc/environment
+  set +a
+fi
+
+stack_s3_bucket=${stack_s3_bucket:-$STACK_S3_BUCKET}
+target_stack=${target_stack:-$TARGET_STACK}
 
 if [[ -z "$stack_s3_bucket" || -z "$target_stack" ]]; then
   echo "Error: --stack_s3_bucket and --dataset_s3_object_key are required."
@@ -38,7 +45,6 @@ s3_copy() {
 
 s3_copy "s3://${stack_s3_bucket}/${target_stack}/containers/pic-sure-frontend.tar.gz" "/opt/picsure/pic-sure-frontend.tar.gz"
 s3_copy "s3://${stack_s3_bucket}/${target_stack}/configs/httpd/httpd-vhosts.conf" "/usr/local/docker-config/httpd-vhosts.conf"
-s3_copy "s3://${stack_s3_bucket}/data/${dataset_s3_object_key}/fence_mapping.json" "/opt/picsure/fence_mapping.json"
 s3_copy "s3://${stack_s3_bucket}/certs/httpd/" "/usr/local/docker-config/cert/" --recursive
 
 CONTAINER_NAME=httpd
@@ -58,7 +64,6 @@ HTTPD_IMAGE=$(podman load < /opt/picsure/pic-sure-frontend.tar.gz | cut -d ' ' -
 podman run --privileged -u root --name=$CONTAINER_NAME \
 --log-opt tag=$CONTAINER_NAME \
 -v /var/log/picsure/httpd/:/usr/local/apache2/logs/:Z \
--v /opt/picsure/fence_mapping.json:/usr/local/apache2/htdocs/picsureui/studyAccess/studies-data.json:Z \
 -v /usr/local/docker-config/cert:/usr/local/apache2/cert/:Z \
 -v /usr/local/docker-config/httpd-vhosts.conf:/usr/local/apache2/conf/extra/httpd-vhosts.conf:Z \
 -p 443:443 -d "$HTTPD_IMAGE"

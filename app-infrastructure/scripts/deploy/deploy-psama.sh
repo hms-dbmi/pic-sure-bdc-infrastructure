@@ -32,9 +32,16 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-stack_s3_bucket=${stack_s3_bucket:-STACK_S3_BUCKET}
-dataset_s3_object_key=${dataset_s3_object_key:-DATASET_S3_OBJECT_KEY}
-target_stack=${target_stack:-TARGET_STACK}
+# Source /etc/environment for fallback values (set during initial provisioning)
+if [[ -f /etc/environment ]]; then
+  set -a
+  source /etc/environment
+  set +a
+fi
+
+stack_s3_bucket=${stack_s3_bucket:-$STACK_S3_BUCKET}
+dataset_s3_object_key=${dataset_s3_object_key:-$DATASET_S3_OBJECT_KEY}
+target_stack=${target_stack:-$TARGET_STACK}
 
 if [[ -z "$stack_s3_bucket" || -z "$dataset_s3_object_key" || -z "$target_stack" ]]; then
   echo "Error: --stack_s3_bucket, --target_stack and --dataset_s3_object_key are required."

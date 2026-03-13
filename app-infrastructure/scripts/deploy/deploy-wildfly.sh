@@ -25,10 +25,17 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-stack_s3_bucket=${stack_s3_bucket:-STACK_S3_BUCKET}
-env_private_dns_name=${env_private_dns_name:-ENV_PRIVATE_DNS_NAME}
-target_stack=${target_stack:-TARGET_STACK}
-dataset_s3_object_key=${dataset_s3_object_key:-DATASET_S3_OBJECT_KEY}
+# Source /etc/environment for fallback values (set during initial provisioning)
+if [[ -f /etc/environment ]]; then
+  set -a
+  source /etc/environment
+  set +a
+fi
+
+stack_s3_bucket=${stack_s3_bucket:-$STACK_S3_BUCKET}
+env_private_dns_name=${env_private_dns_name:-$ENV_PRIVATE_DNS_NAME}
+target_stack=${target_stack:-$TARGET_STACK}
+dataset_s3_object_key=${dataset_s3_object_key:-$DATASET_S3_OBJECT_KEY}
 
 if [[ -z "$stack_s3_bucket" || -z "$env_private_dns_name" || -z "$target_stack" || -z "$dataset_s3_object_key" ]]; then
   echo "Error: --stack_s3_bucket, --target_stack, --env_private_dns_name, and dataset_s3_object_key are required."
