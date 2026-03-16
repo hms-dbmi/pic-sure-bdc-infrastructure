@@ -59,9 +59,12 @@ CONTAINER_NAME="wildfly"
 WILDFLY_IMAGE=$(podman load < /opt/picsure/pic-sure-wildfly.tar.gz | cut -d ' ' -f 3)
 JAVA_OPTS="-Xms2g -Xmx18g -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=1024m -Djava.net.preferIPv4Stack=true -DTARGET_STACK=${target_stack}.${env_private_dns_name}"
 
+# Stop and remove any existing container and systemd service.
+sudo systemctl stop container-$CONTAINER_NAME.service 2>/dev/null || true
 podman rm -f $CONTAINER_NAME || true
 
-podman run -u root --name=$CONTAINER_NAME --network=picsure \
+# Create the container without starting it — systemd will handle startup.
+podman create -u root --name=$CONTAINER_NAME --network=picsure \
     --dns=10.89.0.1 \
     --log-opt tag=$CONTAINER_NAME \
     -v /var/log/picsure/wildfly/:/opt/jboss/wildfly/standalone/log/:Z \
@@ -69,7 +72,7 @@ podman run -u root --name=$CONTAINER_NAME --network=picsure \
     -v /opt/picsure/fence_mapping.json:/usr/local/docker-config/fence_mapping.json:z \
     -v /opt/picsure/aggregate-resource.properties:/opt/jboss/wildfly/standalone/configuration/aggregate-data-sharing/pic-sure-aggregate-resource/resource.properties:Z \
     -v /opt/picsure/visualization-resource.properties:/opt/jboss/wildfly/standalone/configuration/visualization/pic-sure-visualization-resource/resource.properties:Z \
-    -p 8080:8080 -e JAVA_OPTS="$JAVA_OPTS" -d $WILDFLY_IMAGE
+    -p 8080:8080 -e JAVA_OPTS="$JAVA_OPTS" "$WILDFLY_IMAGE"
 
 # systemd setup.
 podman generate systemd --name $CONTAINER_NAME --restart-policy=always --files
@@ -79,8 +82,9 @@ sudo mv container-$CONTAINER_NAME.service /etc/systemd/system/
 sudo restorecon -v /etc/systemd/system/container-$CONTAINER_NAME.service
 sudo systemctl daemon-reload
 sudo systemctl enable container-$CONTAINER_NAME.service
-sudo systemctl restart container-$CONTAINER_NAME.service
+sudo systemctl start container-$CONTAINER_NAME.service
 
 echo "Verifying container-$CONTAINER_NAME.service status..."
 sudo systemctl is-enabled container-$CONTAINER_NAME.service
-sudo systemctl status container-$CONTAINER_NAME.service --no-pager
+# Status check is informational — Jenkins log polling verifies actual startup.
+sudo systemctl status container-$CONTAINER_NAME.service --no-pager || true

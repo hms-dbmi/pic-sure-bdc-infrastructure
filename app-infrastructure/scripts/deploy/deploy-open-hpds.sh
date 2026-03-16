@@ -63,14 +63,18 @@ CONTAINER_NAME=open-hpds
 echo "Loading and running container"
 HPDS_IMAGE=$(podman load < /opt/picsure/pic-sure-hpds.tar.gz | cut -d ' ' -f 3)
 
+# Stop and remove any existing container and systemd service.
+sudo systemctl stop container-$CONTAINER_NAME.service 2>/dev/null || true
 podman rm -f $CONTAINER_NAME || true
-podman run --privileged --name=$CONTAINER_NAME \
+
+# Create the container without starting it — systemd will handle startup.
+podman create --privileged --name=$CONTAINER_NAME \
                 -v /var/log/picsure/open-hpds/:/var/log/:Z \
                 -v /opt/local/hpds:/opt/local/hpds:Z \
                 --log-opt tag=$CONTAINER_NAME \
                 -p 8080:8080 \
                 --env-file /opt/picsure/open-hpds.env \
-                -d "$HPDS_IMAGE"
+                "$HPDS_IMAGE"
 echo "Container created."
 
 echo "Setting up podman for $CONTAINER_NAME"
@@ -81,9 +85,10 @@ sudo restorecon -v /etc/systemd/system/container-$CONTAINER_NAME.service
 
 sudo systemctl daemon-reload
 sudo systemctl enable container-$CONTAINER_NAME.service
-sudo systemctl restart container-$CONTAINER_NAME.service
+sudo systemctl start container-$CONTAINER_NAME.service
 
 echo "Verifying container-$CONTAINER_NAME.service status..."
 sudo systemctl is-enabled container-$CONTAINER_NAME.service
-sudo systemctl status container-$CONTAINER_NAME.service --no-pager
+# Status check is informational — Jenkins log polling verifies actual startup.
+sudo systemctl status container-$CONTAINER_NAME.service --no-pager || true
 echo "Completed podman setup for $CONTAINER_NAME"

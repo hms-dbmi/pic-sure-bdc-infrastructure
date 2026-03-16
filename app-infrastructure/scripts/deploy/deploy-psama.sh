@@ -77,8 +77,12 @@ else
 fi
 
 CONTAINER_NAME=psama
+# Stop and remove any existing container and systemd service.
+sudo systemctl stop container-$CONTAINER_NAME.service 2>/dev/null || true
 podman rm -f $CONTAINER_NAME || true
-podman run -u root --privileged --name=$CONTAINER_NAME --network=picsure \
+
+# Create the container without starting it — systemd will handle startup.
+podman create -u root --privileged --name=$CONTAINER_NAME --network=picsure \
     --dns=10.89.0.1 \
     --env-file /opt/picsure/psama.env \
     -v /var/log/picsure/psama/:/var/log/:Z \
@@ -86,7 +90,7 @@ podman run -u root --privileged --name=$CONTAINER_NAME --network=picsure \
     --log-opt tag=$CONTAINER_NAME \
     -v /opt/picsure/fence_mapping.json:/config/fence_mapping.json:z \
     $PSAMA_PORTS \
-    -d $PSAMA_IMAGE
+    "$PSAMA_IMAGE"
 
 # systemd setup.
 podman generate systemd --name $CONTAINER_NAME --restart-policy=always --files
@@ -96,8 +100,9 @@ sudo mv container-$CONTAINER_NAME.service /etc/systemd/system/
 sudo restorecon -v /etc/systemd/system/container-$CONTAINER_NAME.service
 sudo systemctl daemon-reload
 sudo systemctl enable container-$CONTAINER_NAME.service
-sudo systemctl restart container-$CONTAINER_NAME.service
+sudo systemctl start container-$CONTAINER_NAME.service
 
 echo "Verifying container-$CONTAINER_NAME.service status..."
 sudo systemctl is-enabled container-$CONTAINER_NAME.service
-sudo systemctl status container-$CONTAINER_NAME.service --no-pager
+# Status check is informational — Jenkins log polling verifies actual startup.
+sudo systemctl status container-$CONTAINER_NAME.service --no-pager || true
