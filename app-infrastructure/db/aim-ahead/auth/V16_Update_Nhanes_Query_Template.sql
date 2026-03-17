@@ -7,7 +7,7 @@ SET queryScope = '["\\\\Nhanes\\\\","_"]'
 where name = "PRIV_MANAGED_nhanes";
 
 
-update access_rule set value = '\\\\Nhanes\\\\'
+update access_rule set value = '\\Nhanes\\'
 where value = '\\\\nhanes\\\\';
 
 update access_rule set value = 'Nhanes'
