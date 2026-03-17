@@ -80,7 +80,8 @@ cd ~ || exit 1
 
 chmod 644 /opt/local/hpds/*
 chmod 644 /opt/local/hpds/all/*
-chmod 644 /opt/picsure/*
+chmod 644 /opt/picsure/auth-hpds.env
+chmod 644 /opt/picsure/pic-sure-hpds.tar.gz
 
 echo "Loading and running container"
 CONTAINER_NAME="auth-hpds"
