@@ -84,7 +84,20 @@ sudo systemctl daemon-reload
 sudo systemctl enable container-$CONTAINER_NAME.service
 sudo systemctl start container-$CONTAINER_NAME.service
 
+echo "Waiting for container to initialize..."
+sleep 10
+
 echo "Verifying container-$CONTAINER_NAME.service status..."
 sudo systemctl is-enabled container-$CONTAINER_NAME.service
-# Status check is informational — Jenkins log polling verifies actual startup.
 sudo systemctl status container-$CONTAINER_NAME.service --no-pager || true
+
+echo "--- Journald logs for container-$CONTAINER_NAME.service ---"
+sudo journalctl -u container-$CONTAINER_NAME.service --no-pager -n 50 || true
+
+# Fail the script if the container is not running, so Jenkins reports the real error.
+if ! podman ps --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
+  echo "ERROR: Container '$CONTAINER_NAME' is not running after startup."
+  echo "--- Full container inspect ---"
+  podman inspect $CONTAINER_NAME 2>&1 || true
+  exit 1
+fi
