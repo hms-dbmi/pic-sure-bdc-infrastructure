@@ -82,7 +82,7 @@ sudo mv container-$CONTAINER_NAME.service /etc/systemd/system/
 sudo restorecon -v /etc/systemd/system/container-$CONTAINER_NAME.service
 sudo systemctl daemon-reload
 sudo systemctl enable container-$CONTAINER_NAME.service
-sudo systemctl start container-$CONTAINER_NAME.service
+sudo systemctl start --no-block container-$CONTAINER_NAME.service
 
 echo "Waiting for container to initialize..."
 sleep 10
