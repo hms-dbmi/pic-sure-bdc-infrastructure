@@ -23,7 +23,7 @@ data "template_cloudinit_config" "httpd-user-data" {
 
 resource "aws_instance" "httpd-ec2" {
   ami           = local.ami_id
-  instance_type = "m5.large"
+  instance_type = "m7i.large"
 
   subnet_id = local.private1_subnet_ids[0]
 
