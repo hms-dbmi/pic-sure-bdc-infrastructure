@@ -109,12 +109,12 @@ resource "aws_spot_fleet_request" "genomic-etl-ec2"{
       ami = var.ami-id
       associate_public_ip_address = true
 
-      iam_instance_profile = "jenkins-s3-profile"
+      iam_instance_profile = "bdc-etl-jenkins-role"
 
       user_data = data.template_cloudinit_config.genomic-user-data.rendered
 
       vpc_security_group_ids = [
-          "sg-0dba36beb3a630b47"
+          "sg-091e96fbc2bfa73f1"
       ]
       root_block_device {
         delete_on_termination = true
