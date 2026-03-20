@@ -5,6 +5,10 @@ gss_prefix="${gss_prefix}"
 destigmatized_dataset_s3_object_key="${destigmatized_dataset_s3_object_key}"
 target_stack="${target_stack}"
 
+echo "export STACK_S3_BUCKET=$stack_s3_bucket" >> /etc/environment
+echo "export DESTIGMATIZED_DATASET_S3_OBJECT_KEY=$destigmatized_dataset_s3_object_key" >> /etc/environment
+echo "export TARGET_STACK=$target_stack" >> /etc/environment
+
 echo "ENABLE_PODMAN=true" | sudo tee -a /opt/srce/startup.config
 echo "SPLUNK_INDEX=hms_aws_${gss_prefix}" | sudo tee -a /opt/srce/startup.config
 echo "NESSUS_GROUP=${gss_prefix}_${target_stack}" | sudo tee -a /opt/srce/startup.config

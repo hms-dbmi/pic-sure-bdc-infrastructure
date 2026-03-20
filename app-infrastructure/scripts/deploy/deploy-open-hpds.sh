@@ -21,9 +21,16 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-stack_s3_bucket=${stack_s3_bucket:-STACK_S3_BUCKET}
-destigmatized_dataset_s3_object_key=${destigmatized_dataset_s3_object_key:-DESTIGMATIZED_DATASET_S3_OBJECT_KEY}
-target_stack=${target_stack:-TARGET_STACK}
+# Source /etc/environment for fallback values (set during initial provisioning)
+if [[ -f /etc/environment ]]; then
+  set -a
+  source /etc/environment
+  set +a
+fi
+
+stack_s3_bucket=${stack_s3_bucket:-$STACK_S3_BUCKET}
+destigmatized_dataset_s3_object_key=${destigmatized_dataset_s3_object_key:-$DESTIGMATIZED_DATASET_S3_OBJECT_KEY}
+target_stack=${target_stack:-$TARGET_STACK}
 
 if [[ -z "$stack_s3_bucket" || -z "$destigmatized_dataset_s3_object_key" || -z "$target_stack" ]]; then
   echo "Error: --stack_s3_bucket, --target_stack and --destigmatized_dataset_s3_object_key are required"
@@ -40,6 +47,7 @@ s3_copy() {
 echo "Downloading Files"
 s3_copy "s3://${stack_s3_bucket}/${target_stack}/containers/pic-sure-hpds.tar.gz" "/opt/picsure/pic-sure-hpds.tar.gz"
 s3_copy "s3://${stack_s3_bucket}/data/${destigmatized_dataset_s3_object_key}/destigmatized_javabins_rekeyed.tar" "/opt/local/hpds/destigmatized_javabins_rekeyed.tar"
+s3_copy "s3://${stack_s3_bucket}/configs/hpds/${target_stack}/open-hpds.env" "/opt/picsure/open-hpds.env"
 
 echo "Unpacking destigmatized_javabins_rekeyed.tar"
 cd /opt/local/hpds || exit
@@ -47,18 +55,26 @@ tar -xvf destigmatized_javabins_rekeyed.tar
 cd ~ || exit
 echo "Completed unpacking destigmatized_javabins_rekeyed.tar"
 
+chmod 644 /opt/local/hpds/*
+chmod 644 /opt/picsure/*
+
 CONTAINER_NAME=open-hpds
 
-echo "Creating $CONTAINER_NAME"
-HPDS_IMAGE=$(sudo podman load < /opt/picsure/pic-sure-hpds.tar.gz | cut -d ' ' -f 3)
-sudo podman run --name=$CONTAINER_NAME \
---restart unless-stopped \
---log-opt tag=$CONTAINER_NAME \
--v /opt/local/hpds:/opt/local/hpds:Z \
--v /var/log/picsure/open-hpds/:/var/log/:Z \
--p 8080:8080 \
--e JAVA_OPTS=" -XX:+UseParallelGC -XX:SurvivorRatio=250 -Xms10g -Xmx56g -Dserver.port=8080 -Dspring.profiles.active=open -DCACHE_SIZE=2500 -DSMALL_TASK_THREADS=1 -DLARGE_TASK_THREADS=1 -DSMALL_JOB_LIMIT=100 -DID_BATCH_SIZE=5000 " \
--d "$HPDS_IMAGE"
+echo "Loading and running container"
+HPDS_IMAGE=$(podman load < /opt/picsure/pic-sure-hpds.tar.gz | cut -d ' ' -f 3)
+
+# Stop and remove any existing container and systemd service.
+sudo systemctl stop container-$CONTAINER_NAME.service 2>/dev/null || true
+podman rm -f $CONTAINER_NAME || true
+
+# Create the container without starting it — systemd will handle startup.
+podman create --privileged --name=$CONTAINER_NAME \
+                -v /var/log/picsure/open-hpds/:/var/log/:Z \
+                -v /opt/local/hpds:/opt/local/hpds:Z \
+                --log-opt tag=$CONTAINER_NAME \
+                -p 8080:8080 \
+                --env-file /opt/picsure/open-hpds.env \
+                "$HPDS_IMAGE"
 echo "Container created."
 
 echo "Setting up podman for $CONTAINER_NAME"
@@ -67,12 +83,12 @@ podman generate systemd --name $CONTAINER_NAME --restart-policy=always --files
 sudo mv container-$CONTAINER_NAME.service /etc/systemd/system/
 sudo restorecon -v /etc/systemd/system/container-$CONTAINER_NAME.service
 
-sudo systemctl daemon-reexec
 sudo systemctl daemon-reload
 sudo systemctl enable container-$CONTAINER_NAME.service
-sudo systemctl restart container-$CONTAINER_NAME.service
+sudo systemctl start --no-block container-$CONTAINER_NAME.service
 
 echo "Verifying container-$CONTAINER_NAME.service status..."
 sudo systemctl is-enabled container-$CONTAINER_NAME.service
-sudo systemctl status container-$CONTAINER_NAME.service --no-pager
+# Status check is informational — Jenkins log polling verifies actual startup.
+sudo systemctl status container-$CONTAINER_NAME.service --no-pager || true
 echo "Completed podman setup for $CONTAINER_NAME"

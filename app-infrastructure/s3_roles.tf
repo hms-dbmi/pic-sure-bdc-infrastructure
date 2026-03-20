@@ -234,6 +234,12 @@ resource "aws_iam_role_policy" "auth-hpds-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/hpds/${var.target_stack}/auth-hpds.env"
+    },{
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
       "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/${var.target_stack}/configs/hpds/hpds-log4j.properties"
     },{
       "Action": [
@@ -318,6 +324,12 @@ resource "aws_iam_role_policy" "open-hpds-deployment-s3-policy" {
       ],
       "Effect": "Allow",
       "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/${var.target_stack}/configs/hpds/hpds-log4j.properties"
+    },{
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/hpds/${var.target_stack}/open-hpds.env"
     },{
       "Action": [
         "s3:GetObject"

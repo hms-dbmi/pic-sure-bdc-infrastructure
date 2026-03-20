@@ -1,0 +1,1 @@
+alter table user modify passport MEDIUMTEXT null;
