@@ -1,11 +1,12 @@
-
 data "template_file" "auth_hpds-user_data" {
   template = file("scripts/auth_hpds-user_data.sh")
   vars = {
-    stack_githash = var.stack_githash_long
-    dataset_s3_object_key = var.dataset-s3-object-key
-    genomic_dataset_s3_object_key = var.genomic-dataset-s3-object-key
-    stack_s3_bucket = var.stack_s3_bucket
+    stack_githash                 = var.stack_githash_long
+    dataset_s3_object_key         = var.dataset_s3_object_key
+    genomic_dataset_s3_object_key = var.genomic_dataset_s3_object_key
+    stack_s3_bucket               = var.stack_s3_bucket
+    target_stack                  = var.target_stack
+    gss_prefix          = "${var.environment_prefix}_${var.env_is_open_access ? "open" : "auth"}_${var.environment_name}"
   }
 }
 
@@ -22,34 +23,39 @@ data "template_cloudinit_config" "auth_hpds-user-data" {
 }
 
 resource "aws_instance" "auth-hpds-ec2" {
+  count = var.include_auth_hpds ? 1 : 0
 
-  ami = var.ami-id
-  instance_type = "m5.8xlarge"
+  ami           = local.ami_id
+  instance_type = "m5.12xlarge"
 
-  associate_public_ip_address = true
+  subnet_id = local.private2_subnet_ids[0]
 
-  subnet_id = var.db-subnet-us-east-1a-id
-
-  iam_instance_profile = "auth-hpds-deployment-s3-profile-${var.target-stack}-${var.stack_githash}"
+  iam_instance_profile = "auth-hpds-deployment-s3-profile-${var.target_stack}-${local.uniq_name}"
 
   user_data = data.template_cloudinit_config.auth_hpds-user-data.rendered
 
   vpc_security_group_ids = [
-    aws_security_group.inbound-hpds-from-app.id,
-    aws_security_group.outbound-to-trend-micro.id,
-    aws_security_group.inbound-app-from-lma-for-dev-only.id
+    aws_security_group.outbound-to-internet.id,
+    aws_security_group.inbound-hpds-from-wildfly.id,
   ]
+
   root_block_device {
     delete_on_termination = true
-    encrypted = true
-    volume_size = 1000
+    encrypted             = true
+    volume_size           = 1000
   }
 
   tags = {
     Owner       = "Avillach_Lab"
-    Environment = "development"
-    Name        = "FISMA Terraform Playground - ${var.stack_githash} - Auth HPDS - ${var.target-stack}"
-    automaticPatches = "1"
+    Environment = var.environment_name
+    Stack       = var.target_stack
+    Project     = local.project
+    Name        = "Auth HPDS - ${var.target_stack} - ${local.uniq_name}"
   }
 
+  metadata_options {
+    http_endpoint          = "enabled"
+    http_tokens            = "required"
+    instance_metadata_tags = "enabled"
+  }
 }

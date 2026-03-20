@@ -14,6 +14,8 @@ sudo chown centos:centos -R /home/centos
 cd /home/centos/wildfly
 sudo yum -y install python3-pip
 sudo pip3 install --no-input awscli --upgrade
+# not sure why the binary was installing without exec privileges
+sudo chmod +x /usr/local/bin/aws
 
 sudo chmod +x /usr/local/bin/aws
 

@@ -92,7 +92,9 @@ data "aws_ami" "cis_benchmark" {
 }
 
 resource "aws_instance" "docker-awscli-base" {
+
   ami = data.aws_ami.cis_benchmark.image_id
+
   instance_type = "m5.large"
 
   iam_instance_profile = aws_iam_instance_profile.docker-awscli-base-profile.name
@@ -113,6 +115,12 @@ resource "aws_instance" "docker-awscli-base" {
     Owner       = "Avillach_Lab"
     Environment = "development"
     Name        = "FISMA Terraform Playground - Docker AWS CLI AMI"
+  }
+  
+  metadata_options {
+  	http_endpoint = "enabled"
+  	http_tokens = "required"
+	instance_metadata_tags = "enabled"  
   }
 
   user_data = file("install_docker_and_awscli.sh")

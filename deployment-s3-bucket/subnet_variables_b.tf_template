@@ -1,0 +1,63 @@
+variable "edge-subnet-us-east-1a-cidr" {
+  type = string
+  default = "__SUBNET_CIDR__"
+}
+variable "edge-subnet-us-east-1b-cidr" {
+  type = string
+  default = "__SUBNET_CIDR__"
+}
+
+variable "app-subnet-us-east-1a-cidr" {
+  type = string
+  default = "__SUBNET_CIDR__"
+}
+variable "app-subnet-us-east-1b-cidr" {
+  type = string
+  default = "__SUBNET_CIDR__"
+}
+
+variable "db-subnet-us-east-1a-cidr" {
+  type = string
+  default = "__SUBNET_CIDR__"
+}
+variable "db-subnet-us-east-1b-cidr" {
+  type = string
+  default = "__SUBNET_CIDR__"
+}
+
+variable "edge-subnet-us-east-1a-id" {
+  type = string
+  default = "__SUBNET_ID__"
+}
+variable "edge-subnet-us-east-1b-id" {
+  type = string
+  default = "__SUBNET_ID__"
+}
+
+variable "app-subnet-us-east-1a-id" {
+  type = string
+  default = "__SUBNET_ID__"
+}
+variable "app-subnet-us-east-1b-id" {
+  type = string
+  default = "__SUBNET_ID__"
+}
+
+variable "db-subnet-us-east-1a-id" {
+  type = string
+  default = "__SUBNET_ID__"
+}
+variable "db-subnet-us-east-1b-id" {
+  type = string
+  default = "__SUBNET_ID__"
+}
+
+variable "db-subnet-group-name" {
+  type = string
+  default = "__NAME_DEFINED_FOR_DB_SUBNET_GROUP__"
+}
+
+variable "target-vpc" {
+  type = string
+  default = "__VPC_FOR_THIS_STACK__"
+}
