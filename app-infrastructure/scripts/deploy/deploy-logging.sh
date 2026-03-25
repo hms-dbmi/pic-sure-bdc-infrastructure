@@ -38,7 +38,7 @@ LOGGING_IMAGE=$(podman load < /opt/picsure/pic-sure-logging.tar.gz | cut -d ' ' 
 CONTAINER_NAME=pic-sure-logging
 
 podman rm -f $CONTAINER_NAME || true
-podman create --privileged --name=$CONTAINER_NAME \
+podman run --privileged --name=$CONTAINER_NAME \
       --dns=10.89.0.1 \
       --env-file /opt/picsure/logging.env \
       -e LOG_DIR=/app/logs \
