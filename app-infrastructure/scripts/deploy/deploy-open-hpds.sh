@@ -56,7 +56,8 @@ cd ~ || exit
 echo "Completed unpacking destigmatized_javabins_rekeyed.tar"
 
 chmod 644 /opt/local/hpds/*
-chmod 644 /opt/picsure/*
+chmod 644 /opt/picsure/pic-sure-hpds.tar.gz
+chmod 644 /opt/picsure/open-hpds.env
 
 CONTAINER_NAME=open-hpds
 
