@@ -212,11 +212,11 @@ variable "ras_session_logout_uri" {
 variable "logging_service_url" {
   type        = string
   description = "Base URL of the PIC-SURE logging service"
-  default     = ""
+  default     = "disabled"
 }
 
 variable "logging_api_key" {
   type        = string
   description = "API key for the PIC-SURE logging service"
-  default     = ""
+  default     = "disabled"
 }
