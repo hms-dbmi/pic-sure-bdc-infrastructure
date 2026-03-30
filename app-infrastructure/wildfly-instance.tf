@@ -71,6 +71,8 @@ data "template_file" "wildfly-standalone-xml" {
     client_id                         = var.client_id
     app_user_secret_name              = var.app_user_secret_name
     include_open_hpds                 = var.include_open_hpds
+    logging_service_url               = var.logging_service_url
+    logging_api_key                   = var.logging_api_key
   }
 }
 

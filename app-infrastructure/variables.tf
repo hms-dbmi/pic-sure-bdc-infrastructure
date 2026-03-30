@@ -208,3 +208,15 @@ variable "ras_session_logout_uri" {
   description = "The logout uri for RAS. This is the URI that will be used to end the user's RAS session."
   default = "false"
 }
+
+variable "logging_service_url" {
+  type        = string
+  description = "Base URL of the PIC-SURE logging service"
+  default     = "disabled"
+}
+
+variable "logging_api_key" {
+  type        = string
+  description = "API key for the PIC-SURE logging service"
+  default     = "disabled"
+}
