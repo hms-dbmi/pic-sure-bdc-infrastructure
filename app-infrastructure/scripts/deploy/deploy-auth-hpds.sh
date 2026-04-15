@@ -54,14 +54,21 @@ if [[ -z "$stack_s3_bucket" || -z "$genomic_dataset_s3_object_key" || -z "$datas
   exit 1
 fi
 
-cat << EOF > /opt/picsure/deploy-script-last-execution-values.txt
-export stack_s3_bucket="${stack_s3_bucket}"
-export dataset_s3_object_key="${dataset_s3_object_key}"
-export genomic_dataset_s3_object_key="${genomic_dataset_s3_object_key}"
-export environment_name="${environment_name}"
-export target_stack="${target_stack}"
-export env_private_dns_name="${env_private_dns_name}"
-EOF
+# Determine whether the dataset keys changed since the previous run.
+# A missing last-execution file means this is the first run — always download.
+download_dataset=true
+download_genomic_dataset=true
+last_execution_file="/opt/picsure/deploy-script-last-execution-values.txt"
+if [[ -f "$last_execution_file" ]]; then
+  prev_dataset_s3_object_key=$(awk -F'"' '/^export dataset_s3_object_key=/{print $2}' "$last_execution_file")
+  prev_genomic_dataset_s3_object_key=$(awk -F'"' '/^export genomic_dataset_s3_object_key=/{print $2}' "$last_execution_file")
+  if [[ "$prev_dataset_s3_object_key" == "$dataset_s3_object_key" ]]; then
+    download_dataset=false
+  fi
+  if [[ "$prev_genomic_dataset_s3_object_key" == "$genomic_dataset_s3_object_key" ]]; then
+    download_genomic_dataset=false
+  fi
+fi
 
 s3_copy() {
   for i in {1..5}; do
@@ -70,13 +77,33 @@ s3_copy() {
 }
 
 s3_copy "s3://${stack_s3_bucket}/${target_stack}/containers/pic-sure-hpds.tar.gz" "/opt/picsure/pic-sure-hpds.tar.gz"
-s3_copy "s3://${stack_s3_bucket}/data/${dataset_s3_object_key}/javabins_rekeyed.tar" "/opt/local/hpds/javabins_rekeyed.tar"
-s3_copy "s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/" "/opt/local/hpds/all/" --recursive
 s3_copy "s3://${stack_s3_bucket}/configs/hpds/${target_stack}/auth-hpds.env" "/opt/picsure/auth-hpds.env"
 
-cd /opt/local/hpds || exit 1
-tar -xvf javabins_rekeyed.tar
-cd ~ || exit 1
+if [[ "$download_dataset" == "true" ]]; then
+  s3_copy "s3://${stack_s3_bucket}/data/${dataset_s3_object_key}/javabins_rekeyed.tar" "/opt/local/hpds/javabins_rekeyed.tar"
+  cd /opt/local/hpds || exit 1
+  tar -xvf javabins_rekeyed.tar
+  cd ~ || exit 1
+else
+  echo "Skipping javabins download — dataset_s3_object_key unchanged from previous run (${dataset_s3_object_key})"
+fi
+
+if [[ "$download_genomic_dataset" == "true" ]]; then
+  s3_copy "s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/" "/opt/local/hpds/all/" --recursive
+else
+  echo "Skipping genomic dataset download — genomic_dataset_s3_object_key unchanged from previous run (${genomic_dataset_s3_object_key})"
+fi
+
+# Record values only after downloads so a failed run doesn't cause the next run
+# to incorrectly skip redownloading.
+cat << EOF > "$last_execution_file"
+export stack_s3_bucket="${stack_s3_bucket}"
+export dataset_s3_object_key="${dataset_s3_object_key}"
+export genomic_dataset_s3_object_key="${genomic_dataset_s3_object_key}"
+export environment_name="${environment_name}"
+export target_stack="${target_stack}"
+export env_private_dns_name="${env_private_dns_name}"
+EOF
 
 chmod 644 /opt/local/hpds/*
 chmod 644 /opt/local/hpds/all/*
