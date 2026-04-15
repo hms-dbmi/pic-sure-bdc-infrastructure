@@ -40,16 +40,12 @@ INIT_TIMEOUT_SECS=2400  # Set your desired timeout in seconds
 INIT_START_TIME=$(date +%s)
 
 s3_copy "s3://${stack_s3_bucket}/${target_stack}/scripts/deploy-auth-hpds.sh" "/opt/picsure/deploy-auth-hpds.sh"
-s3_copy "s3://${stack_s3_bucket}/data/${dataset_s3_object_key}/javabins_rekeyed.tar" "/opt/local/hpds/javabins_rekeyed.tar"
-s3_copy "s3://${stack_s3_bucket}/data/${genomic_dataset_s3_object_key}/all/" "/opt/local/hpds/all/" --recursive
-
-cd /opt/local/hpds || exit 1
-tar -xvf javabins_rekeyed.tar
-cd ~ || exit 1
 
 sudo chmod +x /opt/picsure/deploy-auth-hpds.sh
 sudo /opt/picsure/deploy-auth-hpds.sh \
 --stack_s3_bucket "${stack_s3_bucket}" \
+--genomic_dataset_s3_object_key "${genomic_dataset_s3_object_key}" \
+--dataset_s3_object_key "${dataset_s3_object_key}" \
 --environment_name "${environment_name}" \
 --target_stack "${target_stack}" \
 --env_private_dns_name "${env_private_dns_name}"
