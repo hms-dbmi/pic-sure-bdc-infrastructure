@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Orchestrates sequential deployment of all containers on the wildfly host.
-# Wildfly, PSAMA, and Dictionary share the same EC2 instance and must not
-# deploy in parallel — concurrent systemd/D-Bus operations cause failures.
+# Wildfly, PSAMA, Dictionary, and Visualization share the same EC2 instance and
+# must not deploy in parallel — concurrent systemd/D-Bus operations cause failures.
 #
 # S3 downloads and image loading happen inside each individual deploy script.
 # This script simply calls them one at a time to guarantee only one process
@@ -11,6 +11,7 @@
 deploy_wildfly=false
 deploy_psama=false
 deploy_dictionary=false
+deploy_visualization=false
 
 while [[ $# -gt 0 ]]; do
   case $1 in
@@ -24,6 +25,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --deploy_dictionary)
       deploy_dictionary=true
+      shift
+      ;;
+    --deploy_visualization)
+      deploy_visualization=true
       shift
       ;;
     --stack_s3_bucket)
@@ -81,6 +86,13 @@ fi
 if [[ "$deploy_dictionary" == "true" ]]; then
   echo "=== Deploying dictionary ==="
   /opt/picsure/deploy-dictionary.sh \
+    --stack_s3_bucket "$stack_s3_bucket" \
+    --target_stack "$target_stack" || failed=true
+fi
+
+if [[ "$deploy_visualization" == "true" ]]; then
+  echo "=== Deploying visualization ==="
+  /opt/picsure/deploy-visualization.sh \
     --stack_s3_bucket "$stack_s3_bucket" \
     --target_stack "$target_stack" || failed=true
 fi
