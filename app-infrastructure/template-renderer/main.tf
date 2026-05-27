@@ -26,3 +26,17 @@ resource "aws_s3_object" "hpds_open_env" {
   content_type           = "text/plain"
   server_side_encryption = "AES256"
 }
+
+resource "aws_s3_object" "visualization_env" {
+  count = var.render_visualization ? 1 : 0
+
+  bucket = var.stack_s3_bucket
+  key    = "configs/pic-sure-visualization/${var.target_stack}/visualization.env"
+  content = templatefile("${path.module}/templates/visualization.env.tftpl", {
+    target_stack         = var.target_stack
+    env_private_dns_name = var.env_private_dns_name
+  })
+
+  content_type           = "text/plain"
+  server_side_encryption = "AES256"
+}

@@ -17,3 +17,13 @@ output "hpds_open_env_etag" {
   description = "ETag of the rendered open HPDS env file"
   value       = var.render_open_hpds ? aws_s3_object.hpds_open_env[0].etag : ""
 }
+
+output "visualization_env_s3_key" {
+  description = "S3 key of the rendered visualization env file"
+  value       = var.render_visualization ? aws_s3_object.visualization_env[0].key : ""
+}
+
+output "visualization_env_etag" {
+  description = "ETag of the rendered visualization env file"
+  value       = var.render_visualization ? aws_s3_object.visualization_env[0].etag : ""
+}

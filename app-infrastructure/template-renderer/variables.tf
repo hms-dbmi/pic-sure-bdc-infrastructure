@@ -29,3 +29,9 @@ variable "render_open_hpds" {
   type        = bool
   default     = true
 }
+
+variable "render_visualization" {
+  description = "Whether to render and upload the visualization env file"
+  type        = bool
+  default     = true
+}

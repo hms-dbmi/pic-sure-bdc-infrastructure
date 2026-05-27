@@ -183,7 +183,7 @@ resource "aws_iam_role_policy" "wildfly-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/pic-sure-visualization/visualization.env"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/pic-sure-visualization/${var.target_stack}/visualization.env"
     },
     {
       "Action": [

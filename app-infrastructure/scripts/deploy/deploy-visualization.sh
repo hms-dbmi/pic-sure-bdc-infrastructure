@@ -38,7 +38,7 @@ s3_copy() {
   done
 }
 
-s3_copy "s3://${stack_s3_bucket}/configs/pic-sure-visualization/visualization.env" "/opt/picsure/visualization.env"
+s3_copy "s3://${stack_s3_bucket}/configs/pic-sure-visualization/${target_stack}/visualization.env" "/opt/picsure/visualization.env"
 s3_copy "s3://${stack_s3_bucket}/${target_stack}/containers/pic-sure-visualization.tar.gz" "/opt/picsure/pic-sure-visualization.tar.gz"
 
 chmod 644 "/opt/picsure/visualization.env"
