@@ -45,6 +45,7 @@ s3_copy() {
 
 s3_copy "s3://${stack_s3_bucket}/${target_stack}/containers/pic-sure-frontend.tar.gz" "/opt/picsure/pic-sure-frontend.tar.gz"
 s3_copy "s3://${stack_s3_bucket}/${target_stack}/configs/httpd/httpd-vhosts.conf" "/usr/local/docker-config/httpd-vhosts.conf"
+s3_copy "s3://${stack_s3_bucket}/${target_stack}/configs/httpd/bdc.env" "/opt/picsure/bdc.env"
 s3_copy "s3://${stack_s3_bucket}/certs/httpd/" "/usr/local/docker-config/cert/" --recursive
 
 CONTAINER_NAME=httpd
@@ -69,6 +70,7 @@ podman rm -f $CONTAINER_NAME || true
 # Create the container without starting it — systemd will handle startup.
 podman create --privileged -u root --name=$CONTAINER_NAME \
 --log-opt tag=$CONTAINER_NAME \
+--env-file /opt/picsure/bdc.env \
 -v /var/log/picsure/httpd/:/usr/local/apache2/logs/:Z \
 -v /usr/local/docker-config/cert:/usr/local/apache2/cert/:Z \
 -v /usr/local/docker-config/httpd-vhosts.conf:/usr/local/apache2/conf/extra/httpd-vhosts.conf:Z \
