@@ -70,6 +70,12 @@ resource "aws_iam_role_policy" "httpd-deployment-s3-policy" {
       ],
       "Effect": "Allow",
       "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/${var.target_stack}/configs/httpd/banner_config.json"
+    },{
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/pic-sure-frontend/bdc.env"
     },
     {
       "Action": [
