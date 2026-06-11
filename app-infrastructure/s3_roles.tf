@@ -75,7 +75,7 @@ resource "aws_iam_role_policy" "httpd-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/${var.target_stack}/configs/httpd/bdc.env"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/httpd/bdc.env"
     },
     {
       "Action": [
