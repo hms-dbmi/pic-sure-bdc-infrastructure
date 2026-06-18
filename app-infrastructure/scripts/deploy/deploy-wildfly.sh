@@ -52,7 +52,6 @@ s3_copy() {
 s3_copy "s3://${stack_s3_bucket}/${target_stack}/containers/pic-sure-wildfly.tar.gz" "/opt/picsure/pic-sure-wildfly.tar.gz"
 s3_copy "s3://${stack_s3_bucket}/${target_stack}/configs/wildfly/standalone.xml" "/opt/picsure/standalone.xml"
 s3_copy "s3://${stack_s3_bucket}/${target_stack}/configs/wildfly/aggregate-resource.properties" "/opt/picsure/aggregate-resource.properties"
-s3_copy "s3://${stack_s3_bucket}/${target_stack}/configs/wildfly/visualization-resource.properties" "/opt/picsure/visualization-resource.properties"
 s3_copy "s3://${stack_s3_bucket}/data/${dataset_s3_object_key}/fence_mapping.json" "/opt/picsure/fence_mapping.json"
 
 CONTAINER_NAME="wildfly"
@@ -71,7 +70,6 @@ podman create -u root --name=$CONTAINER_NAME --network=picsure \
     -v /opt/picsure/standalone.xml:/opt/jboss/wildfly/standalone/configuration/standalone.xml:Z \
     -v /opt/picsure/fence_mapping.json:/usr/local/docker-config/fence_mapping.json:z \
     -v /opt/picsure/aggregate-resource.properties:/opt/jboss/wildfly/standalone/configuration/aggregate-data-sharing/pic-sure-aggregate-resource/resource.properties:Z \
-    -v /opt/picsure/visualization-resource.properties:/opt/jboss/wildfly/standalone/configuration/visualization/pic-sure-visualization-resource/resource.properties:Z \
     -p 8080:8080 -e JAVA_OPTS="$JAVA_OPTS" "$WILDFLY_IMAGE"
 
 # systemd setup.
