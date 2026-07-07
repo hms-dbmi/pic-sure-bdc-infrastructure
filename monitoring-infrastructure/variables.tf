@@ -9,6 +9,7 @@ variable "stack_s3_bucket" {
 }
 
 variable "env_private_dns_name" {
+  # kept for shared-tfvars compatibility; unused in this module
   type = string
 }
 

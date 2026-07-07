@@ -23,6 +23,13 @@ s3_copy "s3://${stack_s3_bucket}/monitoring/deploy-monitoring.sh" "/opt/picsure/
 sudo chmod +x /opt/picsure/deploy-monitoring.sh
 sudo /opt/picsure/deploy-monitoring.sh --stack_s3_bucket "${stack_s3_bucket}" --environment_name "${environment_name}"
 
+# monitoring exporters (node_exporter + podman-exporter) — self-observability:
+# the monitoring host's ec2_sd discovery includes itself, so it must also run
+# exporters. Scraped over its own private IP (self-referencing SG rule).
+s3_copy "s3://${stack_s3_bucket}/monitoring/deploy-exporters.sh" "/opt/picsure/deploy-exporters.sh"
+sudo chmod +x /opt/picsure/deploy-exporters.sh
+sudo /opt/picsure/deploy-exporters.sh --stack_s3_bucket "${stack_s3_bucket}" || echo "WARN: exporter deploy failed; continuing"
+
 INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)
 sudo /usr/bin/aws --region=us-east-1 ec2 create-tags --resources "$INSTANCE_ID" --tags Key=InitComplete,Value=true
 

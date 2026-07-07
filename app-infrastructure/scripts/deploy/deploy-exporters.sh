@@ -77,31 +77,39 @@ sudo systemctl is-enabled container-$CONTAINER_NAME.service
 sudo systemctl status container-$CONTAINER_NAME.service --no-pager || true
 
 CONTAINER_NAME=podman-exporter
-# Stop and remove any existing container and systemd service.
-sudo systemctl stop container-$CONTAINER_NAME.service 2>/dev/null || true
-podman rm -f $CONTAINER_NAME || true
+# podman-exporter needs the podman API socket. It's not enabled by default;
+# enable it here (idempotent) before touching the socket path below.
+sudo systemctl enable --now podman.socket
 
-# Create the container without starting it — systemd will handle startup.
-podman create --name=$CONTAINER_NAME --net host --privileged \
---log-opt tag=$CONTAINER_NAME \
--v /run/podman/podman.sock:/run/podman/podman.sock:Z \
--e CONTAINER_HOST=unix:///run/podman/podman.sock \
-"$PODMAN_EXPORTER_IMAGE" \
---web.listen-address=:9882
+if [ -S /run/podman/podman.sock ]; then
+  # Stop and remove any existing container and systemd service.
+  sudo systemctl stop container-$CONTAINER_NAME.service 2>/dev/null || true
+  podman rm -f $CONTAINER_NAME || true
 
-# systemd setup.
-podman generate systemd --name $CONTAINER_NAME --restart-policy=always --files
-sudo mv container-$CONTAINER_NAME.service /etc/systemd/system/
-sudo restorecon -v /etc/systemd/system/container-$CONTAINER_NAME.service
+  # Create the container without starting it — systemd will handle startup.
+  podman create --name=$CONTAINER_NAME --net host --privileged \
+  --log-opt tag=$CONTAINER_NAME \
+  -v /run/podman/podman.sock:/run/podman/podman.sock:Z \
+  -e CONTAINER_HOST=unix:///run/podman/podman.sock \
+  "$PODMAN_EXPORTER_IMAGE" \
+  --web.listen-address=:9882
 
-sudo systemctl daemon-reload
-sudo systemctl enable container-$CONTAINER_NAME.service
-sudo systemctl start --no-block container-$CONTAINER_NAME.service
+  # systemd setup.
+  podman generate systemd --name $CONTAINER_NAME --restart-policy=always --files
+  sudo mv container-$CONTAINER_NAME.service /etc/systemd/system/
+  sudo restorecon -v /etc/systemd/system/container-$CONTAINER_NAME.service
 
-echo "Verifying container-$CONTAINER_NAME.service status..."
-sudo systemctl is-enabled container-$CONTAINER_NAME.service
-# Status check is informational — Jenkins log polling verifies actual startup.
-sudo systemctl status container-$CONTAINER_NAME.service --no-pager || true
+  sudo systemctl daemon-reload
+  sudo systemctl enable container-$CONTAINER_NAME.service
+  sudo systemctl start --no-block container-$CONTAINER_NAME.service
+
+  echo "Verifying container-$CONTAINER_NAME.service status..."
+  sudo systemctl is-enabled container-$CONTAINER_NAME.service
+  # Status check is informational — Jenkins log polling verifies actual startup.
+  sudo systemctl status container-$CONTAINER_NAME.service --no-pager || true
+else
+  echo "WARN: podman.sock missing; skipping podman-exporter"
+fi
 
 # Open the exporter ports on the host firewall. This codebase programs the
 # base nftables ruleset directly (see wildfly-user_data.sh), rather than

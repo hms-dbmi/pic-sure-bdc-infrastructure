@@ -10,6 +10,22 @@ resource "aws_security_group" "monitoring" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  ingress {
+    from_port   = 9100
+    to_port     = 9100
+    protocol    = "tcp"
+    self        = true
+    description = "self-scrape of monitoring host exporters"
+  }
+
+  ingress {
+    from_port   = 9882
+    to_port     = 9882
+    protocol    = "tcp"
+    self        = true
+    description = "self-scrape of monitoring host exporters"
+  }
+
   tags = {
     Owner       = "Avillach_Lab"
     Environment = var.environment_name

@@ -92,7 +92,7 @@ sudo systemctl status container-$CONTAINER_NAME.service --no-pager || true
 
 # monitoring: apache-exporter (guarded — httpd deploys are unaffected until the
 # monitoring S3 artifact exists; exporters are additive, never deploy-blocking).
-if aws s3 ls "s3://${stack_s3_bucket}/monitoring/containers/apache-exporter.tar.gz" >/dev/null 2>&1; then
+if sudo /usr/bin/aws --region us-east-1 s3 ls "s3://${stack_s3_bucket}/monitoring/containers/apache-exporter.tar.gz" >/dev/null 2>&1; then
   s3_copy "s3://${stack_s3_bucket}/monitoring/containers/apache-exporter.tar.gz" "/opt/picsure/apache-exporter.tar.gz"
 
   APACHE_EXPORTER_IMAGE=$(podman load < /opt/picsure/apache-exporter.tar.gz | cut -d ' ' -f 3)

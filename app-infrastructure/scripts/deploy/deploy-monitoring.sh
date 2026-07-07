@@ -47,6 +47,12 @@ s3_copy "s3://${stack_s3_bucket}/monitoring/monitoring.env" "/opt/picsure/monito
 s3_copy "s3://${stack_s3_bucket}/monitoring/app-token" "/usr/local/docker-config/monitoring/secrets/app-token"
 
 chmod 600 /usr/local/docker-config/monitoring/secrets/app-token
+# prometheus (prom/prometheus) runs as uid 65534 (nobody) inside the
+# container, so it needs read access to the mounted token file (and its
+# parent dir needs to remain traversable) once the M4 per-service scrape
+# jobs (which use this token) are enabled.
+sudo chown 65534:65534 /usr/local/docker-config/monitoring/secrets/app-token
+sudo chmod 755 /usr/local/docker-config/monitoring/secrets
 
 # Extract the config bundle (yields prometheus/, grafana/ under the monitoring dir).
 tar -xzf /opt/picsure/monitoring-bundle.tar.gz -C /usr/local/docker-config/monitoring/
@@ -62,6 +68,12 @@ podman network exists monitoring || podman network create monitoring
 
 sudo mkdir -p /var/lib/prometheus
 sudo mkdir -p /var/lib/grafana
+
+# Container images run as unprivileged, image-defined UIDs, not root — the
+# host-mounted data dirs must be owned accordingly or the containers crash on
+# first boot trying to write their data files.
+sudo chown 65534:65534 /var/lib/prometheus   # prom/prometheus runs as nobody
+sudo chown 472:472 /var/lib/grafana          # grafana image runs as uid 472
 
 CONTAINER_NAME=prometheus
 # Stop and remove any existing container and systemd service.

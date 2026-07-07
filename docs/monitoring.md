@@ -127,6 +127,11 @@ pending the monorepo consolidation's Phase 3.
      `/etc/environment`, and the value isn't otherwise used by this
      script).)
 
+     Note: re-running `deploy-monitoring.sh` itself via SSM requires passing
+     `--environment_name` explicitly — the monitoring host's `/etc/environment`
+     only has `STACK_S3_BUCKET` set, not `ENVIRONMENT_NAME`, so there is no
+     fallback to source for that script.
+
 ## 3. Access (SSM port-forward)
 
 There is no ingress to the monitoring host other than the metrics-scrape
@@ -161,7 +166,12 @@ Per the monitoring spec §9 ("FISMA (M3/M4)"), over the SSM port-forwards
 above:
 
 - [ ] All configured Prometheus targets show `up == 1` (`node`, `podman`,
-      `apache` jobs at minimum; `prometheus` self-scrape job always).
+      `apache` jobs at minimum; `prometheus` self-scrape job always). The
+      monitoring host itself now appears as a `node`/`podman` target too
+      (self-scrape by design — it runs the same exporters as the app
+      instances so its own disk/TSDB health is observable; see the
+      self-referencing `9100`/`9882` ingress rule on
+      `aws_security_group.monitoring`).
 - [ ] Grafana dashboards render with data (Platform overview, Infrastructure
       at minimum for M3).
 - [ ] Prometheus and Grafana are unreachable from the ALB and from any
@@ -198,7 +208,12 @@ Not in scope for this runbook or the current rollout stage (M3):
    8080) in `prometheus-bdc.yml`, and the corresponding
    `inbound-metrics-from-monitoring`-style SG rules for those ports — gated
    on the monorepo consolidation's Phase 3 (FISMA builds from the
-   monorepo).
+   monorepo). The M4 hpds tag filter (`tag:Node values [HPDS, OPEN_HPDS]`)
+   additionally requires first **adding `Node` tags** to the
+   wildfly/auth-hpds/open-hpds instances in `app-infrastructure` — today only
+   the httpd and monitoring instances carry a `Node` tag. The
+   `prometheus-bdc.yml` M4 comment block itself lives in the
+   `pic-sure-all-in-one` repo, not this one.
 3. **AIM-AHEAD monitoring parity** — the M3/M4 patterns here apply, but
    rollout to AIM-AHEAD is scheduled with the consolidation's dual-environment
    Phase 3 work, not part of this track.
