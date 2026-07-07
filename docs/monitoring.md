@@ -49,7 +49,8 @@ tar -czf config-bundle.tar.gz -C <path-to-pic-sure-all-in-one>/monitoring promet
 aws s3 cp config-bundle.tar.gz s3://$BUCKET/monitoring/
 
 # 3. The deploy scripts themselves — pulled by user-data / SSM at run time.
-aws s3 cp deploy-monitoring.sh deploy-exporters.sh s3://$BUCKET/monitoring/
+aws s3 cp deploy-monitoring.sh s3://$BUCKET/monitoring/
+aws s3 cp deploy-exporters.sh s3://$BUCKET/monitoring/
 # (source: app-infrastructure/scripts/deploy/deploy-monitoring.sh,
 #  app-infrastructure/scripts/deploy/deploy-exporters.sh)
 
@@ -73,7 +74,7 @@ Notes on where each key lands and is consumed:
 | `containers/podman-exporter.tar.gz` | `deploy-exporters.sh` | app instances, `/opt/picsure/podman-exporter.tar.gz` |
 | `containers/apache-exporter.tar.gz` (optional) | `deploy-httpd.sh` | httpd instance, `/opt/picsure/apache-exporter.tar.gz` |
 | `deploy-monitoring.sh` | `monitoring-infrastructure/scripts/monitoring-user_data.sh` | `/opt/picsure/deploy-monitoring.sh` on monitoring host |
-| `deploy-exporters.sh` | `wildfly-user_data.sh`, `auth_hpds-user_data.sh`, `httpd-user_data.sh`, `open_hpds-user_data.sh`, `deploy-httpd.sh` | `/opt/picsure/deploy-exporters.sh` on each app instance |
+| `deploy-exporters.sh` | `wildfly-user_data.sh`, `auth_hpds-user_data.sh`, `httpd-user_data.sh`, `open_hpds-user_data.sh` | `/opt/picsure/deploy-exporters.sh` on each app instance |
 
 The `app-token` value gates the `X-Application-Token` header
 (`http_headers.files` in Prometheus, env var `PICSURE_APPLICATION_TOKEN` on
