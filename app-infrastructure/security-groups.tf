@@ -124,3 +124,50 @@ resource "aws_security_group" "outbound-to-internet" {
     Name        = "outbound-to-internet Security Group - ${var.target_stack} - ${local.uniq_name}"
   }
 }
+
+### Monitoring: metrics scraping ingress (spec 2026-07-06-monitoring-stack-design §6.2)
+locals {
+  monitoring_enabled = var.monitoring_ingress_cidr != ""
+  # SGs attached to app instances, keyed for stable rule addressing
+  metrics_target_sgs = {
+    wildfly = aws_security_group.inbound-wildfly-from-httpd.id
+    httpd   = aws_security_group.inbound-httpd-from-alb.id
+    hpds    = aws_security_group.inbound-hpds-from-wildfly.id
+  }
+}
+
+resource "aws_security_group_rule" "node-exporter-from-monitoring" {
+  for_each          = local.monitoring_enabled ? local.metrics_target_sgs : {}
+  type              = "ingress"
+  from_port         = 9100
+  to_port           = 9100
+  protocol          = "tcp"
+  security_group_id = each.value
+  cidr_blocks       = [var.monitoring_ingress_cidr]
+  description       = "node_exporter scrape from monitoring (${each.key})"
+}
+
+resource "aws_security_group_rule" "podman-exporter-from-monitoring" {
+  for_each          = local.monitoring_enabled ? local.metrics_target_sgs : {}
+  type              = "ingress"
+  from_port         = 9882
+  to_port           = 9882
+  protocol          = "tcp"
+  security_group_id = each.value
+  cidr_blocks       = [var.monitoring_ingress_cidr]
+  description       = "podman-exporter scrape from monitoring (${each.key})"
+}
+
+resource "aws_security_group_rule" "apache-exporter-from-monitoring" {
+  count             = local.monitoring_enabled ? 1 : 0
+  type              = "ingress"
+  from_port         = 9117
+  to_port           = 9117
+  protocol          = "tcp"
+  security_group_id = aws_security_group.inbound-httpd-from-alb.id
+  cidr_blocks       = [var.monitoring_ingress_cidr]
+  description       = "apache_exporter scrape from monitoring"
+}
+
+# M4 (documented, inactive until consolidation Phase 3): per-service actuator ports
+# 9401-9404 on the wildfly host SG + 8080 on the hpds SG from the monitoring SG.

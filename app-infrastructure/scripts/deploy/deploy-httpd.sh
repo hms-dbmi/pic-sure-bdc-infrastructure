@@ -74,7 +74,7 @@ podman create --privileged -u root --name=$CONTAINER_NAME \
 -v /var/log/picsure/httpd/:/usr/local/apache2/logs/:Z \
 -v /usr/local/docker-config/cert:/usr/local/apache2/cert/:Z \
 -v /usr/local/docker-config/httpd-vhosts.conf:/usr/local/apache2/conf/extra/httpd-vhosts.conf:Z \
--p 443:443 "$HTTPD_IMAGE"
+-p 443:443 -p 127.0.0.1:8081:8081 "$HTTPD_IMAGE"
 
 # systemd setup.
 podman generate systemd --name $CONTAINER_NAME --restart-policy=always --files
@@ -89,3 +89,48 @@ echo "Verifying container-$CONTAINER_NAME.service status..."
 sudo systemctl is-enabled container-$CONTAINER_NAME.service
 # Status check is informational — Jenkins log polling verifies actual startup.
 sudo systemctl status container-$CONTAINER_NAME.service --no-pager || true
+
+# monitoring: apache-exporter (guarded — httpd deploys are unaffected until the
+# monitoring S3 artifact exists; exporters are additive, never deploy-blocking).
+if aws s3 ls "s3://${stack_s3_bucket}/monitoring/containers/apache-exporter.tar.gz" >/dev/null 2>&1; then
+  s3_copy "s3://${stack_s3_bucket}/monitoring/containers/apache-exporter.tar.gz" "/opt/picsure/apache-exporter.tar.gz"
+
+  APACHE_EXPORTER_IMAGE=$(podman load < /opt/picsure/apache-exporter.tar.gz | cut -d ' ' -f 3)
+
+  CONTAINER_NAME=apache-exporter
+  # Stop and remove any existing container and systemd service.
+  sudo systemctl stop container-$CONTAINER_NAME.service 2>/dev/null || true
+  podman rm -f $CONTAINER_NAME || true
+
+  # Create the container without starting it — systemd will handle startup.
+  podman create --name=$CONTAINER_NAME --net host \
+  --log-opt tag=$CONTAINER_NAME \
+  "$APACHE_EXPORTER_IMAGE" \
+  --scrape_uri=http://127.0.0.1:8081/server-status?auto \
+  --telemetry.address=:9117
+
+  # systemd setup.
+  podman generate systemd --name $CONTAINER_NAME --restart-policy=always --files
+  sudo mv container-$CONTAINER_NAME.service /etc/systemd/system/
+  sudo restorecon -v /etc/systemd/system/container-$CONTAINER_NAME.service
+
+  sudo systemctl daemon-reload
+  sudo systemctl enable container-$CONTAINER_NAME.service
+  sudo systemctl start --no-block container-$CONTAINER_NAME.service
+
+  echo "Verifying container-$CONTAINER_NAME.service status..."
+  sudo systemctl is-enabled container-$CONTAINER_NAME.service
+  # Status check is informational — Jenkins log polling verifies actual startup.
+  sudo systemctl status container-$CONTAINER_NAME.service --no-pager || true
+
+  # Open the exporter port on the host firewall (same nftables mechanism used
+  # by deploy-exporters.sh — this codebase programs the base ruleset directly
+  # rather than firewalld). Guarded so redeploys don't stack duplicate rules.
+  if ! sudo nft list chain inet filter input 2>/dev/null | grep -qE "tcp dport 9117 accept"; then
+    sudo nft add rule inet filter input tcp dport 9117 accept
+  fi
+  sudo nft list ruleset | sudo tee /etc/nftables/nftables.rules > /dev/null
+  sudo systemctl restart nftables
+else
+  echo "Skipping apache-exporter: s3://${stack_s3_bucket}/monitoring/containers/apache-exporter.tar.gz not found."
+fi

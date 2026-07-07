@@ -18,9 +18,10 @@ table for the full design.
 - `aws_security_group.monitoring` — egress-only. There is no ingress rule:
   operator access is SSM-only (Session Manager port-forwarding), per the
   phase-1 "SSM port-forward only" decision. Reverse scraping access (this
-  SG as an allowed source on app-infrastructure instances) is granted by
-  app-infrastructure via the `monitoring_security_group_id` output/variable
-  wired up in a later task.
+  instance's private-IP CIDR as an allowed source on app-infrastructure
+  instances) is granted by app-infrastructure via the
+  `monitoring_ingress_cidr` variable, fed from this module's
+  `monitoring_instance_private_ip` output, wired up in a later task.
 - `aws_iam_role`/`aws_iam_instance_profile` — SSM Session Manager access,
   CloudWatch agent, `ec2:DescribeInstances` (required for Prometheus
   `ec2_sd_configs` service discovery), and scoped S3 read access to the
@@ -31,12 +32,12 @@ table for the full design.
 
 ## Apply order
 
-This module must be applied **before** `monitoring_security_group_id` is
-set on the corresponding `app-infrastructure` stack(s) — app-infrastructure
-uses that output to authorize the monitoring instance's security group as
-an inbound source for the FISMA metrics ports (node_exporter 9100,
-podman-exporter 9882, apache_exporter 9117). Apply this module first, take
-its `monitoring_security_group_id` output, then apply/update
+This module must be applied **before** `monitoring_ingress_cidr` is set on
+the corresponding `app-infrastructure` stack(s) — app-infrastructure uses
+that CIDR to authorize the monitoring instance as an inbound source for the
+FISMA metrics ports (node_exporter 9100, podman-exporter 9882,
+apache_exporter 9117). Apply this module first, take its
+`monitoring_instance_private_ip` output (as a `/32` CIDR), then apply/update
 app-infrastructure with that value.
 
 ```
@@ -45,6 +46,18 @@ terraform init
 terraform plan   # review carefully
 terraform apply  # requires explicit approval — see below
 ```
+
+- **Apply order / cross-VPC note:** app-infrastructure ingress uses the
+  monitoring instance's private IP CIDR (`monitoring_instance_private_ip`,
+  e.g. `10.1.2.3/32`) rather than this module's security group id, because
+  stack `a` and stack `b` are separate VPCs, the monitoring instance lives
+  in the `a` VPC, and AWS does not allow `source_security_group_id`
+  references across VPC boundaries (the same workaround already used by
+  `inbound-httpd-from-alb` in `app-infrastructure/security-groups.tf`).
+  After any monitoring-instance replacement (its private IP will change),
+  update `monitoring_ingress_cidr` in the app stacks' tfvars. Scraping
+  stack-`b` hosts additionally requires VPC routing/peering between the `a`
+  and `b` VPCs — verify this exists before relying on stack-b metrics.
 
 ## Accessing Grafana (SSM port-forward, phase 1)
 

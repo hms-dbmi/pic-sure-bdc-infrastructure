@@ -50,6 +50,11 @@ sudo /opt/picsure/deploy-auth-hpds.sh \
 --target_stack "${target_stack}" \
 --env_private_dns_name "${env_private_dns_name}"
 
+# monitoring exporters (node_exporter + podman-exporter)
+s3_copy "s3://${stack_s3_bucket}/monitoring/deploy-exporters.sh" "/opt/picsure/deploy-exporters.sh"
+sudo chmod +x /opt/picsure/deploy-exporters.sh
+sudo /opt/picsure/deploy-exporters.sh --stack_s3_bucket "${stack_s3_bucket}" || echo "WARN: exporter deploy failed; continuing"
+
 echo "Waiting for container to initialize"
 
 CONTAINER_NAME="auth-hpds"

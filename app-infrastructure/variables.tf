@@ -220,3 +220,9 @@ variable "logging_api_key" {
   description = "API key for the PIC-SURE logging service"
   default     = "disabled"
 }
+
+variable "monitoring_ingress_cidr" {
+  description = "CIDR of the monitoring instance (monitoring-infrastructure output monitoring_instance_private_ip, e.g. \"10.1.2.3/32\"). Empty string disables metrics ingress rules. CIDR rather than SG id because the monitoring instance lives in the 'a' VPC and SG-id references cannot cross VPC boundaries (same workaround as inbound-httpd-from-alb)."
+  type        = string
+  default     = ""
+}

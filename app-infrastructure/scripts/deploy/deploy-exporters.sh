@@ -27,10 +27,15 @@ fi
 stack_s3_bucket=${stack_s3_bucket:-$STACK_S3_BUCKET}
 environment_name=${environment_name:-$ENVIRONMENT_NAME}
 
-if [[ -z "$stack_s3_bucket" || -z "$environment_name" ]]; then
-  echo "Error: --stack_s3_bucket and --environment_name are required."
+if [[ -z "$stack_s3_bucket" ]]; then
+  echo "Error: --stack_s3_bucket is required."
   exit 1
 fi
+# Note: --environment_name is accepted (and sourced from $ENVIRONMENT_NAME) for
+# forward-compatibility, but is not required here: this script is invoked
+# identically from all four app-instance user-data scripts (B3), and only
+# auth_hpds-user_data.sh exports ENVIRONMENT_NAME today. environment_name is
+# not otherwise used in this script's logic below.
 
 s3_copy() {
   for i in {1..5}; do
