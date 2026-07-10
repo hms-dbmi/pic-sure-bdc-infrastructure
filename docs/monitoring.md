@@ -312,9 +312,26 @@ IAM role.
 
 Not in scope for this runbook or the current rollout stage (M3):
 
-1. **Jenkins job creation** in `avillachlab-jenkins` for the "Monitoring
-   Build and Deploy" job described in §1 above — today the S3 artifact
-   population is a manual operator procedure.
+1. ~~**Jenkins job creation** in `avillachlab-jenkins` for the "Monitoring
+   Build and Deploy" job described in §1 above~~ — done. Two jobs now exist
+   on the `avillachlab-jenkins` repo's `pic_sure_api_monitoring` branch,
+   under `jenkins-docker/jobs/`:
+   - **"Monitoring Build and Deploy"** — full artifacts (all 7 pinned
+     container images, config-bundle.tar.gz, deploy-monitoring.sh,
+     deploy-exporters.sh) plus the SSM deploy invocation; this is the
+     automated equivalent of §1's manual artifact-population commands.
+   - **"Deploy Monitoring Config"** — bundle-only (config-bundle.tar.gz
+     from `prometheus/`, `grafana/`, `blackbox/`) plus the same SSM
+     deploy invocation, for dashboard/scrape-config-only changes that
+     don't need new container images.
+
+   Both jobs are S3/SSM-driven exactly as described in §1 and §3 above and,
+   per that contract, **never create or overwrite the operator-managed
+   secrets** (`monitoring.env`, `app-token`, `db-exporters.env`) — those
+   still must be hand-authored in S3 before the first deploy. The manual
+   §1–2 commands remain valid as the break-glass path if the Jenkins jobs
+   are unavailable or a one-off artifact needs publishing outside the
+   normal job run.
 2. **M4 activation**: enabling the per-service actuator scrape jobs
    (dictionary 9401, logging 9402, visualization 9403, psama 9404, hpds
    8080) in `prometheus-bdc.yml`, and the corresponding
