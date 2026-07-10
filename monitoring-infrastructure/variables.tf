@@ -37,3 +37,20 @@ variable "monitoring_volume_size_gb" {
   type        = number
   default     = 100
 }
+
+variable "env_public_dns_name" {
+  description = "Public-facing DNS name of the environment (blackbox probe target for the public ALB endpoint)"
+  type        = string
+}
+
+variable "env_staging_dns_name" {
+  description = "Staging-stack DNS name of the environment, if any (blackbox probe target). Empty string disables the staging probe."
+  type        = string
+  default     = ""
+}
+
+variable "monitoring_mysql_host" {
+  description = "RDS MySQL endpoint to scrape via mysqld_exporter (same value the app stack uses for picsure_db_host). Empty string disables the mysqld_exporter deploy."
+  type        = string
+  default     = ""
+}

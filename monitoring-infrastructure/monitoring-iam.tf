@@ -57,6 +57,18 @@ resource "aws_iam_role_policy" "monitoring-inline-policy" {
       ],
       "Effect": "Allow",
       "Resource": "arn:aws:s3:::${var.stack_s3_bucket}"
+    },
+    {
+      "Sid": "CloudWatchReadForGrafana",
+      "Action": [
+        "cloudwatch:GetMetricData",
+        "cloudwatch:ListMetrics",
+        "cloudwatch:GetMetricStatistics",
+        "ec2:DescribeRegions",
+        "tag:GetResources"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
     }
   ]
 }

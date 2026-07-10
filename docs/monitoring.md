@@ -26,7 +26,8 @@ created — see Deferred, below).
 # 1. Container images (run wherever docker/podman + internet access exist).
 #    Pinned versions per the monitoring spec.
 for i in prom/prometheus:v3.4.1 grafana/grafana:11.6.0 prom/node-exporter:v1.9.1 \
-         quay.io/navidys/prometheus-podman-exporter:v1.17.0 lusotycoon/apache-exporter:v1.0.10; do
+         quay.io/navidys/prometheus-podman-exporter:v1.17.0 lusotycoon/apache-exporter:v1.0.10 \
+         prom/blackbox-exporter:v0.26.0 prom/mysqld-exporter:v0.17.2; do
   n=$(basename "${i%%:*}"); docker pull "$i" && docker save "$i" | gzip > "$n.tar.gz"
 done
 
@@ -40,12 +41,22 @@ aws s3 cp prometheus-podman-exporter.tar.gz s3://$BUCKET/monitoring/containers/p
 # this key exists, and silently skips it (does not fail httpd deploys)
 # otherwise.
 aws s3 cp apache-exporter.tar.gz s3://$BUCKET/monitoring/containers/
+# blackbox-exporter is required by deploy-monitoring.sh (unconditional, same
+# as prometheus/grafana) — it backs the synthetic public/staging probes.
+aws s3 cp blackbox-exporter.tar.gz s3://$BUCKET/monitoring/containers/
+# mysqld-exporter is optional: deploy-monitoring.sh only starts it when
+# --mysql_host is non-empty AND monitoring/db-exporters.env (below) exists,
+# and silently skips it (does not fail the monitoring deploy) otherwise.
+aws s3 cp mysqld-exporter.tar.gz s3://$BUCKET/monitoring/containers/
 
-# 2. Config bundle: prometheus/ + grafana/ trees from the pic-sure-all-in-one
-#    repo's monitoring/ directory (branch pic_sure_api_monitoring). This is
-#    what deploy-monitoring.sh extracts into
-#    /usr/local/docker-config/monitoring/ on the monitoring host.
-tar -czf config-bundle.tar.gz -C <path-to-pic-sure-all-in-one>/monitoring prometheus grafana
+# 2. Config bundle: prometheus/ + grafana/ + blackbox/ trees from the
+#    pic-sure-all-in-one repo's monitoring/ directory (branch
+#    pic_sure_api_monitoring). This is what deploy-monitoring.sh extracts
+#    into /usr/local/docker-config/monitoring/ on the monitoring host,
+#    including the FISMA-only grafana/provisioning-bdc/ and
+#    grafana/dashboards-bdc/ subtrees (merged into provisioning/ and
+#    dashboards/ by deploy-monitoring.sh after extraction).
+tar -czf config-bundle.tar.gz -C <path-to-pic-sure-all-in-one>/monitoring prometheus grafana blackbox
 aws s3 cp config-bundle.tar.gz s3://$BUCKET/monitoring/
 
 # 3. The deploy scripts themselves — pulled by user-data / SSM at run time.
@@ -55,10 +66,15 @@ aws s3 cp deploy-exporters.sh s3://$BUCKET/monitoring/
 #  app-infrastructure/scripts/deploy/deploy-exporters.sh)
 
 # 4. Secrets (not committed anywhere — hand-authored per environment):
-#    monitoring.env    -> GF_SECURITY_ADMIN_PASSWORD=<grafana admin password>
-#    app-token         -> raw scrape token, one line, no trailing newline issues
+#    monitoring.env         -> GF_SECURITY_ADMIN_PASSWORD=<grafana admin password>
+#    app-token               -> raw scrape token, one line, no trailing newline issues
+#    db-exporters.env        -> MYSQLD_EXPORTER_PASSWORD=<mysqld_exporter DSN password>
+#                                MONITORING_MYSQL_USER=<read-only monitoring user>
+#                                (optional — absence means mysqld-exporter is skipped;
+#                                see the mysql prerequisites below for the user's SQL grant)
 aws s3 cp monitoring.env s3://$BUCKET/monitoring/
 aws s3 cp app-token      s3://$BUCKET/monitoring/
+aws s3 cp db-exporters.env s3://$BUCKET/monitoring/
 ```
 
 Notes on where each key lands and is consumed:
@@ -67,12 +83,15 @@ Notes on where each key lands and is consumed:
 |---|---|---|
 | `containers/prometheus.tar.gz` | `deploy-monitoring.sh` | `/opt/picsure/prometheus.tar.gz` on monitoring host |
 | `containers/grafana.tar.gz` | `deploy-monitoring.sh` | `/opt/picsure/grafana.tar.gz` on monitoring host |
-| `config-bundle.tar.gz` | `deploy-monitoring.sh` | extracted to `/usr/local/docker-config/monitoring/{prometheus,grafana}` |
+| `config-bundle.tar.gz` | `deploy-monitoring.sh` | extracted to `/usr/local/docker-config/monitoring/{prometheus,grafana,blackbox}` — `grafana/provisioning-bdc/` and `grafana/dashboards-bdc/` are then merged into `grafana/provisioning/` and `grafana/dashboards/` |
 | `monitoring.env` | `deploy-monitoring.sh` | `/opt/picsure/monitoring.env` (Grafana `--env-file`) |
 | `app-token` | `deploy-monitoring.sh` | `/usr/local/docker-config/monitoring/secrets/app-token`, `chmod 600` |
 | `containers/node-exporter.tar.gz` | `deploy-exporters.sh` | app instances, `/opt/picsure/node-exporter.tar.gz` |
 | `containers/podman-exporter.tar.gz` | `deploy-exporters.sh` | app instances, `/opt/picsure/podman-exporter.tar.gz` |
 | `containers/apache-exporter.tar.gz` (optional) | `deploy-httpd.sh` | httpd instance, `/opt/picsure/apache-exporter.tar.gz` |
+| `containers/blackbox-exporter.tar.gz` | `deploy-monitoring.sh` | `/opt/picsure/blackbox-exporter.tar.gz` on monitoring host |
+| `containers/mysqld-exporter.tar.gz` (optional) | `deploy-monitoring.sh` | `/opt/picsure/mysqld-exporter.tar.gz` on monitoring host |
+| `db-exporters.env` (optional; keys `MYSQLD_EXPORTER_PASSWORD`, `MONITORING_MYSQL_USER`) | `deploy-monitoring.sh` | `/usr/local/docker-config/monitoring/secrets/db-exporters.env`, `chmod 600` |
 | `deploy-monitoring.sh` | `monitoring-infrastructure/scripts/monitoring-user_data.sh` | `/opt/picsure/deploy-monitoring.sh` on monitoring host |
 | `deploy-exporters.sh` | `wildfly-user_data.sh`, `auth_hpds-user_data.sh`, `httpd-user_data.sh`, `open_hpds-user_data.sh` | `/opt/picsure/deploy-exporters.sh` on each app instance |
 
@@ -85,25 +104,82 @@ per-service actuator scrape jobs (dictionary 9401, logging 9402,
 visualization 9403, psama 9404, hpds 8080), which are currently commented out
 pending the monorepo consolidation's Phase 3.
 
-## 2. Deploy order
+## 2. Prerequisites: database monitoring users
+
+`mysqld-exporter` needs a dedicated, **read-only** MySQL user on the RDS
+instance (`var.picsure_db_host`, same endpoint the app stack connects to).
+Create it out-of-band (not via Terraform — this is application data, not
+infrastructure) before populating `db-exporters.env`:
+
+```sql
+CREATE USER 'monitoring'@'%' IDENTIFIED BY '<strong-password>';
+GRANT PROCESS, REPLICATION CLIENT, SELECT ON performance_schema.* TO 'monitoring'@'%';
+```
+
+Put the username in `MONITORING_MYSQL_USER` and the password in
+`MYSQLD_EXPORTER_PASSWORD` inside `db-exporters.env` (§1 above). Both keys
+must be present for `deploy-monitoring.sh` to start the exporter; if either
+is missing, or `--mysql_host` is empty, the deploy logs
+`WARN: skipping mysqld-exporter ...` and continues (never fails).
+
+**FISMA dictionary-PostgreSQL — documented stub, not implemented here.**
+Unlike MySQL, the FISMA dictionary-PostgreSQL endpoint is **not present
+anywhere in this repo** — it only exists in the S3-hosted
+`configs/picsure-dictionary/picsure-dictionary.env`. Because
+`deploy-monitoring.sh` can't discover it, `postgres_exporter` is
+intentionally **not** wired up on the FISMA monitoring host in this change;
+the aio (non-FISMA) monitoring stack already implements the equivalent
+`postgres-exporter` container against the local `dictionary-db` container,
+so the deploy assets (container image, compose service pattern) already
+exist and this is a pure plumbing gap, not a missing capability. When the
+FISMA dictionary-PG endpoint is exposed to this repo (e.g. as a new
+`monitoring_pg_host` tfvar sourced from that S3 env file), replicate the
+`mysqld-exporter` pattern above verbatim: a `monitoring/db-exporters.env`
+key pair (`MONITORING_PG_USER`/`MONITORING_PG_PASSWORD` or similar), an
+S3 `containers/postgres-exporter.tar.gz` artifact, and a guarded
+podman-create block in `deploy-monitoring.sh` mirroring the mysqld-exporter
+one added here.
+
+## 3. Deploy order
 
 1. Populate S3 as above.
-2. `terraform apply` in `monitoring-infrastructure/` — **requires explicit
+2. Set the new `monitoring-infrastructure` tfvars before applying:
+   - `env_public_dns_name` (string, required) — the environment's public ALB
+     DNS name; rendered into the FISMA `prometheus-bdc.yml` blackbox scrape
+     job in place of the `__PUBLIC_DNS__` token. Leaving it unset makes
+     `terraform plan` fail (no default); passing an empty string is not the
+     same as omitting it and is not recommended (see the WARN below).
+   - `env_staging_dns_name` (string, default `""`) — staging-stack DNS name,
+     same substitution for `__STAGING_DNS__`. Empty disables the staging
+     probe target.
+   - `monitoring_mysql_host` (string, default `""`) — the RDS MySQL endpoint,
+     the **same value the app stack passes as `picsure_db_host`**
+     (`app-infrastructure/variables.tf`). Empty disables the mysqld_exporter
+     deploy entirely (skip-with-WARN, never fails the deploy).
+   If `--public_dns`/`--staging_dns` end up empty at deploy time,
+   `deploy-monitoring.sh` leaves the corresponding `__PUBLIC_DNS__`/
+   `__STAGING_DNS__` token unrendered in `prometheus.yml` (an obviously-broken
+   target rather than a silently-wrong one) and logs
+   `WARN: blackbox public/staging probes unrendered`.
+3. `terraform apply` in `monitoring-infrastructure/` — **requires explicit
    operator approval**; see that module's README for the full apply-order
    and cross-VPC discussion. Take its `monitoring_instance_private_ip`
    output.
-3. Set `monitoring_ingress_cidr` (as a `/32`, e.g. `10.1.2.3/32` — this is a
+4. Set `monitoring_ingress_cidr` (as a `/32`, e.g. `10.1.2.3/32` — this is a
    CIDR, **not** a security-group id; `monitoring_ingress_cidr` is defined in
    `app-infrastructure/variables.tf` and consumed in
    `app-infrastructure/security-groups.tf`, because stack `a`/`b` are
    separate VPCs and `source_security_group_id` cannot cross a VPC boundary)
    on the app stack(s)' tfvars.
-4. `terraform plan` for `app-infrastructure` per stack — **requires explicit
+5. `terraform plan` for `app-infrastructure` per stack — **requires explicit
    operator approval** before any apply. This wires up
    `node-exporter-from-monitoring` / `podman-exporter-from-monitoring` (per
-   host SG: wildfly, httpd, hpds) and `apache-exporter-from-monitoring`
-   (httpd SG only) ingress rules, scoped to `monitoring_ingress_cidr`.
-5. Exporters land automatically:
+   host SG: wildfly, httpd, hpds), `apache-exporter-from-monitoring`
+   (httpd SG only), and `mysql-from-monitoring` (RDS-facing
+   `inbound-mysql-from-wildfly` SG, port 3306 — lets the monitoring host's
+   mysqld_exporter reach the RDS instance) ingress rules, all scoped to
+   `monitoring_ingress_cidr`.
+6. Exporters land automatically:
    - On the **next stack rollout** (new instances), via each app instance's
      user-data, which fetches and runs `deploy-exporters.sh` (node_exporter
      9100 + podman-exporter 9882) and, on the httpd instance,
@@ -132,7 +208,7 @@ pending the monorepo consolidation's Phase 3.
      only has `STACK_S3_BUCKET` set, not `ENVIRONMENT_NAME`, so there is no
      fallback to source for that script.
 
-## 3. Access (SSM port-forward)
+## 4. Access (SSM port-forward)
 
 There is no ingress to the monitoring host other than the metrics-scrape
 rules described above — operator access is SSM-only. Prometheus binds
@@ -160,7 +236,7 @@ aws ssm start-session \
 `<monitoring-instance-id>` is the `monitoring_instance_id` Terraform output
 from `monitoring-infrastructure`.
 
-## 4. Verification checklist
+## 5. Verification checklist
 
 Per the monitoring spec §9 ("FISMA (M3/M4)"), over the SSM port-forwards
 above:
@@ -192,11 +268,38 @@ above:
 - [ ] If scraping stack-`b` hosts: confirm VPC routing/peering exists between
       the `a` VPC (monitoring instance) and `b` VPC first — see the
       cross-VPC note in `monitoring-infrastructure/README.md`.
+- [ ] `probe_success == 1` for each configured `blackbox` target (public DNS
+      always; staging DNS if `env_staging_dns_name` was set) — confirms the
+      blackbox-exporter container is reachable from prometheus on the podman
+      `monitoring` network and the ALB is answering.
+- [ ] Certificate expiry is plausible: `probe_ssl_earliest_cert_expiry` minus
+      current time is a sane number of days (not negative, not absent) for
+      each `https://` blackbox target.
+- [ ] mysql target: either `up == 1` on the `mysql` Prometheus job (when
+      `monitoring_mysql_host` and `db-exporters.env` were both provided), or
+      a documented skip — confirm via the deploy log's
+      `WARN: skipping mysqld-exporter ...` line (SSM command output /
+      `journalctl -u container-mysqld-exporter` if the container should be
+      running but isn't).
+- [ ] CloudWatch panels render in the `aws-edge` Grafana dashboard (ALB
+      request count/5xx/latency/healthy-hosts, RDS CPU/connections/storage,
+      EBS burst balance) — confirms the `picsure-cloudwatch` datasource and
+      the monitoring role's CloudWatch read policy (below) both work.
 - [ ] Static checks before any of the above: `bash -n` on the modified deploy
       scripts, `terraform validate` + `terraform plan` reviewed by an
       operator (no `terraform apply` without explicit approval).
 
-## 5. Deferred / follow-on work
+**Security review note:** this change adds `cloudwatch:GetMetricData`,
+`cloudwatch:ListMetrics`, `cloudwatch:GetMetricStatistics`,
+`ec2:DescribeRegions`, and `tag:GetResources` (all on `Resource: "*"`, as
+required by the Grafana CloudWatch datasource — none of these actions
+support resource-level scoping) to the `monitoring-ec2-role`'s inline
+policy (`monitoring-infrastructure/monitoring-iam.tf`). All four are
+read-only; none grant write/delete/modify permissions. Flag this addition
+explicitly in any FISMA security control review of the monitoring host's
+IAM role.
+
+## 6. Deferred / follow-on work
 
 Not in scope for this runbook or the current rollout stage (M3):
 

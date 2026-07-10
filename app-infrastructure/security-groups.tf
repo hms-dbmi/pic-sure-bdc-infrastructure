@@ -169,5 +169,16 @@ resource "aws_security_group_rule" "apache-exporter-from-monitoring" {
   description       = "apache_exporter scrape from monitoring"
 }
 
+resource "aws_security_group_rule" "mysql-from-monitoring" {
+  count             = local.monitoring_enabled ? 1 : 0
+  type              = "ingress"
+  from_port         = 3306
+  to_port           = 3306
+  protocol          = "tcp"
+  security_group_id = aws_security_group.inbound-mysql-from-wildfly.id
+  cidr_blocks       = [var.monitoring_ingress_cidr]
+  description       = "mysqld_exporter (monitoring host) to RDS MySQL"
+}
+
 # M4 (documented, inactive until consolidation Phase 3): per-service actuator ports
 # 9401-9404 on the wildfly host SG + 8080 on the hpds SG from the monitoring SG.

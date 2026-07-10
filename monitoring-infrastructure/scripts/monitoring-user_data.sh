@@ -3,6 +3,9 @@
 stack_s3_bucket="${stack_s3_bucket}"
 environment_name="${environment_name}"
 gss_prefix="${gss_prefix}"
+env_public_dns_name="${env_public_dns_name}"
+env_staging_dns_name="${env_staging_dns_name}"
+monitoring_mysql_host="${monitoring_mysql_host}"
 
 echo "ENABLE_PODMAN=true" | sudo tee -a /opt/srce/startup.config
 echo "export STACK_S3_BUCKET=$stack_s3_bucket" >> /etc/environment
@@ -21,7 +24,8 @@ s3_copy() {
 s3_copy "s3://${stack_s3_bucket}/monitoring/deploy-monitoring.sh" "/opt/picsure/deploy-monitoring.sh"
 
 sudo chmod +x /opt/picsure/deploy-monitoring.sh
-sudo /opt/picsure/deploy-monitoring.sh --stack_s3_bucket "${stack_s3_bucket}" --environment_name "${environment_name}"
+sudo /opt/picsure/deploy-monitoring.sh --stack_s3_bucket "${stack_s3_bucket}" --environment_name "${environment_name}" \
+  --public_dns "${env_public_dns_name}" --staging_dns "${env_staging_dns_name}" --mysql_host "${monitoring_mysql_host}"
 
 # monitoring exporters (node_exporter + podman-exporter) — self-observability:
 # the monitoring host's ec2_sd discovery includes itself, so it must also run

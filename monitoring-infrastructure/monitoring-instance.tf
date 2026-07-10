@@ -1,9 +1,12 @@
 data "template_file" "monitoring-user_data" {
   template = file("scripts/monitoring-user_data.sh")
   vars = {
-    stack_s3_bucket  = var.stack_s3_bucket
-    environment_name = var.environment_name
-    gss_prefix       = "${var.environment_prefix}_${var.env_is_open_access ? "open" : "auth"}_${var.environment_name}"
+    stack_s3_bucket       = var.stack_s3_bucket
+    environment_name      = var.environment_name
+    gss_prefix            = "${var.environment_prefix}_${var.env_is_open_access ? "open" : "auth"}_${var.environment_name}"
+    env_public_dns_name   = var.env_public_dns_name
+    env_staging_dns_name  = var.env_staging_dns_name
+    monitoring_mysql_host = var.monitoring_mysql_host
   }
 }
 
