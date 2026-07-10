@@ -253,7 +253,8 @@ else
     --env-file /usr/local/docker-config/monitoring/secrets/db-exporters.env \
     "$MYSQLD_EXPORTER_IMAGE" \
     --mysqld.username="$MONITORING_MYSQL_USER" \
-    --mysqld.address="${mysql_host}:3306"
+    --mysqld.address="${mysql_host}:3306" \
+    --collect.perf_schema.eventsstatements
 
     # systemd setup.
     podman generate systemd --name $CONTAINER_NAME --restart-policy=always --files
