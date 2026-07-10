@@ -212,49 +212,61 @@ sudo systemctl is-enabled container-$CONTAINER_NAME.service
 # Status check is informational — Jenkins log polling verifies actual startup.
 sudo systemctl status container-$CONTAINER_NAME.service --no-pager || true
 
-# mysqld_exporter: only started when a MySQL host was passed in AND the
-# credentials secret exists in S3 — exporters are additive, never
-# deploy-blocking (mirrors the apache-exporter guard in deploy-httpd.sh).
-if [[ -n "$mysql_host" ]] && sudo /usr/bin/aws --region us-east-1 s3 ls "s3://${stack_s3_bucket}/monitoring/db-exporters.env" >/dev/null 2>&1; then
-  s3_copy "s3://${stack_s3_bucket}/monitoring/containers/mysqld-exporter.tar.gz" "/opt/picsure/mysqld-exporter.tar.gz"
+# mysqld_exporter: only started when a MySQL host was passed in, the
+# credentials secret exists in S3, AND that secret actually contains both
+# required keys — exporters are additive, never deploy-blocking (mirrors
+# the apache-exporter guard in deploy-httpd.sh). Each failure mode below
+# logs its own grep-able "WARN: skipping mysqld-exporter" line.
+if [[ -z "$mysql_host" ]]; then
+  echo "WARN: skipping mysqld-exporter (--mysql_host empty)"
+elif ! sudo /usr/bin/aws --region us-east-1 s3 ls "s3://${stack_s3_bucket}/monitoring/db-exporters.env" >/dev/null 2>&1; then
+  echo "WARN: skipping mysqld-exporter (s3://${stack_s3_bucket}/monitoring/db-exporters.env not found)"
+else
   s3_copy "s3://${stack_s3_bucket}/monitoring/db-exporters.env" "/usr/local/docker-config/monitoring/secrets/db-exporters.env"
 
   chmod 600 /usr/local/docker-config/monitoring/secrets/db-exporters.env
 
   # --mysqld.username isn't sourced from the env-file (podman --env-file only
   # sets container env, it doesn't substitute into command args), so pull it
-  # out of the fetched secret the same way compose's ${VAR:-default} would.
-  MONITORING_MYSQL_USER=$(grep -m1 '^MONITORING_MYSQL_USER=' /usr/local/docker-config/monitoring/secrets/db-exporters.env | cut -d '=' -f2-)
-  MONITORING_MYSQL_USER=${MONITORING_MYSQL_USER:-monitoring}
+  # out of the fetched secret. Strip any CRLF (secret may have been authored
+  # on Windows) so a trailing \r can't leak into the flag value or defeat
+  # the empty-string check below.
+  MONITORING_MYSQL_USER=$(grep -m1 '^MONITORING_MYSQL_USER=' /usr/local/docker-config/monitoring/secrets/db-exporters.env | cut -d '=' -f2- | tr -d '\r')
+  MYSQLD_EXPORTER_PASSWORD=$(grep -m1 '^MYSQLD_EXPORTER_PASSWORD=' /usr/local/docker-config/monitoring/secrets/db-exporters.env | cut -d '=' -f2- | tr -d '\r')
 
-  MYSQLD_EXPORTER_IMAGE=$(podman load < /opt/picsure/mysqld-exporter.tar.gz | cut -d ' ' -f 3)
+  if [[ -z "$MONITORING_MYSQL_USER" || -z "$MYSQLD_EXPORTER_PASSWORD" ]]; then
+    echo "WARN: skipping mysqld-exporter (db-exporters.env is missing MONITORING_MYSQL_USER and/or MYSQLD_EXPORTER_PASSWORD)"
+  else
+    s3_copy "s3://${stack_s3_bucket}/monitoring/containers/mysqld-exporter.tar.gz" "/opt/picsure/mysqld-exporter.tar.gz"
 
-  CONTAINER_NAME=mysqld-exporter
-  # Stop and remove any existing container and systemd service.
-  sudo systemctl stop container-$CONTAINER_NAME.service 2>/dev/null || true
-  podman rm -f $CONTAINER_NAME || true
+    MYSQLD_EXPORTER_IMAGE=$(podman load < /opt/picsure/mysqld-exporter.tar.gz | cut -d ' ' -f 3)
 
-  # Create the container without starting it — systemd will handle startup.
-  podman create --network monitoring --name=$CONTAINER_NAME \
-  --log-opt tag=$CONTAINER_NAME \
-  --env-file /usr/local/docker-config/monitoring/secrets/db-exporters.env \
-  "$MYSQLD_EXPORTER_IMAGE" \
-  --mysqld.username="$MONITORING_MYSQL_USER" \
-  --mysqld.address="${mysql_host}:3306"
+    CONTAINER_NAME=mysqld-exporter
+    # Stop and remove any existing container and systemd service.
+    sudo systemctl stop container-$CONTAINER_NAME.service 2>/dev/null || true
+    podman rm -f $CONTAINER_NAME || true
 
-  # systemd setup.
-  podman generate systemd --name $CONTAINER_NAME --restart-policy=always --files
-  sudo mv container-$CONTAINER_NAME.service /etc/systemd/system/
-  sudo restorecon -v /etc/systemd/system/container-$CONTAINER_NAME.service
+    # Create the container without starting it — systemd will handle startup.
+    # Password flows only via --env-file; it is never placed on the command line.
+    podman create --network monitoring --name=$CONTAINER_NAME \
+    --log-opt tag=$CONTAINER_NAME \
+    --env-file /usr/local/docker-config/monitoring/secrets/db-exporters.env \
+    "$MYSQLD_EXPORTER_IMAGE" \
+    --mysqld.username="$MONITORING_MYSQL_USER" \
+    --mysqld.address="${mysql_host}:3306"
 
-  sudo systemctl daemon-reload
-  sudo systemctl enable container-$CONTAINER_NAME.service
-  sudo systemctl start --no-block container-$CONTAINER_NAME.service
+    # systemd setup.
+    podman generate systemd --name $CONTAINER_NAME --restart-policy=always --files
+    sudo mv container-$CONTAINER_NAME.service /etc/systemd/system/
+    sudo restorecon -v /etc/systemd/system/container-$CONTAINER_NAME.service
 
-  echo "Verifying container-$CONTAINER_NAME.service status..."
-  sudo systemctl is-enabled container-$CONTAINER_NAME.service
-  # Status check is informational — Jenkins log polling verifies actual startup.
-  sudo systemctl status container-$CONTAINER_NAME.service --no-pager || true
-else
-  echo "WARN: skipping mysqld-exporter (--mysql_host empty or s3://${stack_s3_bucket}/monitoring/db-exporters.env not found)"
+    sudo systemctl daemon-reload
+    sudo systemctl enable container-$CONTAINER_NAME.service
+    sudo systemctl start --no-block container-$CONTAINER_NAME.service
+
+    echo "Verifying container-$CONTAINER_NAME.service status..."
+    sudo systemctl is-enabled container-$CONTAINER_NAME.service
+    # Status check is informational — Jenkins log polling verifies actual startup.
+    sudo systemctl status container-$CONTAINER_NAME.service --no-pager || true
+  fi
 fi

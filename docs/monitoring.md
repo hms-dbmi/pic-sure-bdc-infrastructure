@@ -45,8 +45,10 @@ aws s3 cp apache-exporter.tar.gz s3://$BUCKET/monitoring/containers/
 # as prometheus/grafana) — it backs the synthetic public/staging probes.
 aws s3 cp blackbox-exporter.tar.gz s3://$BUCKET/monitoring/containers/
 # mysqld-exporter is optional: deploy-monitoring.sh only starts it when
-# --mysql_host is non-empty AND monitoring/db-exporters.env (below) exists,
-# and silently skips it (does not fail the monitoring deploy) otherwise.
+# --mysql_host is non-empty, monitoring/db-exporters.env (below) exists in
+# S3, and that file has non-empty MONITORING_MYSQL_USER and
+# MYSQLD_EXPORTER_PASSWORD values; any other case logs a WARN and skips it
+# (never fails the monitoring deploy).
 aws s3 cp mysqld-exporter.tar.gz s3://$BUCKET/monitoring/containers/
 
 # 2. Config bundle: prometheus/ + grafana/ + blackbox/ trees from the
@@ -91,7 +93,7 @@ Notes on where each key lands and is consumed:
 | `containers/apache-exporter.tar.gz` (optional) | `deploy-httpd.sh` | httpd instance, `/opt/picsure/apache-exporter.tar.gz` |
 | `containers/blackbox-exporter.tar.gz` | `deploy-monitoring.sh` | `/opt/picsure/blackbox-exporter.tar.gz` on monitoring host |
 | `containers/mysqld-exporter.tar.gz` (optional) | `deploy-monitoring.sh` | `/opt/picsure/mysqld-exporter.tar.gz` on monitoring host |
-| `db-exporters.env` (optional; keys `MYSQLD_EXPORTER_PASSWORD`, `MONITORING_MYSQL_USER`) | `deploy-monitoring.sh` | `/usr/local/docker-config/monitoring/secrets/db-exporters.env`, `chmod 600` |
+| `db-exporters.env` (optional; both keys `MYSQLD_EXPORTER_PASSWORD` and `MONITORING_MYSQL_USER` required non-empty) | `deploy-monitoring.sh` | `/usr/local/docker-config/monitoring/secrets/db-exporters.env`, `chmod 600` |
 | `deploy-monitoring.sh` | `monitoring-infrastructure/scripts/monitoring-user_data.sh` | `/opt/picsure/deploy-monitoring.sh` on monitoring host |
 | `deploy-exporters.sh` | `wildfly-user_data.sh`, `auth_hpds-user_data.sh`, `httpd-user_data.sh`, `open_hpds-user_data.sh` | `/opt/picsure/deploy-exporters.sh` on each app instance |
 
@@ -117,10 +119,15 @@ GRANT PROCESS, REPLICATION CLIENT, SELECT ON performance_schema.* TO 'monitoring
 ```
 
 Put the username in `MONITORING_MYSQL_USER` and the password in
-`MYSQLD_EXPORTER_PASSWORD` inside `db-exporters.env` (§1 above). Both keys
-must be present for `deploy-monitoring.sh` to start the exporter; if either
-is missing, or `--mysql_host` is empty, the deploy logs
-`WARN: skipping mysqld-exporter ...` and continues (never fails).
+`MYSQLD_EXPORTER_PASSWORD` inside `db-exporters.env` (§1 above). There is no
+default username — both keys must be present and non-empty in
+`db-exporters.env` for `deploy-monitoring.sh` to start the exporter.
+`deploy-monitoring.sh` checks, in order: `--mysql_host` is non-empty, the
+`db-exporters.env` secret exists in S3, and (once fetched) it actually
+contains non-empty values for both `MONITORING_MYSQL_USER` and
+`MYSQLD_EXPORTER_PASSWORD`. If any of those three checks fails, the deploy
+logs its own `WARN: skipping mysqld-exporter (...)` line naming the specific
+reason and continues (never fails the deploy).
 
 **FISMA dictionary-PostgreSQL — documented stub, not implemented here.**
 Unlike MySQL, the FISMA dictionary-PostgreSQL endpoint is **not present
@@ -276,9 +283,11 @@ above:
       current time is a sane number of days (not negative, not absent) for
       each `https://` blackbox target.
 - [ ] mysql target: either `up == 1` on the `mysql` Prometheus job (when
-      `monitoring_mysql_host` and `db-exporters.env` were both provided), or
-      a documented skip — confirm via the deploy log's
-      `WARN: skipping mysqld-exporter ...` line (SSM command output /
+      `monitoring_mysql_host` was provided, `db-exporters.env` exists in S3,
+      and it contains non-empty `MONITORING_MYSQL_USER` and
+      `MYSQLD_EXPORTER_PASSWORD` values), or a documented skip — confirm via
+      the deploy log's `WARN: skipping mysqld-exporter (...)` line, which
+      names which of the three conditions failed (SSM command output /
       `journalctl -u container-mysqld-exporter` if the container should be
       running but isn't).
 - [ ] CloudWatch panels render in the `aws-edge` Grafana dashboard (ALB
