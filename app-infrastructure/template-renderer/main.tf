@@ -40,3 +40,86 @@ resource "aws_s3_object" "visualization_env" {
   content_type           = "text/plain"
   server_side_encryption = "AES256"
 }
+
+# ---- Gateway-rewrite service env files -------------------------------------
+# All three render together under one flag: query_service_internal_token and
+# picsure_application_token are minted per apply and must be byte-identical
+# across gateway.env, operations.env, and query.env.
+
+resource "random_password" "query_service_internal_token" {
+  count   = var.render_picsure_services ? 1 : 0
+  length  = 43
+  special = false
+}
+
+resource "random_password" "picsure_application_token" {
+  count   = var.render_picsure_services ? 1 : 0
+  length  = 43
+  special = false
+}
+
+resource "random_password" "aggregate_obfuscation_salt" {
+  count   = var.render_picsure_services ? 1 : 0
+  length  = 32
+  special = false
+  upper   = false
+}
+
+data "aws_secretsmanager_secret_version" "picsure_app_user" {
+  count     = var.render_picsure_services ? 1 : 0
+  secret_id = var.app_user_secret_name
+}
+
+locals {
+  picsure_app_user = var.render_picsure_services ? jsondecode(data.aws_secretsmanager_secret_version.picsure_app_user[0].secret_string) : {}
+}
+
+resource "aws_s3_object" "gateway_env" {
+  count  = var.render_picsure_services ? 1 : 0
+  bucket = var.stack_s3_bucket
+  key    = "configs/gateway/${var.target_stack}/gateway.env"
+  content = templatefile("${path.module}/templates/gateway.env.tftpl", {
+    target_stack                      = var.target_stack
+    env_private_dns_name              = var.env_private_dns_name
+    picsure_token_introspection_token = var.picsure_token_introspection_token
+    logging_api_key                   = var.logging_api_key
+    include_open_hpds                 = var.include_open_hpds
+    picsure_application_token         = random_password.picsure_application_token[0].result
+    query_service_internal_token      = random_password.query_service_internal_token[0].result
+  })
+
+  content_type           = "text/plain"
+  server_side_encryption = "AES256"
+}
+
+resource "aws_s3_object" "operations_env" {
+  count  = var.render_picsure_services ? 1 : 0
+  bucket = var.stack_s3_bucket
+  key    = "configs/operations/${var.target_stack}/operations.env"
+  content = templatefile("${path.module}/templates/operations.env.tftpl", {
+    picsure_db_host              = local.picsure_app_user["host"]
+    picsure_db_username          = local.picsure_app_user["username"]
+    picsure_db_password          = local.picsure_app_user["password"]
+    picsure_application_token    = random_password.picsure_application_token[0].result
+    query_service_internal_token = random_password.query_service_internal_token[0].result
+  })
+
+  content_type           = "text/plain"
+  server_side_encryption = "AES256"
+}
+
+resource "aws_s3_object" "query_env" {
+  count  = var.render_picsure_services ? 1 : 0
+  bucket = var.stack_s3_bucket
+  key    = "configs/query/${var.target_stack}/query.env"
+  content = templatefile("${path.module}/templates/query.env.tftpl", {
+    target_stack                 = var.target_stack
+    env_private_dns_name         = var.env_private_dns_name
+    aggregate_obfuscation_salt   = random_password.aggregate_obfuscation_salt[0].result
+    picsure_application_token    = random_password.picsure_application_token[0].result
+    query_service_internal_token = random_password.query_service_internal_token[0].result
+  })
+
+  content_type           = "text/plain"
+  server_side_encryption = "AES256"
+}
