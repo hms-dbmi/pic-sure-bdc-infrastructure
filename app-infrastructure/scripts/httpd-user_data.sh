@@ -30,7 +30,8 @@ sudo chmod +x /opt/picsure/deploy-httpd.sh
 sudo /opt/picsure/deploy-httpd.sh --stack_s3_bucket "${stack_s3_bucket}" --target_stack "${target_stack}" --dataset_s3_object_key "${dataset_s3_object_key}"
 
 # Check if the gateway host is resolvable after httpd-vhosts.conf has been downloaded
-for i in 1 2 3 4 5; do echo "confirming gateway resolvable" && sudo curl --connect-timeout 1 "$(grep -A30 preprod /usr/local/docker-config/httpd-vhosts.conf | grep 'picsure/(' | grep -v health | head -1 | cut -d "\"" -f 2 | sed 's|:8080/.*|:8080/system/status|')" || if [ $? = 6 ]; then (exit 1); fi && break || sleep 60; done
+# Probes the gateway's /system/status endpoint via any non-health /picsure RewriteRule target
+for i in 1 2 3 4 5; do echo "confirming gateway resolvable" && sudo curl --connect-timeout 1 "$(grep 'picsure/(' /usr/local/docker-config/httpd-vhosts.conf | grep RewriteRule | grep -v health | head -1 | cut -d "\"" -f 2 | sed 's|:8080/.*|:8080/system/status|')" || if [ $? = 6 ]; then (exit 1); fi && break || sleep 60; done
 
 INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)
 sudo /usr/bin/aws --region=us-east-1 ec2 create-tags --resources "$INSTANCE_ID" --tags Key=InitComplete,Value=true
