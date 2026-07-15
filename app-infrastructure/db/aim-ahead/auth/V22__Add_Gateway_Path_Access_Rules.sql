@@ -56,12 +56,13 @@ WHERE legacy.name = 'AR_VISUALIZATION_PROXY_REQUESTS';
 
 -- Fail loudly if any rule is ALL-gated on GATE_QUERY_v3: adding a second path
 -- gate to an ALL-gate parent would silently break it. Signal by violating the
--- uuid column's NOT NULL primary-key constraint (error 1048 aborts the
--- migration; on failure inspect the parent rules with George before
--- re-running — the DML in this file is transactional, nothing half-applies).
+-- primary key constraint — duplicate of GATE_QUERY_v3's own uuid — which
+-- errors 1062 in every sql_mode, strict or not (error aborts the migration;
+-- on failure inspect the parent rules with George before re-running — the
+-- DML in this file is transactional, nothing half-applies).
 INSERT INTO access_rule (uuid, name, description, rule, type, value,
     checkMapKeyOnly, checkMapNode, subAccessRuleParent_uuid, isGateAnyRelation, isEvaluateOnlyByGates)
-SELECT NULL, 'MIGRATION_GUARD_ALL_GATED_V3_PARENT',
+SELECT gate.uuid, 'MIGRATION_GUARD_ALL_GATED_V3_PARENT',
        'MIGRATION GUARD: ALL-gated parent of GATE_QUERY_v3 found — manual review required',
        '', 0, '', 0x00, 0x00, NULL, 0x00, 0x00
 FROM accessRule_gate ag
