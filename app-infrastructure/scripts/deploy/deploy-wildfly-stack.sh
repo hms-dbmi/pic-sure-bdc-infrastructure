@@ -1,22 +1,33 @@
 #!/bin/bash
 
 # Orchestrates sequential deployment of all containers on the wildfly host.
-# Wildfly, PSAMA, Dictionary, and Visualization share the same EC2 instance and
-# must not deploy in parallel — concurrent systemd/D-Bus operations cause failures.
+# Gateway, Operations, Query, PSAMA, Dictionary, and Visualization share the
+# same EC2 instance and must not deploy in parallel — concurrent
+# systemd/D-Bus operations cause failures.
 #
 # S3 downloads and image loading happen inside each individual deploy script.
 # This script simply calls them one at a time to guarantee only one process
 # talks to systemd at any point.
 
-deploy_wildfly=false
+deploy_gateway=false
+deploy_operations=false
+deploy_query=false
 deploy_psama=false
 deploy_dictionary=false
 deploy_visualization=false
 
 while [[ $# -gt 0 ]]; do
   case $1 in
-    --deploy_wildfly)
-      deploy_wildfly=true
+    --deploy_gateway)
+      deploy_gateway=true
+      shift
+      ;;
+    --deploy_operations)
+      deploy_operations=true
+      shift
+      ;;
+    --deploy_query)
+      deploy_query=true
       shift
       ;;
     --deploy_psama)
@@ -65,12 +76,18 @@ fi
 
 failed=false
 
-if [[ "$deploy_wildfly" == "true" ]]; then
-  echo "=== Deploying wildfly ==="
-  /opt/picsure/deploy-wildfly.sh \
+if [[ "$deploy_operations" == "true" ]]; then
+  echo "=== Deploying pic-sure-operations-service ==="
+  /opt/picsure/deploy-operations.sh \
     --stack_s3_bucket "$stack_s3_bucket" \
-    --target_stack "$target_stack" \
-    ${dataset_s3_object_key:+--dataset_s3_object_key "$dataset_s3_object_key"} || failed=true
+    --target_stack "$target_stack" || failed=true
+fi
+
+if [[ "$deploy_query" == "true" ]]; then
+  echo "=== Deploying pic-sure-hpds-query-service ==="
+  /opt/picsure/deploy-query.sh \
+    --stack_s3_bucket "$stack_s3_bucket" \
+    --target_stack "$target_stack" || failed=true
 fi
 
 if [[ "$deploy_psama" == "true" ]]; then
@@ -97,9 +114,16 @@ if [[ "$deploy_visualization" == "true" ]]; then
     --target_stack "$target_stack" || failed=true
 fi
 
+if [[ "$deploy_gateway" == "true" ]]; then
+  echo "=== Deploying gateway ==="
+  /opt/picsure/deploy-gateway.sh \
+    --stack_s3_bucket "$stack_s3_bucket" \
+    --target_stack "$target_stack" || failed=true
+fi
+
 if [[ "$failed" == "true" ]]; then
   echo "ERROR: One or more container deployments failed."
   exit 1
 fi
 
-echo "=== All wildfly-host deployments complete ==="
+echo "=== All picsure-host deployments complete ==="

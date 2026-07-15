@@ -56,9 +56,11 @@ systemctl restart nftables
 
 systemctl enable --now podman
 
-sudo mkdir -p /var/log/picsure/{wildfly,psama,dictionary,logging,visualization}
+sudo mkdir -p /var/log/picsure/{gateway,operations,query,psama,dictionary,logging,visualization}
 
-s3_copy "s3://${stack_s3_bucket}/${target_stack}/scripts/deploy-wildfly.sh" "/opt/picsure/deploy-wildfly.sh"
+s3_copy "s3://${stack_s3_bucket}/${target_stack}/scripts/deploy-gateway.sh" "/opt/picsure/deploy-gateway.sh"
+s3_copy "s3://${stack_s3_bucket}/${target_stack}/scripts/deploy-operations.sh" "/opt/picsure/deploy-operations.sh"
+s3_copy "s3://${stack_s3_bucket}/${target_stack}/scripts/deploy-query.sh" "/opt/picsure/deploy-query.sh"
 s3_copy "s3://${stack_s3_bucket}/${target_stack}/scripts/deploy-psama.sh" "/opt/picsure/deploy-psama.sh"
 s3_copy "s3://${stack_s3_bucket}/${target_stack}/scripts/deploy-dictionary.sh" "/opt/picsure/deploy-dictionary.sh"
 s3_copy "s3://${stack_s3_bucket}/${target_stack}/scripts/deploy-wildfly-stack.sh" "/opt/picsure/deploy-wildfly-stack.sh"
@@ -67,7 +69,9 @@ s3_copy "s3://${stack_s3_bucket}/${target_stack}/scripts/deploy-logging.sh" "/op
 s3_copy "s3://${stack_s3_bucket}/${target_stack}/scripts/deploy-visualization.sh" "/opt/picsure/deploy-visualization.sh"
 
 
-sudo chmod +x /opt/picsure/deploy-wildfly.sh
+sudo chmod +x /opt/picsure/deploy-gateway.sh
+sudo chmod +x /opt/picsure/deploy-operations.sh
+sudo chmod +x /opt/picsure/deploy-query.sh
 sudo chmod +x /opt/picsure/deploy-psama.sh
 sudo chmod +x /opt/picsure/deploy-dictionary.sh
 sudo chmod +x /opt/picsure/deploy-wildfly-stack.sh
@@ -76,11 +80,13 @@ sudo chmod +x /opt/picsure/deploy-logging.sh
 sudo chmod +x /opt/picsure/deploy-visualization.sh
 
 
-sudo /opt/picsure/deploy-wildfly.sh --env_private_dns_name "${env_private_dns_name}" --stack_s3_bucket "${stack_s3_bucket}" --target_stack "${target_stack}" --dataset_s3_object_key "${dataset_s3_object_key}"
+sudo /opt/picsure/deploy-operations.sh --stack_s3_bucket "${stack_s3_bucket}" --target_stack "${target_stack}"
+sudo /opt/picsure/deploy-query.sh --stack_s3_bucket "${stack_s3_bucket}" --target_stack "${target_stack}"
 sudo /opt/picsure/deploy-psama.sh --stack_s3_bucket "${stack_s3_bucket}" --target_stack "${target_stack}" --dataset_s3_object_key "${dataset_s3_object_key}"
 sudo /opt/picsure/deploy-dictionary.sh --stack_s3_bucket "${stack_s3_bucket}" --target_stack "${target_stack}"
 sudo /opt/picsure/deploy-logging.sh --stack_s3_bucket "${stack_s3_bucket}" --target_stack "${target_stack}"
 sudo /opt/picsure/deploy-visualization.sh --stack_s3_bucket "${stack_s3_bucket}" --target_stack "${target_stack}"
+sudo /opt/picsure/deploy-gateway.sh --stack_s3_bucket "${stack_s3_bucket}" --target_stack "${target_stack}"
 
 INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)
 sudo /usr/bin/aws --region=us-east-1 ec2 create-tags --resources "$INSTANCE_ID" --tags Key=InitComplete,Value=true

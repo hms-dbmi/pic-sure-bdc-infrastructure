@@ -10,14 +10,6 @@ while [[ $# -gt 0 ]]; do
       target_stack="$2"
       shift 2
       ;;
-    --env_private_dns_name)
-      env_private_dns_name="$2"
-      shift 2
-      ;;
-    --dataset_s3_object_key)
-      dataset_s3_object_key="$2"
-      shift 2
-      ;;
     *)
       echo "Unknown argument: $1"
       exit 1
@@ -33,15 +25,12 @@ if [[ -f /etc/environment ]]; then
 fi
 
 stack_s3_bucket=${stack_s3_bucket:-$STACK_S3_BUCKET}
-env_private_dns_name=${env_private_dns_name:-$ENV_PRIVATE_DNS_NAME}
 target_stack=${target_stack:-$TARGET_STACK}
-dataset_s3_object_key=${dataset_s3_object_key:-$DATASET_S3_OBJECT_KEY}
 
-if [[ -z "$stack_s3_bucket" || -z "$env_private_dns_name" || -z "$target_stack" || -z "$dataset_s3_object_key" ]]; then
-  echo "Error: --stack_s3_bucket, --target_stack, --env_private_dns_name, and --dataset_s3_object_key are required."
+if [[ -z "$stack_s3_bucket" || -z "$target_stack" ]]; then
+  echo "Error: --stack_s3_bucket and --target_stack are required."
   exit 1
 fi
-
 
 s3_copy() {
   for i in {1..5}; do
@@ -49,34 +38,27 @@ s3_copy() {
   done
 }
 
-s3_copy "s3://${stack_s3_bucket}/${target_stack}/containers/pic-sure-wildfly.tar.gz" "/opt/picsure/pic-sure-wildfly.tar.gz"
-s3_copy "s3://${stack_s3_bucket}/${target_stack}/configs/wildfly/standalone.xml" "/opt/picsure/standalone.xml"
-s3_copy "s3://${stack_s3_bucket}/${target_stack}/configs/wildfly/aggregate-resource.properties" "/opt/picsure/aggregate-resource.properties"
-s3_copy "s3://${stack_s3_bucket}/data/${dataset_s3_object_key}/fence_mapping.json" "/opt/picsure/fence_mapping.json"
+s3_copy "s3://${stack_s3_bucket}/configs/operations/${target_stack}/operations.env" "/opt/picsure/operations.env"
+s3_copy "s3://${stack_s3_bucket}/${target_stack}/containers/pic-sure-operations-service.tar.gz" "/opt/picsure/pic-sure-operations-service.tar.gz"
 
-CONTAINER_NAME="wildfly"
-WILDFLY_IMAGE=$(podman load < /opt/picsure/pic-sure-wildfly.tar.gz | cut -d ' ' -f 3)
-JAVA_OPTS="-Xms2g -Xmx18g -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=1024m -Djava.net.preferIPv4Stack=true -DTARGET_STACK=${target_stack}.${env_private_dns_name}"
+CONTAINER_NAME="pic-sure-operations-service"
+OPERATIONS_IMAGE=$(podman load < /opt/picsure/pic-sure-operations-service.tar.gz | cut -d ' ' -f 3)
+JAVA_OPTS="-Xms1g -Xmx4g -Djava.net.preferIPv4Stack=true"
 
 # Stop and remove any existing container and systemd service.
 sudo systemctl stop container-$CONTAINER_NAME.service 2>/dev/null || true
 podman rm -f $CONTAINER_NAME || true
 
 # Create the container without starting it — systemd will handle startup.
-podman create -u root --name=$CONTAINER_NAME --network=picsure \
+podman create --name=$CONTAINER_NAME --network=picsure \
     --dns=10.89.0.1 \
     --log-opt tag=$CONTAINER_NAME \
-    -v /var/log/picsure/wildfly/:/opt/jboss/wildfly/standalone/log/:Z \
-    -v /opt/picsure/standalone.xml:/opt/jboss/wildfly/standalone/configuration/standalone.xml:Z \
-    -v /opt/picsure/fence_mapping.json:/usr/local/docker-config/fence_mapping.json:z \
-    -v /opt/picsure/aggregate-resource.properties:/opt/jboss/wildfly/standalone/configuration/aggregate-data-sharing/pic-sure-aggregate-resource/resource.properties:Z \
-    -p 8080:8080 -e JAVA_OPTS="$JAVA_OPTS" "$WILDFLY_IMAGE"
+    --env-file /opt/picsure/operations.env \
+    -e JAVA_OPTS="$JAVA_OPTS" "$OPERATIONS_IMAGE"
 
 # systemd setup.
 podman generate systemd --name $CONTAINER_NAME --restart-policy=always --files
-
 sudo mv container-$CONTAINER_NAME.service /etc/systemd/system/
-
 sudo restorecon -v /etc/systemd/system/container-$CONTAINER_NAME.service
 sudo systemctl daemon-reload
 sudo systemctl enable container-$CONTAINER_NAME.service
