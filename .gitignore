@@ -14,4 +14,5 @@ stack_variables_b.tf.baseline
 ip-vars.properties
 
 .idea/
-*.iml.terraform.lock.hcl
+*.iml
+.terraform.lock.hcl
