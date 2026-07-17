@@ -46,14 +46,12 @@ variable "picsure_token_introspection_token" {
   description = "PSAMA_APPLICATION service JWT for gateway token introspection"
   type        = string
   default     = ""
-  sensitive   = true
 }
 
 variable "logging_api_key" {
   description = "API key for the pic-sure-logging service"
   type        = string
   default     = ""
-  sensitive   = true
 }
 
 variable "app_user_secret_name" {
