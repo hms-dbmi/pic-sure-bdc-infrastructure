@@ -1,4 +1,14 @@
 #!/bin/bash
+set -euo pipefail
+
+# Tag the instance so 'Await Initialization' can gate on the outcome. Any
+# failure exits through the trap and tags InitComplete=failed instead of
+# leaving the instance half-configured but tagged successful.
+tag_init_complete() {
+  INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)
+  sudo /usr/bin/aws --region=us-east-1 ec2 create-tags --resources "$INSTANCE_ID" --tags Key=InitComplete,Value="$1"
+}
+trap 'rc=$?; [ "$rc" -eq 0 ] || tag_init_complete failed' EXIT
 
 target_stack="${target_stack}"
 env_private_dns_name="${env_private_dns_name}"
@@ -24,10 +34,14 @@ echo "NESSUS_GROUP=${gss_prefix}_${target_stack}" | sudo tee -a /opt/srce/startu
 sudo sh /opt/srce/scripts/start-gsstools.sh
 
 
+# Fail closed: if all attempts fail, abort (the EXIT trap tags InitComplete=failed).
 s3_copy() {
   for i in {1..5}; do
-    sudo /usr/bin/aws --region us-east-1 s3 cp "$@" --no-progress && break || sleep 30
+    sudo /usr/bin/aws --region us-east-1 s3 cp "$@" --no-progress && return 0
+    sleep 30
   done
+  echo "ERROR: aws s3 cp failed after 5 attempts: $*" >&2
+  exit 1
 }
 
 # Add swap space
@@ -88,8 +102,7 @@ sudo /opt/picsure/deploy-logging.sh --stack_s3_bucket "${stack_s3_bucket}" --tar
 sudo /opt/picsure/deploy-visualization.sh --stack_s3_bucket "${stack_s3_bucket}" --target_stack "${target_stack}"
 sudo /opt/picsure/deploy-gateway.sh --stack_s3_bucket "${stack_s3_bucket}" --target_stack "${target_stack}"
 
-INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)
-sudo /usr/bin/aws --region=us-east-1 ec2 create-tags --resources "$INSTANCE_ID" --tags Key=InitComplete,Value=true
+tag_init_complete true
 
 echo "user-data progress starting update"
-sudo yum -y update
+sudo yum -y update || echo "WARNING: yum update failed (non-fatal)"
