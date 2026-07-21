@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 # Orchestrates sequential deployment of all containers on the wildfly host.
 # Gateway, Operations, Query, PSAMA, Dictionary, and Visualization share the
@@ -15,6 +16,11 @@ deploy_query=false
 deploy_psama=false
 deploy_dictionary=false
 deploy_visualization=false
+stack_s3_bucket=""
+target_stack=""
+dataset_s3_object_key=""
+enable_debug=""
+spring_profile=""
 
 while [[ $# -gt 0 ]]; do
   case $1 in
