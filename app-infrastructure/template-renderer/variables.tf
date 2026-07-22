@@ -63,5 +63,7 @@ variable "app_user_secret_name" {
 variable "include_open_hpds" {
   description = "Whether open access is enabled (drives GATEWAY_OPEN_ACCESS_ENABLED)"
   type        = bool
-  default     = true
+  # Fail closed: open (unauthenticated) access must be opted into explicitly. A
+  # missing -var must never silently enable GATEWAY_OPEN_ACCESS_ENABLED.
+  default = false
 }
