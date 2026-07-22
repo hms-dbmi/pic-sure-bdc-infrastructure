@@ -111,8 +111,11 @@ export target_stack="${target_stack}"
 export env_private_dns_name="${env_private_dns_name}"
 EOF
 
-chmod 644 /opt/local/hpds/*
-chmod 644 /opt/local/hpds/all/*
+# chmod only regular files: a glob (e.g. /opt/local/hpds/all/*) matches nothing
+# when the genomic dataset is empty/absent, and under set -e that aborts the whole
+# deploy. find is a no-op on an empty tree and skips directories (leaving all/
+# traversable).
+find /opt/local/hpds -type f -exec chmod 644 {} +
 chmod 644 /opt/picsure/auth-hpds.env
 chmod 644 /opt/picsure/pic-sure-hpds.tar.gz
 

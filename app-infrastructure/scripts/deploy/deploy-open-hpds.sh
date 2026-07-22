@@ -61,7 +61,9 @@ tar -xvf destigmatized_javabins_rekeyed.tar
 cd ~ || exit
 echo "Completed unpacking destigmatized_javabins_rekeyed.tar"
 
-chmod 644 /opt/local/hpds/*
+# chmod only regular files: a bare glob aborts under set -e if the tree is empty,
+# and chmod 644 on a directory would strip its traversal bit.
+find /opt/local/hpds -type f -exec chmod 644 {} +
 chmod 644 /opt/picsure/pic-sure-hpds.tar.gz
 chmod 644 /opt/picsure/open-hpds.env
 
