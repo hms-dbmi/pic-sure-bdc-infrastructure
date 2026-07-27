@@ -16,8 +16,8 @@ resource "aws_s3_object" "hpds_auth_env" {
 resource "aws_s3_object" "hpds_open_env" {
   count = var.render_open_hpds ? 1 : 0
 
-  bucket  = var.stack_s3_bucket
-  key     = "configs/hpds/${var.target_stack}/open-hpds.env"
+  bucket = var.stack_s3_bucket
+  key    = "configs/hpds/${var.target_stack}/open-hpds.env"
   content = templatefile("${path.module}/templates/hpds-open.env.tftpl", {
     target_stack         = var.target_stack
     env_private_dns_name = var.env_private_dns_name
@@ -32,9 +32,10 @@ resource "aws_s3_object" "visualization_env" {
 
   bucket = var.stack_s3_bucket
   key    = "configs/pic-sure-visualization/${var.target_stack}/visualization.env"
+  # No stack/DNS interpolation: visualization now reaches pic-sure-hpds-query-service by podman DNS on the
+  # shared network, so the template carries no per-stack HPDS host.
   content = templatefile("${path.module}/templates/visualization.env.tftpl", {
-    target_stack         = var.target_stack
-    env_private_dns_name = var.env_private_dns_name
+    logging_api_key = var.logging_api_key
   })
 
   content_type           = "text/plain"
