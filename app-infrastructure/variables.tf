@@ -70,6 +70,7 @@ variable "include_open_hpds" {
 }
 
 # removing for now as they are secrets handled by the stack_variables
+# retained: passed by Jenkins; consumed by template-renderer / kept for cutover
 variable "picsure_token_introspection_token" {
   type    = string
   default = ""
@@ -149,6 +150,7 @@ variable "pdf_link" {
   default = "https://tinyurl.com/BDC-PIC-SURE-User-Guide"
 }
 
+# retained: passed by Jenkins; consumed by template-renderer / kept for cutover
 variable "picsure_db_host" {
     type = string
     description = "The host for the picsure db"
@@ -209,12 +211,14 @@ variable "ras_session_logout_uri" {
   default = "false"
 }
 
+# retained: passed by Jenkins; consumed by template-renderer / kept for cutover
 variable "logging_service_url" {
   type        = string
   description = "Base URL of the PIC-SURE logging service"
   default     = "disabled"
 }
 
+# retained: passed by Jenkins; consumed by template-renderer / kept for cutover
 variable "logging_api_key" {
   type        = string
   description = "API key for the PIC-SURE logging service"

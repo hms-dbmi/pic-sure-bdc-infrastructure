@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 while [[ $# -gt 0 ]]; do
   case $1 in
@@ -24,18 +25,23 @@ if [[ -f /etc/environment ]]; then
   set +a
 fi
 
-stack_s3_bucket=${stack_s3_bucket:-$STACK_S3_BUCKET}
-target_stack=${target_stack:-$TARGET_STACK}
+stack_s3_bucket=${stack_s3_bucket:-${STACK_S3_BUCKET:-}}
+target_stack=${target_stack:-${TARGET_STACK:-}}
 
 if [[ -z "$stack_s3_bucket" || -z "$target_stack" ]]; then
   echo "Error: --stack_s3_bucket and --target_stack are required."
   exit 1
 fi
 
+# Fail closed: if all attempts fail, abort the deploy rather than continuing
+# with whatever stale file is already on disk.
 s3_copy() {
   for i in {1..5}; do
-    sudo /usr/bin/aws --region us-east-1 s3 cp "$@" --no-progress && break || sleep 30
+    sudo /usr/bin/aws --region us-east-1 s3 cp "$@" --no-progress && return 0
+    sleep 30
   done
+  echo "ERROR: aws s3 cp failed after 5 attempts: $*" >&2
+  exit 1
 }
 
 s3_copy "s3://${stack_s3_bucket}/configs/pic-sure-visualization/${target_stack}/visualization.env" "/opt/picsure/visualization.env"
