@@ -91,4 +91,4 @@ while true; do
 done
 
 echo "user-data progress starting update"
-sudo yum -y update || echo "WARNING: yum update failed (non-fatal)"
+sudo yum -y update --allowerasing || echo "WARNING: yum update failed (non-fatal)"

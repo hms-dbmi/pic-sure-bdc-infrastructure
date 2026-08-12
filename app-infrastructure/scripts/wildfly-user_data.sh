@@ -105,4 +105,4 @@ sudo /opt/picsure/deploy-gateway.sh --stack_s3_bucket "${stack_s3_bucket}" --tar
 tag_init_complete true
 
 echo "user-data progress starting update"
-sudo yum -y update || echo "WARNING: yum update failed (non-fatal)"
+sudo yum -y update --allowerasing || echo "WARNING: yum update failed (non-fatal)"

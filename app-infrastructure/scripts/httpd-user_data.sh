@@ -50,4 +50,4 @@ for i in 1 2 3 4 5; do echo "confirming gateway resolvable" && sudo curl --conne
 tag_init_complete true
 
 echo "user-data progress starting update"
-sudo yum -y update || echo "WARNING: yum update failed (non-fatal)"
+sudo yum -y update --allowerasing || echo "WARNING: yum update failed (non-fatal)"
