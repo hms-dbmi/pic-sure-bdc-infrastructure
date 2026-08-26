@@ -62,6 +62,18 @@ test_environment() {
   assert_query \
     "SELECT COUNT(*) FROM accessRule_gate ag JOIN access_rule ar ON ar.uuid IN (ag.gate_id, ag.accessRule_id) WHERE ar.name IN ('AR_ALLOW_HPDS_AUTH_INGRESS', 'AR_ALLOW_HPDS_OPEN_INGRESS');" \
     '0'
+
+  assert_query \
+    "SELECT COUNT(*) FROM access_rule WHERE type = 17;" \
+    '0'
+
+  assert_query \
+    "SELECT COUNT(*) FROM accessRule_privilege arp LEFT JOIN access_rule ar ON ar.uuid = arp.accessRule_id WHERE ar.uuid IS NULL;" \
+    '0'
+
+  assert_query \
+    "SELECT COUNT(*) FROM accessRule_gate arg LEFT JOIN access_rule gate_rule ON gate_rule.uuid = arg.gate_id LEFT JOIN access_rule parent_rule ON parent_rule.uuid = arg.accessRule_id WHERE gate_rule.uuid IS NULL OR parent_rule.uuid IS NULL;" \
+    '0'
 }
 
 test_environment bdc
