@@ -5,6 +5,19 @@ set -euo pipefail
 repo_root=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)
 container_name="picsure-hpds-ingress-mysql-$$"
 
+applied_bdc_v22="$repo_root/app-infrastructure/db/bdc/auth/V22__Create_User_Consents_Override.sql"
+if [[ ! -f "$applied_bdc_v22" ]]; then
+  printf 'Applied BDC migration V22 is missing: %s\n' "$applied_bdc_v22" >&2
+  exit 1
+fi
+
+read -r applied_bdc_v22_checksum applied_bdc_v22_size _ < <(cksum "$applied_bdc_v22")
+if [[ "$applied_bdc_v22_checksum" != '4019684724' || "$applied_bdc_v22_size" != '258' ]]; then
+  printf 'Applied BDC migration V22 has changed. Expected cksum 4019684724 258, got %s %s.\n' \
+    "$applied_bdc_v22_checksum" "$applied_bdc_v22_size" >&2
+  exit 1
+fi
+
 cleanup() {
   docker rm -f "$container_name" >/dev/null 2>&1 || true
 }
