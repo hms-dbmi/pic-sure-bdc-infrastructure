@@ -1,8 +1,8 @@
-create table consents_override {
+create table consents_override (
     `uuid` binary(16) NOT NULL UNIQUE,
     `name` TEXT NOT NULL UNIQUE,
     `consents` JSON
-};
+);
 
 CREATE TABLE user_consents_override (
    `uuid` binary(16) NOT NULL UNIQUE,
