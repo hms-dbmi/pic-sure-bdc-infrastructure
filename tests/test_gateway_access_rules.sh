@@ -113,9 +113,21 @@ assert_gateway_rules() {
         "$(query "SELECT COUNT(*) FROM access_rule WHERE name LIKE 'MIGRATION_GUARD%';")" "0"
 
     # /logging sits on the gateway's allow-list-prefixes and is never
-    # introspected, so a rule for it would never be evaluated.
+    # introspected, so a clean-prefix rule for it would never be evaluated.
     expect "$label: no clean-prefix rule for /logging" \
         "$(query "SELECT COUNT(*) FROM access_rule WHERE value LIKE '^/logging%';")" "0"
+
+    # The legacy /proxy rules are retained for WildFly until cutover, and
+    # PrivilegeService's startup attachment loop no longer exists to bind them.
+    # Each must carry a privilege of its own.
+    for rule in AR_DICTIONARY_REQUESTS AR_LOGGING_REQUESTS; do
+        expect "$label: $rule is attached" \
+            "$(query "
+                SELECT CASE WHEN COUNT(*) > 0 THEN 'attached' ELSE 'UNATTACHED' END
+                FROM accessRule_privilege arp
+                JOIN access_rule ar ON ar.uuid = arp.accessRule_id
+                WHERE ar.name = '$rule';")" "attached"
+    done
 }
 
 # Renaming the privilege an ingress rule attaches to must abort the migration

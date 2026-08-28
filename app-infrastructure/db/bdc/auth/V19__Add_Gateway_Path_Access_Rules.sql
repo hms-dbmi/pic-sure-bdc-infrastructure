@@ -15,7 +15,7 @@
 -- already booted, and nothing at all in a fresh one, where the result is a
 -- silent denial of every /dictionary request.
 --
--- No rule is created for /logging. That prefix is on the gateway's
+-- No clean-prefix rule is created for /logging. That prefix is on the gateway's
 -- allow-list-prefixes, so it is never introspected and an access rule for it
 -- would never be evaluated.
 
@@ -89,3 +89,40 @@ SELECT @vizCleanPrefix, 'MIGRATION_GUARD_UNATTACHED_RULE',
        '', 0, '', 0x00, 0x00, NULL, 0x00, 0x00
 FROM dual
 WHERE NOT EXISTS (SELECT 1 FROM accessRule_privilege WHERE accessRule_id = @vizCleanPrefix);
+
+-- ---- legacy /proxy rules ----------------------------------------------------
+
+-- These two are the WildFly-era route grants, RETAINED here until cutover. V10
+-- and V17 create them with no privilege attachment, and until now the only
+-- thing that bound them to a user was
+-- PrivilegeService.updateAllPrivilegesOnStartup(), which reads a hardcoded
+-- fence.standard.access.rules list. That loop is being deleted, so the binding
+-- has to live where the rule does.
+--
+-- AR_LOGGING_REQUESTS is still live: httpd-vhosts-bdc.conf routes
+-- /picsure/proxy/pic-sure-logging/* to WildFly, which introspects it.
+-- AR_DICTIONARY_REQUESTS no longer has a route on this branch; it is attached
+-- anyway so the two legacy rules behave identically through the cutover, when
+-- both they and these attachments are deleted together.
+--
+-- INSERT IGNORE, not INSERT: in an environment PSAMA has already booted these
+-- rows exist for every privilege, and re-inserting a subset of them would
+-- violate the accessRule_privilege primary key.
+INSERT IGNORE INTO accessRule_privilege (privilege_id, accessRule_id)
+SELECT p.uuid, ar.uuid
+FROM privilege p, access_rule ar
+WHERE p.name IN ('MANAGED_PRIV_DICTIONARY', 'MANAGED_PRIV_OPEN_ACCESS', 'MANAGED_PRIV_AUTH_ACCESS')
+  AND ar.name IN ('AR_DICTIONARY_REQUESTS', 'AR_LOGGING_REQUESTS');
+
+-- Fail the migration if either legacy rule ended up unattached.
+INSERT INTO access_rule (
+    uuid, name, description, rule, type, value, checkMapKeyOnly, checkMapNode,
+    subAccessRuleParent_uuid, isGateAnyRelation, isEvaluateOnlyByGates
+)
+SELECT orphan.uuid, 'MIGRATION_GUARD_UNATTACHED_RULE',
+       'MIGRATION GUARD: a legacy /proxy rule matched no privilege',
+       '', 0, '', 0x00, 0x00, NULL, 0x00, 0x00
+FROM access_rule orphan
+WHERE orphan.name IN ('AR_DICTIONARY_REQUESTS', 'AR_LOGGING_REQUESTS')
+  AND NOT EXISTS (SELECT 1 FROM accessRule_privilege WHERE accessRule_id = orphan.uuid)
+LIMIT 1;
