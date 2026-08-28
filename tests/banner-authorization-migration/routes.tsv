@@ -1,4 +1,4 @@
-pattern	^/operations/banners(?:/?|/saved/?|/order/?|/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(?:/?|/publish/?|/disable/?|/archive/?))$
+pattern	^/operations/banners(?:/?|/saved/?|/order/?|/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(?:/?|/publish/?|/disable/?|/archive/?|/restore/?))$
 allow	/operations/banners
 allow	/operations/banners/
 allow	/operations/banners/saved
@@ -15,6 +15,10 @@ allow	/operations/banners/00000000-0000-0000-0000-000000000001/archive
 allow	/operations/banners/00000000-0000-0000-0000-000000000001/archive/
 allow	/operations/banners/ABCDEFAB-CDEF-ABCD-EFAB-CDEFABCDEFAB/archive
 allow	/operations/banners/ABCDEFAB-CDEF-ABCD-EFAB-CDEFABCDEFAB/archive/
+allow	/operations/banners/00000000-0000-0000-0000-000000000001/restore
+allow	/operations/banners/00000000-0000-0000-0000-000000000001/restore/
+allow	/operations/banners/ABCDEFAB-CDEF-ABCD-EFAB-CDEFABCDEFAB/restore
+allow	/operations/banners/ABCDEFAB-CDEF-ABCD-EFAB-CDEFABCDEFAB/restore/
 deny	/operations/banners/active
 deny	/operations/banners/active/
 deny	/operations/banners/saved/extra
@@ -40,3 +44,11 @@ deny	/operations/banners/00000000-0000-0000-0000-00000000000g/archive
 deny	/operations/banners//archive
 deny	/prefix/operations/banners/00000000-0000-0000-0000-000000000001/archive
 deny	/operations/banners/00000000-0000-0000-0000-000000000001/archive?force=true
+deny	/operations/banners/00000000-0000-0000-0000-000000000001/restore/extra
+deny	/operations/banners/00000000-0000-0000-0000-000000000001/restores
+deny	/operations/banners/restore
+deny	/operations/banners/not-a-uuid/restore
+deny	/operations/banners/00000000-0000-0000-0000-00000000000g/restore
+deny	/operations/banners//restore
+deny	/prefix/operations/banners/00000000-0000-0000-0000-000000000001/restore
+deny	/operations/banners/00000000-0000-0000-0000-000000000001/restore?force=true
