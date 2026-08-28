@@ -18,7 +18,7 @@ CREATE TABLE access_rule (
     description VARCHAR(2000),
     rule VARCHAR(255),
     type INT,
-    value VARCHAR(1000),
+    value VARCHAR(255),
     checkMapKeyOnly BIT NOT NULL,
     checkMapNode BIT NOT NULL,
     subAccessRuleParent_uuid BINARY(16),
