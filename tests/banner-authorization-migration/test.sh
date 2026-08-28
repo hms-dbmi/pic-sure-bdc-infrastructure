@@ -6,18 +6,21 @@ fixture="$repo_root/tests/banner-authorization-migration/routes.tsv"
 before="$repo_root/tests/banner-authorization-migration/before.sql"
 bdc_add="$repo_root/app-infrastructure/db/bdc/auth/V22__Add_Banner_Management_Access_Rule.sql"
 bdc_expand="$repo_root/app-infrastructure/db/bdc/auth/V23__Expand_Banner_Management_Access_Rule.sql"
+bdc_reorder="$repo_root/app-infrastructure/db/bdc/auth/V24__Authorize_Banner_Reorder.sql"
 aim_add="$repo_root/app-infrastructure/db/aim-ahead/auth/V24__Add_Banner_Management_Access_Rule.sql"
 aim_expand="$repo_root/app-infrastructure/db/aim-ahead/auth/V25__Expand_Banner_Management_Access_Rule.sql"
+aim_reorder="$repo_root/app-infrastructure/db/aim-ahead/auth/V26__Authorize_Banner_Reorder.sql"
 container="banner-auth-infra-${GITHUB_RUN_ID:-local}-$$"
 password="banner-auth-test"
 
-for file in "$fixture" "$before" "$bdc_add" "$bdc_expand" "$aim_add" "$aim_expand"; do
+for file in "$fixture" "$before" "$bdc_add" "$bdc_expand" "$bdc_reorder" "$aim_add" "$aim_expand" "$aim_reorder"; do
   test -f "$file" || { echo "Missing required file: $file" >&2; exit 1; }
 done
-paths=("$(realpath "$bdc_add")" "$(realpath "$bdc_expand")" "$(realpath "$aim_add")" "$(realpath "$aim_expand")")
-test "$(printf '%s\n' "${paths[@]}" | sort -u | wc -l | tr -d ' ')" = "4"
+paths=("$(realpath "$bdc_add")" "$(realpath "$bdc_expand")" "$(realpath "$bdc_reorder")" "$(realpath "$aim_add")" "$(realpath "$aim_expand")" "$(realpath "$aim_reorder")")
+test "$(printf '%s\n' "${paths[@]}" | sort -u | wc -l | tr -d ' ')" = "6"
 cmp "$bdc_add" "$aim_add"
 cmp "$bdc_expand" "$aim_expand"
+cmp "$bdc_reorder" "$aim_reorder"
 
 cleanup() {
   docker rm -f "$container" >/dev/null 2>&1 || true
@@ -41,11 +44,14 @@ verify_deployment() {
   local deployment="$1"
   local add_migration="$2"
   local expand_migration="$3"
+  local reorder_migration="$4"
 
   mysql_exec < "$before"
   mysql_exec < "$add_migration"
   mysql_exec -e "UPDATE auth.access_rule SET value = 'unexpected-pre-expansion-value' WHERE name = 'AR_BANNER_MANAGEMENT_GATEWAY';"
   mysql_exec < "$expand_migration"
+  mysql_exec -e "UPDATE auth.access_rule SET value = 'unexpected-pre-reorder-value' WHERE name = 'AR_BANNER_MANAGEMENT_GATEWAY';"
+  mysql_exec < "$reorder_migration"
 
   local pattern granted_roles
   pattern="$(mysql_exec -e "SELECT value FROM auth.access_rule WHERE name = 'AR_BANNER_MANAGEMENT_GATEWAY';")"
@@ -80,6 +86,6 @@ for kind, route in entries:
 PY
 }
 
-verify_deployment BDC "$bdc_add" "$bdc_expand"
-verify_deployment AIM "$aim_add" "$aim_expand"
+verify_deployment BDC "$bdc_add" "$bdc_expand" "$bdc_reorder"
+verify_deployment AIM "$aim_add" "$aim_expand" "$aim_reorder"
 echo "BDC and AIM banner authorization migrations verified"

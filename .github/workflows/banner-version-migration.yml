@@ -6,16 +6,20 @@ on:
     paths:
       - 'app-infrastructure/db/bdc/picsure/V9__CREATE_BANNER_OCCURRENCE.sql'
       - 'app-infrastructure/db/bdc/picsure/V10__CREATE_BANNER_VERSION.sql'
+      - 'app-infrastructure/db/bdc/picsure/V11__CREATE_BANNER_PRIORITY_ALLOCATOR.sql'
       - 'app-infrastructure/db/aim-ahead/picsure/V9__CREATE_BANNER_OCCURRENCE.sql'
       - 'app-infrastructure/db/aim-ahead/picsure/V10__CREATE_BANNER_VERSION.sql'
+      - 'app-infrastructure/db/aim-ahead/picsure/V11__CREATE_BANNER_PRIORITY_ALLOCATOR.sql'
       - 'tests/banner-version-migration/**'
       - '.github/workflows/banner-version-migration.yml'
   pull_request:
     paths:
       - 'app-infrastructure/db/bdc/picsure/V9__CREATE_BANNER_OCCURRENCE.sql'
       - 'app-infrastructure/db/bdc/picsure/V10__CREATE_BANNER_VERSION.sql'
+      - 'app-infrastructure/db/bdc/picsure/V11__CREATE_BANNER_PRIORITY_ALLOCATOR.sql'
       - 'app-infrastructure/db/aim-ahead/picsure/V9__CREATE_BANNER_OCCURRENCE.sql'
       - 'app-infrastructure/db/aim-ahead/picsure/V10__CREATE_BANNER_VERSION.sql'
+      - 'app-infrastructure/db/aim-ahead/picsure/V11__CREATE_BANNER_PRIORITY_ALLOCATOR.sql'
       - 'tests/banner-version-migration/**'
       - '.github/workflows/banner-version-migration.yml'
 
@@ -30,5 +34,7 @@ jobs:
           tests/banner-version-migration/test.sh
           app-infrastructure/db/bdc/picsure/V9__CREATE_BANNER_OCCURRENCE.sql
           app-infrastructure/db/bdc/picsure/V10__CREATE_BANNER_VERSION.sql
+          app-infrastructure/db/bdc/picsure/V11__CREATE_BANNER_PRIORITY_ALLOCATOR.sql
           app-infrastructure/db/aim-ahead/picsure/V9__CREATE_BANNER_OCCURRENCE.sql
           app-infrastructure/db/aim-ahead/picsure/V10__CREATE_BANNER_VERSION.sql
+          app-infrastructure/db/aim-ahead/picsure/V11__CREATE_BANNER_PRIORITY_ALLOCATOR.sql

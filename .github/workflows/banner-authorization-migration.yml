@@ -6,16 +6,20 @@ on:
     paths:
       - 'app-infrastructure/db/bdc/auth/V22__Add_Banner_Management_Access_Rule.sql'
       - 'app-infrastructure/db/bdc/auth/V23__Expand_Banner_Management_Access_Rule.sql'
+      - 'app-infrastructure/db/bdc/auth/V24__Authorize_Banner_Reorder.sql'
       - 'app-infrastructure/db/aim-ahead/auth/V24__Add_Banner_Management_Access_Rule.sql'
       - 'app-infrastructure/db/aim-ahead/auth/V25__Expand_Banner_Management_Access_Rule.sql'
+      - 'app-infrastructure/db/aim-ahead/auth/V26__Authorize_Banner_Reorder.sql'
       - 'tests/banner-authorization-migration/**'
       - '.github/workflows/banner-authorization-migration.yml'
   pull_request:
     paths:
       - 'app-infrastructure/db/bdc/auth/V22__Add_Banner_Management_Access_Rule.sql'
       - 'app-infrastructure/db/bdc/auth/V23__Expand_Banner_Management_Access_Rule.sql'
+      - 'app-infrastructure/db/bdc/auth/V24__Authorize_Banner_Reorder.sql'
       - 'app-infrastructure/db/aim-ahead/auth/V24__Add_Banner_Management_Access_Rule.sql'
       - 'app-infrastructure/db/aim-ahead/auth/V25__Expand_Banner_Management_Access_Rule.sql'
+      - 'app-infrastructure/db/aim-ahead/auth/V26__Authorize_Banner_Reorder.sql'
       - 'tests/banner-authorization-migration/**'
       - '.github/workflows/banner-authorization-migration.yml'
 

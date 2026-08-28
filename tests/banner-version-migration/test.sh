@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if [[ "$#" -eq 0 ]] || (( $# % 2 != 0 )); then
-    echo "usage: $0 <banner-occurrence-migration.sql> <banner-version-migration.sql> [...]" >&2
+if [[ "$#" -eq 0 ]] || (( $# % 3 != 0 )); then
+    echo "usage: $0 <banner-occurrence.sql> <banner-version.sql> <banner-priority-allocator.sql> [...]" >&2
     exit 2
 fi
 
@@ -47,12 +47,18 @@ mysql_exec() {
     docker exec --interactive "$mysql_container" mysql --user=root --password=test --batch --skip-column-names "$@"
 }
 
-for ((index = 0; index < ${#migration_files[@]}; index += 2)); do
+for ((index = 0; index < ${#migration_files[@]}; index += 3)); do
     occurrence_migration="${migration_files[index]}"
     version_migration="${migration_files[index + 1]}"
+    priority_migration="${migration_files[index + 2]}"
 
     if [[ "$(realpath "$occurrence_migration")" == "$(realpath "$version_migration")" ]]; then
         echo "occurrence and version migrations must be distinct files" >&2
+        exit 2
+    fi
+    if [[ "$(realpath "$occurrence_migration")" == "$(realpath "$priority_migration")" ]] ||
+       [[ "$(realpath "$version_migration")" == "$(realpath "$priority_migration")" ]]; then
+        echo "banner migrations must be distinct files" >&2
         exit 2
     fi
 
@@ -116,5 +122,22 @@ for ((index = 0; index < ${#migration_files[@]}; index += 2)); do
         echo "unexpected banner version constraints for $version_migration: $constraint_result" >&2
         exit 1
     fi
+    mysql_exec picsure --execute="
+        UPDATE banner_occurrence
+        SET priority = 9, end_at = NULL
+        WHERE uuid = UUID_TO_BIN('00000000-0000-0000-0000-000000000001');"
+    mysql_exec < "$priority_migration"
+    allocator_result="$(mysql_exec picsure --execute="
+        SELECT CONCAT(
+            (SELECT COUNT(*) FROM banner_priority_allocator WHERE id = 1 AND next_priority = 10), ':',
+            (SELECT COUNT(*) FROM information_schema.table_constraints
+             WHERE table_schema = 'picsure' AND table_name = 'banner_priority_allocator'
+               AND constraint_name = 'chk_banner_priority_allocator_singleton' AND constraint_type = 'CHECK')
+        );")"
+    if [[ "$allocator_result" != "1:1" ]]; then
+        echo "unexpected banner priority allocator for $priority_migration: $allocator_result" >&2
+        exit 1
+    fi
     echo "Banner version migration verified: $version_migration"
+    echo "Banner priority allocator migration verified: $priority_migration"
 done
