@@ -1,16 +1,34 @@
 name: Banner version migrations
 
 on:
-  pull_request:
   push:
+    branches: [main]
+    paths:
+      - 'app-infrastructure/db/bdc/picsure/V9__CREATE_BANNER_OCCURRENCE.sql'
+      - 'app-infrastructure/db/bdc/picsure/V10__CREATE_BANNER_VERSION.sql'
+      - 'app-infrastructure/db/aim-ahead/picsure/V9__CREATE_BANNER_OCCURRENCE.sql'
+      - 'app-infrastructure/db/aim-ahead/picsure/V10__CREATE_BANNER_VERSION.sql'
+      - 'tests/banner-version-migration/**'
+      - '.github/workflows/banner-version-migration.yml'
+  pull_request:
+    paths:
+      - 'app-infrastructure/db/bdc/picsure/V9__CREATE_BANNER_OCCURRENCE.sql'
+      - 'app-infrastructure/db/bdc/picsure/V10__CREATE_BANNER_VERSION.sql'
+      - 'app-infrastructure/db/aim-ahead/picsure/V9__CREATE_BANNER_OCCURRENCE.sql'
+      - 'app-infrastructure/db/aim-ahead/picsure/V10__CREATE_BANNER_VERSION.sql'
+      - 'tests/banner-version-migration/**'
+      - '.github/workflows/banner-version-migration.yml'
 
 jobs:
   mysql:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - name: Execute the BDC and AIM-AHEAD deployment migrations on MySQL
         run: >-
           tests/banner-version-migration/test.sh
+          app-infrastructure/db/bdc/picsure/V9__CREATE_BANNER_OCCURRENCE.sql
           app-infrastructure/db/bdc/picsure/V10__CREATE_BANNER_VERSION.sql
+          app-infrastructure/db/aim-ahead/picsure/V9__CREATE_BANNER_OCCURRENCE.sql
           app-infrastructure/db/aim-ahead/picsure/V10__CREATE_BANNER_VERSION.sql

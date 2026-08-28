@@ -2,6 +2,7 @@ name: Banner authorization migration
 
 on:
   push:
+    branches: [main]
     paths:
       - 'app-infrastructure/db/bdc/auth/V22__Add_Banner_Management_Access_Rule.sql'
       - 'app-infrastructure/db/bdc/auth/V23__Expand_Banner_Management_Access_Rule.sql'
