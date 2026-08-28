@@ -1,4 +1,4 @@
-pattern	^/operations/banners(?:/?|/saved/?|/order/?|/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(?:/?|/publish/?))$
+pattern	^/operations/banners(?:/?|/saved/?|/order/?|/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(?:/?|/publish/?|/disable/?))$
 allow	/operations/banners
 allow	/operations/banners/
 allow	/operations/banners/saved
@@ -9,6 +9,8 @@ allow	/operations/banners/00000000-0000-0000-0000-000000000001
 allow	/operations/banners/00000000-0000-0000-0000-000000000001/
 allow	/operations/banners/ABCDEFAB-CDEF-ABCD-EFAB-CDEFABCDEFAB/publish
 allow	/operations/banners/ABCDEFAB-CDEF-ABCD-EFAB-CDEFABCDEFAB/publish/
+allow	/operations/banners/00000000-0000-0000-0000-000000000001/disable
+allow	/operations/banners/ABCDEFAB-CDEF-ABCD-EFAB-CDEFABCDEFAB/disable/
 deny	/operations/banners/active
 deny	/operations/banners/active/
 deny	/operations/banners/saved/extra
@@ -17,6 +19,9 @@ deny	/operations/banners/orders
 deny	/operations/banners/not-a-uuid
 deny	/operations/banners/00000000-0000-0000-0000-00000000000g
 deny	/operations/banners/00000000-0000-0000-0000-000000000001/publish/extra
+deny	/operations/banners/00000000-0000-0000-0000-000000000001/disable/extra
+deny	/operations/banners/00000000-0000-0000-0000-000000000001/disabled
+deny	/operations/banners/disable
 deny	/operations/banners/00000000-0000-0000-0000-000000000001/saved
 deny	/operations/banners//saved
 deny	/operations/banner
