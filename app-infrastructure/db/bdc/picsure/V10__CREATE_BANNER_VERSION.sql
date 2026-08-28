@@ -30,42 +30,14 @@ INSERT INTO banner_version (
     uuid, banner_uuid, version_number, html_content, title, appearance, icon, dismissible, audience, placement,
     page_targets, start_at, end_at, presentation_hash, effective_at, actor
 )
-SELECT UUID_TO_BIN(UUID()), uuid, 1, html_content, title, appearance, icon, dismissible, audience, placement,
-       page_targets, start_at, end_at, presentation_hash, published_at,
-       COALESCE(NULLIF(published_by, ''), 'SYSTEM_MIGRATION')
-FROM banner_occurrence
-WHERE status = 'PUBLISHED';
-
-DELIMITER //
-CREATE TRIGGER banner_occurrence_version_after_insert
-    AFTER INSERT ON banner_occurrence
-    FOR EACH ROW
-BEGIN
-    IF NEW.status = 'PUBLISHED' THEN
-        INSERT INTO banner_version (
-            uuid, banner_uuid, version_number, html_content, title, appearance, icon, dismissible, audience, placement,
-            page_targets, start_at, end_at, presentation_hash, effective_at, actor
-        ) VALUES (
-            UUID_TO_BIN(UUID()), NEW.uuid, 1, NEW.html_content, NEW.title, NEW.appearance, NEW.icon, NEW.dismissible,
-            NEW.audience, NEW.placement, NEW.page_targets, NEW.start_at, NEW.end_at, NEW.presentation_hash,
-            NEW.published_at, COALESCE(NULLIF(NEW.published_by, ''), 'SYSTEM_MIGRATION')
-        );
-    END IF;
-END//
-
-CREATE TRIGGER banner_occurrence_version_after_first_publish
-    AFTER UPDATE ON banner_occurrence
-    FOR EACH ROW
-BEGIN
-    IF OLD.status <> 'PUBLISHED' AND NEW.status = 'PUBLISHED' THEN
-        INSERT INTO banner_version (
-            uuid, banner_uuid, version_number, html_content, title, appearance, icon, dismissible, audience, placement,
-            page_targets, start_at, end_at, presentation_hash, effective_at, actor
-        ) VALUES (
-            UUID_TO_BIN(UUID()), NEW.uuid, 1, NEW.html_content, NEW.title, NEW.appearance, NEW.icon, NEW.dismissible,
-            NEW.audience, NEW.placement, NEW.page_targets, NEW.start_at, NEW.end_at, NEW.presentation_hash,
-            NEW.published_at, COALESCE(NULLIF(NEW.published_by, ''), 'SYSTEM_MIGRATION')
-        );
-    END IF;
-END//
-DELIMITER ;
+SELECT UUID_TO_BIN(UUID()), occurrence.uuid, 1, occurrence.html_content, occurrence.title, occurrence.appearance,
+       occurrence.icon, occurrence.dismissible, occurrence.audience, occurrence.placement, occurrence.page_targets,
+       occurrence.start_at, occurrence.end_at, occurrence.presentation_hash, occurrence.published_at,
+       COALESCE(NULLIF(occurrence.published_by, ''), 'SYSTEM_MIGRATION')
+FROM banner_occurrence occurrence
+WHERE occurrence.status = 'PUBLISHED'
+  AND NOT EXISTS (
+      SELECT 1
+      FROM banner_version version
+      WHERE version.banner_uuid = occurrence.uuid
+  );
