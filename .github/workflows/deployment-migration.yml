@@ -1,0 +1,36 @@
+name: BDC and AIM-AHEAD deployment migration proof
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'app-infrastructure/db/bdc/auth/**'
+      - 'app-infrastructure/db/bdc/picsure/**'
+      - 'app-infrastructure/db/aim-ahead/auth/**'
+      - 'app-infrastructure/db/aim-ahead/picsure/**'
+      - 'tests/deployment-migration/**'
+      - 'tests/banner-authorization-migration/**'
+      - 'tests/banner-version-migration/**'
+      - '.github/workflows/deployment-migration.yml'
+  pull_request:
+    paths:
+      - 'app-infrastructure/db/bdc/auth/**'
+      - 'app-infrastructure/db/bdc/picsure/**'
+      - 'app-infrastructure/db/aim-ahead/auth/**'
+      - 'app-infrastructure/db/aim-ahead/picsure/**'
+      - 'tests/deployment-migration/**'
+      - 'tests/banner-authorization-migration/**'
+      - 'tests/banner-version-migration/**'
+      - '.github/workflows/deployment-migration.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  mysql:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Prove BDC and AIM-AHEAD deployment-owned banner migrations
+        run: tests/deployment-migration/test.sh all

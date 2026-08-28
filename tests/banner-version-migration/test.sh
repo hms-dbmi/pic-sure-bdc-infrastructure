@@ -11,6 +11,8 @@ test_id="banner-version-$PPID-$$"
 network_name="$test_id-network"
 mysql_container="$test_id-mysql"
 migration_files=("$@")
+mysql_image="mysql:8.0.43@sha256:ccf4fed7ff4b886aeb3573a1f5d5b509525ecff55a2d1e2653c27a5abdded309"
+flyway_image="flyway/flyway:11.7.2@sha256:8ace7d9825bb3ad1d6e14ee27b3a830b638ac841ba424b99b2d92aa65a99d484"
 
 cleanup() {
     docker rm -f "$mysql_container" >/dev/null 2>&1 || true
@@ -27,11 +29,11 @@ done
 
 docker network create "$network_name" >/dev/null
 docker run --detach --name "$mysql_container" --network "$network_name" \
-    --env MYSQL_ROOT_PASSWORD=test --env MYSQL_DATABASE=picsure mysql:8.0 >/dev/null
+    --env MYSQL_ROOT_PASSWORD=test --env MYSQL_DATABASE=picsure "$mysql_image" >/dev/null
 
 mysql_ready=false
 for _ in {1..60}; do
-    if docker run --rm --network "$network_name" mysql:8.0 mysqladmin \
+    if docker run --rm --network "$network_name" "$mysql_image" mysqladmin \
         --host="$mysql_container" --user=root --password=test ping --silent >/dev/null 2>&1; then
         mysql_ready=true
         break
@@ -68,7 +70,7 @@ for ((index = 0; index < ${#migration_files[@]}; index += 3)); do
 
     docker run --rm --network "$network_name" \
         --volume "$(cd "$(dirname "$version_migration")" && pwd)/$(basename "$version_migration"):/flyway/sql/V2__CREATE_BANNER_VERSION.sql:ro" \
-        flyway/flyway:11.7.2 \
+        "$flyway_image" \
         -url="jdbc:mysql://$mysql_container:3306/picsure?allowPublicKeyRetrieval=true" -user=root -password=test \
         -baselineOnMigrate=true -baselineVersion=1 migrate
 

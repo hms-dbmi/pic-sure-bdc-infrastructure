@@ -18,6 +18,7 @@ aim_archive="$repo_root/app-infrastructure/db/aim-ahead/auth/V28__Allow_Banner_A
 aim_restore="$repo_root/app-infrastructure/db/aim-ahead/auth/V29__Allow_Banner_Restore_Route.sql"
 container="banner-auth-infra-${GITHUB_RUN_ID:-local}-$$"
 password="banner-auth-test"
+mysql_image="mysql:8.0.43@sha256:ccf4fed7ff4b886aeb3573a1f5d5b509525ecff55a2d1e2653c27a5abdded309"
 
 for file in "$fixture" "$before" "$bdc_add" "$bdc_expand" "$bdc_reorder" "$bdc_disable" "$bdc_archive" "$bdc_restore" "$aim_add" "$aim_expand" \
   "$aim_reorder" "$aim_disable" "$aim_archive" "$aim_restore"; do
@@ -41,7 +42,7 @@ cleanup() {
 }
 trap cleanup EXIT
 
-docker run --name "$container" -e MYSQL_ROOT_PASSWORD="$password" -d mysql:8.0 >/dev/null
+docker run --name "$container" -e MYSQL_ROOT_PASSWORD="$password" -d "$mysql_image" >/dev/null
 for _ in {1..60}; do
   if docker exec "$container" mysql -uroot -p"$password" -e "SELECT 1" >/dev/null 2>&1; then
     break
