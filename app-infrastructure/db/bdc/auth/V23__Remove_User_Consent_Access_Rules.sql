@@ -4,8 +4,8 @@
 -- AccessRuleService._decisionMaker's default branch refuses to grant on a type
 -- it does not recognise. A type-17 row left in the table is therefore not
 -- inert, it is a rule that can only ever deny -- and the one this schema
--- creates, GATE_QUERY_v3 (V20), hangs off MANAGED_PRIV_AUTH_ACCESS, which every
--- authenticated user holds. V24's AR_ALLOW_HPDS_AUTH_INGRESS is its
+-- creates, GATE_QUERY_v3 (V15), hangs off MANAGED_PRIV_AUTH_ACCESS, which every
+-- authenticated user holds. V21's AR_ALLOW_HPDS_AUTH_INGRESS is its
 -- replacement; the per-study check it used to perform now runs in the HPDS
 -- query service, against the caller's consents, on every query and on every
 -- read of a stored result.
