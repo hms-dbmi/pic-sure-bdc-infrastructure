@@ -3,6 +3,7 @@ set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 fixture="$repo_root/tests/banner-authorization-migration/routes.tsv"
+route_verifier="$repo_root/tests/banner-authorization-migration/verify_routes.py"
 before="$repo_root/tests/banner-authorization-migration/before.sql"
 bdc_add="$repo_root/app-infrastructure/db/bdc/auth/V22__Add_Banner_Management_Access_Rule.sql"
 bdc_expand="$repo_root/app-infrastructure/db/bdc/auth/V23__Expand_Banner_Management_Access_Rule.sql"
@@ -20,7 +21,7 @@ container="banner-auth-infra-${GITHUB_RUN_ID:-local}-$$"
 password="banner-auth-test"
 mysql_image="mysql:8.0.43@sha256:ccf4fed7ff4b886aeb3573a1f5d5b509525ecff55a2d1e2653c27a5abdded309"
 
-for file in "$fixture" "$before" "$bdc_add" "$bdc_expand" "$bdc_reorder" "$bdc_disable" "$bdc_archive" "$bdc_restore" "$aim_add" "$aim_expand" \
+for file in "$fixture" "$route_verifier" "$before" "$bdc_add" "$bdc_expand" "$bdc_reorder" "$bdc_disable" "$bdc_archive" "$bdc_restore" "$aim_add" "$aim_expand" \
   "$aim_reorder" "$aim_disable" "$aim_archive" "$aim_restore"; do
   test -f "$file" || { echo "Missing required file: $file" >&2; exit 1; }
 done
@@ -92,22 +93,7 @@ verify_deployment() {
     JOIN auth.privilege p ON p.uuid = rp.privilege_id
     WHERE r.name = 'PIC-SURE User' AND p.name = 'BANNER_MANAGEMENT';")" = "0"
 
-  python3 - "$pattern" "$fixture" "$deployment" <<'PY'
-import re
-import sys
-from pathlib import Path
-
-actual_pattern, fixture_path, deployment = sys.argv[1:]
-entries = [line.split("\t", 1) for line in Path(fixture_path).read_text().splitlines()]
-expected_pattern = next(value for kind, value in entries if kind == "pattern")
-assert actual_pattern == expected_pattern, (deployment, actual_pattern, expected_pattern)
-rule = re.compile(actual_pattern)
-for kind, route in entries:
-    if kind == "allow":
-        assert rule.fullmatch(route), f"{deployment} expected allowed route: {route}"
-    elif kind == "deny":
-        assert not rule.fullmatch(route), f"{deployment} expected denied route: {route}"
-PY
+  python3 "$route_verifier" "$pattern" "$fixture" "$deployment"
 }
 
 verify_deployment BDC "$bdc_add" "$bdc_expand" "$bdc_reorder" "$bdc_disable" "$bdc_archive" "$bdc_restore"

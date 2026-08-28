@@ -8,6 +8,8 @@ selection="${1:-all}"
 mysql_image="mysql:8.0.43@sha256:ccf4fed7ff4b886aeb3573a1f5d5b509525ecff55a2d1e2653c27a5abdded309"
 feature_flyway_image="flyway/flyway:11.7.2@sha256:8ace7d9825bb3ad1d6e14ee27b3a830b638ac841ba424b99b2d92aa65a99d484"
 deployment_flyway_image="flyway/flyway:10.8@sha256:2f39377b52cdf1c70ffe9c1437aabed4e70fb716bb41323b03ee09ce17aaf292"
+aio_contract_url="https://github.com/hms-dbmi/PIC-SURE-Migrations.git"
+aio_contract_sha="05b1a77512dc0921570f0d442853fdcee75b8131"
 bdc_release_control_url="https://github.com/hms-dbmi/pic-sure-bdc-release-control.git"
 bdc_release_control_sha="1339c50749fadd1f2e55f8b5a5b68b3ab0422f9a"
 bdc_infrastructure_url="https://github.com/hms-dbmi/pic-sure-bdc-infrastructure.git"
@@ -16,7 +18,7 @@ bdc_infrastructure_sha="2f384ada6e84fc6c041741b83db940e1253e6bf6"
 
 # AIM-AHEAD's release control is private and operator-managed. This local proof
 # binds the user-confirmed public migration history as a tested baseline only.
-aim_release_control_sha="PRIVATE_OPERATOR_MANAGED"
+aim_release_control_marker="PRIVATE_OPERATOR_MANAGED"
 aim_infrastructure_url="https://github.com/hms-dbmi/pic-sure-bdc-infrastructure.git"
 aim_infrastructure_ref="pic_sure_api_rewrite"
 aim_infrastructure_sha="2f384ada6e84fc6c041741b83db940e1253e6bf6"
@@ -30,6 +32,9 @@ tmp_parent="${tmp_parent%/}"
 tmp_root="$(mktemp -d "$tmp_parent/$test_id.XXXXXX")"
 executed_results="$tmp_root/executed-results.tsv"
 source_root="${DEPLOYMENT_PROOF_SOURCE_ROOT:-$tmp_root/sources}"
+aio_source_root="${AIO_PROOF_SOURCE_ROOT:-$source_root/aio-contract}"
+aio_contract_dir="$aio_source_root/tests/aio-deployment-migration"
+deployment_flyway_version=""
 
 cleanup() {
     docker rm -f "$mysql_container" >/dev/null 2>&1 || true
@@ -53,11 +58,11 @@ required_files=(
     "$test_dir/matrix.tsv"
     "$test_dir/feature-sql.sha256"
     "$test_dir/occurrence-intermediate-sql.sha256"
-    "$test_dir/banner-schema.tsv"
     "$test_dir/supported-data.sql"
     "$test_dir/occurrence-only.sql"
     "$repo_root/tests/banner-authorization-migration/test.sh"
     "$repo_root/tests/banner-authorization-migration/routes.tsv"
+    "$repo_root/tests/banner-authorization-migration/verify_routes.py"
     "$repo_root/tests/banner-version-migration/test.sh"
 )
 for file in "${required_files[@]}"; do
@@ -89,7 +94,7 @@ checkout_commit() {
 
     git init --quiet "$destination"
     git -C "$destination" remote add origin "$url"
-    retry "Fetching $url at $sha" git -C "$destination" fetch --quiet --depth 1 origin "$sha"
+    retry "Fetching $url at $sha" git -C "$destination" fetch --quiet --depth 1 origin "$sha" || return 1
     git -C "$destination" checkout --quiet --detach FETCH_HEAD
 }
 
@@ -97,6 +102,7 @@ assert_checkout() {
     local label="$1"
     local checkout="$2"
     local expected_sha="$3"
+    local require_detached="${4:-true}"
     local actual_sha
     local status
 
@@ -108,7 +114,7 @@ assert_checkout() {
         echo "$label SHA mismatch: expected $expected_sha, got $actual_sha" >&2
         exit 1
     fi
-    if git -C "$checkout" symbolic-ref --quiet HEAD >/dev/null; then
+    if [[ "$require_detached" == true ]] && git -C "$checkout" symbolic-ref --quiet HEAD >/dev/null; then
         echo "$label checkout must be detached at $expected_sha" >&2
         exit 1
     fi
@@ -127,9 +133,30 @@ import sys
 
 with open(sys.argv[1], encoding="utf-8") as handle:
     value = json.load(handle).get("infrastructure_git_hash")
-assert isinstance(value, str) and value.strip(), value
+if not isinstance(value, str) or not value.strip():
+    raise SystemExit(f"Missing infrastructure_git_hash in {sys.argv[1]}")
 print(value)
 PY
+}
+
+prepare_aio_contract() {
+    if [[ -z "${AIO_PROOF_SOURCE_ROOT:-}" && -z "${DEPLOYMENT_PROOF_SOURCE_ROOT:-}" ]]; then
+        mkdir -p "$source_root"
+        if ! checkout_commit "$aio_contract_url" "$aio_contract_sha" "$aio_source_root"; then
+            echo "Pinned Ticket 15 AIO contract $aio_contract_sha is not reachable from $aio_contract_url." >&2
+            echo "Publish Ticket 15 first, or set AIO_PROOF_SOURCE_ROOT to a clean checkout at that exact commit." >&2
+            exit 1
+        fi
+        assert_checkout "Ticket 15 AIO contract" "$aio_source_root" "$aio_contract_sha"
+    elif [[ -z "${AIO_PROOF_SOURCE_ROOT:-}" ]]; then
+        assert_checkout "Ticket 15 AIO contract" "$aio_source_root" "$aio_contract_sha"
+    else
+        assert_checkout "Ticket 15 AIO contract" "$aio_source_root" "$aio_contract_sha" false
+    fi
+
+    for file in "$aio_contract_dir/banner-schema.tsv" "$aio_contract_dir/feature-sql.sha256"; do
+        test -f "$file" || { echo "Missing pinned Ticket 15 AIO contract file: $file" >&2; exit 1; }
+    done
 }
 
 prepare_tenant_source() {
@@ -195,27 +222,30 @@ root = Path(sys.argv[1])
 for line in Path(sys.argv[2]).read_text(encoding="utf-8").splitlines():
     expected, relative = line.split("\t", 1)
     actual = hashlib.sha256((root / relative).read_bytes()).hexdigest()
-    assert actual == expected, (relative, actual, expected)
+    if actual != expected:
+        raise SystemExit(
+            f"Checksum mismatch for {relative}: expected {expected}, got {actual}"
+        )
 PY
 }
 
 verify_cross_deployment_sql_parity() {
-    python3 - "$test_dir/feature-sql.sha256" <<'PY'
+    python3 - "$aio_contract_dir/feature-sql.sha256" "$test_dir/feature-sql.sha256" <<'PY'
 import sys
 from pathlib import Path
 
-aio_expected = [
-    "dcc6de407419b6a197043d5ca9832d144b08c2023be412103325c9505addbce6",
-    "498f17e73f36d4c36ea43c12465e3c834f81ac2548f3666bbed20547dc1877c1",
-    "6c0b975e3847ab4fed3bb378fd46d0d2b14655c2039f10eecb6f454841ba9947",
-    "4805cf2a570f16739e162b64b6c47fd21efa2cb6604e6dec9fd2d6c103d68fd4",
-    "cfeb6dcc7310abd0e8881b9e073261adc5875fba4b7f0560bd657ef9aef59ed4",
-    "fad26fe626fe2a6df0f245524ecc179009bf6560542b5dbfacf801a29d1985b2",
-    "6929c9835a87a52463ed2064b1aa4d5b66a9dc8a89b119c136050e47ef1c8cd2",
-    "ab553dd5edb73dddd9b345aa4ab6d013d81720bbee8d3501517cb283101f324e",
-    "6effba55291c4292384b696a5233f30d9f18992e8f28824458e4084ffbc5f21e",
+aio_paths = [
+    "Baseline/auth/V6__ADD_BANNER_MANAGEMENT_ACCESS_RULE.sql",
+    "Baseline/auth/V7__EXPAND_BANNER_MANAGEMENT_ACCESS_RULE.sql",
+    "Baseline/auth/V8__AUTHORIZE_BANNER_REORDER.sql",
+    "Baseline/auth/V9__ALLOW_BANNER_DISABLE_ROUTE.sql",
+    "Baseline/auth/V10__ALLOW_BANNER_ARCHIVE_ROUTE.sql",
+    "Baseline/auth/V11__ALLOW_BANNER_RESTORE_ROUTE.sql",
+    "Baseline/picsure/V10__CREATE_BANNER_OCCURRENCE.sql",
+    "Baseline/picsure/V11__CREATE_BANNER_VERSION.sql",
+    "Baseline/picsure/V12__CREATE_BANNER_PRIORITY_ALLOCATOR.sql",
 ]
-expected_paths = [
+deployment_paths = [
     "app-infrastructure/db/bdc/auth/V22__Add_Banner_Management_Access_Rule.sql",
     "app-infrastructure/db/bdc/auth/V23__Expand_Banner_Management_Access_Rule.sql",
     "app-infrastructure/db/bdc/auth/V24__Authorize_Banner_Reorder.sql",
@@ -235,20 +265,44 @@ expected_paths = [
     "app-infrastructure/db/aim-ahead/picsure/V10__CREATE_BANNER_VERSION.sql",
     "app-infrastructure/db/aim-ahead/picsure/V11__CREATE_BANNER_PRIORITY_ALLOCATOR.sql",
 ]
-rows = [line.split("\t", 1) for line in Path(sys.argv[1]).read_text(encoding="utf-8").splitlines()]
-assert len(rows) == 18, len(rows)
-assert [path for _, path in rows] == expected_paths
+
+
+def read_rows(path):
+    rows = [line.split("\t", 1) for line in Path(path).read_text(encoding="utf-8").splitlines()]
+    if any(len(row) != 2 for row in rows):
+        raise SystemExit(f"Malformed checksum manifest: {path}")
+    return rows
+
+
+aio_rows = read_rows(sys.argv[1])
+deployment_rows = read_rows(sys.argv[2])
+if [path for _, path in aio_rows] != aio_paths:
+    raise SystemExit(f"Unexpected Ticket 15 AIO feature manifest paths: {sys.argv[1]}")
+if [path for _, path in deployment_rows] != deployment_paths:
+    raise SystemExit(f"Unexpected BDC/AIM feature manifest paths: {sys.argv[2]}")
+
+aio_checksums = [checksum for checksum, _ in aio_rows]
 for offset in (0, 9):
-    assert [checksum for checksum, _ in rows[offset:offset + 9]] == aio_expected
+    deployment = "BDC" if offset == 0 else "AIM-AHEAD"
+    actual = [checksum for checksum, _ in deployment_rows[offset:offset + 9]]
+    if actual != aio_checksums:
+        raise SystemExit(f"{deployment} feature SQL does not match pinned Ticket 15 AIO contract")
+print("AIO/BDC/AIM corresponding feature SQL checksums MATCH")
 PY
 }
 
 verify_matrix_contract() {
     python3 - "$test_dir/matrix.tsv" "$bdc_release_control_sha" "$bdc_infrastructure_sha" \
-        "$aim_release_control_sha" "$aim_infrastructure_sha" "$aim_infrastructure_ref" "$mysql_image" "$feature_flyway_image" \
-        "$deployment_flyway_image" <<'PY'
+        "$aim_release_control_marker" "$aim_infrastructure_sha" "$aim_infrastructure_ref" "$mysql_image" "$feature_flyway_image" \
+        "$deployment_flyway_image" "$deployment_flyway_version" <<'PY'
 import csv
 import sys
+
+
+def require(condition, message):
+    if not condition:
+        raise SystemExit(message)
+
 
 expected_header = [
     "deployment", "cell", "starting_state", "forward_migration_range", "release_control_sha",
@@ -259,35 +313,53 @@ expected_header = [
 ]
 with open(sys.argv[1], encoding="utf-8", newline="") as handle:
     reader = csv.DictReader(handle, delimiter="\t")
-    assert reader.fieldnames == expected_header, reader.fieldnames
+    require(reader.fieldnames == expected_header, f"Unexpected matrix header: {reader.fieldnames!r}")
     rows = list(reader)
 
-assert [(row["deployment"], row["cell"]) for row in rows] == [
+expected_cells = [
     (deployment, cell)
     for deployment in ("BDC", "AIM-AHEAD")
     for cell in ("fresh", "supported-upgrade", "occurrence-only")
 ]
+actual_cells = [(row["deployment"], row["cell"]) for row in rows]
+require(actual_cells == expected_cells, f"Unexpected matrix cells: {actual_cells!r}")
 expected = {
     "BDC": (sys.argv[2], sys.argv[3], "27", "11"),
     "AIM-AHEAD": (sys.argv[4], sys.argv[5], "29", "11"),
 }
 for row in rows:
     release_sha, infrastructure_sha, auth_max, picsure_max = expected[row["deployment"]]
-    assert row["release_control_sha"] == release_sha
-    assert infrastructure_sha in row["custom_start_source"]
+    label = f'{row["deployment"]} {row["cell"]}'
+    require(row["release_control_sha"] == release_sha, f"{label} release-control marker mismatch")
+    require(infrastructure_sha in row["custom_start_source"], f"{label} infrastructure SHA mismatch")
     if row["deployment"] == "AIM-AHEAD":
-        assert sys.argv[6] in row["custom_start_source"]
-    assert row["mysql_image"] == sys.argv[7]
-    assert row["flyway_test_image"] == sys.argv[8]
-    assert row["deployment_migration_image"] == sys.argv[9]
-    assert row["deployment_flyway_version"] == "10.8.1"
-    assert row["final_custom_auth_max"] == auth_max
-    assert row["final_custom_picsure_max"] == picsure_max
-    assert row["result"] == "PASS"
-    assert row["feature_sql_checksum_result"] == "MATCH"
+        require(sys.argv[6] in row["custom_start_source"], f"{label} infrastructure ref mismatch")
+    require(row["mysql_image"] == sys.argv[7], f"{label} MySQL image mismatch")
+    require(row["flyway_test_image"] == sys.argv[8], f"{label} feature Flyway image mismatch")
+    require(row["deployment_migration_image"] == sys.argv[9], f"{label} deployment Flyway image mismatch")
+    require(row["deployment_flyway_version"] == sys.argv[10], f"{label} deployment Flyway version mismatch")
+    require(row["final_custom_auth_max"] == auth_max, f"{label} final auth history mismatch")
+    require(row["final_custom_picsure_max"] == picsure_max, f"{label} final PIC-SURE history mismatch")
+    require(row["result"] == "PASS", f"{label} result must be PASS")
+    require(row["feature_sql_checksum_result"] == "MATCH", f"{label} parity result must be MATCH")
     for field in ("starting_state", "forward_migration_range", "core_auth_source", "core_picsure_source", "remaining_assumptions"):
-        assert row[field].strip(), (row["deployment"], row["cell"], field)
+        require(row[field].strip(), f"{label} field {field} must not be empty")
 PY
+}
+
+read_deployment_flyway_version() {
+    local output
+    local version
+
+    output="$(docker run --rm "$deployment_flyway_image" -v 2>&1)"
+    version="$(printf '%s\n' "$output" | sed -nE 's/^Flyway .* Edition ([^ ]+) by Redgate$/\1/p')"
+    if [[ -z "$version" || "$version" == *$'\n'* ]]; then
+        echo "Could not read one Flyway version from $deployment_flyway_image:" >&2
+        printf '%s\n' "$output" >&2
+        exit 1
+    fi
+    deployment_flyway_version="$version"
+    echo "Deployment Flyway runtime version: $deployment_flyway_version"
 }
 
 start_mysql() {
@@ -386,28 +458,56 @@ assert_schema() {
           AND table_name IN ('banner_occurrence', 'banner_version', 'banner_priority_allocator')
         ORDER BY FIELD(table_name, 'banner_occurrence', 'banner_version', 'banner_priority_allocator'), ordinal_position;
     " > "$actual"
-    diff -u "$test_dir/banner-schema.tsv" "$actual"
+    diff -u "$aio_contract_dir/banner-schema.tsv" "$actual"
 
     assert_equal "$(mysql_exec --execute="
-        SELECT CONCAT(
-            (SELECT COUNT(*) FROM information_schema.key_column_usage WHERE constraint_schema='picsure' AND table_name='banner_occurrence' AND constraint_name='PRIMARY'), ':',
-            (SELECT COUNT(*) FROM information_schema.key_column_usage WHERE constraint_schema='picsure' AND table_name='banner_occurrence' AND constraint_name='PRIMARY' AND column_name='uuid' AND ordinal_position=1), ':',
-            (SELECT COUNT(*) FROM information_schema.key_column_usage WHERE constraint_schema='picsure' AND table_name='banner_version' AND constraint_name='PRIMARY'), ':',
-            (SELECT COUNT(*) FROM information_schema.key_column_usage WHERE constraint_schema='picsure' AND table_name='banner_version' AND constraint_name='PRIMARY' AND column_name='uuid' AND ordinal_position=1), ':',
-            (SELECT COUNT(*) FROM information_schema.key_column_usage WHERE constraint_schema='picsure' AND table_name='banner_priority_allocator' AND constraint_name='PRIMARY'), ':',
-            (SELECT COUNT(*) FROM information_schema.key_column_usage WHERE constraint_schema='picsure' AND table_name='banner_priority_allocator' AND constraint_name='PRIMARY' AND column_name='id' AND ordinal_position=1), ':',
-            (SELECT COUNT(*) FROM information_schema.key_column_usage WHERE constraint_schema='picsure' AND table_name='banner_occurrence' AND constraint_name='fk_banner_occurrence_restore'), ':',
-            (SELECT COUNT(*) FROM information_schema.key_column_usage WHERE constraint_schema='picsure' AND table_name='banner_occurrence' AND constraint_name='fk_banner_occurrence_restore' AND column_name='restored_from_uuid' AND referenced_table_schema='picsure' AND referenced_table_name='banner_occurrence' AND referenced_column_name='uuid'), ':',
-            (SELECT COUNT(*) FROM information_schema.key_column_usage WHERE constraint_schema='picsure' AND table_name='banner_version' AND constraint_name='fk_banner_version_occurrence'), ':',
-            (SELECT COUNT(*) FROM information_schema.key_column_usage WHERE constraint_schema='picsure' AND table_name='banner_version' AND constraint_name='fk_banner_version_occurrence' AND column_name='banner_uuid' AND referenced_table_schema='picsure' AND referenced_table_name='banner_occurrence' AND referenced_column_name='uuid'), ':',
-            (SELECT COUNT(*) FROM information_schema.table_constraints WHERE table_schema='picsure' AND table_name='banner_version' AND constraint_name='uq_banner_version_number' AND constraint_type='UNIQUE'), ':',
-            (SELECT GROUP_CONCAT(column_name ORDER BY ordinal_position) FROM information_schema.key_column_usage WHERE constraint_schema='picsure' AND table_name='banner_version' AND constraint_name='uq_banner_version_number'), ':',
-            (SELECT LOWER(REPLACE(REPLACE(check_clause, CHAR(96), ''), ' ', '')) FROM information_schema.check_constraints WHERE constraint_schema='picsure' AND constraint_name='chk_banner_priority_allocator_singleton'), ':',
-            (SELECT GROUP_CONCAT(column_name ORDER BY seq_in_index) FROM information_schema.statistics WHERE table_schema='picsure' AND table_name='banner_occurrence' AND index_name='idx_banner_occurrence_active'), ':',
-            (SELECT GROUP_CONCAT(column_name ORDER BY seq_in_index) FROM information_schema.statistics WHERE table_schema='picsure' AND table_name='banner_occurrence' AND index_name='idx_banner_occurrence_priority')
-        );")" \
-        "1:1:1:1:1:1:1:1:1:1:1:banner_uuid,version_number:(id=1):status,start_at,end_at,priority:priority" \
-        "$tenant banner constraints and indexes"
+        SELECT GROUP_CONCAT(column_name ORDER BY ordinal_position)
+        FROM information_schema.key_column_usage
+        WHERE constraint_schema='picsure' AND table_name='banner_occurrence' AND constraint_name='PRIMARY';")" \
+        "uuid" "$tenant banner_occurrence primary key"
+    assert_equal "$(mysql_exec --execute="
+        SELECT GROUP_CONCAT(column_name ORDER BY ordinal_position)
+        FROM information_schema.key_column_usage
+        WHERE constraint_schema='picsure' AND table_name='banner_version' AND constraint_name='PRIMARY';")" \
+        "uuid" "$tenant banner_version primary key"
+    assert_equal "$(mysql_exec --execute="
+        SELECT GROUP_CONCAT(column_name ORDER BY ordinal_position)
+        FROM information_schema.key_column_usage
+        WHERE constraint_schema='picsure' AND table_name='banner_priority_allocator' AND constraint_name='PRIMARY';")" \
+        "id" "$tenant banner_priority_allocator primary key"
+    assert_equal "$(mysql_exec --execute="
+        SELECT GROUP_CONCAT(CONCAT(column_name, '->', referenced_table_schema, '.', referenced_table_name, '.', referenced_column_name) ORDER BY ordinal_position)
+        FROM information_schema.key_column_usage
+        WHERE constraint_schema='picsure' AND table_name='banner_occurrence' AND constraint_name='fk_banner_occurrence_restore';")" \
+        "restored_from_uuid->picsure.banner_occurrence.uuid" "$tenant banner occurrence restore foreign key"
+    assert_equal "$(mysql_exec --execute="
+        SELECT GROUP_CONCAT(CONCAT(column_name, '->', referenced_table_schema, '.', referenced_table_name, '.', referenced_column_name) ORDER BY ordinal_position)
+        FROM information_schema.key_column_usage
+        WHERE constraint_schema='picsure' AND table_name='banner_version' AND constraint_name='fk_banner_version_occurrence';")" \
+        "banner_uuid->picsure.banner_occurrence.uuid" "$tenant banner version occurrence foreign key"
+    assert_equal "$(mysql_exec --execute="
+        SELECT GROUP_CONCAT(k.column_name ORDER BY k.ordinal_position)
+        FROM information_schema.key_column_usage k
+        JOIN information_schema.table_constraints t
+          ON t.constraint_schema=k.constraint_schema AND t.table_name=k.table_name AND t.constraint_name=k.constraint_name
+        WHERE k.constraint_schema='picsure' AND k.table_name='banner_version'
+          AND k.constraint_name='uq_banner_version_number' AND t.constraint_type='UNIQUE';")" \
+        "banner_uuid,version_number" "$tenant banner version number unique constraint"
+    assert_equal "$(mysql_exec --execute="
+        SELECT LOWER(REPLACE(REPLACE(check_clause, CHAR(96), ''), ' ', ''))
+        FROM information_schema.check_constraints
+        WHERE constraint_schema='picsure' AND constraint_name='chk_banner_priority_allocator_singleton';")" \
+        "(id=1)" "$tenant banner priority allocator singleton check"
+    assert_equal "$(mysql_exec --execute="
+        SELECT GROUP_CONCAT(column_name ORDER BY seq_in_index)
+        FROM information_schema.statistics
+        WHERE table_schema='picsure' AND table_name='banner_occurrence' AND index_name='idx_banner_occurrence_active';")" \
+        "status,start_at,end_at,priority" "$tenant active banner index"
+    assert_equal "$(mysql_exec --execute="
+        SELECT GROUP_CONCAT(column_name ORDER BY seq_in_index)
+        FROM information_schema.statistics
+        WHERE table_schema='picsure' AND table_name='banner_occurrence' AND index_name='idx_banner_occurrence_priority';")" \
+        "priority" "$tenant banner priority index"
 }
 
 assert_authorization() {
@@ -429,29 +529,23 @@ assert_authorization() {
         JOIN privilege p ON p.uuid=rp.privilege_id
         WHERE r.name='PIC-SURE User' AND p.name='BANNER_MANAGEMENT';")" "0" "$tenant ordinary-user denial"
     assert_equal "$(mysql_exec auth --execute="
-        SELECT CONCAT(
-            (SELECT COUNT(*) FROM privilege p JOIN application a ON a.uuid=p.application_id WHERE p.name='BANNER_MANAGEMENT' AND a.name='PICSURE'), ':',
-            (SELECT COUNT(*) FROM accessRule_privilege arp JOIN privilege p ON p.uuid=arp.privilege_id JOIN access_rule ar ON ar.uuid=arp.accessRule_id WHERE p.name='BANNER_MANAGEMENT' AND ar.name='AR_BANNER_MANAGEMENT_GATEWAY'), ':',
-            (SELECT COUNT(*) FROM privilege WHERE name='BANNER_MANAGEMENT'), ':',
-            (SELECT COUNT(*) FROM access_rule WHERE name='AR_BANNER_MANAGEMENT_GATEWAY')
-        );")" "1:1:1:1" "$tenant banner authorization ownership and uniqueness"
+        SELECT COUNT(*) FROM privilege p
+        JOIN application a ON a.uuid=p.application_id
+        WHERE p.name='BANNER_MANAGEMENT' AND a.name='PICSURE';")" \
+        "1" "$tenant banner privilege application ownership"
+    assert_equal "$(mysql_exec auth --execute="
+        SELECT COUNT(*) FROM accessRule_privilege arp
+        JOIN privilege p ON p.uuid=arp.privilege_id
+        JOIN access_rule ar ON ar.uuid=arp.accessRule_id
+        WHERE p.name='BANNER_MANAGEMENT' AND ar.name='AR_BANNER_MANAGEMENT_GATEWAY';")" \
+        "1" "$tenant banner access-rule privilege link"
+    assert_equal "$(mysql_exec auth --execute="SELECT COUNT(*) FROM privilege WHERE name='BANNER_MANAGEMENT';")" \
+        "1" "$tenant banner privilege uniqueness"
+    assert_equal "$(mysql_exec auth --execute="SELECT COUNT(*) FROM access_rule WHERE name='AR_BANNER_MANAGEMENT_GATEWAY';")" \
+        "1" "$tenant banner access-rule uniqueness"
 
-    python3 - "$pattern" "$repo_root/tests/banner-authorization-migration/routes.tsv" "$tenant" <<'PY'
-import re
-import sys
-from pathlib import Path
-
-pattern, fixture, tenant = sys.argv[1:]
-entries = [line.split("\t", 1) for line in Path(fixture).read_text(encoding="utf-8").splitlines()]
-expected = next(value for kind, value in entries if kind == "pattern")
-assert pattern == expected, (tenant, pattern, expected)
-rule = re.compile(pattern)
-for kind, route in entries:
-    if kind == "allow":
-        assert rule.fullmatch(route), f"{tenant} expected allowed route: {route}"
-    elif kind == "deny":
-        assert not rule.fullmatch(route), f"{tenant} expected denied route: {route}"
-PY
+    python3 "$repo_root/tests/banner-authorization-migration/verify_routes.py" \
+        "$pattern" "$repo_root/tests/banner-authorization-migration/routes.tsv" "$tenant"
 }
 
 record_matrix_result() {
@@ -486,11 +580,17 @@ if sys.argv[3] == "all":
 else:
     tenant, cell = sys.argv[3].split(":", 1)
     selected = {("BDC" if tenant == "bdc" else "AIM-AHEAD", cell)}
-assert set(actual) == selected, (set(actual), selected)
+if set(actual) != selected:
+    raise SystemExit(f"Executed matrix cells mismatch: expected {selected!r}, got {set(actual)!r}")
 for key in selected:
     for field, value in actual[key].items():
         if field not in {"deployment", "cell"}:
-            assert expected[key][field] == value, (key, field, value, expected[key][field])
+            expected_value = expected[key][field]
+            if expected_value != value:
+                raise SystemExit(
+                    f"Executed matrix result mismatch for {key!r} field {field}: "
+                    f"expected {expected_value!r}, got {value!r}"
+                )
 PY
 }
 
@@ -523,11 +623,39 @@ run_tenant_cell() {
             mysql_exec < "$test_dir/supported-data.sql"
             run_flyway auth "$final_root/auth"
             run_flyway picsure "$final_root/picsure"
-            assert_equal "$(mysql_exec --execute="
-                SELECT CONCAT(
-                    (SELECT COUNT(*) FROM auth.role WHERE uuid=UUID_TO_BIN('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa') AND name='Synthetic preserved role'), ':',
-                    (SELECT COUNT(*) FROM picsure.user WHERE uuid=UUID_TO_BIN('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb') AND subject='synthetic-banner-proof' AND userId='preserve-me')
-                );")" "1:1" "$deployment supported-upgrade synthetic data"
+            assert_equal "$(mysql_exec auth --execute="
+                SELECT COUNT(*) FROM role
+                WHERE uuid=UUID_TO_BIN('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa')
+                  AND name='Synthetic preserved role' AND description='Synthetic deployment migration proof row';")" \
+                "1" "$deployment supported-upgrade preserved role"
+            assert_equal "$(mysql_exec auth --execute="
+                SELECT COUNT(*) FROM privilege p
+                JOIN application a ON a.uuid=p.application_id
+                WHERE p.uuid=UUID_TO_BIN('dddddddd-dddd-dddd-dddd-dddddddddddd')
+                  AND p.name='SYNTHETIC_PRESERVED_PRIVILEGE' AND p.description='Synthetic preserved privilege'
+                  AND p.queryTemplate='synthetic-template' AND p.queryScope='[\"synthetic\"]' AND a.name='PICSURE';")" \
+                "1" "$deployment supported-upgrade preserved privilege"
+            assert_equal "$(mysql_exec auth --execute="
+                SELECT COUNT(*) FROM access_rule
+                WHERE uuid=UUID_TO_BIN('eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee')
+                  AND name='AR_SYNTHETIC_PRESERVED' AND description='Synthetic preserved access rule'
+                  AND rule='synthetic-rule' AND type=99 AND value='synthetic-value';")" \
+                "1" "$deployment supported-upgrade preserved access rule"
+            assert_equal "$(mysql_exec auth --execute="
+                SELECT COUNT(*) FROM accessRule_privilege
+                WHERE privilege_id=UUID_TO_BIN('dddddddd-dddd-dddd-dddd-dddddddddddd')
+                  AND accessRule_id=UUID_TO_BIN('eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee');")" \
+                "1" "$deployment supported-upgrade preserved access-rule privilege link"
+            assert_equal "$(mysql_exec auth --execute="
+                SELECT COUNT(*) FROM role_privilege
+                WHERE role_id=UUID_TO_BIN('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa')
+                  AND privilege_id=UUID_TO_BIN('dddddddd-dddd-dddd-dddd-dddddddddddd');")" \
+                "1" "$deployment supported-upgrade preserved role privilege link"
+            assert_equal "$(mysql_exec picsure --execute="
+                SELECT COUNT(*) FROM user
+                WHERE uuid=UUID_TO_BIN('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb')
+                  AND subject='synthetic-banner-proof' AND userId='preserve-me' AND roles='SYNTHETIC';")" \
+                "1" "$deployment supported-upgrade preserved PIC-SURE user"
             ;;
         occurrence-only)
             run_flyway auth "$release_root/auth"
@@ -575,6 +703,7 @@ run_tenant_cell() {
     echo "$deployment matrix cell PASS: $cell"
 }
 
+prepare_aio_contract
 case "$selection" in
     bdc:*)
         prepare_tenant_source bdc "$bdc_release_control_url" "$bdc_release_control_sha" "$bdc_infrastructure_url" "$bdc_infrastructure_ref" "$bdc_infrastructure_sha"
@@ -594,6 +723,7 @@ esac
 verify_checksum_manifest "$test_dir/feature-sql.sha256"
 verify_checksum_manifest "$test_dir/occurrence-intermediate-sql.sha256"
 verify_cross_deployment_sql_parity
+read_deployment_flyway_version
 verify_matrix_contract
 start_mysql
 
@@ -607,7 +737,6 @@ case "$selection" in
         for cell in fresh supported-upgrade occurrence-only; do
             run_tenant_cell aim-ahead AIM-AHEAD "$cell" 23 29
         done
-        cmp "$tmp_root/bdc-banner-schema.tsv" "$tmp_root/aim-ahead-banner-schema.tsv"
         "$repo_root/tests/banner-authorization-migration/test.sh"
         "$repo_root/tests/banner-version-migration/test.sh" \
             "$repo_root/app-infrastructure/db/bdc/picsure/V9__CREATE_BANNER_OCCURRENCE.sql" \
