@@ -21,6 +21,8 @@ allow	/operations/banners/ABCDEFAB-CDEF-ABCD-EFAB-CDEFABCDEFAB/restore
 allow	/operations/banners/ABCDEFAB-CDEF-ABCD-EFAB-CDEFABCDEFAB/restore/
 deny	/operations/banners/active
 deny	/operations/banners/active/
+deny	/operations/banners/active/v2
+deny	/operations/banners/active/v2/
 deny	/operations/banners/saved/extra
 deny	/operations/banners/order/extra
 deny	/operations/banners/orders
