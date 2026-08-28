@@ -66,21 +66,39 @@ for ((index = 0; index < ${#migration_files[@]}; index += 2)); do
         -url="jdbc:mysql://$mysql_container:3306/picsure?allowPublicKeyRetrieval=true" -user=root -password=test \
         -baselineOnMigrate=true -baselineVersion=1 migrate
 
-    actual_versions="$(mysql_exec picsure --execute="
+    snapshot_result="$(mysql_exec picsure --execute="
         SELECT CONCAT(
-            LOWER(BIN_TO_UUID(banner_uuid)), CHAR(9), version_number, CHAR(9),
-            DATE_FORMAT(effective_at, '%Y-%m-%d %H:%i:%s.%f'), CHAR(9), actor
-        )
-        FROM banner_version
-        ORDER BY banner_uuid;
+            (SELECT COUNT(*) FROM banner_version WHERE uuid IS NOT NULL
+                AND banner_uuid = UUID_TO_BIN('00000000-0000-0000-0000-000000000001') AND version_number = 1
+                AND BINARY html_content = BINARY '<p>Publication | time wins</p>' AND title = 'Published metadata'
+                AND appearance = 'WARNING' AND icon = 'WARNING' AND dismissible = FALSE AND audience = 'SIGNED_IN'
+                AND placement = 'SITE_TOP'
+                AND page_targets = JSON_ARRAY(JSON_OBJECT('kind', 'EXACT', 'path', '/admin|status'))
+                AND start_at = '2026-08-27 11:30:00.000000' AND end_at = '2026-08-28 12:00:00.000000'
+                AND presentation_hash = REPEAT('a', 64) AND effective_at = '2026-08-27 12:00:00.000000'
+                AND actor = 'publisher'), ':',
+            (SELECT COUNT(*) FROM banner_version WHERE uuid IS NOT NULL
+                AND banner_uuid = UUID_TO_BIN('00000000-0000-0000-0000-000000000002') AND version_number = 1
+                AND BINARY html_content = BINARY '<p>Updated time fallback</p>' AND title = 'Updated metadata'
+                AND appearance = 'PRIMARY' AND icon = 'INFORMATION' AND dismissible = TRUE AND audience = 'EVERYONE'
+                AND placement = 'SITE_TOP' AND page_targets = JSON_ARRAY(JSON_OBJECT('kind', 'ALL'))
+                AND start_at = '2026-08-27 13:00:00.000000' AND end_at = '2026-08-29 13:00:00.000000'
+                AND presentation_hash = REPEAT('b', 64) AND effective_at = '2026-08-27 13:00:00.000000'
+                AND actor = 'SYSTEM_MIGRATION'), ':',
+            (SELECT COUNT(*) FROM banner_version WHERE uuid IS NOT NULL
+                AND banner_uuid = UUID_TO_BIN('00000000-0000-0000-0000-000000000003') AND version_number = 1
+                AND BINARY html_content = BINARY '<p>Created time fallback</p>' AND title = 'Created metadata'
+                AND appearance = 'ERROR' AND icon = 'ERROR' AND dismissible = FALSE AND audience = 'SIGNED_OUT'
+                AND placement = 'SITE_TOP'
+                AND page_targets = JSON_ARRAY(JSON_OBJECT('kind', 'EXACT', 'path', '/created'))
+                AND start_at = '2026-08-27 14:00:00.000000' AND end_at = '2026-08-30 14:00:00.000000'
+                AND presentation_hash = REPEAT('c', 64) AND effective_at = '2026-08-27 09:00:00.000000'
+                AND actor = 'SYSTEM_MIGRATION'), ':',
+            (SELECT COUNT(*) FROM banner_version)
+        );
     ")"
-    expected_versions="$(printf '%s\n' \
-        $'00000000-0000-0000-0000-000000000001\\t1\\t2026-08-27 12:00:00.000000\\tpublisher' \
-        $'00000000-0000-0000-0000-000000000002\\t1\\t2026-08-27 13:00:00.000000\\tSYSTEM_MIGRATION' \
-        $'00000000-0000-0000-0000-000000000003\\t1\\t2026-08-27 09:00:00.000000\\tSYSTEM_MIGRATION')"
-    if [[ "$actual_versions" != "$expected_versions" ]]; then
-        echo "unexpected banner version backfill for $version_migration" >&2
-        diff <(printf '%s\n' "$expected_versions") <(printf '%s\n' "$actual_versions") || true
+    if [[ "$snapshot_result" != "1:1:1:3" ]]; then
+        echo "unexpected banner version snapshot for $version_migration: $snapshot_result" >&2
         exit 1
     fi
 
