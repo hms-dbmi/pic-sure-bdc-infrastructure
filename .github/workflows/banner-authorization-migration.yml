@@ -1,0 +1,31 @@
+name: Banner authorization migration
+
+on:
+  push:
+    paths:
+      - 'app-infrastructure/db/bdc/auth/V22__Add_Banner_Management_Access_Rule.sql'
+      - 'app-infrastructure/db/bdc/auth/V23__Expand_Banner_Management_Access_Rule.sql'
+      - 'app-infrastructure/db/aim-ahead/auth/V24__Add_Banner_Management_Access_Rule.sql'
+      - 'app-infrastructure/db/aim-ahead/auth/V25__Expand_Banner_Management_Access_Rule.sql'
+      - 'tests/banner-authorization-migration/**'
+      - '.github/workflows/banner-authorization-migration.yml'
+  pull_request:
+    paths:
+      - 'app-infrastructure/db/bdc/auth/V22__Add_Banner_Management_Access_Rule.sql'
+      - 'app-infrastructure/db/bdc/auth/V23__Expand_Banner_Management_Access_Rule.sql'
+      - 'app-infrastructure/db/aim-ahead/auth/V24__Add_Banner_Management_Access_Rule.sql'
+      - 'app-infrastructure/db/aim-ahead/auth/V25__Expand_Banner_Management_Access_Rule.sql'
+      - 'tests/banner-authorization-migration/**'
+      - '.github/workflows/banner-authorization-migration.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run actual BDC and AIM authorization migrations on MySQL 8
+        run: tests/banner-authorization-migration/test.sh
