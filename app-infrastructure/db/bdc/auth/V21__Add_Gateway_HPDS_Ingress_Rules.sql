@@ -3,7 +3,7 @@
 -- Under the gateway the query service selects the HPDS backend from the PATH
 -- (/hpds/auth/... or /hpds/open/...), and the introspection payload the gateway
 -- sends PSAMA is a single key, {"Target Service": <decoded path>}, with no
--- request body. The resourceUUID grants (V15's AR_ALLOW_OPEN_ACCESS_V3 and its
+-- request body. The resourceUUID grants (V14's AR_ALLOW_OPEN_ACCESS_V3 and its
 -- siblings) therefore cannot resolve any more: JsonPath $.query.resourceUUID
 -- raises PathNotFound and the rule denies. The path is the only thing left to
 -- authorize on.
@@ -12,7 +12,7 @@
 -- the caller's consents with the caller's own token, injects the authorization
 -- filters before it dispatches a query, and re-checks them when a stored result
 -- is read back. These two rules are route grants and nothing more: they say
--- which backend a privilege may reach, not which data it may see. V25 retires
+-- which backend a privilege may reach, not which data it may see. V23 retires
 -- the consent rule type they replace.
 --
 -- The legacy resourceUUID rules are RETAINED for WildFly until cutover.
@@ -36,7 +36,7 @@ SELECT uuid, @openHpdsIngress
 FROM privilege
 WHERE name = 'MANAGED_PRIV_OPEN_ACCESS';
 
--- Fail the migration if that matched nothing (see V22 for the mechanism).
+-- Fail the migration if that matched nothing (see V19 for the mechanism).
 INSERT INTO access_rule (
     uuid, name, description, rule, type, value, checkMapKeyOnly, checkMapNode,
     subAccessRuleParent_uuid, isGateAnyRelation, isEvaluateOnlyByGates
