@@ -7,9 +7,9 @@
     "resolvedCommit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
   },
   "releaseInput": {
-    "buildSpecSha256": "4d3638676915f94927f85090dbeee279b73ee81316d711dc3448131af9c9bb9c",
-    "tupleSha256": "c4646dcb0640688afbddaf16d88e36e182cd647513195580e606f9be7b2754c9",
-    "jenkinsSourceCommit": "25ae017b1fdeb28bef260aa39f4ffd5244cd6431"
+    "buildSpecSha256": "88abc960961ddd44782ba7d3697e4adbfc808783cad21989f023dbf19f95a4b3",
+    "tupleSha256": "006b92ad609f37f92cbf9477c283baad5c80b6133074e438cf6018a0988fe669",
+    "jenkinsSourceCommit": "af9436260cd9d9d721800667fbf51e5bb948bd62"
   },
   "checks": {
     "privateReleaseControlPinsRequiredTuple": true,

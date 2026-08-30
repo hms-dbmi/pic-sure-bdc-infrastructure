@@ -88,6 +88,10 @@ class PublicAimInputTest(unittest.TestCase):
                 "a" * 40,
                 "--controller-deployment",
                 "aim-ahead",
+                "--artifact-bucket",
+                "synthetic-bucket",
+                "--controller-artifact-bucket",
+                "synthetic-bucket",
                 "--attestation",
                 str(attestation),
                 "--run-database-migrations",
@@ -157,6 +161,10 @@ class PublicAimInputTest(unittest.TestCase):
                 "aim-ahead",
                 "--jenkins-source-commit",
                 JENKINS_COMMIT,
+                "--artifact-bucket",
+                "synthetic-bucket",
+                "--controller-artifact-bucket",
+                "synthetic-bucket",
                 "--run-database-migrations",
                 "true",
                 "--include-api",
@@ -442,6 +450,19 @@ class ExistingDeploymentProofTest(unittest.TestCase):
         for rejected_cause in ("replay", "rebuild", "remote", "timer", "nested", "mixed"):
             with self.subTest(rejected_cause=rejected_cause):
                 self.assertIn(rejected_cause, checklist)
+
+    def test_checklist_separates_runtime_aim_attestation_and_documents_safe_retry(self):
+        checklist = (TEST_DIR / "README.md").read_text(encoding="utf-8")
+        self.assertIn(
+            "/var/jenkins_home/banner-rollout/aim-ahead-operator-attestation.json",
+            checklist,
+        )
+        self.assertNotIn(
+            "private release-control root as `banner-rollout-attestation.json`",
+            checklist,
+        )
+        self.assertIn("new rollback-run prefix", checklist)
+        self.assertIn("refreshed attestation", checklist)
 
     def test_banner_host_scripts_download_from_the_attested_artifact_prefix(self):
         scripts = ROOT / "app-infrastructure/scripts/deploy"
