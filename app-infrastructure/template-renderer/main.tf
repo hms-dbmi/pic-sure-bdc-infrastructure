@@ -103,6 +103,7 @@ resource "aws_s3_object" "operations_env" {
     picsure_db_password          = local.picsure_app_user["password"]
     picsure_application_token    = random_password.picsure_application_token[0].result
     query_service_internal_token = random_password.query_service_internal_token[0].result
+    logging_api_key              = var.logging_api_key
   })
 
   content_type           = "text/plain"

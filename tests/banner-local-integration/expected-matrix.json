@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "rolloutContractSha256": "f8cb265d735b757872391e04fdcd5b999b785eaa427ca13f8f2eefd493715359",
+  "sharedSourceCommits": {
+    "backend": "0178bbd2d1753e07dcead77a6d0e8ca37bf76dd8",
+    "frontend": "7b69aa960ff98f97c1a2d026b7137b0e3dcdf603",
+    "migrationParity": "05b1a77512dc0921570f0d442853fdcee75b8131"
+  },
+  "ownerCommits": {
+    "jenkins": "29ec9a69c23aa663ff2496d58982c1ad329c3234",
+    "bdcReleaseControl": "4a61fc127cece1ef012fb42301fb765d0222ecd0",
+    "aioDeployment": "715857456594814957d9abc26ad14efbccb65e11",
+    "aioReleaseControl": "bfb07196be55f7f121dc250f7aa51d826642ff86"
+  },
+  "rolloutTuples": {
+    "BDC": "561c67ba394188ab4a95d5bce0b487e7ab15ed7128685df3827fce290b52a37f",
+    "AIM_AHEAD": "41ea143aac0adf493bf6ffdb8b629f23aee5c88bc7306b358aede9f23be37dd0"
+  },
+  "aimRequiredInputSha256": "8dbfcc2068e06a3040bc0ac2b8ed061315c8ab75bc0dfe199bf7467221aacb2e",
+  "dockerOwnerEntrypoints": [
+    {
+      "ticket": 16,
+      "root": "infrastructure",
+      "command": "tests/deployment-migration/test.sh all",
+      "status": "NOT_RUN_ENOSPC"
+    },
+    {
+      "ticket": 17,
+      "root": "backend",
+      "command": "tests/operations-binary-compatibility/test.sh all",
+      "status": "NOT_RUN_ENOSPC"
+    },
+    {
+      "ticket": 18,
+      "root": "backend",
+      "command": "tests/banner-feed-compatibility/test.sh all",
+      "status": "NOT_RUN_ENOSPC"
+    },
+    {
+      "ticket": "22A",
+      "root": "aioDeployment",
+      "command": "tests/banner-local-integration/test.sh all",
+      "status": "NOT_RUN_ENOSPC"
+    }
+  ],
+  "rows": [
+    {
+      "deployment": "AIO",
+      "fixture": "Ticket 22A exact local source",
+      "releaseControlCommit": "bfb07196be55f7f121dc250f7aa51d826642ff86",
+      "localIntegration": "NOT_RUN",
+      "dockerRuntime": "NOT_RUN",
+      "liveOperatorAttestation": "NOT_RUN"
+    },
+    {
+      "deployment": "BDC",
+      "fixture": "fixtures/bdc.json",
+      "releaseControlCommit": "4a61fc127cece1ef012fb42301fb765d0222ecd0",
+      "localIntegration": "NOT_RUN",
+      "dockerRuntime": "NOT_RUN",
+      "liveOperatorAttestation": "NOT_RUN"
+    },
+    {
+      "deployment": "AIM_AHEAD",
+      "fixture": "fixtures/aim-ahead.json",
+      "releaseControlCommit": "SYNTHETIC_LOCAL_ATTESTATION_ONLY",
+      "localIntegration": "NOT_RUN",
+      "dockerRuntime": "NOT_RUN",
+      "liveOperatorAttestation": "NOT_RUN_MANUAL"
+    }
+  ],
+  "limitations": {
+    "productionTls": "NOT_RUN",
+    "externalRouting": "NOT_RUN",
+    "jenkins": "NOT_RUN",
+    "aws": "NOT_RUN",
+    "ssm": "NOT_RUN",
+    "terraformApply": "NOT_RUN",
+    "systemd": "NOT_RUN",
+    "podman": "NOT_RUN",
+    "alb": "NOT_RUN",
+    "privateAimReleaseControl": "NOT_RUN_MANUAL"
+  }
+}

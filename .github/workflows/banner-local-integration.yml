@@ -1,0 +1,109 @@
+name: BDC and AIM-AHEAD banner local contract
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/banner-local-integration.yml'
+      - 'app-infrastructure/configs/httpd-vhosts-*.conf'
+      - 'app-infrastructure/db/**'
+      - 'app-infrastructure/template-renderer/**'
+      - 'tests/banner-local-integration/**'
+      - 'tests/fisma-banner-rollout/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  non-docker-contract:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      BANNER_LOCAL_AIO_ROOT: ${{ github.workspace }}/.proof-inputs/pic-sure-all-in-one
+      BANNER_LOCAL_AIO_RELEASE_CONTROL_ROOT: ${{ github.workspace }}/.proof-inputs/baseline-pic-sure-release-control
+      BANNER_LOCAL_BACKEND_ROOT: ${{ github.workspace }}/.proof-inputs/pic-sure
+      BANNER_LOCAL_FRONTEND_ROOT: ${{ github.workspace }}/.proof-inputs/PIC-SURE-Frontend
+      BANNER_LOCAL_MIGRATIONS_ROOT: ${{ github.workspace }}/.proof-inputs/PIC-SURE-Migrations
+      BANNER_LOCAL_JENKINS_ROOT: ${{ github.workspace }}/.proof-inputs/avillachlab-jenkins
+      BANNER_LOCAL_BDC_RELEASE_CONTROL_ROOT: ${{ github.workspace }}/.proof-inputs/pic-sure-bdc-release-control
+
+    steps:
+      - name: Check out infrastructure proof
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+
+      - name: Exclude exact proof inputs from the executing checkout
+        run: printf '%s\n' '/.proof-inputs/' >> .git/info/exclude
+
+      - name: Check out exact AIO input
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          repository: hms-dbmi/pic-sure-all-in-one
+          ref: 715857456594814957d9abc26ad14efbccb65e11
+          path: .proof-inputs/pic-sure-all-in-one
+          fetch-depth: 0
+
+      - name: Check out exact AIO release-control input
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          repository: hms-dbmi/baseline-pic-sure-release-control
+          ref: bfb07196be55f7f121dc250f7aa51d826642ff86
+          path: .proof-inputs/baseline-pic-sure-release-control
+          fetch-depth: 0
+
+      - name: Check out exact backend input
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          repository: hms-dbmi/pic-sure
+          ref: 0178bbd2d1753e07dcead77a6d0e8ca37bf76dd8
+          path: .proof-inputs/pic-sure
+          fetch-depth: 0
+
+      - name: Check out exact frontend input
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          repository: hms-dbmi/PIC-SURE-Frontend
+          ref: 7b69aa960ff98f97c1a2d026b7137b0e3dcdf603
+          path: .proof-inputs/PIC-SURE-Frontend
+          fetch-depth: 0
+
+      - name: Check out exact migrations input
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          repository: hms-dbmi/PIC-SURE-Migrations
+          ref: 05b1a77512dc0921570f0d442853fdcee75b8131
+          path: .proof-inputs/PIC-SURE-Migrations
+          fetch-depth: 0
+
+      - name: Check out exact Jenkins input
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          repository: hms-dbmi/avillachlab-jenkins
+          ref: 29ec9a69c23aa663ff2496d58982c1ad329c3234
+          path: .proof-inputs/avillachlab-jenkins
+          fetch-depth: 0
+
+      - name: Check out exact BDC release-control input
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          repository: hms-dbmi/pic-sure-bdc-release-control
+          ref: 4a61fc127cece1ef012fb42301fb765d0222ecd0
+          path: .proof-inputs/pic-sure-bdc-release-control
+          fetch-depth: 0
+
+      - name: Validate the non-Docker contract and fixtures
+        env:
+          BANNER_LOCAL_DIAGNOSTICS_ROOT: ${{ runner.temp }}/banner-local-integration-diagnostics
+        run: |
+          tests/banner-local-integration/test.sh contract
+          python3 tests/banner-local-integration/run.py contract
+
+      - name: Upload failure diagnostics
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: banner-local-integration-diagnostics
+          path: ${{ runner.temp }}/banner-local-integration-diagnostics
+          if-no-files-found: warn
+          retention-days: 7
