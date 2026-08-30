@@ -42,16 +42,17 @@
       },
       "jenkins": {
         "repository": "https://github.com/hms-dbmi/avillachlab-jenkins.git",
-        "commit": "9af6bc0d46ccaa0c42fb1e1fc83e471343bf2c78"
+        "commit": "f643a289a5c93acef917cbeb62962d8c857c2217"
       }
     },
+    "contractSource": {
+      "repository": "https://github.com/hms-dbmi/pic-sure.git",
+      "commit": "0178bbd2d1753e07dcead77a6d0e8ca37bf76dd8",
+      "path": ".github/banner-rollout-contract.json",
+      "sha256": "f8cb265d735b757872391e04fdcd5b999b785eaa427ca13f8f2eefd493715359"
+    },
     "contract": {
-      "source": {
-        "repository": "https://github.com/hms-dbmi/pic-sure.git",
-        "commit": "0178bbd2d1753e07dcead77a6d0e8ca37bf76dd8",
-        "path": ".github/banner-rollout-contract.json",
-        "sha256": "f8cb265d735b757872391e04fdcd5b999b785eaa427ca13f8f2eefd493715359"
-      },
+      "schemaVersion": 3,
       "deploymentWideCacheRefresh": "PSAMA_PROCESS_RESTART",
       "forwardPhases": [
         "APPLY_AUTHORIZATION_AND_PIC_SURE_MIGRATIONS",
@@ -73,11 +74,13 @@
         "targetedDisableAllowedWhileFrozen": true,
         "legacyBackendTransitionRequiresTargetedClear": true,
         "freezeRetainedBelowTargetingBackend": true,
-        "frontendFirstRollbackAloneSafe": false,
-        "schemaRollback": "KEEP_FORWARD_SCHEMA",
-        "downMigrationAllowed": false
-      }
+        "frontendFirstRollbackAloneSafe": false
+      },
+      "schemaRollback": "KEEP_FORWARD_SCHEMA",
+      "downMigrationAllowed": false,
+      "targetedFeedRollbackBoundary": "DISABLE_ACTIVE_AND_SCHEDULED_TARGETED_BANNERS_BEFORE_LEGACY_ACTIVE_FEED_BACKEND",
+      "managementWriteFreezeBoundary": "KEEP_BANNER_MANAGEMENT_WRITES_FROZEN_BELOW_TARGETING_CAPABLE_BACKEND"
     },
-    "tupleSha256": "dcb24e851f1715a16596f2263c13a2b1aa49b98836c9d367e183d81df4842eca"
+    "tupleSha256": "dc40c95c92103d17ef0f378febd1b567a50ae1e6a6a09372a704611c4e31279b"
   }
 }

@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "deployment": "AIM-AHEAD",
+  "privateReleaseControl": {
+    "repository": "ssh://synthetic.invalid/operator-supplied.git",
+    "ref": "synthetic-reviewed-ref",
+    "resolvedCommit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "checks": {
+    "privateReleaseControlPinsRequiredTuple": true,
+    "publicInfrastructureRefContainsRequiredCommit": true,
+    "forwardOrderAccepted": true,
+    "rollbackFreezeAndTargetedDisableBoundaryAccepted": true,
+    "forwardSchemaRetainedAndDownMigrationsForbidden": true
+  },
+  "operator": "synthetic-operator",
+  "attestedAtUtc": "2026-08-29T00:00:00Z"
+}

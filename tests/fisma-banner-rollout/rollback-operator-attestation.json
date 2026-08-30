@@ -2,6 +2,7 @@
   "schemaVersion": 1,
   "deployment": "__BDC_OR_AIM_AHEAD__",
   "tupleSha256": "__FORWARD_ROLLOUT_TUPLE_SHA256__",
+  "stage": "__FRONTEND_ALLOWED_OR_BACKEND_ALLOWED_OR_PSAMA_ALLOWED_OR_COMPLETE__",
   "phases": [
     {"phase": "FREEZE_BANNER_MANAGEMENT_WRITES", "attested": false},
     {"phase": "ROLL_BACK_FRONTEND", "attested": false},
@@ -12,7 +13,8 @@
   ],
   "state": {
     "managementWritesFrozen": false,
-    "targetedActiveOrScheduledRemaining": "__OPERATOR_RECORDED_COUNT__",
+    "frontendRolledBack": false,
+    "targetedActiveOrScheduledRemaining": null,
     "forwardSchemaRetained": false,
     "downMigrationRun": false,
     "psamaRecreated": false
