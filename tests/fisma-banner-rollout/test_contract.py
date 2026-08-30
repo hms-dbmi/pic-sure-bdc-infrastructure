@@ -545,6 +545,24 @@ class ExistingDeploymentProofTest(unittest.TestCase):
                 self.assertEqual(0, result.returncode, result.stderr)
                 self.assertIn("--artifact_prefix", result.stdout)
                 self.assertIn("--artifact_etag", result.stdout)
+
+        for relative in (
+            "app-infrastructure/variables.tf",
+            "app-infrastructure/wildfly-instance.tf",
+            "app-infrastructure/httpd-instance.tf",
+            "app-infrastructure/scripts/wildfly-user_data.sh",
+            "app-infrastructure/scripts/httpd-user_data.sh",
+        ):
+            with self.subTest(bootstrap_file=relative):
+                result = subprocess.run(
+                    ["git", "show", f"{pinned}:{relative}"],
+                    cwd=ROOT,
+                    text=True,
+                    capture_output=True,
+                    check=False,
+                )
+                self.assertEqual(0, result.returncode, result.stderr)
+                self.assertIn("bootstrap_standard_critical_artifacts", result.stdout)
         for name in ("wildfly-iam.tf", "s3_roles.tf"):
             with self.subTest(iam=name):
                 result = subprocess.run(

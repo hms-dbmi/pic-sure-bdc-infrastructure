@@ -12,7 +12,7 @@
       "git_hash": "7b69aa960ff98f97c1a2d026b7137b0e3dcdf603"
     }
   ],
-  "infrastructure_git_hash": "c686eed42696bcdf27fd0cec694be088f432ddc3",
+  "infrastructure_git_hash": "c18c56a4aeaf7b75a1f4feb4bc19c5c09a29c7c1",
   "banner_rollout": {
     "schemaVersion": 3,
     "deployment": "AIM-AHEAD",
@@ -34,7 +34,7 @@
       "infrastructure": {
         "repository": "https://github.com/hms-dbmi/pic-sure-bdc-infrastructure.git",
         "ref": "pic_sure_api_rewrite",
-        "commit": "c686eed42696bcdf27fd0cec694be088f432ddc3"
+        "commit": "c18c56a4aeaf7b75a1f4feb4bc19c5c09a29c7c1"
       },
       "migrationsParity": {
         "repository": "https://github.com/hms-dbmi/PIC-SURE-Migrations.git",
@@ -42,7 +42,7 @@
       },
       "jenkins": {
         "repository": "https://github.com/hms-dbmi/avillachlab-jenkins.git",
-        "commit": "8c182375dd30f5b2b891ee8adc51dd87f8e14b37"
+        "commit": "0101a8e85be8bef7f34e53109ed228ff2d852142"
       }
     },
     "contractSource": {
@@ -81,6 +81,6 @@
       "targetedFeedRollbackBoundary": "DISABLE_ACTIVE_AND_SCHEDULED_TARGETED_BANNERS_BEFORE_LEGACY_ACTIVE_FEED_BACKEND",
       "managementWriteFreezeBoundary": "KEEP_BANNER_MANAGEMENT_WRITES_FROZEN_BELOW_TARGETING_CAPABLE_BACKEND"
     },
-    "tupleSha256": "cb050d91217e046b2d5cb102ecf4d16f4834841a3afd3046d6bf3f6f69f50694"
+    "tupleSha256": "cb470add19b017fae25519b8bf1c25473eb7d46af6dd43c2e6d632588d43340c"
   }
 }
