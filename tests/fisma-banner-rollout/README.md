@@ -18,11 +18,11 @@ Do not copy BDC release control into the AIM-AHEAD boundary. Start with `aim-ahe
 
    Stop if `merge-base` returns nonzero. Pin the exact reviewed commit, not `FETCH_HEAD`, in the private release input.
 
-   The executable infrastructure dependency is `c18c56a4aeaf7b75a1f4feb4bc19c5c09a29c7c1`, a descendant of the reviewed base and the earlier immutable-artifact commits. It adds the banner bootstrap switch as well as the exact IAM paths and host-side `--artifact_etag` downloads. The following metadata commit pins that executable commit and Jenkins `af9436260cd9d9d721800667fbf51e5bb948bd62`. This dependency order avoids a self-reference.
+   The executable infrastructure dependency is `c18c56a4aeaf7b75a1f4feb4bc19c5c09a29c7c1`, a descendant of the reviewed base and the earlier immutable-artifact commits. It adds the banner bootstrap switch as well as the exact IAM paths and host-side `--artifact_etag` downloads. The following metadata commit pins that executable commit and Jenkins `b119932a04aee73d8a6348154ef1b40a53fca86e`. This dependency order avoids a self-reference.
 
 2. Pin every value from `aim-ahead-required-release-input.json` in the private release control. Keep the private repository URL, ref, and resolved commit inside the boundary.
 
-3. Copy `aim-ahead-operator-attestation.json` to an operator-owned location outside the private release-control checkout. Fill the private release-control source, its exact checked-out commit, operator, timestamp, and five boolean checks. Do not commit the completed file. Place those exact completed bytes at `/var/jenkins_home/banner-rollout/aim-ahead-operator-attestation.json` through the deployment boundary's approved operator process. Deployment Pipeline reads this runtime artifact once, validates that it binds to the exact checked-out private release-control commit, and propagates the same bytes to the combined job.
+3. Copy `aim-ahead-operator-attestation.json` to an operator-owned location outside the private release-control checkout. Fill the private release-control source, its exact checked-out commit, operator, timestamp, and five boolean checks. Do not commit the completed file. Place those exact completed bytes at `/var/jenkins_home/banner-rollout/aim-ahead-operator-attestation.json` through the deployment boundary's approved operator process. Keep the file readable by the Jenkins service account and outside job workspaces so it will survive workspace cleanup. Deployment Pipeline reads this runtime artifact once, validates that it binds to the exact checked-out private release-control commit, and propagates the same bytes to the combined job.
 
 4. Validate the private release input and attestation together with the Jenkins source pinned in `aim-ahead-required-release-input.json`:
 
@@ -32,7 +32,7 @@ Do not copy BDC release control into the AIM-AHEAD boundary. Start with `aim-ahe
      --operation FORWARD \
      --build-spec /operator/path/private-release-control/build-spec.json \
      --attestation /operator/path/aim-ahead-operator-attestation.json \
-     --jenkins-source-commit af9436260cd9d9d721800667fbf51e5bb948bd62 \
+     --jenkins-source-commit b119932a04aee73d8a6348154ef1b40a53fca86e \
      --release-control-commit __ACTUAL_CHECKED_OUT_PRIVATE_RELEASE_CONTROL_COMMIT__ \
      --controller-deployment aim-ahead \
      --artifact-bucket __CONTROLLER_BOUND_STACK_BUCKET__ \
@@ -44,6 +44,8 @@ Do not copy BDC release control into the AIM-AHEAD boundary. Start with `aim-ahe
    ```
 
 5. Use the supported **Check For Updates → Deployment Pipeline → PIC-SURE Pipeline Build and Deploy** entrypoint on the attested private release-control commit. Check For Updates first builds the HPDS, Logging, Visualization, and Dictionary images used by the rebuilt stack. It withholds Gateway, Operations, Query, PSAMA, and frontend from the mutable bootstrap namespace. Deployment Pipeline also disables standard critical artifacts in the new Wildfly and HTTPD instance user-data, so an intervening standard writer cannot publish them during bootstrap. The immutable combined job publishes those components backend-first after initialization. A manual run may start at Deployment Pipeline only when it supplies the same exact `deployment_git_hash`, three dataset keys, `STACK_S3_BUCKET`, `BANNER_ROLLOUT=true`, and `BANNER_ROLLOUT_OPERATION=FORWARD` inputs produced by Check For Updates. It must also set `BANNER_MANUAL_OPERATOR_MODE=true`, `BANNER_EXPECTED_DEPLOYMENT` to the deployment in that release input, and `BANNER_EXPECTED_TUPLE_SHA256` to its exact tuple. Jenkins requires one identified `UserIdCause` for this mode and rejects replay, rebuild, remote, timer, nested, or mixed causes. Deployment Pipeline checks the expected deployment and tuple against the retrieved input before its backup and migration stages, retains the deployment-state lock, token and configuration rendering, stack rebuild, initialization, sensor check, and state write, then invokes the combined job with migrations attested as complete. Direct forward runs of the combined or leaf jobs fail closed.
+
+A standalone AIM-AHEAD `NON_BANNER_COMPONENTS` run starts **PIC-SURE Pipeline Build and Deploy** with the exact private release-control commit, controller-bound bucket, `BANNER_ROLLOUT_OPERATION=NON_BANNER_COMPONENTS`, and all four banner-critical selections set to false. Copy the exact current runtime attestation bytes into `BANNER_AIM_ATTESTATION_JSON`. The combined job writes and validates that supplied snapshot. It does not reread the runtime file. Parented forward runs continue to accept only the snapshot propagated by Deployment Pipeline.
 
 This local checklist does not inspect the private release control and does not attest a deployed state. The operator owns the completed attestation.
 
@@ -62,7 +64,7 @@ Use a fresh copy of `rollback-operator-attestation.json` for the affected deploy
    ```bash
    python3 jenkins-docker/scripts/validate-banner-rollout.py \
      --rollback-attestation /operator/path/rollback-operator-attestation.json \
-     --jenkins-source-commit af9436260cd9d9d721800667fbf51e5bb948bd62 \
+     --jenkins-source-commit b119932a04aee73d8a6348154ef1b40a53fca86e \
      --controller-deployment __bdc_OR_aim-ahead__ \
      --target-stack __TARGET_STACK__ \
      --required-rollback-stage __CURRENT_STAGE__

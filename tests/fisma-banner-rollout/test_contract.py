@@ -463,6 +463,11 @@ class ExistingDeploymentProofTest(unittest.TestCase):
         )
         self.assertIn("new rollback-run prefix", checklist)
         self.assertIn("refreshed attestation", checklist)
+        self.assertIn("readable by the Jenkins service account", checklist)
+        self.assertIn("survive workspace cleanup", checklist)
+        self.assertIn("standalone AIM-AHEAD `NON_BANNER_COMPONENTS`", checklist)
+        self.assertIn("BANNER_AIM_ATTESTATION_JSON", checklist)
+        self.assertIn("does not reread the runtime file", checklist)
 
     def test_banner_host_scripts_download_from_the_attested_artifact_prefix(self):
         scripts = ROOT / "app-infrastructure/scripts/deploy"
