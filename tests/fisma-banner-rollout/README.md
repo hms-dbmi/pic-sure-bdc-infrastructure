@@ -13,12 +13,12 @@ Do not copy BDC release control into the AIM-AHEAD boundary. Start with `aim-ahe
      https://github.com/hms-dbmi/pic-sure-bdc-infrastructure.git \
      refs/heads/pic_sure_api_rewrite
    git -C /operator/path/pic-sure-bdc-infrastructure merge-base --is-ancestor \
-     5d2ba9f59f161ace5e807c82a0580518a9d44d16 FETCH_HEAD
+     c686eed42696bcdf27fd0cec694be088f432ddc3 FETCH_HEAD
    ```
 
    Stop if `merge-base` returns nonzero. Pin the exact reviewed commit, not `FETCH_HEAD`, in the private release input.
 
-   The executable infrastructure dependency is `3a10a20ce261e3771cb4cd48bc4d72967f3c54d3`, a descendant of the reviewed base. That first commit adds host-side `--artifact_prefix` support. The following metadata commit pins both that executable commit and Jenkins `c9b7273f0b8b31d5e8585a47fba02c9425104af1`; the two-commit sequence avoids an impossible self-reference while keeping the deployed infrastructure input immutable.
+   The executable infrastructure dependency is `c686eed42696bcdf27fd0cec694be088f432ddc3`, a descendant of the reviewed base and the earlier `--artifact_prefix` support commit. It adds the exact IAM paths and host-side `--artifact_etag` downloads. The following metadata commit pins that executable commit and Jenkins `31bd9e43577d4aa662f74ab6fcc3865aa287fe97`. This dependency order avoids a self-reference.
 
 2. Pin every value from `aim-ahead-required-release-input.json` in the private release control. Keep the private repository URL, ref, and resolved commit inside the boundary.
 
@@ -32,7 +32,7 @@ Do not copy BDC release control into the AIM-AHEAD boundary. Start with `aim-ahe
      --operation FORWARD \
      --build-spec /operator/path/private-release-control/build-spec.json \
      --attestation /operator/path/private-release-control/banner-rollout-attestation.json \
-     --jenkins-source-commit c9b7273f0b8b31d5e8585a47fba02c9425104af1 \
+     --jenkins-source-commit 31bd9e43577d4aa662f74ab6fcc3865aa287fe97 \
      --release-control-commit __ACTUAL_CHECKED_OUT_PRIVATE_RELEASE_CONTROL_COMMIT__ \
      --controller-deployment aim-ahead \
      --run-database-migrations true \
@@ -41,13 +41,13 @@ Do not copy BDC release control into the AIM-AHEAD boundary. Start with `aim-ahe
      --include-frontend true
    ```
 
-5. Use the supported **Check For Updates → Deployment Pipeline → PIC-SURE Pipeline Build and Deploy** entrypoint on the attested private release-control commit. A manual run may start at Deployment Pipeline only when it supplies the same exact `deployment_git_hash`, three dataset keys, `STACK_S3_BUCKET`, `BANNER_ROLLOUT=true`, and `BANNER_ROLLOUT_OPERATION=FORWARD` inputs produced by Check For Updates. Deployment Pipeline validates before its backup and migration stages, retains the deployment-state lock, token and configuration rendering, stack rebuild, initialization, sensor check, and state write, then invokes the combined job with migrations attested as complete. Direct forward runs of the combined or leaf jobs fail closed.
+5. Use the supported **Check For Updates → Deployment Pipeline → PIC-SURE Pipeline Build and Deploy** entrypoint on the attested private release-control commit. Check For Updates first completes the normal all-image build wave used by the rebuilt stack. A manual run may start at Deployment Pipeline only when it supplies the same exact `deployment_git_hash`, three dataset keys, `STACK_S3_BUCKET`, `BANNER_ROLLOUT=true`, and `BANNER_ROLLOUT_OPERATION=FORWARD` inputs produced by Check For Updates. Deployment Pipeline validates before its backup and migration stages, retains the deployment-state lock, token and configuration rendering, stack rebuild, initialization, sensor check, and state write, then invokes the combined job with migrations attested as complete. Direct forward runs of the combined or leaf jobs fail closed.
 
 This local checklist does not inspect the private release control and does not attest a deployed state. The operator owns the completed attestation.
 
 ## Rollback
 
-Use a fresh copy of `rollback-operator-attestation.json` for the affected deployment and exact forward tuple. Fill `controllerDeployment`, `targetStack`, a unique `<targetStack>/banner-rollout/<rollback-run>/containers` artifact prefix, and the exact old frontend and backend commits. Refresh `attestedAtUtc` before each stage; evidence older than 24 hours is rejected. Validate and retain the record inside the deployment boundary before each manual rollback step. The template does not invent a write-freeze endpoint or perform a mutation.
+Use a fresh copy of `rollback-operator-attestation.json` for the affected deployment and exact forward tuple. Fill `controllerDeployment`, `targetStack`, a unique `<targetStack>/banner-rollout/rollback/<rollback-run>/containers` artifact prefix, and the exact old frontend and backend commits. Image jobs reject an existing key. Deploy jobs verify the object metadata and ETag, then the host downloads with that ETag as an `If-Match` condition. Refresh `attestedAtUtc` before each stage; evidence older than 24 hours is rejected. Validate and retain the record inside the deployment boundary before each manual rollback step. The template does not invent a write-freeze endpoint or perform a mutation.
 
 1. Freeze ordinary banner management writes. The freeze must still allow the targeted-disable operation. Set `stage` to `FRONTEND_ALLOWED`, attest only `FREEZE_BANNER_MANAGEMENT_WRITES`, record `managementWritesFrozen: true`, `frontendRolledBack: false`, a null targeted count, retained forward schema, no down-migration, and `psamaRecreated: false`. Validate this state before the standalone frontend rollback.
 2. Run **PIC-SURE Frontend Build** at `git_hash=artifacts.frontendCommit` with the exact bucket, target stack, `BANNER_ROLLBACK=true`, and the attestation JSON. It validates `FRONTEND_ALLOWED`, verifies the checkout, and writes the old image only to `artifactPrefix`. Run **PIC-SURE Frontend Deploy** with the same bucket, stack, rollback flag, and JSON. It verifies that exact object and tells the host to download from the attested prefix. Do not move Operations or Gateway yet.
@@ -60,7 +60,7 @@ Use a fresh copy of `rollback-operator-attestation.json` for the affected deploy
    ```bash
    python3 jenkins-docker/scripts/validate-banner-rollout.py \
      --rollback-attestation /operator/path/rollback-operator-attestation.json \
-     --jenkins-source-commit c9b7273f0b8b31d5e8585a47fba02c9425104af1 \
+     --jenkins-source-commit 31bd9e43577d4aa662f74ab6fcc3865aa287fe97 \
      --controller-deployment __bdc_OR_aim-ahead__ \
      --target-stack __TARGET_STACK__ \
      --required-rollback-stage __CURRENT_STAGE__

@@ -3,7 +3,7 @@
   "deployment": "__BDC_OR_AIM_AHEAD__",
   "controllerDeployment": "__BDC_OR_AIM_AHEAD__",
   "targetStack": "__TARGET_STACK__",
-  "artifactPrefix": "__TARGET_STACK__/banner-rollout/__EXACT_ROLLOUT_RUN__/containers",
+  "artifactPrefix": "__TARGET_STACK__/banner-rollout/rollback/__UNIQUE_ROLLBACK_RUN__/containers",
   "artifacts": {
     "frontendCommit": "__EXACT_OLD_FRONTEND_40_CHARACTER_COMMIT__",
     "backendCommit": "__EXACT_OLD_BACKEND_40_CHARACTER_COMMIT__"

@@ -13,6 +13,14 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 TEST_DIR = Path(__file__).resolve().parent
 FIXTURE_DIR = TEST_DIR / "fixtures"
+TICKET_16_OWNER_SHA256 = {
+    "feature-sql.sha256": "f94f3c3dc4f7cc8462f78d07b9a71c8cabf45a6027e3653e522ddc6cacc6802c",
+    "matrix.tsv": "b343dc423a869b418a77b6b5eaef65e244bc6ddcdb2056b987fd2f8eb05e4739",
+    "occurrence-intermediate-sql.sha256": "d5fbd8537da31e0cfa8c1db03f0375d217439781131c879de1c9c4ed29ed6585",
+    "occurrence-only.sql": "b33554a460bda5ceea9fdc1e0ee38bad1f3eb05a7a61b5b574d48ef99de3389d",
+    "supported-data.sql": "1416c5ffce7cacb72454dd9604a800bc38fc574f504d0835f68d9a721e87bbcd",
+    "test.sh": "07c2b5a80c3da5ecbe698adb8742091012d6b624c71e6dea9b782ab899ad3a09",
+}
 JENKINS_ROOT = Path(os.environ["JENKINS_ROOT"])
 VALIDATOR = JENKINS_ROOT / "jenkins-docker/scripts/validate-banner-rollout.py"
 JENKINS_COMMIT = subprocess.run(
@@ -55,7 +63,7 @@ def bind_rollback(attestation: dict, deployment: str) -> None:
     attestation["deployment"] = deployment
     attestation["controllerDeployment"] = deployment
     attestation["targetStack"] = "staging"
-    attestation["artifactPrefix"] = "staging/banner-rollout/synthetic-old-run/containers"
+    attestation["artifactPrefix"] = "staging/banner-rollout/rollback/synthetic-old-run/containers"
     attestation["artifacts"] = {"frontendCommit": "1" * 40, "backendCommit": "2" * 40}
     attestation["tupleSha256"] = expected_tuple(deployment)
     attestation["operator"] = "synthetic-operator"
@@ -358,13 +366,21 @@ class PublicAimInputTest(unittest.TestCase):
 
 class ExistingDeploymentProofTest(unittest.TestCase):
     def test_ticket_16_contract_files_are_unchanged(self):
+        expected_owners = {
+            "feature-sql.sha256",
+            "matrix.tsv",
+            "occurrence-intermediate-sql.sha256",
+            "occurrence-only.sql",
+            "supported-data.sql",
+            "test.sh",
+        }
+        self.assertEqual(expected_owners, set(TICKET_16_OWNER_SHA256))
         self.assertEqual(
-            "f94f3c3dc4f7cc8462f78d07b9a71c8cabf45a6027e3653e522ddc6cacc6802c",
-            sha256(ROOT / "tests/deployment-migration/feature-sql.sha256"),
-        )
-        self.assertEqual(
-            "b343dc423a869b418a77b6b5eaef65e244bc6ddcdb2056b987fd2f8eb05e4739",
-            sha256(ROOT / "tests/deployment-migration/matrix.tsv"),
+            TICKET_16_OWNER_SHA256,
+            {
+                name: sha256(ROOT / "tests/deployment-migration" / name)
+                for name in TICKET_16_OWNER_SHA256
+            },
         )
 
     def test_backend_script_recreates_psama_between_operations_and_gateway(self):
@@ -394,8 +410,11 @@ class ExistingDeploymentProofTest(unittest.TestCase):
 
     def test_checklist_accepts_required_commit_as_ref_ancestor(self):
         checklist = (TEST_DIR / "README.md").read_text(encoding="utf-8")
+        spec = json.loads((TEST_DIR / "aim-ahead-required-release-input.json").read_text(encoding="utf-8"))
+        required_commit = spec["banner_rollout"]["components"]["infrastructure"]["commit"]
         self.assertIn("merge-base --is-ancestor", checklist)
-        self.assertNotIn("resolved commit must be `5d2ba9", checklist)
+        self.assertIn(f"{required_commit} FETCH_HEAD", checklist)
+        self.assertNotIn("5d2ba9f59f161ace5e807c82a0580518a9d44d16 FETCH_HEAD", checklist)
 
     def test_checklist_documents_supported_forward_and_executable_rollback_jobs(self):
         checklist = (TEST_DIR / "README.md").read_text(encoding="utf-8")
@@ -428,9 +447,40 @@ class ExistingDeploymentProofTest(unittest.TestCase):
             with self.subTest(script=name):
                 text = (scripts / name).read_text(encoding="utf-8")
                 self.assertIn("--artifact_prefix", text)
-                self.assertIn("artifact_prefix", text)
+                self.assertIn("--artifact_etag", text)
+                self.assertIn("s3api get-object", text)
+                self.assertIn("--if-match", text)
         orchestrator = (scripts / "deploy-wildfly-stack.sh").read_text(encoding="utf-8")
         self.assertGreaterEqual(orchestrator.count('--artifact_prefix "$artifact_prefix"'), 4)
+        self.assertGreaterEqual(orchestrator.count("--artifact_etag"), 4)
+
+    def test_instance_roles_can_read_exact_forward_and_rollback_artifacts(self):
+        wildfly_policy = (ROOT / "app-infrastructure/wildfly-iam.tf").read_text(encoding="utf-8")
+        httpd_policy = (ROOT / "app-infrastructure/s3_roles.tf").read_text(encoding="utf-8")
+        for namespace in ("forward", "rollback"):
+            for artifact in (
+                "pic-sure-operations-service.tar.gz",
+                "pic-sure-hpds-query-service.tar.gz",
+                "psama.tar.gz",
+                "pic-sure-gateway.tar.gz",
+            ):
+                with self.subTest(namespace=namespace, artifact=artifact):
+                    self.assertIn(
+                        f'${{var.target_stack}}/banner-rollout/{namespace}/*/containers/{artifact}',
+                        wildfly_policy,
+                    )
+            self.assertIn(
+                f'${{var.target_stack}}/banner-rollout/{namespace}/*/containers/*',
+                wildfly_policy,
+            )
+            self.assertIn(
+                f'${{var.target_stack}}/banner-rollout/{namespace}/*/containers/pic-sure-frontend.tar.gz',
+                httpd_policy,
+            )
+            self.assertIn(
+                f'${{var.target_stack}}/banner-rollout/{namespace}/*/containers/*',
+                httpd_policy,
+            )
 
     def test_pinned_infrastructure_commit_contains_artifact_prefix_support(self):
         spec = json.loads((TEST_DIR / "aim-ahead-required-release-input.json").read_text(encoding="utf-8"))
@@ -454,6 +504,19 @@ class ExistingDeploymentProofTest(unittest.TestCase):
                 )
                 self.assertEqual(0, result.returncode, result.stderr)
                 self.assertIn("--artifact_prefix", result.stdout)
+                self.assertIn("--artifact_etag", result.stdout)
+        for name in ("wildfly-iam.tf", "s3_roles.tf"):
+            with self.subTest(iam=name):
+                result = subprocess.run(
+                    ["git", "show", f"{pinned}:app-infrastructure/{name}"],
+                    cwd=ROOT,
+                    text=True,
+                    capture_output=True,
+                    check=False,
+                )
+                self.assertEqual(0, result.returncode, result.stderr)
+                self.assertIn("/banner-rollout/forward/*/containers/", result.stdout)
+                self.assertIn("/banner-rollout/rollback/*/containers/", result.stdout)
 
     def test_rollback_template_binds_controller_stack_and_artifacts(self):
         template = json.loads((TEST_DIR / "rollback-operator-attestation.json").read_text(encoding="utf-8"))
