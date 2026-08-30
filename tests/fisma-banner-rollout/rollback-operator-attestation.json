@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "deployment": "__BDC_OR_AIM_AHEAD__",
+  "tupleSha256": "__FORWARD_ROLLOUT_TUPLE_SHA256__",
+  "phases": [
+    {"phase": "FREEZE_BANNER_MANAGEMENT_WRITES", "attested": false},
+    {"phase": "ROLL_BACK_FRONTEND", "attested": false},
+    {"phase": "DISABLE_ACTIVE_AND_SCHEDULED_TARGETED_BANNERS_BEFORE_LEGACY_ACTIVE_FEED_BACKEND", "attested": false},
+    {"phase": "ROLL_BACK_OPERATIONS_AND_GATEWAY", "attested": false},
+    {"phase": "KEEP_BANNER_MANAGEMENT_WRITES_FROZEN_BELOW_TARGETING_CAPABLE_BACKEND", "attested": false},
+    {"phase": "RECREATE_PSAMA", "attested": false}
+  ],
+  "state": {
+    "managementWritesFrozen": false,
+    "targetedActiveOrScheduledRemaining": "__OPERATOR_RECORDED_COUNT__",
+    "forwardSchemaRetained": false,
+    "downMigrationRun": false,
+    "psamaRecreated": false
+  },
+  "operator": "__OPERATOR_NAME__",
+  "attestedAtUtc": "__YYYY_MM_DD_T_HH_MM_SS_Z__"
+}

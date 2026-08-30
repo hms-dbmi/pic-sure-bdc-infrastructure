@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 1,
+  "deployment": "AIM-AHEAD",
+  "privateReleaseControl": {
+    "repository": "__OPERATOR_SUPPLIED_PRIVATE_REPOSITORY__",
+    "ref": "__OPERATOR_SUPPLIED_REF__",
+    "resolvedCommit": "__OPERATOR_SUPPLIED_40_CHARACTER_COMMIT__"
+  },
+  "requiredReleaseInput": {
+    "database": [],
+    "application": [
+      {
+        "project_name": "PIC-SURE-API Build",
+        "project_job_git_key": "PSA",
+        "git_hash": "0178bbd2d1753e07dcead77a6d0e8ca37bf76dd8"
+      },
+      {
+        "project_name": "PIC-SURE-FRONTEND Build",
+        "project_job_git_key": "PSF",
+        "git_hash": "7b69aa960ff98f97c1a2d026b7137b0e3dcdf603"
+      }
+    ],
+    "infrastructure_git_hash": "5d2ba9f59f161ace5e807c82a0580518a9d44d16",
+    "banner_rollout": {
+      "schemaVersion": 3,
+      "deployment": "AIM-AHEAD",
+      "requiredServices": ["PSAMA", "OPERATIONS", "GATEWAY"],
+      "releaseControl": {
+        "visibility": "PRIVATE_FISMA_BOUNDARY",
+        "operatorManaged": true,
+        "resolvedCommitSource": "OPERATOR_ATTESTATION"
+      },
+      "components": {
+        "backend": {
+          "repository": "https://github.com/hms-dbmi/pic-sure.git",
+          "commit": "0178bbd2d1753e07dcead77a6d0e8ca37bf76dd8"
+        },
+        "frontend": {
+          "repository": "https://github.com/hms-dbmi/PIC-SURE-Frontend.git",
+          "commit": "7b69aa960ff98f97c1a2d026b7137b0e3dcdf603"
+        },
+        "infrastructure": {
+          "repository": "https://github.com/hms-dbmi/pic-sure-bdc-infrastructure.git",
+          "ref": "pic_sure_api_rewrite",
+          "commit": "5d2ba9f59f161ace5e807c82a0580518a9d44d16"
+        },
+        "migrationsParity": {
+          "repository": "https://github.com/hms-dbmi/PIC-SURE-Migrations.git",
+          "commit": "05b1a77512dc0921570f0d442853fdcee75b8131"
+        },
+        "jenkins": {
+          "repository": "https://github.com/hms-dbmi/avillachlab-jenkins.git",
+          "commit": "9af6bc0d46ccaa0c42fb1e1fc83e471343bf2c78"
+        }
+      },
+      "contract": {
+        "source": {
+          "repository": "https://github.com/hms-dbmi/pic-sure.git",
+          "commit": "0178bbd2d1753e07dcead77a6d0e8ca37bf76dd8",
+          "path": ".github/banner-rollout-contract.json",
+          "sha256": "f8cb265d735b757872391e04fdcd5b999b785eaa427ca13f8f2eefd493715359"
+        },
+        "deploymentWideCacheRefresh": "PSAMA_PROCESS_RESTART",
+        "forwardPhases": [
+          "APPLY_AUTHORIZATION_AND_PIC_SURE_MIGRATIONS",
+          "RECREATE_PSAMA",
+          "VERIFY_OPERATIONS_AND_GATEWAY_HEALTH",
+          "PUBLISH_FRONTEND_ACTIVE_V2"
+        ],
+        "rollbackPhases": [
+          "FREEZE_BANNER_MANAGEMENT_WRITES",
+          "ROLL_BACK_FRONTEND",
+          "DISABLE_ACTIVE_AND_SCHEDULED_TARGETED_BANNERS_BEFORE_LEGACY_ACTIVE_FEED_BACKEND",
+          "ROLL_BACK_OPERATIONS_AND_GATEWAY",
+          "KEEP_BANNER_MANAGEMENT_WRITES_FROZEN_BELOW_TARGETING_CAPABLE_BACKEND",
+          "RECREATE_PSAMA"
+        ],
+        "rollbackStateContract": {
+          "freezeRequiredBeforeFrontendRollback": true,
+          "ordinaryManagementWritesAllowedWhileFrozen": false,
+          "targetedDisableAllowedWhileFrozen": true,
+          "legacyBackendTransitionRequiresTargetedClear": true,
+          "freezeRetainedBelowTargetingBackend": true,
+          "frontendFirstRollbackAloneSafe": false,
+          "schemaRollback": "KEEP_FORWARD_SCHEMA",
+          "downMigrationAllowed": false
+        }
+      },
+      "tupleSha256": "dcb24e851f1715a16596f2263c13a2b1aa49b98836c9d367e183d81df4842eca"
+    }
+  },
+  "checks": {
+    "privateReleaseControlPinsRequiredTuple": false,
+    "publicInfrastructureRefResolvesToRequiredCommit": false,
+    "forwardOrderAccepted": false,
+    "rollbackFreezeAndTargetedDisableBoundaryAccepted": false,
+    "forwardSchemaRetainedAndDownMigrationsForbidden": false
+  },
+  "operator": "__OPERATOR_NAME__",
+  "attestedAtUtc": "__YYYY_MM_DD_T_HH_MM_SS_Z__"
+}
