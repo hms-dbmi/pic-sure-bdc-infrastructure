@@ -80,7 +80,7 @@ jobs:
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           repository: hms-dbmi/avillachlab-jenkins
-          ref: eba112dc4d19b18b17be76c9e3de99540185fbb9
+          ref: 2d8a5d17bfe5a96664cdad5bc29a028a3ea8528b
           path: .proof-inputs/avillachlab-jenkins
           fetch-depth: 0
 
@@ -88,7 +88,7 @@ jobs:
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           repository: hms-dbmi/pic-sure-bdc-release-control
-          ref: ba3855503801b2d514aa6e18a884e0a8ee2fea16
+          ref: e91d914228fd8984b052cd08d615711f7cce4b57
           path: .proof-inputs/pic-sure-bdc-release-control
           fetch-depth: 0
 
