@@ -18,15 +18,15 @@ TEST_DIR = Path(__file__).resolve().parent
 BACKEND_COMMIT = "0178bbd2d1753e07dcead77a6d0e8ca37bf76dd8"
 FRONTEND_COMMIT = "7b69aa960ff98f97c1a2d026b7137b0e3dcdf603"
 MIGRATIONS_COMMIT = "05b1a77512dc0921570f0d442853fdcee75b8131"
-JENKINS_COMMIT = "29ec9a69c23aa663ff2496d58982c1ad329c3234"
-BDC_RELEASE_CONTROL_COMMIT = "4a61fc127cece1ef012fb42301fb765d0222ecd0"
+JENKINS_COMMIT = "6e72d8daefa5e4a902d5250162f56e7e1bbdb40c"
+BDC_RELEASE_CONTROL_COMMIT = "2b74944b87d445e470c5d655c5ed52fff09250aa"
 AIO_COMMIT = "715857456594814957d9abc26ad14efbccb65e11"
 AIO_RELEASE_CONTROL_COMMIT = "bfb07196be55f7f121dc250f7aa51d826642ff86"
 REQUIRED_BASE = "cc1920a76fb6aeb9266fb4cffe98e946c2d983e4"
 ROLLOUT_SHA256 = "f8cb265d735b757872391e04fdcd5b999b785eaa427ca13f8f2eefd493715359"
-BDC_TUPLE = "561c67ba394188ab4a95d5bce0b487e7ab15ed7128685df3827fce290b52a37f"
-AIM_TUPLE = "41ea143aac0adf493bf6ffdb8b629f23aee5c88bc7306b358aede9f23be37dd0"
-AIM_INPUT_SHA256 = "8dbfcc2068e06a3040bc0ac2b8ed061315c8ab75bc0dfe199bf7467221aacb2e"
+BDC_TUPLE = "9e5bdf8be795bc389b829c7b6e05f9f834a9f64d41010f497190cb2907f04a1c"
+AIM_TUPLE = "a6ad74af85db178b9e8c02020a2cd048e72582a0be790376b281531549d53f3d"
+AIM_INPUT_SHA256 = "1e17e4e66fe7c645e3115d60b08b659035813ae9d721a214463d6388bfdbaf5d"
 SYNTHETIC_LOGGING_KEY = "t22b-synthetic-shared-logging-key"
 SYNTHETIC_PRIVATE_RELEASE_COMMIT = "a" * 40
 NOT_RUN_UUID = "00000000-0000-4000-8000-000000000000"
@@ -448,7 +448,12 @@ def owner_commands(roots):
         "BACKEND_ROOT": str(roots["backend"]),
     }
     infra_env = {**base, "JENKINS_ROOT": str(roots["jenkins"]), "BACKEND_ROOT": str(roots["backend"])}
-    rc_env = {**base, "JENKINS_ROOT": str(roots["jenkins"]), "BACKEND_ROOT": str(roots["backend"])}
+    rc_env = {
+        **base,
+        "JENKINS_ROOT": str(roots["jenkins"]),
+        "BDC_INFRASTRUCTURE_ROOT": str(ROOT),
+        "BACKEND_ROOT": str(roots["backend"]),
+    }
     cache_env = {**base, "JAVA_HOME": java_home, "PATH": f"{java_home}/bin:{base['PATH']}"}
     commands = [
         ("ticket22a-contract", ["bash", "tests/banner-local-integration/test.sh", "contract"], roots["aio"], base),

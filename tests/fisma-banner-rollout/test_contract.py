@@ -72,6 +72,33 @@ def bind_rollback(attestation: dict, deployment: str) -> None:
 
 
 class PublicAimInputTest(unittest.TestCase):
+    def test_aim_tuple_pins_logging_capable_executable_infrastructure(self):
+        spec = json.loads((TEST_DIR / "aim-ahead-required-release-input.json").read_text(encoding="utf-8"))
+        logging_commit = "d10cecdeb89f14f8c672a81347ffa70d9b001ab3"
+        self.assertEqual(logging_commit, spec["infrastructure_git_hash"])
+        self.assertEqual(
+            logging_commit,
+            spec["banner_rollout"]["components"]["infrastructure"]["commit"],
+        )
+        template = subprocess.run(
+            [
+                "git",
+                "show",
+                f"{logging_commit}:app-infrastructure/template-renderer/templates/operations.env.tftpl",
+            ],
+            cwd=ROOT,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+        self.assertEqual(0, template.returncode, template.stderr)
+        self.assertIn("LOGGING_SERVICE_URL=http://pic-sure-logging", template.stdout)
+        self.assertIn("LOGGING_API_KEY=${logging_api_key}", template.stdout)
+        self.assertEqual(
+            JENKINS_COMMIT,
+            spec["banner_rollout"]["components"]["jenkins"]["commit"],
+        )
+
     def test_aim_input_validates_as_its_own_deployment(self):
         with fresh_aim_attestation() as attestation:
             result = subprocess.run(

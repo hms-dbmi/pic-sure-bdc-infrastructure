@@ -37,6 +37,32 @@ class BannerLocalIntegrationContractTest(unittest.TestCase):
         self.assertIn("logging_api_key", operations)
         self.assertIn("var.logging_api_key", operations)
 
+    def test_release_inputs_pin_the_executable_commit_that_contains_logging_wiring(self):
+        runner = load_runner()
+        logging_commit = "d10cecdeb89f14f8c672a81347ffa70d9b001ab3"
+        roots = runner.configured_roots(require_all=True)
+        inputs = {
+            "BDC": json.loads(
+                (roots["bdc_release_control"] / "build-spec.json").read_text(encoding="utf-8")
+            ),
+            "AIM_AHEAD": json.loads(
+                (ROOT / "tests/fisma-banner-rollout/aim-ahead-required-release-input.json").read_text(
+                    encoding="utf-8"
+                )
+            ),
+        }
+        for deployment, spec in inputs.items():
+            with self.subTest(deployment=deployment):
+                self.assertEqual(logging_commit, spec["infrastructure_git_hash"])
+                self.assertEqual(
+                    logging_commit,
+                    spec["banner_rollout"]["components"]["infrastructure"]["commit"],
+                )
+        validator = (
+            roots["jenkins"] / "jenkins-docker/scripts/validate-banner-rollout.py"
+        ).read_text(encoding="utf-8")
+        self.assertIn(f'"commit": "{logging_commit}"', validator)
+
     def test_bdc_and_aim_local_proof_contract_is_checked_in(self):
         required = (
             "README.md",
