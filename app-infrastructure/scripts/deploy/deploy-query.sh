@@ -11,6 +11,10 @@ while [[ $# -gt 0 ]]; do
       target_stack="$2"
       shift 2
       ;;
+    --artifact_prefix)
+      artifact_prefix="$2"
+      shift 2
+      ;;
     *)
       echo "Unknown argument: $1"
       exit 1
@@ -27,6 +31,7 @@ fi
 
 stack_s3_bucket=${stack_s3_bucket:-${STACK_S3_BUCKET:-}}
 target_stack=${target_stack:-${TARGET_STACK:-}}
+artifact_prefix=${artifact_prefix:-${target_stack}/containers}
 
 if [[ -z "$stack_s3_bucket" || -z "$target_stack" ]]; then
   echo "Error: --stack_s3_bucket and --target_stack are required."
@@ -45,7 +50,7 @@ s3_copy() {
 }
 
 s3_copy "s3://${stack_s3_bucket}/configs/query/${target_stack}/query.env" "/opt/picsure/query.env"
-s3_copy "s3://${stack_s3_bucket}/${target_stack}/containers/pic-sure-hpds-query-service.tar.gz" "/opt/picsure/pic-sure-hpds-query-service.tar.gz"
+s3_copy "s3://${stack_s3_bucket}/${artifact_prefix}/pic-sure-hpds-query-service.tar.gz" "/opt/picsure/pic-sure-hpds-query-service.tar.gz"
 
 CONTAINER_NAME="pic-sure-hpds-query-service"
 QUERY_IMAGE=$(podman load < /opt/picsure/pic-sure-hpds-query-service.tar.gz | cut -d ' ' -f 3)

@@ -21,6 +21,7 @@ target_stack=""
 dataset_s3_object_key=""
 enable_debug=""
 spring_profile=""
+artifact_prefix=""
 
 while [[ $# -gt 0 ]]; do
   case $1 in
@@ -68,6 +69,10 @@ while [[ $# -gt 0 ]]; do
       spring_profile="$2"
       shift 2
       ;;
+    --artifact_prefix)
+      artifact_prefix="$2"
+      shift 2
+      ;;
     *)
       echo "Unknown argument: $1"
       exit 1
@@ -80,20 +85,24 @@ if [[ -z "$stack_s3_bucket" || -z "$target_stack" ]]; then
   exit 1
 fi
 
+artifact_prefix=${artifact_prefix:-${target_stack}/containers}
+
 failed=false
 
 if [[ "$deploy_operations" == "true" ]]; then
   echo "=== Deploying pic-sure-operations-service ==="
   /opt/picsure/deploy-operations.sh \
     --stack_s3_bucket "$stack_s3_bucket" \
-    --target_stack "$target_stack" || failed=true
+    --target_stack "$target_stack" \
+    --artifact_prefix "$artifact_prefix" || failed=true
 fi
 
 if [[ "$deploy_query" == "true" ]]; then
   echo "=== Deploying pic-sure-hpds-query-service ==="
   /opt/picsure/deploy-query.sh \
     --stack_s3_bucket "$stack_s3_bucket" \
-    --target_stack "$target_stack" || failed=true
+    --target_stack "$target_stack" \
+    --artifact_prefix "$artifact_prefix" || failed=true
 fi
 
 if [[ "$deploy_psama" == "true" ]]; then
@@ -101,6 +110,7 @@ if [[ "$deploy_psama" == "true" ]]; then
   /opt/picsure/deploy-psama.sh \
     --stack_s3_bucket "$stack_s3_bucket" \
     --target_stack "$target_stack" \
+    --artifact_prefix "$artifact_prefix" \
     ${dataset_s3_object_key:+--dataset_s3_object_key "$dataset_s3_object_key"} \
     ${enable_debug:+--enable_debug "$enable_debug"} \
     ${spring_profile:+--spring_profile "$spring_profile"} || failed=true
@@ -124,7 +134,8 @@ if [[ "$deploy_gateway" == "true" ]]; then
   echo "=== Deploying gateway ==="
   /opt/picsure/deploy-gateway.sh \
     --stack_s3_bucket "$stack_s3_bucket" \
-    --target_stack "$target_stack" || failed=true
+    --target_stack "$target_stack" \
+    --artifact_prefix "$artifact_prefix" || failed=true
 fi
 
 if [[ "$failed" == "true" ]]; then

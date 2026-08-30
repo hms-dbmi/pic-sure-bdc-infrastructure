@@ -26,6 +26,10 @@ while [[ $# -gt 0 ]]; do
       target_stack="$2"
       shift 2
       ;;
+    --artifact_prefix)
+      artifact_prefix="$2"
+      shift 2
+      ;;
     *)
       echo "Unknown argument: $1"
       exit 1
@@ -43,6 +47,7 @@ fi
 stack_s3_bucket=${stack_s3_bucket:-${STACK_S3_BUCKET:-}}
 dataset_s3_object_key=${dataset_s3_object_key:-${DATASET_S3_OBJECT_KEY:-}}
 target_stack=${target_stack:-${TARGET_STACK:-}}
+artifact_prefix=${artifact_prefix:-${target_stack}/containers}
 
 if [[ -z "$stack_s3_bucket" || -z "$dataset_s3_object_key" || -z "$target_stack" ]]; then
   echo "Error: --stack_s3_bucket, --target_stack and --dataset_s3_object_key are required."
@@ -61,7 +66,7 @@ s3_copy() {
 }
 
 s3_copy "s3://${stack_s3_bucket}/configs/psama/psama.env" "/opt/picsure/psama.env"
-s3_copy "s3://${stack_s3_bucket}/${target_stack}/containers/psama.tar.gz" "/opt/picsure/psama.tar.gz"
+s3_copy "s3://${stack_s3_bucket}/${artifact_prefix}/psama.tar.gz" "/opt/picsure/psama.tar.gz"
 s3_copy "s3://${stack_s3_bucket}/data/${dataset_s3_object_key}/fence_mapping.json" "/opt/picsure/fence_mapping.json"
 
 chmod 644 "/opt/picsure/psama.env"

@@ -15,6 +15,10 @@ while [[ $# -gt 0 ]]; do
        dataset_s3_object_key="$2"
        shift 2
        ;;
+    --artifact_prefix)
+       artifact_prefix="$2"
+       shift 2
+       ;;
     *)
       echo "Unknown argument: $1"
       exit 1
@@ -31,6 +35,7 @@ fi
 
 stack_s3_bucket=${stack_s3_bucket:-${STACK_S3_BUCKET:-}}
 target_stack=${target_stack:-${TARGET_STACK:-}}
+artifact_prefix=${artifact_prefix:-${target_stack}/containers}
 
 if [[ -z "$stack_s3_bucket" || -z "$target_stack" ]]; then
   echo "Error: --stack_s3_bucket and --target_stack are required."
@@ -49,7 +54,7 @@ s3_copy() {
   exit 1
 }
 
-s3_copy "s3://${stack_s3_bucket}/${target_stack}/containers/pic-sure-frontend.tar.gz" "/opt/picsure/pic-sure-frontend.tar.gz"
+s3_copy "s3://${stack_s3_bucket}/${artifact_prefix}/pic-sure-frontend.tar.gz" "/opt/picsure/pic-sure-frontend.tar.gz"
 s3_copy "s3://${stack_s3_bucket}/${target_stack}/configs/httpd/httpd-vhosts.conf" "/usr/local/docker-config/httpd-vhosts.conf"
 s3_copy "s3://${stack_s3_bucket}/configs/pic-sure-frontend/bdc.env" "/opt/picsure/bdc.env"
 s3_copy "s3://${stack_s3_bucket}/certs/httpd/" "/usr/local/docker-config/cert/" --recursive
