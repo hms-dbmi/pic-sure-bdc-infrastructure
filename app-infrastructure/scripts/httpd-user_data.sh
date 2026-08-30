@@ -14,6 +14,7 @@ stack_s3_bucket="${stack_s3_bucket}"
 gss_prefix="${gss_prefix}"
 target_stack="${target_stack}"
 dataset_s3_object_key="${dataset_s3_object_key}"
+bootstrap_standard_critical_artifacts="${bootstrap_standard_critical_artifacts}"
 
 echo "ENABLE_PODMAN=true" | sudo tee -a /opt/srce/startup.config
 echo "export STACK_S3_BUCKET=$stack_s3_bucket" >> /etc/environment
@@ -41,11 +42,13 @@ s3_copy() {
 s3_copy "s3://${stack_s3_bucket}/${target_stack}/scripts/deploy-httpd.sh" "/opt/picsure/deploy-httpd.sh"
 
 sudo chmod +x /opt/picsure/deploy-httpd.sh
-sudo /opt/picsure/deploy-httpd.sh --stack_s3_bucket "${stack_s3_bucket}" --target_stack "${target_stack}" --dataset_s3_object_key "${dataset_s3_object_key}"
+if [[ "$bootstrap_standard_critical_artifacts" == "true" ]]; then
+  sudo /opt/picsure/deploy-httpd.sh --stack_s3_bucket "${stack_s3_bucket}" --target_stack "${target_stack}" --dataset_s3_object_key "${dataset_s3_object_key}"
 
-# Check if the gateway host is resolvable after httpd-vhosts.conf has been downloaded
-# Probes the gateway's /system/status endpoint via any non-health /picsure RewriteRule target
-for i in 1 2 3 4 5; do echo "confirming gateway resolvable" && sudo curl --connect-timeout 1 "$(grep 'picsure/(' /usr/local/docker-config/httpd-vhosts.conf | grep RewriteRule | grep -v health | head -1 | cut -d "\"" -f 2 | sed 's|:8080/.*|:8080/system/status|')" || if [ $? = 6 ]; then (exit 1); fi && break || sleep 60; done
+  # Check if the gateway host is resolvable after httpd-vhosts.conf has been downloaded
+  # Probes the gateway's /system/status endpoint via any non-health /picsure RewriteRule target
+  for i in 1 2 3 4 5; do echo "confirming gateway resolvable" && sudo curl --connect-timeout 1 "$(grep 'picsure/(' /usr/local/docker-config/httpd-vhosts.conf | grep RewriteRule | grep -v health | head -1 | cut -d "\"" -f 2 | sed 's|:8080/.*|:8080/system/status|')" || if [ $? = 6 ]; then (exit 1); fi && break || sleep 60; done
+fi
 
 tag_init_complete true
 

@@ -7,8 +7,10 @@ data "template_file" "wildfly-user_data" {
     target_stack          = var.target_stack
     gss_prefix            = "${var.environment_prefix}_${var.env_is_open_access ? "open" : "auth"}_${var.environment_name}"
     env_private_dns_name  = var.env_private_dns_name
+    bootstrap_standard_critical_artifacts = tostring(var.bootstrap_standard_critical_artifacts)
   }
 }
+
 
 data "template_cloudinit_config" "wildfly-user-data" {
   gzip          = true
@@ -58,4 +60,3 @@ resource "aws_instance" "wildfly-ec2" {
   }
 
 }
-

@@ -69,6 +69,12 @@ variable "include_open_hpds" {
   type    = bool
 }
 
+variable "bootstrap_standard_critical_artifacts" {
+  description = "Start Gateway, Operations, Query, PSAMA, and frontend from the standard artifact namespace during instance bootstrap"
+  type        = bool
+  default     = true
+}
+
 # removing for now as they are secrets handled by the stack_variables
 # retained: passed by Jenkins; consumed by template-renderer / kept for cutover
 variable "picsure_token_introspection_token" {

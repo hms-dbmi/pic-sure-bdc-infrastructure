@@ -2,6 +2,7 @@
 import hashlib
 import json
 import os
+import re
 import subprocess
 import tempfile
 import unittest
@@ -453,6 +454,45 @@ class ExistingDeploymentProofTest(unittest.TestCase):
         orchestrator = (scripts / "deploy-wildfly-stack.sh").read_text(encoding="utf-8")
         self.assertGreaterEqual(orchestrator.count('--artifact_prefix "$artifact_prefix"'), 4)
         self.assertGreaterEqual(orchestrator.count("--artifact_etag"), 4)
+
+    def test_banner_bootstrap_skips_only_standard_critical_artifacts(self):
+        app = ROOT / "app-infrastructure"
+        variables = (app / "variables.tf").read_text(encoding="utf-8")
+        wildfly_instance = (app / "wildfly-instance.tf").read_text(encoding="utf-8")
+        httpd_instance = (app / "httpd-instance.tf").read_text(encoding="utf-8")
+        wildfly_user_data = (app / "scripts/wildfly-user_data.sh").read_text(encoding="utf-8")
+        httpd_user_data = (app / "scripts/httpd-user_data.sh").read_text(encoding="utf-8")
+
+        self.assertIn('variable "bootstrap_standard_critical_artifacts"', variables)
+        self.assertIn("default     = true", variables)
+        for instance in (wildfly_instance, httpd_instance):
+            self.assertIn(
+                "bootstrap_standard_critical_artifacts = tostring(var.bootstrap_standard_critical_artifacts)",
+                instance,
+            )
+
+        guard = re.compile(
+            r'if \[\[ "\$bootstrap_standard_critical_artifacts" == "true" \]\]; then\n.*?\nfi',
+            re.DOTALL,
+        )
+        wildfly_guards = guard.findall(wildfly_user_data)
+        self.assertEqual(2, len(wildfly_guards))
+        guarded_wildfly = "\n".join(wildfly_guards)
+        unguarded_wildfly = guard.sub("", wildfly_user_data)
+        for script in ("operations", "query", "psama", "gateway"):
+            command = f"sudo /opt/picsure/deploy-{script}.sh"
+            with self.subTest(critical_bootstrap=script):
+                self.assertIn(command, guarded_wildfly)
+                self.assertNotIn(command, unguarded_wildfly)
+        for script in ("dictionary", "logging", "visualization"):
+            with self.subTest(unrelated_bootstrap=script):
+                self.assertIn(f"sudo /opt/picsure/deploy-{script}.sh", unguarded_wildfly)
+
+        httpd_guards = guard.findall(httpd_user_data)
+        self.assertEqual(1, len(httpd_guards))
+        self.assertIn("sudo /opt/picsure/deploy-httpd.sh", httpd_guards[0])
+        self.assertIn("confirming gateway resolvable", httpd_guards[0])
+        self.assertNotIn("sudo /opt/picsure/deploy-httpd.sh", guard.sub("", httpd_user_data))
 
     def test_instance_roles_can_read_exact_forward_and_rollback_artifacts(self):
         wildfly_policy = (ROOT / "app-infrastructure/wildfly-iam.tf").read_text(encoding="utf-8")
