@@ -29,7 +29,7 @@ jobs:
 
     steps:
       - name: Check out infrastructure proof
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           fetch-depth: 0
 
@@ -37,15 +37,15 @@ jobs:
         run: printf '%s\n' '/.proof-inputs/' >> .git/info/exclude
 
       - name: Check out exact AIO input
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           repository: hms-dbmi/pic-sure-all-in-one
-          ref: 715857456594814957d9abc26ad14efbccb65e11
+          ref: 52adb20a8160a2c956b9dd7fc642a30cd1a79ac9
           path: .proof-inputs/pic-sure-all-in-one
           fetch-depth: 0
 
       - name: Check out exact AIO release-control input
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           repository: hms-dbmi/baseline-pic-sure-release-control
           ref: bfb07196be55f7f121dc250f7aa51d826642ff86
@@ -53,7 +53,7 @@ jobs:
           fetch-depth: 0
 
       - name: Check out exact backend input
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           repository: hms-dbmi/pic-sure
           ref: 0178bbd2d1753e07dcead77a6d0e8ca37bf76dd8
@@ -61,7 +61,7 @@ jobs:
           fetch-depth: 0
 
       - name: Check out exact frontend input
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           repository: hms-dbmi/PIC-SURE-Frontend
           ref: 7b69aa960ff98f97c1a2d026b7137b0e3dcdf603
@@ -69,7 +69,7 @@ jobs:
           fetch-depth: 0
 
       - name: Check out exact migrations input
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           repository: hms-dbmi/PIC-SURE-Migrations
           ref: 05b1a77512dc0921570f0d442853fdcee75b8131
@@ -77,18 +77,18 @@ jobs:
           fetch-depth: 0
 
       - name: Check out exact Jenkins input
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           repository: hms-dbmi/avillachlab-jenkins
-          ref: 6e72d8daefa5e4a902d5250162f56e7e1bbdb40c
+          ref: eba112dc4d19b18b17be76c9e3de99540185fbb9
           path: .proof-inputs/avillachlab-jenkins
           fetch-depth: 0
 
       - name: Check out exact BDC release-control input
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           repository: hms-dbmi/pic-sure-bdc-release-control
-          ref: 2b74944b87d445e470c5d655c5ed52fff09250aa
+          ref: ba3855503801b2d514aa6e18a884e0a8ee2fea16
           path: .proof-inputs/pic-sure-bdc-release-control
           fetch-depth: 0
 
@@ -101,7 +101,7 @@ jobs:
 
       - name: Upload failure diagnostics
         if: failure()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: banner-local-integration-diagnostics
           path: ${{ runner.temp }}/banner-local-integration-diagnostics

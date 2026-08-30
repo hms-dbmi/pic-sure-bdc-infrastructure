@@ -3,7 +3,6 @@
 import copy
 import importlib.util
 import json
-import os
 from pathlib import Path
 import tempfile
 import unittest
@@ -21,6 +20,12 @@ def load_runner():
 
 
 class BannerLocalIntegrationContractTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.runner = load_runner()
+        cls.roots = cls.runner.configured_roots(require_all=True)
+        cls.verified_heads = cls.runner.verify_roots(cls.roots)
+
     def test_operations_renders_the_existing_logging_transport(self):
         template = (
             ROOT
@@ -38,9 +43,9 @@ class BannerLocalIntegrationContractTest(unittest.TestCase):
         self.assertIn("var.logging_api_key", operations)
 
     def test_release_inputs_pin_the_executable_commit_that_contains_logging_wiring(self):
-        runner = load_runner()
+        runner = self.runner
         logging_commit = "d10cecdeb89f14f8c672a81347ffa70d9b001ab3"
-        roots = runner.configured_roots(require_all=True)
+        roots = self.roots
         inputs = {
             "BDC": json.loads(
                 (roots["bdc_release_control"] / "build-spec.json").read_text(encoding="utf-8")
@@ -78,9 +83,8 @@ class BannerLocalIntegrationContractTest(unittest.TestCase):
         self.assertEqual([], missing, f"missing BDC/AIM local proof files: {missing}")
 
     def test_ticket22a_contract_snapshot_is_exact_and_closed(self):
-        runner = load_runner()
-        aio_root = os.environ.get("BANNER_LOCAL_AIO_ROOT")
-        contract = runner.verify_contract_snapshot(Path(aio_root) if aio_root else None)
+        runner = self.runner
+        contract = runner.verify_contract_snapshot(self.roots["aio"])
         self.assertEqual(
             "28885897e199529ac3c0957d4e87a492328fd5480936a7cd3e740c7cf57d49be",
             runner.sha256_file(TEST_DIR / "contract.json"),
@@ -92,20 +96,28 @@ class BannerLocalIntegrationContractTest(unittest.TestCase):
         )
 
     def test_deployment_fixtures_use_distinct_real_tenant_inputs(self):
-        runner = load_runner()
+        runner = self.runner
         with tempfile.TemporaryDirectory() as directory:
-            bdc = runner.validate_fixture(TEST_DIR / "fixtures/bdc.json", Path(directory) / "bdc")
+            bdc = runner.validate_fixture(
+                TEST_DIR / "fixtures/bdc.json",
+                Path(directory) / "bdc",
+                self.verified_heads,
+            )
             aim = runner.validate_fixture(
-                TEST_DIR / "fixtures/aim-ahead.json", Path(directory) / "aim-ahead"
+                TEST_DIR / "fixtures/aim-ahead.json",
+                Path(directory) / "aim-ahead",
+                self.verified_heads,
             )
         self.assertNotEqual(bdc["migrationRoot"], aim["migrationRoot"])
         self.assertNotEqual(bdc["httpdTemplate"], aim["httpdTemplate"])
         self.assertNotEqual(bdc["renderedHttpdSha256"], aim["renderedHttpdSha256"])
         self.assertEqual(bdc["sharedBackendCommit"], aim["sharedBackendCommit"])
         self.assertEqual(bdc["sharedFrontendCommit"], aim["sharedFrontendCommit"])
+        self.assertEqual(self.verified_heads["backend"], bdc["sharedBackendCommit"])
+        self.assertEqual(self.verified_heads["frontend"], bdc["sharedFrontendCommit"])
 
     def test_fixture_filename_binds_the_canonical_tenant_identity_and_paths(self):
-        runner = load_runner()
+        runner = self.runner
         fixture = json.loads((TEST_DIR / "fixtures/bdc.json").read_text(encoding="utf-8"))
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -124,7 +136,11 @@ class BannerLocalIntegrationContractTest(unittest.TestCase):
                     changed[field] = value
                     fixture_path.write_text(json.dumps(changed), encoding="utf-8")
                     with self.assertRaises(runner.ProofError):
-                        runner.validate_fixture(fixture_path, root / f"rendered-{field}")
+                        runner.validate_fixture(
+                            fixture_path,
+                            root / f"rendered-{field}",
+                            self.verified_heads,
+                        )
 
     def test_matrix_is_closed_and_does_not_claim_docker_or_private_aim(self):
         matrix = json.loads((TEST_DIR / "expected-matrix.json").read_text(encoding="utf-8"))
@@ -132,6 +148,9 @@ class BannerLocalIntegrationContractTest(unittest.TestCase):
         for row in matrix["rows"]:
             self.assertEqual("NOT_RUN", row["localIntegration"])
             self.assertEqual("NOT_RUN", row["dockerRuntime"])
+        self.assertIn("flyway:11.7.2", matrix["rows"][0]["flywayImage"])
+        self.assertIn("flyway:10.8", matrix["rows"][1]["flywayImage"])
+        self.assertEqual(matrix["rows"][1]["flywayImage"], matrix["rows"][2]["flywayImage"])
         aim = matrix["rows"][2]
         self.assertEqual("SYNTHETIC_LOCAL_ATTESTATION_ONLY", aim["releaseControlCommit"])
         self.assertEqual("NOT_RUN_MANUAL", aim["liveOperatorAttestation"])
@@ -140,9 +159,13 @@ class BannerLocalIntegrationContractTest(unittest.TestCase):
         self.assertTrue(
             all(item["status"] == "NOT_RUN_ENOSPC" for item in matrix["dockerOwnerEntrypoints"])
         )
+        self.assertEqual(
+            "715857456594814957d9abc26ad14efbccb65e11",
+            matrix["ownerCommits"]["aioReleaseWorkflow"],
+        )
 
     def test_matrix_provenance_rows_and_owner_commands_are_bound_to_verified_facts(self):
-        runner = load_runner()
+        runner = self.runner
         matrix = json.loads((TEST_DIR / "expected-matrix.json").read_text(encoding="utf-8"))
         mutations = (
             ("shared commit", ("sharedSourceCommits", "backend"), "f" * 40),
@@ -163,12 +186,9 @@ class BannerLocalIntegrationContractTest(unittest.TestCase):
                     runner.validate_expected_matrix(changed)
 
     def test_results_validate_without_promoting_runtime_checks(self):
-        runner = load_runner()
-        aio_root = os.environ.get("BANNER_LOCAL_AIO_ROOT")
-        if not aio_root:
-            self.skipTest("BANNER_LOCAL_AIO_ROOT is required for the authoritative validator")
-        contract = runner.verify_contract_snapshot(Path(aio_root))
-        validator = runner.load_ticket22a_validator(Path(aio_root))
+        runner = self.runner
+        contract = runner.verify_contract_snapshot(self.roots["aio"])
+        validator = runner.load_ticket22a_validator(self.roots["aio"])
         for deployment in ("AIO", "BDC", "AIM_AHEAD"):
             row = runner.result_row(deployment, runner.REQUIRED_BASE, {"synthetic": True}, False)
             validator(contract, row)
@@ -181,8 +201,38 @@ class BannerLocalIntegrationContractTest(unittest.TestCase):
                 row["checks"]["publishedBrowserRender"],
             })
 
+    def test_result_rows_use_the_deployment_specific_flyway_image(self):
+        runner = self.runner
+        aio = runner.result_row("AIO", runner.REQUIRED_BASE, {"synthetic": True}, False)
+        bdc = runner.result_row("BDC", runner.REQUIRED_BASE, {"synthetic": True}, False)
+        aim = runner.result_row("AIM_AHEAD", runner.REQUIRED_BASE, {"synthetic": True}, False)
+
+        self.assertEqual(
+            "flyway/flyway:11.7.2@sha256:8ace7d9825bb3ad1d6e14ee27b3a830b638ac841ba424b99b2d92aa65a99d484",
+            aio["images"]["flyway"],
+        )
+        self.assertEqual(
+            "flyway/flyway:10.8@sha256:2f39377b52cdf1c70ffe9c1437aabed4e70fb716bb41323b03ee09ce17aaf292",
+            bdc["images"]["flyway"],
+        )
+        self.assertEqual(bdc["images"]["flyway"], aim["images"]["flyway"])
+
+    def test_cleanup_pass_requires_the_temporary_root_to_be_gone(self):
+        runner = self.runner
+        rows = [runner.result_row("BDC", runner.REQUIRED_BASE, {"synthetic": True}, False)]
+        self.assertEqual("NOT_RUN", rows[0]["checks"]["cleanup"])
+
+        with tempfile.TemporaryDirectory() as directory:
+            runtime = Path(directory)
+            with self.assertRaises(runner.ProofError):
+                runner.complete_temporary_cleanup(rows, runtime)
+            self.assertEqual("NOT_RUN", rows[0]["checks"]["cleanup"])
+
+        runner.complete_temporary_cleanup(rows, runtime)
+        self.assertEqual("PASS", rows[0]["checks"]["cleanup"])
+
     def test_failure_diagnostics_are_run_scoped_and_allowlisted(self):
-        runner = load_runner()
+        runner = self.runner
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             runtime = root / "runtime"
@@ -196,7 +246,7 @@ class BannerLocalIntegrationContractTest(unittest.TestCase):
             self.assertFalse((diagnostics / "secret.env").exists())
 
     def test_failures_at_the_same_commit_use_distinct_diagnostics_directories(self):
-        runner = load_runner()
+        runner = self.runner
         with tempfile.TemporaryDirectory() as directory:
             parent = Path(directory)
             path_for = getattr(

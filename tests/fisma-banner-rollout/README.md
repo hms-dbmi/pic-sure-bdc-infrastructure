@@ -18,7 +18,16 @@ Do not copy BDC release control into the AIM-AHEAD boundary. Start with `aim-ahe
 
    Stop if `merge-base` returns nonzero. Pin the exact reviewed commit, not `FETCH_HEAD`, in the private release input.
 
-   The executable infrastructure dependency is `d10cecdeb89f14f8c672a81347ffa70d9b001ab3`. It contains the banner bootstrap and immutable-artifact work plus the Operations logging transport wiring. The public release-input metadata pins that executable commit and Jenkins `6e72d8daefa5e4a902d5250162f56e7e1bbdb40c`; it never pins its own later metadata commit.
+   The executable infrastructure dependency is
+   `d10cecdeb89f14f8c672a81347ffa70d9b001ab3`. It contains the banner bootstrap
+   and immutable-artifact work plus the Operations logging transport wiring.
+   Ticket 22B metadata is the exact clean executing infrastructure proof HEAD;
+   it is not the executable dependency. The public release-input bytes have
+   SHA-256 `95f8e6efb029d37b563128137042728714010487de702bcbba2516310bfde29e`
+   and pin executable infrastructure
+   `d10cecdeb89f14f8c672a81347ffa70d9b001ab3` plus Jenkins
+   `eba112dc4d19b18b17be76c9e3de99540185fbb9`; they never pin the later
+   metadata commit.
 
 2. Pin every value from `aim-ahead-required-release-input.json` in the private release control. Keep the private repository URL, ref, and resolved commit inside the boundary.
 
@@ -32,7 +41,7 @@ Do not copy BDC release control into the AIM-AHEAD boundary. Start with `aim-ahe
      --operation FORWARD \
      --build-spec /operator/path/private-release-control/build-spec.json \
      --attestation /operator/path/aim-ahead-operator-attestation.json \
-     --jenkins-source-commit 6e72d8daefa5e4a902d5250162f56e7e1bbdb40c \
+     --jenkins-source-commit eba112dc4d19b18b17be76c9e3de99540185fbb9 \
      --release-control-commit __ACTUAL_CHECKED_OUT_PRIVATE_RELEASE_CONTROL_COMMIT__ \
      --controller-deployment aim-ahead \
      --artifact-bucket __CONTROLLER_BOUND_STACK_BUCKET__ \
@@ -64,7 +73,7 @@ Use a fresh copy of `rollback-operator-attestation.json` for the affected deploy
    ```bash
    python3 jenkins-docker/scripts/validate-banner-rollout.py \
      --rollback-attestation /operator/path/rollback-operator-attestation.json \
-     --jenkins-source-commit 6e72d8daefa5e4a902d5250162f56e7e1bbdb40c \
+     --jenkins-source-commit eba112dc4d19b18b17be76c9e3de99540185fbb9 \
      --controller-deployment __bdc_OR_aim-ahead__ \
      --target-stack __TARGET_STACK__ \
      --required-rollback-stage __CURRENT_STAGE__

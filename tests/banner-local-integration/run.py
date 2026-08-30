@@ -18,34 +18,42 @@ TEST_DIR = Path(__file__).resolve().parent
 BACKEND_COMMIT = "0178bbd2d1753e07dcead77a6d0e8ca37bf76dd8"
 FRONTEND_COMMIT = "7b69aa960ff98f97c1a2d026b7137b0e3dcdf603"
 MIGRATIONS_COMMIT = "05b1a77512dc0921570f0d442853fdcee75b8131"
-JENKINS_COMMIT = "6e72d8daefa5e4a902d5250162f56e7e1bbdb40c"
-BDC_RELEASE_CONTROL_COMMIT = "2b74944b87d445e470c5d655c5ed52fff09250aa"
-AIO_COMMIT = "715857456594814957d9abc26ad14efbccb65e11"
+JENKINS_COMMIT = "eba112dc4d19b18b17be76c9e3de99540185fbb9"
+BDC_RELEASE_CONTROL_COMMIT = "ba3855503801b2d514aa6e18a884e0a8ee2fea16"
+AIO_COMMIT = "52adb20a8160a2c956b9dd7fc642a30cd1a79ac9"
+AIO_RELEASE_WORKFLOW_COMMIT = "715857456594814957d9abc26ad14efbccb65e11"
 AIO_RELEASE_CONTROL_COMMIT = "bfb07196be55f7f121dc250f7aa51d826642ff86"
 REQUIRED_BASE = "cc1920a76fb6aeb9266fb4cffe98e946c2d983e4"
 ROLLOUT_SHA256 = "f8cb265d735b757872391e04fdcd5b999b785eaa427ca13f8f2eefd493715359"
-BDC_TUPLE = "9e5bdf8be795bc389b829c7b6e05f9f834a9f64d41010f497190cb2907f04a1c"
-AIM_TUPLE = "a6ad74af85db178b9e8c02020a2cd048e72582a0be790376b281531549d53f3d"
-AIM_INPUT_SHA256 = "1e17e4e66fe7c645e3115d60b08b659035813ae9d721a214463d6388bfdbaf5d"
+BDC_TUPLE = "b03fa63ff219777c84b5c0a32d2df32f9f5f91e03e150efc024f6d70e7ffbd2f"
+AIM_TUPLE = "043c7d16470cb9a433b9c049c1c4dabdb83b4f6349499c2be233a4ec3ad5ac8b"
+AIM_INPUT_SHA256 = "95f8e6efb029d37b563128137042728714010487de702bcbba2516310bfde29e"
 SYNTHETIC_LOGGING_KEY = "t22b-synthetic-shared-logging-key"
 SYNTHETIC_PRIVATE_RELEASE_COMMIT = "a" * 40
 NOT_RUN_UUID = "00000000-0000-4000-8000-000000000000"
 ZERO_SHA256 = "0" * 64
-IMAGES = {
+FISMA_IMAGES = {
     "mysql": "mysql:8.0.43@sha256:ccf4fed7ff4b886aeb3573a1f5d5b509525ecff55a2d1e2653c27a5abdded309",
     "flyway": "flyway/flyway:10.8@sha256:2f39377b52cdf1c70ffe9c1437aabed4e70fb716bb41323b03ee09ce17aaf292",
     "javaBuild": "maven:3-amazoncorretto-25@sha256:de7a3e517efac1b933af6ceb375974a061ba71c908ea51a18bd937716a8ade93",
     "javaRuntime": "amazoncorretto:25@sha256:397edfaaa0fdfc95001d4c4a4ab82174073277a5d630fd9375c94dca25b5991d",
     "playwright": "mcr.microsoft.com/playwright:v1.60.0-noble@sha256:9bd26ad900bb5e0f4dee75839e957a89ae89c2b7ab1e76050e559790e946b948",
 }
+AIO_IMAGES = {
+    **FISMA_IMAGES,
+    "flyway": "flyway/flyway:11.7.2@sha256:8ace7d9825bb3ad1d6e14ee27b3a830b638ac841ba424b99b2d92aa65a99d484",
+}
 ROOT_ENVIRONMENTS = {
-    "aio": "BANNER_LOCAL_AIO_ROOT",
-    "aio_release_control": "BANNER_LOCAL_AIO_RELEASE_CONTROL_ROOT",
-    "backend": "BANNER_LOCAL_BACKEND_ROOT",
-    "frontend": "BANNER_LOCAL_FRONTEND_ROOT",
-    "migrations": "BANNER_LOCAL_MIGRATIONS_ROOT",
-    "jenkins": "BANNER_LOCAL_JENKINS_ROOT",
-    "bdc_release_control": "BANNER_LOCAL_BDC_RELEASE_CONTROL_ROOT",
+    "aio": ("BANNER_LOCAL_AIO_ROOT", "AIO proof"),
+    "aio_release_control": ("BANNER_LOCAL_AIO_RELEASE_CONTROL_ROOT", "AIO release control"),
+    "backend": ("BANNER_LOCAL_BACKEND_ROOT", "shared backend"),
+    "frontend": ("BANNER_LOCAL_FRONTEND_ROOT", "shared frontend"),
+    "migrations": ("BANNER_LOCAL_MIGRATIONS_ROOT", "AIO migration parity"),
+    "jenkins": ("BANNER_LOCAL_JENKINS_ROOT", "Jenkins deployment workflow"),
+    "bdc_release_control": (
+        "BANNER_LOCAL_BDC_RELEASE_CONTROL_ROOT",
+        "BDC release control",
+    ),
 }
 FIXTURE_CONTRACTS = {
     "bdc.json": {
@@ -132,7 +140,7 @@ def require_repository(root, expected_commit, label, require_clean=True):
     if require_clean:
         status = git_output(root, "status", "--porcelain=v1", "--untracked-files=all")
         require(not status, f"{label} source is dirty:\n{status}")
-    return root
+    return actual
 
 
 def require_executing_repository(require_clean=True):
@@ -149,9 +157,23 @@ def require_executing_repository(require_clean=True):
     return head
 
 
+def local_checkout(source, destination, commit):
+    command(
+        ["git", "clone", "--quiet", "--local", "--no-hardlinks", "--no-checkout", source, destination],
+        cwd=destination.parent,
+        timeout=300,
+    )
+    command(
+        ["git", "-C", destination, "-c", "advice.detachedHead=false", "checkout", "--quiet", "--detach", commit],
+        cwd=destination.parent,
+        timeout=60,
+    )
+    require_repository(destination, commit, "reviewed AIO release workflow")
+
+
 def configured_roots(require_all=True):
     roots = {}
-    for name, variable in ROOT_ENVIRONMENTS.items():
+    for name, (variable, _label) in ROOT_ENVIRONMENTS.items():
         value = os.environ.get(variable)
         if require_all:
             require(value, f"{variable} must identify the exact clean owner root")
@@ -170,8 +192,11 @@ def verify_roots(roots):
         "jenkins": JENKINS_COMMIT,
         "bdc_release_control": BDC_RELEASE_CONTROL_COMMIT,
     }
+    verified = {}
     for name, commit in expected.items():
-        require_repository(roots[name], commit, name.replace("_", " "))
+        _variable, label = ROOT_ENVIRONMENTS[name]
+        verified[name] = require_repository(roots[name], commit, label)
+    return verified
 
 
 def render_terraform_template(path, values):
@@ -206,7 +231,7 @@ def migration_maximum(root):
     return max(versions)
 
 
-def validate_fixture(fixture_path, output_root):
+def validate_fixture(fixture_path, output_root, verified_heads):
     fixture_path = Path(fixture_path)
     fixture = json.loads(fixture_path.read_text(encoding="utf-8"))
     require(fixture_path.name in FIXTURE_CONTRACTS, f"unknown deployment fixture: {fixture_path.name}")
@@ -289,8 +314,8 @@ def validate_fixture(fixture_path, output_root):
         "renderedGatewaySha256": sha256_bytes(gateway.encode()),
         "renderedOperationsSha256": sha256_bytes(operations.encode()),
         "renderedHttpdSha256": sha256_bytes(httpd.encode()),
-        "sharedBackendCommit": BACKEND_COMMIT,
-        "sharedFrontendCommit": FRONTEND_COMMIT,
+        "sharedBackendCommit": verified_heads["backend"],
+        "sharedFrontendCommit": verified_heads["frontend"],
     }
 
 
@@ -354,6 +379,7 @@ def expected_matrix_contract():
             "jenkins": JENKINS_COMMIT,
             "bdcReleaseControl": BDC_RELEASE_CONTROL_COMMIT,
             "aioDeployment": AIO_COMMIT,
+            "aioReleaseWorkflow": AIO_RELEASE_WORKFLOW_COMMIT,
             "aioReleaseControl": AIO_RELEASE_CONTROL_COMMIT,
         },
         "rolloutTuples": {"BDC": BDC_TUPLE, "AIM_AHEAD": AIM_TUPLE},
@@ -388,6 +414,7 @@ def expected_matrix_contract():
             {
                 "deployment": "AIO",
                 "fixture": "Ticket 22A exact local source",
+                "flywayImage": AIO_IMAGES["flyway"],
                 "releaseControlCommit": AIO_RELEASE_CONTROL_COMMIT,
                 "localIntegration": "NOT_RUN",
                 "dockerRuntime": "NOT_RUN",
@@ -396,6 +423,7 @@ def expected_matrix_contract():
             {
                 "deployment": "BDC",
                 "fixture": "fixtures/bdc.json",
+                "flywayImage": FISMA_IMAGES["flyway"],
                 "releaseControlCommit": BDC_RELEASE_CONTROL_COMMIT,
                 "localIntegration": "NOT_RUN",
                 "dockerRuntime": "NOT_RUN",
@@ -404,6 +432,7 @@ def expected_matrix_contract():
             {
                 "deployment": "AIM_AHEAD",
                 "fixture": "fixtures/aim-ahead.json",
+                "flywayImage": FISMA_IMAGES["flyway"],
                 "releaseControlCommit": "SYNTHETIC_LOCAL_ATTESTATION_ONLY",
                 "localIntegration": "NOT_RUN",
                 "dockerRuntime": "NOT_RUN",
@@ -429,7 +458,7 @@ def validate_expected_matrix(matrix):
     require(matrix == expected_matrix_contract(), "expected matrix does not match verified proof facts")
 
 
-def owner_commands(roots):
+def owner_commands(roots, aio_release_workflow_root):
     python = sys.executable
     java_home = os.environ.get(
         "BANNER_LOCAL_JAVA_HOME",
@@ -459,8 +488,8 @@ def owner_commands(roots):
         ("ticket22a-contract", ["bash", "tests/banner-local-integration/test.sh", "contract"], roots["aio"], base),
         ("ticket20-aio-rollout", [python, "tests/banner-rollout/test_contract.py"], roots["aio"], base),
         ("ticket20-aio-rollout-opt", [python, "tests/banner-rollout/test_contract.py"], roots["aio"], {**base, "PYTHONOPTIMIZE": "1"}),
-        ("ticket20-release-control", [python, "tests/test_build_spec.py"], roots["aio_release_control"], {**base, "AIO_PIN_VALIDATION_ROOT": str(roots["aio"])}),
-        ("ticket20-release-control-opt", [python, "tests/test_build_spec.py"], roots["aio_release_control"], {**base, "PYTHONOPTIMIZE": "1", "AIO_PIN_VALIDATION_ROOT": str(roots["aio"])}),
+        ("ticket20-release-control", [python, "tests/test_build_spec.py"], roots["aio_release_control"], {**base, "AIO_PIN_VALIDATION_ROOT": str(aio_release_workflow_root)}),
+        ("ticket20-release-control-opt", [python, "tests/test_build_spec.py"], roots["aio_release_control"], {**base, "PYTHONOPTIMIZE": "1", "AIO_PIN_VALIDATION_ROOT": str(aio_release_workflow_root)}),
         ("ticket17-binary-contract", [python, "-m", "unittest", "discover", "-v", "-s", "tests/operations-binary-compatibility", "-p", "test_*.py"], roots["backend"], base),
         ("ticket17-binary-contract-opt", [python, "-m", "unittest", "discover", "-v", "-s", "tests/operations-binary-compatibility", "-p", "test_*.py"], roots["backend"], {**base, "PYTHONOPTIMIZE": "1"}),
         ("ticket18-feed-contract", [python, "-m", "unittest", "discover", "-v", "-s", "tests/banner-feed-compatibility", "-p", "test_*.py"], roots["backend"], base),
@@ -505,7 +534,7 @@ def result_row(deployment, executing_head, fixture, owner_passed):
         "auditReceipt": "NOT_RUN",
         "publishedAnonymousV2Feed": "NOT_RUN",
         "publishedBrowserRender": "NOT_RUN",
-        "cleanup": "PASS",
+        "cleanup": "NOT_RUN",
     }
     extension = {
         "proofMode": "NON_DOCKER_ENOSPC",
@@ -527,7 +556,7 @@ def result_row(deployment, executing_head, fixture, owner_passed):
         "deployment": deployment,
         "status": "NOT_RUN",
         "sourceCommits": source_commits,
-        "images": IMAGES,
+        "images": AIO_IMAGES if deployment == "AIO" else FISMA_IMAGES,
         "rolloutContractSha256": ROLLOUT_SHA256,
         "checks": checks,
         "observations": {
@@ -587,9 +616,59 @@ def failure_diagnostics_path(diagnostics_parent, executing_head, run_token=None)
     return Path(diagnostics_parent) / f"{executing_head[:12]}-{token}-failure"
 
 
+def complete_temporary_cleanup(results, runtime_root):
+    require(not Path(runtime_root).exists(), "temporary proof root still exists after cleanup")
+    require(
+        all(result["checks"]["cleanup"] == "NOT_RUN" for result in results),
+        "cleanup state was promoted early",
+    )
+    for result in results:
+        result["checks"]["cleanup"] = "PASS"
+
+
+def collect_temporary_evidence(runtime, roots, verified_heads, run_owners):
+    fixtures = {
+        "BDC": validate_fixture(
+            TEST_DIR / "fixtures/bdc.json", runtime / "rendered", verified_heads
+        ),
+        "AIM_AHEAD": validate_fixture(
+            TEST_DIR / "fixtures/aim-ahead.json", runtime / "rendered", verified_heads
+        ),
+    }
+    require(
+        fixtures["BDC"]["sharedBackendCommit"]
+        == fixtures["AIM_AHEAD"]["sharedBackendCommit"],
+        "deployment fixtures use different backend trees",
+    )
+    require(
+        fixtures["BDC"]["sharedFrontendCommit"]
+        == fixtures["AIM_AHEAD"]["sharedFrontendCommit"],
+        "deployment fixtures use different frontend trees",
+    )
+
+    owner_passed = False
+    if run_owners:
+        logs = runtime / "owner-logs"
+        logs.mkdir()
+        aio_release_workflow_root = runtime / "reviewed-aio-release-workflow"
+        local_checkout(
+            roots["aio"], aio_release_workflow_root, AIO_RELEASE_WORKFLOW_COMMIT
+        )
+        for name, arguments, cwd, env in owner_commands(roots, aio_release_workflow_root):
+            print(f"Ticket 22B owner: {name}", flush=True)
+            command(arguments, cwd=cwd, env=env, timeout=3600, log_path=logs / f"{name}.log")
+        require(
+            verify_roots(roots) == verified_heads,
+            "verified owner roots changed during composition",
+        )
+        require_executing_repository(require_clean=True)
+        owner_passed = True
+    return fixtures, owner_passed
+
+
 def run_proof(run_owners, diagnostics_run_token=None):
     roots = configured_roots(require_all=True)
-    verify_roots(roots)
+    verified_heads = verify_roots(roots)
     executing_head = require_executing_repository(require_clean=True)
     contract = verify_contract_snapshot(roots["aio"])
     verify_rollout_inputs(roots)
@@ -600,53 +679,39 @@ def run_proof(run_owners, diagnostics_run_token=None):
         os.environ.get("BANNER_LOCAL_DIAGNOSTICS_ROOT", "/tmp/banner-local-integration-diagnostics")
     ).resolve()
     temp_parent = Path(os.environ.get("TMPDIR", "/tmp")).resolve()
-    with tempfile.TemporaryDirectory(prefix="banner-local-nondocker-", dir=temp_parent) as directory:
+    with tempfile.TemporaryDirectory(
+        prefix="banner-local-nondocker-", dir=temp_parent
+    ) as directory:
         runtime = Path(directory)
-        fixtures = {
-            "BDC": validate_fixture(TEST_DIR / "fixtures/bdc.json", runtime / "rendered"),
-            "AIM_AHEAD": validate_fixture(TEST_DIR / "fixtures/aim-ahead.json", runtime / "rendered"),
-        }
-        require(fixtures["BDC"]["sharedBackendCommit"] == fixtures["AIM_AHEAD"]["sharedBackendCommit"],
-                "deployment fixtures use different backend trees")
-        require(fixtures["BDC"]["sharedFrontendCommit"] == fixtures["AIM_AHEAD"]["sharedFrontendCommit"],
-                "deployment fixtures use different frontend trees")
-
-        owner_passed = False
         try:
-            if run_owners:
-                logs = runtime / "owner-logs"
-                logs.mkdir()
-                for name, arguments, cwd, env in owner_commands(roots):
-                    print(f"Ticket 22B owner: {name}", flush=True)
-                    command(arguments, cwd=cwd, env=env, timeout=3600, log_path=logs / f"{name}.log")
-                verify_roots(roots)
-                require_executing_repository(require_clean=True)
-                owner_passed = True
-            results = [
-                result_row("AIO", executing_head, {"sourceCommit": AIO_COMMIT}, owner_passed),
-                result_row("BDC", executing_head, fixtures["BDC"], owner_passed),
-                result_row("AIM_AHEAD", executing_head, fixtures["AIM_AHEAD"], owner_passed),
-            ]
-            validator = load_ticket22a_validator(roots["aio"])
-            for result in results:
-                validator(contract, result)
-            observed = {
-                "schemaVersion": 1,
-                "executingCommit": executing_head,
-                "ownerChecks": "PASS" if owner_passed else "NOT_RUN",
-                "dockerCapacity": "ENOSPC_CONFIRMED_NOT_RETESTED",
-                "results": results,
-                "manualLimitations": expected["limitations"],
-            }
-            output = runtime / "observed-matrix.json"
-            output.write_text(json.dumps(observed, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-            print(output.read_text(encoding="utf-8"), end="")
+            fixtures, owner_passed = collect_temporary_evidence(
+                runtime, roots, verified_heads, run_owners
+            )
         except Exception:
             preserve_diagnostics(
                 runtime,
                 failure_diagnostics_path(diagnostics_parent, executing_head, diagnostics_run_token),
             )
             raise
+
+    results = [
+        result_row("AIO", executing_head, {"sourceCommit": AIO_COMMIT}, owner_passed),
+        result_row("BDC", executing_head, fixtures["BDC"], owner_passed),
+        result_row("AIM_AHEAD", executing_head, fixtures["AIM_AHEAD"], owner_passed),
+    ]
+    complete_temporary_cleanup(results, runtime)
+    validator = load_ticket22a_validator(roots["aio"])
+    for result in results:
+        validator(contract, result)
+    observed = {
+        "schemaVersion": 1,
+        "executingCommit": executing_head,
+        "ownerChecks": "PASS" if owner_passed else "NOT_RUN",
+        "dockerCapacity": "ENOSPC_CONFIRMED_NOT_RETESTED",
+        "results": results,
+        "manualLimitations": expected["limitations"],
+    }
+    print(json.dumps(observed, indent=2, sort_keys=True) + "\n", end="")
 
 
 def main():

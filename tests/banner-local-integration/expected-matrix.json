@@ -7,16 +7,17 @@
     "migrationParity": "05b1a77512dc0921570f0d442853fdcee75b8131"
   },
   "ownerCommits": {
-    "jenkins": "6e72d8daefa5e4a902d5250162f56e7e1bbdb40c",
-    "bdcReleaseControl": "2b74944b87d445e470c5d655c5ed52fff09250aa",
-    "aioDeployment": "715857456594814957d9abc26ad14efbccb65e11",
+    "jenkins": "eba112dc4d19b18b17be76c9e3de99540185fbb9",
+    "bdcReleaseControl": "ba3855503801b2d514aa6e18a884e0a8ee2fea16",
+    "aioDeployment": "52adb20a8160a2c956b9dd7fc642a30cd1a79ac9",
+    "aioReleaseWorkflow": "715857456594814957d9abc26ad14efbccb65e11",
     "aioReleaseControl": "bfb07196be55f7f121dc250f7aa51d826642ff86"
   },
   "rolloutTuples": {
-    "BDC": "9e5bdf8be795bc389b829c7b6e05f9f834a9f64d41010f497190cb2907f04a1c",
-    "AIM_AHEAD": "a6ad74af85db178b9e8c02020a2cd048e72582a0be790376b281531549d53f3d"
+    "BDC": "b03fa63ff219777c84b5c0a32d2df32f9f5f91e03e150efc024f6d70e7ffbd2f",
+    "AIM_AHEAD": "043c7d16470cb9a433b9c049c1c4dabdb83b4f6349499c2be233a4ec3ad5ac8b"
   },
-  "aimRequiredInputSha256": "1e17e4e66fe7c645e3115d60b08b659035813ae9d721a214463d6388bfdbaf5d",
+  "aimRequiredInputSha256": "95f8e6efb029d37b563128137042728714010487de702bcbba2516310bfde29e",
   "dockerOwnerEntrypoints": [
     {
       "ticket": 16,
@@ -47,6 +48,7 @@
     {
       "deployment": "AIO",
       "fixture": "Ticket 22A exact local source",
+      "flywayImage": "flyway/flyway:11.7.2@sha256:8ace7d9825bb3ad1d6e14ee27b3a830b638ac841ba424b99b2d92aa65a99d484",
       "releaseControlCommit": "bfb07196be55f7f121dc250f7aa51d826642ff86",
       "localIntegration": "NOT_RUN",
       "dockerRuntime": "NOT_RUN",
@@ -55,7 +57,8 @@
     {
       "deployment": "BDC",
       "fixture": "fixtures/bdc.json",
-      "releaseControlCommit": "2b74944b87d445e470c5d655c5ed52fff09250aa",
+      "flywayImage": "flyway/flyway:10.8@sha256:2f39377b52cdf1c70ffe9c1437aabed4e70fb716bb41323b03ee09ce17aaf292",
+      "releaseControlCommit": "ba3855503801b2d514aa6e18a884e0a8ee2fea16",
       "localIntegration": "NOT_RUN",
       "dockerRuntime": "NOT_RUN",
       "liveOperatorAttestation": "NOT_RUN"
@@ -63,6 +66,7 @@
     {
       "deployment": "AIM_AHEAD",
       "fixture": "fixtures/aim-ahead.json",
+      "flywayImage": "flyway/flyway:10.8@sha256:2f39377b52cdf1c70ffe9c1437aabed4e70fb716bb41323b03ee09ce17aaf292",
       "releaseControlCommit": "SYNTHETIC_LOCAL_ATTESTATION_ONLY",
       "localIntegration": "NOT_RUN",
       "dockerRuntime": "NOT_RUN",
