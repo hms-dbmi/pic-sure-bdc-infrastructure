@@ -6,6 +6,11 @@
     "ref": "synthetic-reviewed-ref",
     "resolvedCommit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
   },
+  "releaseInput": {
+    "buildSpecSha256": "cfd84a2cdc74c279b87ef93e1a569ec78e19ddf9ad7147e16accabccf59e4c41",
+    "tupleSha256": "703cd6efb9c68171995bd16536e9107a503ba4a5dc0746b08411908186b761ec",
+    "jenkinsSourceCommit": "c9b7273f0b8b31d5e8585a47fba02c9425104af1"
+  },
   "checks": {
     "privateReleaseControlPinsRequiredTuple": true,
     "publicInfrastructureRefContainsRequiredCommit": true,
@@ -14,5 +19,5 @@
     "forwardSchemaRetainedAndDownMigrationsForbidden": true
   },
   "operator": "synthetic-operator",
-  "attestedAtUtc": "2026-08-29T00:00:00Z"
+  "attestedAtUtc": "__TEST_SUPPLIES_FRESH_TIMESTAMP__"
 }

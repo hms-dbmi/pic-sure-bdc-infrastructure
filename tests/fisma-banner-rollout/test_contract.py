@@ -5,11 +5,14 @@ import os
 import subprocess
 import tempfile
 import unittest
+from contextlib import contextmanager
+from datetime import datetime, timezone
 from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[2]
 TEST_DIR = Path(__file__).resolve().parent
+FIXTURE_DIR = TEST_DIR / "fixtures"
 JENKINS_ROOT = Path(os.environ["JENKINS_ROOT"])
 VALIDATOR = JENKINS_ROOT / "jenkins-docker/scripts/validate-banner-rollout.py"
 JENKINS_COMMIT = subprocess.run(
@@ -32,10 +35,38 @@ def expected_tuple(deployment: str) -> str:
     return hashlib.sha256(json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
 
 
+def fresh_timestamp() -> str:
+    return datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+
+
+@contextmanager
+def fresh_aim_attestation():
+    attestation = json.loads(
+        (FIXTURE_DIR / "aim-ahead-completed-attestation.synthetic.json").read_text(encoding="utf-8")
+    )
+    attestation["attestedAtUtc"] = fresh_timestamp()
+    with tempfile.NamedTemporaryFile("w", suffix=".json") as handle:
+        json.dump(attestation, handle)
+        handle.flush()
+        yield Path(handle.name)
+
+
+def bind_rollback(attestation: dict, deployment: str) -> None:
+    attestation["deployment"] = deployment
+    attestation["controllerDeployment"] = deployment
+    attestation["targetStack"] = "staging"
+    attestation["artifactPrefix"] = "staging/banner-rollout/synthetic-old-run/containers"
+    attestation["artifacts"] = {"frontendCommit": "1" * 40, "backendCommit": "2" * 40}
+    attestation["tupleSha256"] = expected_tuple(deployment)
+    attestation["operator"] = "synthetic-operator"
+    attestation["attestedAtUtc"] = fresh_timestamp()
+
+
 class PublicAimInputTest(unittest.TestCase):
     def test_aim_input_validates_as_its_own_deployment(self):
-        result = subprocess.run(
-            [
+        with fresh_aim_attestation() as attestation:
+            result = subprocess.run(
+                [
                 "python3",
                 str(VALIDATOR),
                 "--deployment",
@@ -44,8 +75,12 @@ class PublicAimInputTest(unittest.TestCase):
                 str(TEST_DIR / "aim-ahead-required-release-input.json"),
                 "--jenkins-source-commit",
                 JENKINS_COMMIT,
+                "--release-control-commit",
+                "a" * 40,
+                "--controller-deployment",
+                "aim-ahead",
                 "--attestation",
-                str(TEST_DIR / "aim-ahead-completed-attestation.synthetic.json"),
+                str(attestation),
                 "--run-database-migrations",
                 "true",
                 "--include-api",
@@ -54,12 +89,12 @@ class PublicAimInputTest(unittest.TestCase):
                 "true",
                 "--include-frontend",
                 "true",
-            ],
-            text=True,
-            capture_output=True,
-            timeout=10,
-            check=False,
-        )
+                ],
+                text=True,
+                capture_output=True,
+                timeout=10,
+                check=False,
+            )
         self.assertEqual(0, result.returncode, result.stdout + result.stderr)
         self.assertEqual(
             expected_tuple("AIM-AHEAD"),
@@ -74,7 +109,14 @@ class PublicAimInputTest(unittest.TestCase):
             with self.subTest(option=option):
                 jenkins_source = []
                 if option == "--rollback-attestation":
-                    jenkins_source = ["--jenkins-source-commit", JENKINS_COMMIT]
+                    jenkins_source = [
+                        "--jenkins-source-commit",
+                        JENKINS_COMMIT,
+                        "--controller-deployment",
+                        "aim-ahead",
+                        "--target-stack",
+                        "staging",
+                    ]
                 result = subprocess.run(
                     ["python3", str(VALIDATOR), option, str(TEST_DIR / name), *jenkins_source],
                     text=True,
@@ -83,17 +125,56 @@ class PublicAimInputTest(unittest.TestCase):
                     check=False,
                 )
                 self.assertEqual(2, result.returncode, result.stdout + result.stderr)
-                self.assertIn("attestation is incomplete", result.stderr)
+                if option == "--attestation":
+                    self.assertIn("requires the exact --build-spec", result.stderr)
+                else:
+                    self.assertIn("attestation is incomplete", result.stderr)
 
-    def test_synthetic_completed_aim_attestation_passes(self):
-        result = subprocess.run(
-            ["python3", str(VALIDATOR), "--attestation", str(TEST_DIR / "aim-ahead-completed-attestation.synthetic.json")],
-            text=True,
-            capture_output=True,
-            timeout=10,
-            check=False,
-        )
+    def test_synthetic_completed_aim_attestation_passes_with_exact_input(self):
+        with fresh_aim_attestation() as attestation:
+            result = subprocess.run(
+                [
+                "python3",
+                str(VALIDATOR),
+                "--deployment",
+                "AIM-AHEAD",
+                "--build-spec",
+                str(TEST_DIR / "aim-ahead-required-release-input.json"),
+                "--attestation",
+                str(attestation),
+                "--release-control-commit",
+                "a" * 40,
+                "--controller-deployment",
+                "aim-ahead",
+                "--jenkins-source-commit",
+                JENKINS_COMMIT,
+                "--run-database-migrations",
+                "true",
+                "--include-api",
+                "true",
+                "--include-psama",
+                "true",
+                "--include-frontend",
+                "true",
+                ],
+                text=True,
+                capture_output=True,
+                timeout=10,
+                check=False,
+            )
         self.assertEqual(0, result.returncode, result.stdout + result.stderr)
+
+    def test_aim_attestation_fixture_binds_the_exact_release_input(self):
+        attestation = json.loads(
+            (FIXTURE_DIR / "aim-ahead-completed-attestation.synthetic.json").read_text(encoding="utf-8")
+        )
+        spec = TEST_DIR / "aim-ahead-required-release-input.json"
+        self.assertEqual("a" * 40, attestation["privateReleaseControl"]["resolvedCommit"])
+        self.assertEqual(sha256(spec), attestation["releaseInput"]["buildSpecSha256"])
+        self.assertEqual(expected_tuple("AIM-AHEAD"), attestation["releaseInput"]["tupleSha256"])
+        self.assertEqual(JENKINS_COMMIT, attestation["releaseInput"]["jenkinsSourceCommit"])
+        self.assertEqual("__TEST_SUPPLIES_FRESH_TIMESTAMP__", attestation["attestedAtUtc"])
+        self.assertFalse((TEST_DIR / "aim-ahead-completed-attestation.synthetic.json").exists())
 
     def test_bdc_and_aim_rollback_attestations_pass_separately(self):
         template = json.loads((TEST_DIR / "rollback-operator-attestation.json").read_text(encoding="utf-8"))
@@ -104,7 +185,7 @@ class PublicAimInputTest(unittest.TestCase):
         for deployment, tuple_sha in tuples.items():
             with self.subTest(deployment=deployment):
                 attestation = json.loads(json.dumps(template))
-                attestation["deployment"] = deployment
+                bind_rollback(attestation, deployment)
                 attestation["tupleSha256"] = tuple_sha
                 attestation["stage"] = "COMPLETE"
                 for phase in attestation["phases"]:
@@ -117,8 +198,6 @@ class PublicAimInputTest(unittest.TestCase):
                     "downMigrationRun": False,
                     "psamaRecreated": True,
                 }
-                attestation["operator"] = "synthetic-operator"
-                attestation["attestedAtUtc"] = "2026-08-29T00:00:00Z"
                 with tempfile.NamedTemporaryFile("w", suffix=".json") as handle:
                     json.dump(attestation, handle)
                     handle.flush()
@@ -130,6 +209,10 @@ class PublicAimInputTest(unittest.TestCase):
                             handle.name,
                             "--jenkins-source-commit",
                             JENKINS_COMMIT,
+                            "--controller-deployment",
+                            deployment.lower(),
+                            "--target-stack",
+                            "staging",
                         ],
                         text=True,
                         capture_output=True,
@@ -178,14 +261,11 @@ class PublicAimInputTest(unittest.TestCase):
         for stage, expected in cases.items():
             with self.subTest(stage=stage):
                 attestation = json.loads(json.dumps(template))
-                attestation["deployment"] = "BDC"
-                attestation["tupleSha256"] = expected_tuple("BDC")
+                bind_rollback(attestation, "BDC")
                 attestation["stage"] = stage
                 for phase, attested in zip(attestation["phases"], expected["attested"]):
                     phase["attested"] = attested
                 attestation["state"] = expected["state"]
-                attestation["operator"] = "synthetic-operator"
-                attestation["attestedAtUtc"] = "2026-08-29T00:00:00Z"
                 with tempfile.NamedTemporaryFile("w", suffix=".json") as handle:
                     json.dump(attestation, handle)
                     handle.flush()
@@ -197,6 +277,10 @@ class PublicAimInputTest(unittest.TestCase):
                             handle.name,
                             "--jenkins-source-commit",
                             JENKINS_COMMIT,
+                            "--controller-deployment",
+                            "bdc",
+                            "--target-stack",
+                            "staging",
                         ],
                         text=True,
                         capture_output=True,
@@ -215,7 +299,7 @@ class PublicAimInputTest(unittest.TestCase):
         ):
             with self.subTest(deployment=deployment, tuple_sha=tuple_sha, timestamp=timestamp, phase=phase):
                 attestation = json.loads(json.dumps(template))
-                attestation["deployment"] = deployment
+                bind_rollback(attestation, deployment)
                 attestation["tupleSha256"] = tuple_sha
                 attestation["stage"] = "COMPLETE"
                 for entry in attestation["phases"]:
@@ -243,6 +327,10 @@ class PublicAimInputTest(unittest.TestCase):
                             handle.name,
                             "--jenkins-source-commit",
                             JENKINS_COMMIT,
+                            "--controller-deployment",
+                            deployment.lower(),
+                            "--target-stack",
+                            "staging",
                         ],
                         text=True,
                         capture_output=True,
@@ -308,6 +396,74 @@ class ExistingDeploymentProofTest(unittest.TestCase):
         checklist = (TEST_DIR / "README.md").read_text(encoding="utf-8")
         self.assertIn("merge-base --is-ancestor", checklist)
         self.assertNotIn("resolved commit must be `5d2ba9", checklist)
+
+    def test_checklist_documents_supported_forward_and_executable_rollback_jobs(self):
+        checklist = (TEST_DIR / "README.md").read_text(encoding="utf-8")
+        self.assertIn("Check For Updates → Deployment Pipeline", checklist)
+        for job in (
+            "PIC-SURE Frontend Build",
+            "PIC-SURE Frontend Deploy",
+            "PIC-SURE Maven Build",
+            "PIC-SURE Operations Service Image",
+            "PIC-SURE Gateway Image",
+            "PIC-SURE HPDS Query Service Image",
+            "PIC-SURE Auth Micro App Image",
+            "PIC-SURE Wildfly Stack Deploy",
+            "PIC-SURE Auth Micro App Deploy",
+        ):
+            with self.subTest(job=job):
+                self.assertIn(job, checklist)
+        self.assertIn("--controller-deployment", checklist)
+        self.assertIn("--target-stack", checklist)
+
+    def test_banner_host_scripts_download_from_the_attested_artifact_prefix(self):
+        scripts = ROOT / "app-infrastructure/scripts/deploy"
+        for name in (
+            "deploy-operations.sh",
+            "deploy-query.sh",
+            "deploy-psama.sh",
+            "deploy-gateway.sh",
+            "deploy-httpd.sh",
+        ):
+            with self.subTest(script=name):
+                text = (scripts / name).read_text(encoding="utf-8")
+                self.assertIn("--artifact_prefix", text)
+                self.assertIn("artifact_prefix", text)
+        orchestrator = (scripts / "deploy-wildfly-stack.sh").read_text(encoding="utf-8")
+        self.assertGreaterEqual(orchestrator.count('--artifact_prefix "$artifact_prefix"'), 4)
+
+    def test_pinned_infrastructure_commit_contains_artifact_prefix_support(self):
+        spec = json.loads((TEST_DIR / "aim-ahead-required-release-input.json").read_text(encoding="utf-8"))
+        pinned = spec["banner_rollout"]["components"]["infrastructure"]["commit"]
+        self.assertEqual(pinned, spec["infrastructure_git_hash"])
+        for name in (
+            "deploy-wildfly-stack.sh",
+            "deploy-operations.sh",
+            "deploy-query.sh",
+            "deploy-psama.sh",
+            "deploy-gateway.sh",
+            "deploy-httpd.sh",
+        ):
+            with self.subTest(script=name):
+                result = subprocess.run(
+                    ["git", "show", f"{pinned}:app-infrastructure/scripts/deploy/{name}"],
+                    cwd=ROOT,
+                    text=True,
+                    capture_output=True,
+                    check=False,
+                )
+                self.assertEqual(0, result.returncode, result.stderr)
+                self.assertIn("--artifact_prefix", result.stdout)
+
+    def test_rollback_template_binds_controller_stack_and_artifacts(self):
+        template = json.loads((TEST_DIR / "rollback-operator-attestation.json").read_text(encoding="utf-8"))
+        self.assertIn("controllerDeployment", template)
+        self.assertIn("targetStack", template)
+        self.assertIn("artifactPrefix", template)
+        self.assertEqual(
+            {"frontendCommit", "backendCommit"},
+            set(template["artifacts"]),
+        )
 
 
 if __name__ == "__main__":

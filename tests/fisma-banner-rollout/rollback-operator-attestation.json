@@ -1,6 +1,13 @@
 {
   "schemaVersion": 1,
   "deployment": "__BDC_OR_AIM_AHEAD__",
+  "controllerDeployment": "__BDC_OR_AIM_AHEAD__",
+  "targetStack": "__TARGET_STACK__",
+  "artifactPrefix": "__TARGET_STACK__/banner-rollout/__EXACT_ROLLOUT_RUN__/containers",
+  "artifacts": {
+    "frontendCommit": "__EXACT_OLD_FRONTEND_40_CHARACTER_COMMIT__",
+    "backendCommit": "__EXACT_OLD_BACKEND_40_CHARACTER_COMMIT__"
+  },
   "tupleSha256": "__FORWARD_ROLLOUT_TUPLE_SHA256__",
   "stage": "__FRONTEND_ALLOWED_OR_BACKEND_ALLOWED_OR_PSAMA_ALLOWED_OR_COMPLETE__",
   "phases": [

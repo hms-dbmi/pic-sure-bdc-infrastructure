@@ -18,6 +18,8 @@ Do not copy BDC release control into the AIM-AHEAD boundary. Start with `aim-ahe
 
    Stop if `merge-base` returns nonzero. Pin the exact reviewed commit, not `FETCH_HEAD`, in the private release input.
 
+   The executable infrastructure dependency is `3a10a20ce261e3771cb4cd48bc4d72967f3c54d3`, a descendant of the reviewed base. That first commit adds host-side `--artifact_prefix` support. The following metadata commit pins both that executable commit and Jenkins `c9b7273f0b8b31d5e8585a47fba02c9425104af1`; the two-commit sequence avoids an impossible self-reference while keeping the deployed infrastructure input immutable.
+
 2. Pin every value from `aim-ahead-required-release-input.json` in the private release control. Keep the private repository URL, ref, and resolved commit inside the boundary.
 
 3. Copy `aim-ahead-operator-attestation.json` to the private release-control root as `banner-rollout-attestation.json`. Fill the private release-control source, operator, timestamp, and five boolean checks. Do not add the completed file or private values to this public repository. The Retrieve Build Spec job archives this exact filename, and the AIM forward validator rejects the build when it is absent or incomplete.
@@ -30,33 +32,37 @@ Do not copy BDC release control into the AIM-AHEAD boundary. Start with `aim-ahe
      --operation FORWARD \
      --build-spec /operator/path/private-release-control/build-spec.json \
      --attestation /operator/path/private-release-control/banner-rollout-attestation.json \
-     --jenkins-source-commit f643a289a5c93acef917cbeb62962d8c857c2217 \
+     --jenkins-source-commit c9b7273f0b8b31d5e8585a47fba02c9425104af1 \
+     --release-control-commit __ACTUAL_CHECKED_OUT_PRIVATE_RELEASE_CONTROL_COMMIT__ \
+     --controller-deployment aim-ahead \
      --run-database-migrations true \
      --include-api true \
      --include-psama true \
      --include-frontend true
    ```
 
-5. Run Check For Updates on the attested private release-control commit. It routes banner metadata to the combined pipeline with migrations, API, PSAMA, and frontend selected. The old build-before-migration path is used only when `banner_rollout` is absent. Do not use standalone Operations, Gateway, PSAMA, or frontend jobs for the forward release.
+5. Use the supported **Check For Updates → Deployment Pipeline → PIC-SURE Pipeline Build and Deploy** entrypoint on the attested private release-control commit. A manual run may start at Deployment Pipeline only when it supplies the same exact `deployment_git_hash`, three dataset keys, `STACK_S3_BUCKET`, `BANNER_ROLLOUT=true`, and `BANNER_ROLLOUT_OPERATION=FORWARD` inputs produced by Check For Updates. Deployment Pipeline validates before its backup and migration stages, retains the deployment-state lock, token and configuration rendering, stack rebuild, initialization, sensor check, and state write, then invokes the combined job with migrations attested as complete. Direct forward runs of the combined or leaf jobs fail closed.
 
 This local checklist does not inspect the private release control and does not attest a deployed state. The operator owns the completed attestation.
 
 ## Rollback
 
-Use a fresh copy of `rollback-operator-attestation.json` for the affected deployment and exact forward tuple. Validate and retain the record inside the deployment boundary before each manual rollback step. The template does not invent a write-freeze endpoint or perform a mutation.
+Use a fresh copy of `rollback-operator-attestation.json` for the affected deployment and exact forward tuple. Fill `controllerDeployment`, `targetStack`, a unique `<targetStack>/banner-rollout/<rollback-run>/containers` artifact prefix, and the exact old frontend and backend commits. Refresh `attestedAtUtc` before each stage; evidence older than 24 hours is rejected. Validate and retain the record inside the deployment boundary before each manual rollback step. The template does not invent a write-freeze endpoint or perform a mutation.
 
 1. Freeze ordinary banner management writes. The freeze must still allow the targeted-disable operation. Set `stage` to `FRONTEND_ALLOWED`, attest only `FREEZE_BANNER_MANAGEMENT_WRITES`, record `managementWritesFrozen: true`, `frontendRolledBack: false`, a null targeted count, retained forward schema, no down-migration, and `psamaRecreated: false`. Validate this state before the standalone frontend rollback.
-2. Roll back the frontend. Do not move Operations or Gateway yet.
+2. Run **PIC-SURE Frontend Build** at `git_hash=artifacts.frontendCommit` with the exact bucket, target stack, `BANNER_ROLLBACK=true`, and the attestation JSON. It validates `FRONTEND_ALLOWED`, verifies the checkout, and writes the old image only to `artifactPrefix`. Run **PIC-SURE Frontend Deploy** with the same bucket, stack, rollback flag, and JSON. It verifies that exact object and tells the host to download from the attested prefix. Do not move Operations or Gateway yet.
 3. Disable every Active or Scheduled targeted banner. Set `stage` to `BACKEND_ALLOWED`, attest the first three phases, record `frontendRolledBack: true` and a targeted remaining count of zero, and validate before moving Operations or Gateway below the targeting-capable generation.
-4. Roll back Operations and Gateway together through the Wildfly Stack Deploy rollback mode. Keep management writes frozen while that backend remains in service.
+4. Run **PIC-SURE Maven Build** at `git_hash=artifacts.backendCommit` for the target stack. Run **PIC-SURE Operations Service Image**, **PIC-SURE Gateway Image**, **PIC-SURE HPDS Query Service Image**, and **PIC-SURE Auth Micro App Image** with the exact bucket, target stack, `BANNER_ROLLBACK=true`, and the `BACKEND_ALLOWED` JSON. Each job verifies the stamped backend commit and writes only to `artifactPrefix`. Then run **PIC-SURE Wildfly Stack Deploy** with Operations, Gateway, and Query selected, PSAMA unselected, and the same rollback evidence. It verifies and consumes only the attested objects. Keep management writes frozen while that backend remains in service.
 5. Keep the forward authorization and PIC-SURE schema. Do not run a Flyway down-migration.
-6. Before recreating PSAMA, set `stage` to `PSAMA_ALLOWED`, attest the first five phases, keep `psamaRecreated: false`, and validate. Recreate PSAMA through the standalone Auth Micro App Deploy rollback mode. Then set `stage` to `COMPLETE`, attest all six phases, and record `psamaRecreated: true`.
+6. Before recreating PSAMA, set `stage` to `PSAMA_ALLOWED`, attest the first five phases, keep `psamaRecreated: false`, and validate. Run **PIC-SURE Auth Micro App Deploy** with the exact bucket, target stack, dataset key, `BANNER_ROLLBACK=true`, and the `PSAMA_ALLOWED` JSON; its Wildfly leaf recreates PSAMA from the already verified attested prefix. Then set `stage` to `COMPLETE`, attest all six phases, and record `psamaRecreated: true`.
 7. Run this validator with the matching `--required-rollback-stage` before the frontend, backend, and PSAMA steps, and with `COMPLETE` once more on the completed record:
 
    ```bash
    python3 jenkins-docker/scripts/validate-banner-rollout.py \
      --rollback-attestation /operator/path/rollback-operator-attestation.json \
-     --jenkins-source-commit f643a289a5c93acef917cbeb62962d8c857c2217 \
+     --jenkins-source-commit c9b7273f0b8b31d5e8585a47fba02c9425104af1 \
+     --controller-deployment __bdc_OR_aim-ahead__ \
+     --target-stack __TARGET_STACK__ \
      --required-rollback-stage __CURRENT_STAGE__
    ```
 
