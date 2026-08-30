@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import copy
 import importlib.util
 import json
 import os
@@ -77,6 +78,28 @@ class BannerLocalIntegrationContractTest(unittest.TestCase):
         self.assertEqual(bdc["sharedBackendCommit"], aim["sharedBackendCommit"])
         self.assertEqual(bdc["sharedFrontendCommit"], aim["sharedFrontendCommit"])
 
+    def test_fixture_filename_binds_the_canonical_tenant_identity_and_paths(self):
+        runner = load_runner()
+        fixture = json.loads((TEST_DIR / "fixtures/bdc.json").read_text(encoding="utf-8"))
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            fixture_path = root / "bdc.json"
+            mutations = {
+                "identity": ("deployment", "AIM_AHEAD"),
+                "migration path": ("migrationRoot", "app-infrastructure/db/aim-ahead"),
+                "HTTPD path": (
+                    "httpdTemplate",
+                    "app-infrastructure/configs/httpd-vhosts-aim-ahead.conf",
+                ),
+            }
+            for label, (field, value) in mutations.items():
+                with self.subTest(label=label):
+                    changed = copy.deepcopy(fixture)
+                    changed[field] = value
+                    fixture_path.write_text(json.dumps(changed), encoding="utf-8")
+                    with self.assertRaises(runner.ProofError):
+                        runner.validate_fixture(fixture_path, root / f"rendered-{field}")
+
     def test_matrix_is_closed_and_does_not_claim_docker_or_private_aim(self):
         matrix = json.loads((TEST_DIR / "expected-matrix.json").read_text(encoding="utf-8"))
         self.assertEqual(["AIO", "BDC", "AIM_AHEAD"], [row["deployment"] for row in matrix["rows"]])
@@ -91,6 +114,27 @@ class BannerLocalIntegrationContractTest(unittest.TestCase):
         self.assertTrue(
             all(item["status"] == "NOT_RUN_ENOSPC" for item in matrix["dockerOwnerEntrypoints"])
         )
+
+    def test_matrix_provenance_rows_and_owner_commands_are_bound_to_verified_facts(self):
+        runner = load_runner()
+        matrix = json.loads((TEST_DIR / "expected-matrix.json").read_text(encoding="utf-8"))
+        mutations = (
+            ("shared commit", ("sharedSourceCommits", "backend"), "f" * 40),
+            ("owner commit", ("ownerCommits", "jenkins"), "f" * 40),
+            ("tuple", ("rolloutTuples", "BDC"), "f" * 64),
+            ("AIM checksum", ("aimRequiredInputSha256",), "f" * 64),
+            ("fixture row", ("rows", 1, "fixture"), "fixtures/aim-ahead.json"),
+            ("Docker owner", ("dockerOwnerEntrypoints", 0, "command"), "true"),
+        )
+        for label, path, replacement in mutations:
+            with self.subTest(label=label):
+                changed = copy.deepcopy(matrix)
+                target = changed
+                for component in path[:-1]:
+                    target = target[component]
+                target[path[-1]] = replacement
+                with self.assertRaises(runner.ProofError):
+                    runner.validate_expected_matrix(changed)
 
     def test_results_validate_without_promoting_runtime_checks(self):
         runner = load_runner()
@@ -124,6 +168,21 @@ class BannerLocalIntegrationContractTest(unittest.TestCase):
             copied = runner.preserve_diagnostics(runtime, diagnostics)
             self.assertEqual(["nested/result.json", "owner.log"], copied)
             self.assertFalse((diagnostics / "secret.env").exists())
+
+    def test_failures_at_the_same_commit_use_distinct_diagnostics_directories(self):
+        runner = load_runner()
+        with tempfile.TemporaryDirectory() as directory:
+            parent = Path(directory)
+            path_for = getattr(
+                runner,
+                "failure_diagnostics_path",
+                lambda root, commit, run_token: root / f"{commit[:12]}-failure",
+            )
+            first = path_for(parent, runner.REQUIRED_BASE, "run-0001")
+            second = path_for(parent, runner.REQUIRED_BASE, "run-0002")
+            self.assertNotEqual(first, second)
+            self.assertEqual(parent, first.parent)
+            self.assertEqual(parent, second.parent)
 
     def test_owner_composition_is_non_docker_and_fail_closed(self):
         source = (TEST_DIR / "run.py").read_text(encoding="utf-8")

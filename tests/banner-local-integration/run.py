@@ -10,6 +10,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import uuid
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -45,6 +46,30 @@ ROOT_ENVIRONMENTS = {
     "migrations": "BANNER_LOCAL_MIGRATIONS_ROOT",
     "jenkins": "BANNER_LOCAL_JENKINS_ROOT",
     "bdc_release_control": "BANNER_LOCAL_BDC_RELEASE_CONTROL_ROOT",
+}
+FIXTURE_CONTRACTS = {
+    "bdc.json": {
+        "deployment": "BDC",
+        "migrationRoot": "app-infrastructure/db/bdc",
+        "httpdTemplate": "app-infrastructure/configs/httpd-vhosts-bdc.conf",
+        "targetStack": "b",
+        "privateDnsName": "bdc.synthetic.invalid",
+        "publicDnsName": "bdc.synthetic.invalid",
+        "publicDnsNameStaging": "bdc-staging.synthetic.invalid",
+        "expectedAuthMigrationMaximum": 27,
+        "expectedPicsureMigrationMaximum": 11,
+    },
+    "aim-ahead.json": {
+        "deployment": "AIM_AHEAD",
+        "migrationRoot": "app-infrastructure/db/aim-ahead",
+        "httpdTemplate": "app-infrastructure/configs/httpd-vhosts-aim-ahead.conf",
+        "targetStack": "b",
+        "privateDnsName": "aim-ahead.synthetic.invalid",
+        "publicDnsName": "aim-ahead.synthetic.invalid",
+        "publicDnsNameStaging": "aim-ahead-staging.synthetic.invalid",
+        "expectedAuthMigrationMaximum": 29,
+        "expectedPicsureMigrationMaximum": 11,
+    },
 }
 
 
@@ -182,7 +207,13 @@ def migration_maximum(root):
 
 
 def validate_fixture(fixture_path, output_root):
-    fixture = json.loads(Path(fixture_path).read_text(encoding="utf-8"))
+    fixture_path = Path(fixture_path)
+    fixture = json.loads(fixture_path.read_text(encoding="utf-8"))
+    require(fixture_path.name in FIXTURE_CONTRACTS, f"unknown deployment fixture: {fixture_path.name}")
+    require(
+        fixture == FIXTURE_CONTRACTS[fixture_path.name],
+        f"{fixture_path.name} does not match its canonical tenant identity and paths",
+    )
     deployment = fixture["deployment"]
     migration_root = ROOT / fixture["migrationRoot"]
     httpd_template = ROOT / fixture["httpdTemplate"]
@@ -308,6 +339,94 @@ def verify_rollout_inputs(roots):
             "synthetic AIM attestation does not bind the public tuple")
     require(all(attestation["checks"].values()), "synthetic AIM attestation is incomplete")
     return attestation
+
+
+def expected_matrix_contract():
+    return {
+        "schemaVersion": 1,
+        "rolloutContractSha256": ROLLOUT_SHA256,
+        "sharedSourceCommits": {
+            "backend": BACKEND_COMMIT,
+            "frontend": FRONTEND_COMMIT,
+            "migrationParity": MIGRATIONS_COMMIT,
+        },
+        "ownerCommits": {
+            "jenkins": JENKINS_COMMIT,
+            "bdcReleaseControl": BDC_RELEASE_CONTROL_COMMIT,
+            "aioDeployment": AIO_COMMIT,
+            "aioReleaseControl": AIO_RELEASE_CONTROL_COMMIT,
+        },
+        "rolloutTuples": {"BDC": BDC_TUPLE, "AIM_AHEAD": AIM_TUPLE},
+        "aimRequiredInputSha256": AIM_INPUT_SHA256,
+        "dockerOwnerEntrypoints": [
+            {
+                "ticket": 16,
+                "root": "infrastructure",
+                "command": "tests/deployment-migration/test.sh all",
+                "status": "NOT_RUN_ENOSPC",
+            },
+            {
+                "ticket": 17,
+                "root": "backend",
+                "command": "tests/operations-binary-compatibility/test.sh all",
+                "status": "NOT_RUN_ENOSPC",
+            },
+            {
+                "ticket": 18,
+                "root": "backend",
+                "command": "tests/banner-feed-compatibility/test.sh all",
+                "status": "NOT_RUN_ENOSPC",
+            },
+            {
+                "ticket": "22A",
+                "root": "aioDeployment",
+                "command": "tests/banner-local-integration/test.sh all",
+                "status": "NOT_RUN_ENOSPC",
+            },
+        ],
+        "rows": [
+            {
+                "deployment": "AIO",
+                "fixture": "Ticket 22A exact local source",
+                "releaseControlCommit": AIO_RELEASE_CONTROL_COMMIT,
+                "localIntegration": "NOT_RUN",
+                "dockerRuntime": "NOT_RUN",
+                "liveOperatorAttestation": "NOT_RUN",
+            },
+            {
+                "deployment": "BDC",
+                "fixture": "fixtures/bdc.json",
+                "releaseControlCommit": BDC_RELEASE_CONTROL_COMMIT,
+                "localIntegration": "NOT_RUN",
+                "dockerRuntime": "NOT_RUN",
+                "liveOperatorAttestation": "NOT_RUN",
+            },
+            {
+                "deployment": "AIM_AHEAD",
+                "fixture": "fixtures/aim-ahead.json",
+                "releaseControlCommit": "SYNTHETIC_LOCAL_ATTESTATION_ONLY",
+                "localIntegration": "NOT_RUN",
+                "dockerRuntime": "NOT_RUN",
+                "liveOperatorAttestation": "NOT_RUN_MANUAL",
+            },
+        ],
+        "limitations": {
+            "productionTls": "NOT_RUN",
+            "externalRouting": "NOT_RUN",
+            "jenkins": "NOT_RUN",
+            "aws": "NOT_RUN",
+            "ssm": "NOT_RUN",
+            "terraformApply": "NOT_RUN",
+            "systemd": "NOT_RUN",
+            "podman": "NOT_RUN",
+            "alb": "NOT_RUN",
+            "privateAimReleaseControl": "NOT_RUN_MANUAL",
+        },
+    }
+
+
+def validate_expected_matrix(matrix):
+    require(matrix == expected_matrix_contract(), "expected matrix does not match verified proof facts")
 
 
 def owner_commands(roots):
@@ -456,14 +575,21 @@ def preserve_diagnostics(runtime_root, diagnostics_root):
     return copied
 
 
-def run_proof(run_owners):
+def failure_diagnostics_path(diagnostics_parent, executing_head, run_token=None):
+    token = run_token or uuid.uuid4().hex
+    require(re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]{0,63}", token) is not None,
+            "diagnostics run token is invalid")
+    return Path(diagnostics_parent) / f"{executing_head[:12]}-{token}-failure"
+
+
+def run_proof(run_owners, diagnostics_run_token=None):
     roots = configured_roots(require_all=True)
     verify_roots(roots)
     executing_head = require_executing_repository(require_clean=True)
     contract = verify_contract_snapshot(roots["aio"])
     verify_rollout_inputs(roots)
     expected = json.loads((TEST_DIR / "expected-matrix.json").read_text(encoding="utf-8"))
-    require(expected["rolloutContractSha256"] == ROLLOUT_SHA256, "matrix rollout checksum drift")
+    validate_expected_matrix(expected)
 
     diagnostics_parent = Path(
         os.environ.get("BANNER_LOCAL_DIAGNOSTICS_ROOT", "/tmp/banner-local-integration-diagnostics")
@@ -511,7 +637,10 @@ def run_proof(run_owners):
             output.write_text(json.dumps(observed, indent=2, sort_keys=True) + "\n", encoding="utf-8")
             print(output.read_text(encoding="utf-8"), end="")
         except Exception:
-            preserve_diagnostics(runtime, diagnostics_parent / f"{executing_head[:12]}-failure")
+            preserve_diagnostics(
+                runtime,
+                failure_diagnostics_path(diagnostics_parent, executing_head, diagnostics_run_token),
+            )
             raise
 
 
