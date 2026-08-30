@@ -435,6 +435,13 @@ class ExistingDeploymentProofTest(unittest.TestCase):
                 self.assertIn(job, checklist)
         self.assertIn("--controller-deployment", checklist)
         self.assertIn("--target-stack", checklist)
+        self.assertIn("BANNER_MANUAL_OPERATOR_MODE=true", checklist)
+        self.assertIn("BANNER_EXPECTED_DEPLOYMENT", checklist)
+        self.assertIn("BANNER_EXPECTED_TUPLE_SHA256", checklist)
+        self.assertIn("one identified `UserIdCause`", checklist)
+        for rejected_cause in ("replay", "rebuild", "remote", "timer", "nested", "mixed"):
+            with self.subTest(rejected_cause=rejected_cause):
+                self.assertIn(rejected_cause, checklist)
 
     def test_banner_host_scripts_download_from_the_attested_artifact_prefix(self):
         scripts = ROOT / "app-infrastructure/scripts/deploy"

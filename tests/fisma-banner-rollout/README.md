@@ -18,7 +18,7 @@ Do not copy BDC release control into the AIM-AHEAD boundary. Start with `aim-ahe
 
    Stop if `merge-base` returns nonzero. Pin the exact reviewed commit, not `FETCH_HEAD`, in the private release input.
 
-   The executable infrastructure dependency is `c18c56a4aeaf7b75a1f4feb4bc19c5c09a29c7c1`, a descendant of the reviewed base and the earlier immutable-artifact commits. It adds the banner bootstrap switch as well as the exact IAM paths and host-side `--artifact_etag` downloads. The following metadata commit pins that executable commit and Jenkins `24dd5cebbd8cfbf55edac5474ea932eaac856697`. This dependency order avoids a self-reference.
+   The executable infrastructure dependency is `c18c56a4aeaf7b75a1f4feb4bc19c5c09a29c7c1`, a descendant of the reviewed base and the earlier immutable-artifact commits. It adds the banner bootstrap switch as well as the exact IAM paths and host-side `--artifact_etag` downloads. The following metadata commit pins that executable commit and Jenkins `25ae017b1fdeb28bef260aa39f4ffd5244cd6431`. This dependency order avoids a self-reference.
 
 2. Pin every value from `aim-ahead-required-release-input.json` in the private release control. Keep the private repository URL, ref, and resolved commit inside the boundary.
 
@@ -32,7 +32,7 @@ Do not copy BDC release control into the AIM-AHEAD boundary. Start with `aim-ahe
      --operation FORWARD \
      --build-spec /operator/path/private-release-control/build-spec.json \
      --attestation /operator/path/private-release-control/banner-rollout-attestation.json \
-     --jenkins-source-commit 24dd5cebbd8cfbf55edac5474ea932eaac856697 \
+     --jenkins-source-commit 25ae017b1fdeb28bef260aa39f4ffd5244cd6431 \
      --release-control-commit __ACTUAL_CHECKED_OUT_PRIVATE_RELEASE_CONTROL_COMMIT__ \
      --controller-deployment aim-ahead \
      --run-database-migrations true \
@@ -41,7 +41,7 @@ Do not copy BDC release control into the AIM-AHEAD boundary. Start with `aim-ahe
      --include-frontend true
    ```
 
-5. Use the supported **Check For Updates → Deployment Pipeline → PIC-SURE Pipeline Build and Deploy** entrypoint on the attested private release-control commit. Check For Updates first builds the HPDS, Logging, Visualization, and Dictionary images used by the rebuilt stack. It withholds Gateway, Operations, Query, PSAMA, and frontend from the mutable bootstrap namespace. Deployment Pipeline also disables standard critical artifacts in the new Wildfly and HTTPD instance user-data, so an intervening standard writer cannot publish them during bootstrap. The immutable combined job publishes those components backend-first after initialization. A manual run may start at Deployment Pipeline only when it supplies the same exact `deployment_git_hash`, three dataset keys, `STACK_S3_BUCKET`, `BANNER_ROLLOUT=true`, and `BANNER_ROLLOUT_OPERATION=FORWARD` inputs produced by Check For Updates. Deployment Pipeline validates before its backup and migration stages, retains the deployment-state lock, token and configuration rendering, stack rebuild, initialization, sensor check, and state write, then invokes the combined job with migrations attested as complete. Direct forward runs of the combined or leaf jobs fail closed.
+5. Use the supported **Check For Updates → Deployment Pipeline → PIC-SURE Pipeline Build and Deploy** entrypoint on the attested private release-control commit. Check For Updates first builds the HPDS, Logging, Visualization, and Dictionary images used by the rebuilt stack. It withholds Gateway, Operations, Query, PSAMA, and frontend from the mutable bootstrap namespace. Deployment Pipeline also disables standard critical artifacts in the new Wildfly and HTTPD instance user-data, so an intervening standard writer cannot publish them during bootstrap. The immutable combined job publishes those components backend-first after initialization. A manual run may start at Deployment Pipeline only when it supplies the same exact `deployment_git_hash`, three dataset keys, `STACK_S3_BUCKET`, `BANNER_ROLLOUT=true`, and `BANNER_ROLLOUT_OPERATION=FORWARD` inputs produced by Check For Updates. It must also set `BANNER_MANUAL_OPERATOR_MODE=true`, `BANNER_EXPECTED_DEPLOYMENT` to the deployment in that release input, and `BANNER_EXPECTED_TUPLE_SHA256` to its exact tuple. Jenkins requires one identified `UserIdCause` for this mode and rejects replay, rebuild, remote, timer, nested, or mixed causes. Deployment Pipeline checks the expected deployment and tuple against the retrieved input before its backup and migration stages, retains the deployment-state lock, token and configuration rendering, stack rebuild, initialization, sensor check, and state write, then invokes the combined job with migrations attested as complete. Direct forward runs of the combined or leaf jobs fail closed.
 
 This local checklist does not inspect the private release control and does not attest a deployed state. The operator owns the completed attestation.
 
@@ -60,7 +60,7 @@ Use a fresh copy of `rollback-operator-attestation.json` for the affected deploy
    ```bash
    python3 jenkins-docker/scripts/validate-banner-rollout.py \
      --rollback-attestation /operator/path/rollback-operator-attestation.json \
-     --jenkins-source-commit 24dd5cebbd8cfbf55edac5474ea932eaac856697 \
+     --jenkins-source-commit 25ae017b1fdeb28bef260aa39f4ffd5244cd6431 \
      --controller-deployment __bdc_OR_aim-ahead__ \
      --target-stack __TARGET_STACK__ \
      --required-rollback-stage __CURRENT_STAGE__
