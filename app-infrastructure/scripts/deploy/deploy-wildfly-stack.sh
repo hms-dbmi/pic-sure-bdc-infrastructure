@@ -22,6 +22,10 @@ dataset_s3_object_key=""
 enable_debug=""
 spring_profile=""
 artifact_prefix=""
+operations_artifact_etag=""
+query_artifact_etag=""
+psama_artifact_etag=""
+gateway_artifact_etag=""
 
 while [[ $# -gt 0 ]]; do
   case $1 in
@@ -73,6 +77,22 @@ while [[ $# -gt 0 ]]; do
       artifact_prefix="$2"
       shift 2
       ;;
+    --operations_artifact_etag)
+      operations_artifact_etag="$2"
+      shift 2
+      ;;
+    --query_artifact_etag)
+      query_artifact_etag="$2"
+      shift 2
+      ;;
+    --psama_artifact_etag)
+      psama_artifact_etag="$2"
+      shift 2
+      ;;
+    --gateway_artifact_etag)
+      gateway_artifact_etag="$2"
+      shift 2
+      ;;
     *)
       echo "Unknown argument: $1"
       exit 1
@@ -94,7 +114,8 @@ if [[ "$deploy_operations" == "true" ]]; then
   /opt/picsure/deploy-operations.sh \
     --stack_s3_bucket "$stack_s3_bucket" \
     --target_stack "$target_stack" \
-    --artifact_prefix "$artifact_prefix" || failed=true
+    --artifact_prefix "$artifact_prefix" \
+    --artifact_etag "$operations_artifact_etag" || failed=true
 fi
 
 if [[ "$deploy_query" == "true" ]]; then
@@ -102,7 +123,8 @@ if [[ "$deploy_query" == "true" ]]; then
   /opt/picsure/deploy-query.sh \
     --stack_s3_bucket "$stack_s3_bucket" \
     --target_stack "$target_stack" \
-    --artifact_prefix "$artifact_prefix" || failed=true
+    --artifact_prefix "$artifact_prefix" \
+    --artifact_etag "$query_artifact_etag" || failed=true
 fi
 
 if [[ "$deploy_psama" == "true" ]]; then
@@ -111,6 +133,7 @@ if [[ "$deploy_psama" == "true" ]]; then
     --stack_s3_bucket "$stack_s3_bucket" \
     --target_stack "$target_stack" \
     --artifact_prefix "$artifact_prefix" \
+    --artifact_etag "$psama_artifact_etag" \
     ${dataset_s3_object_key:+--dataset_s3_object_key "$dataset_s3_object_key"} \
     ${enable_debug:+--enable_debug "$enable_debug"} \
     ${spring_profile:+--spring_profile "$spring_profile"} || failed=true
@@ -135,7 +158,8 @@ if [[ "$deploy_gateway" == "true" ]]; then
   /opt/picsure/deploy-gateway.sh \
     --stack_s3_bucket "$stack_s3_bucket" \
     --target_stack "$target_stack" \
-    --artifact_prefix "$artifact_prefix" || failed=true
+    --artifact_prefix "$artifact_prefix" \
+    --artifact_etag "$gateway_artifact_etag" || failed=true
 fi
 
 if [[ "$failed" == "true" ]]; then
