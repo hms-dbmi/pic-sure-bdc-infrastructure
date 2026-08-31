@@ -35,3 +35,35 @@ variable "render_visualization" {
   type        = bool
   default     = true
 }
+
+variable "render_picsure_services" {
+  description = "Render gateway/operations/query env files. All three render together: the shared tokens are minted per apply and must stay identical across the files."
+  type        = bool
+  default     = false
+}
+
+variable "picsure_token_introspection_token" {
+  description = "PSAMA_APPLICATION service JWT for gateway token introspection"
+  type        = string
+  default     = ""
+}
+
+variable "logging_api_key" {
+  description = "API key for the pic-sure-logging service"
+  type        = string
+  default     = ""
+}
+
+variable "app_user_secret_name" {
+  description = "Secrets Manager secret holding the picsure app DB user (username/password/host)"
+  type        = string
+  default     = ""
+}
+
+variable "include_open_hpds" {
+  description = "Whether open access is enabled (drives GATEWAY_OPEN_ACCESS_ENABLED)"
+  type        = bool
+  # Fail closed: open (unauthenticated) access must be opted into explicitly. A
+  # missing -var must never silently enable GATEWAY_OPEN_ACCESS_ENABLED.
+  default = false
+}

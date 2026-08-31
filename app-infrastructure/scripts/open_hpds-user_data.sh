@@ -1,4 +1,14 @@
 #!/bin/bash
+set -euo pipefail
+
+# Tag the instance so 'Await Initialization' can gate on the outcome. Any
+# failure exits through the trap and tags InitComplete=failed instead of
+# leaving the instance half-configured but tagged successful.
+tag_init_complete() {
+  INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)
+  sudo /usr/bin/aws --region=us-east-1 ec2 create-tags --resources "$INSTANCE_ID" --tags Key=InitComplete,Value="$1"
+}
+trap 'rc=$?; [ "$rc" -eq 0 ] || tag_init_complete failed' EXIT
 
 stack_s3_bucket="${stack_s3_bucket}"
 gss_prefix="${gss_prefix}"
@@ -22,10 +32,14 @@ INIT_START_TIME=$(date +%s)
 
 sudo mkdir -p /var/log/picsure/open-hpds/
 
+# Fail closed: if all attempts fail, abort (the EXIT trap tags InitComplete=failed).
 s3_copy() {
   for i in {1..5}; do
-    sudo /usr/bin/aws --region us-east-1 s3 cp "$@" --no-progress && break || sleep 30
+    sudo /usr/bin/aws --region us-east-1 s3 cp "$@" --no-progress && return 0
+    sleep 30
   done
+  echo "ERROR: aws s3 cp failed after 5 attempts: $*" >&2
+  exit 1
 }
 
 s3_copy "s3://${stack_s3_bucket}/${target_stack}/scripts/deploy-open-hpds.sh" "/opt/picsure/deploy-open-hpds.sh"
@@ -38,13 +52,12 @@ sudo /opt/picsure/deploy-open-hpds.sh \
 echo "Waiting for container to initialize"
 CONTAINER_NAME="open-hpds"
 while true; do
-  status=$(podman logs "$CONTAINER_NAME" 2>&1 | grep "$INIT_MESSAGE")
+  status=$(podman logs "$CONTAINER_NAME" 2>&1 | grep "$INIT_MESSAGE" || true)
 
   if [ -n "$status" ]; then
     echo "$CONTAINER_NAME container has initialized."
 
-    INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)
-    sudo /usr/bin/aws --region=us-east-1 ec2 create-tags --resources "$INSTANCE_ID" --tags Key=InitComplete,Value=true
+    tag_init_complete true
     break
   else
     CURRENT_TIME=$(date +%s)
@@ -52,8 +65,7 @@ while true; do
 
     if [ "$ELAPSED_TIME" -ge "$INIT_TIMEOUT_SECS" ]; then
       echo "Timeout reached ($INIT_TIMEOUT_SECS seconds). The $CONTAINER_NAME container initialization didn't complete."
-      INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")" --silent http://169.254.169.254/latest/meta-data/instance-id)
-      sudo /usr/bin/aws --region=us-east-1 ec2 create-tags --resources "$INSTANCE_ID" --tags Key=InitComplete,Value=failed
+      tag_init_complete failed
 
       break
     fi
@@ -63,4 +75,4 @@ while true; do
 done
 
 echo "user-data progress starting update"
-sudo yum -y update
+sudo yum -y update --allowerasing || echo "WARNING: yum update failed (non-fatal)"

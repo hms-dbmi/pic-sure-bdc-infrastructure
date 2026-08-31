@@ -59,38 +59,3 @@ resource "aws_instance" "wildfly-ec2" {
 
 }
 
-data "template_file" "wildfly-standalone-xml" {
-  template = file("configs/standalone.xml")
-  vars     = {
-    picsure-db-host                   = var.picsure_db_host
-    target_stack                      = var.target_stack
-    picsure_token_introspection_token = var.picsure_token_introspection_token
-    env_private_dns_name              = var.env_private_dns_name
-    env_public_dns_name               = var.env_public_dns_name
-    application_id_for_base_query     = var.application_id_for_base_query
-    client_id                         = var.client_id
-    app_user_secret_name              = var.app_user_secret_name
-    include_open_hpds                 = var.include_open_hpds
-    logging_service_url               = var.logging_service_url
-    logging_api_key                   = var.logging_api_key
-  }
-}
-
-resource "local_file" "wildfly-standalone-xml-file" {
-  content  = data.template_file.wildfly-standalone-xml.rendered
-  filename = "standalone.xml"
-}
-
-data "template_file" "aggregate-resource-properties" {
-  template = file("configs/aggregate-resource.properties")
-  vars     = {
-    target_stack         = var.target_stack
-    env_private_dns_name = var.env_private_dns_name
-  }
-}
-
-resource "local_file" "aggregate-resource-properties-file" {
-  content  = data.template_file.aggregate-resource-properties.rendered
-  filename = "aggregate-resource.properties"
-}
-

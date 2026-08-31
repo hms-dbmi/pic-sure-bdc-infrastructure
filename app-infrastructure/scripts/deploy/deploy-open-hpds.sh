@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 while [[ $# -gt 0 ]]; do
   case $1 in
@@ -28,9 +29,9 @@ if [[ -f /etc/environment ]]; then
   set +a
 fi
 
-stack_s3_bucket=${stack_s3_bucket:-$STACK_S3_BUCKET}
-destigmatized_dataset_s3_object_key=${destigmatized_dataset_s3_object_key:-$DESTIGMATIZED_DATASET_S3_OBJECT_KEY}
-target_stack=${target_stack:-$TARGET_STACK}
+stack_s3_bucket=${stack_s3_bucket:-${STACK_S3_BUCKET:-}}
+destigmatized_dataset_s3_object_key=${destigmatized_dataset_s3_object_key:-${DESTIGMATIZED_DATASET_S3_OBJECT_KEY:-}}
+target_stack=${target_stack:-${TARGET_STACK:-}}
 
 if [[ -z "$stack_s3_bucket" || -z "$destigmatized_dataset_s3_object_key" || -z "$target_stack" ]]; then
   echo "Error: --stack_s3_bucket, --target_stack and --destigmatized_dataset_s3_object_key are required"
@@ -38,10 +39,15 @@ if [[ -z "$stack_s3_bucket" || -z "$destigmatized_dataset_s3_object_key" || -z "
 fi
 
 
+# Fail closed: if all attempts fail, abort the deploy rather than continuing
+# with whatever stale file is already on disk.
 s3_copy() {
   for i in {1..5}; do
-    sudo /usr/bin/aws --region us-east-1 s3 cp "$@" --no-progress && break || sleep 30
+    sudo /usr/bin/aws --region us-east-1 s3 cp "$@" --no-progress && return 0
+    sleep 30
   done
+  echo "ERROR: aws s3 cp failed after 5 attempts: $*" >&2
+  exit 1
 }
 
 echo "Downloading Files"
@@ -55,7 +61,9 @@ tar -xvf destigmatized_javabins_rekeyed.tar
 cd ~ || exit
 echo "Completed unpacking destigmatized_javabins_rekeyed.tar"
 
-chmod 644 /opt/local/hpds/*
+# chmod only regular files: a bare glob aborts under set -e if the tree is empty,
+# and chmod 644 on a directory would strip its traversal bit.
+find /opt/local/hpds -type f -exec chmod 644 {} +
 chmod 644 /opt/picsure/pic-sure-hpds.tar.gz
 chmod 644 /opt/picsure/open-hpds.env
 
@@ -93,3 +101,13 @@ sudo systemctl is-enabled container-$CONTAINER_NAME.service
 # Status check is informational — Jenkins log polling verifies actual startup.
 sudo systemctl status container-$CONTAINER_NAME.service --no-pager || true
 echo "Completed podman setup for $CONTAINER_NAME"
+
+# Give systemd a moment to start the container, then fail the script if it is
+# not running, so Jenkins reports the real error.
+sleep 10
+if ! podman ps --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
+  echo "ERROR: Container '$CONTAINER_NAME' is not running after startup."
+  echo "--- Full container inspect ---"
+  podman inspect $CONTAINER_NAME 2>&1 || true
+  exit 1
+fi

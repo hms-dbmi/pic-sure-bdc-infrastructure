@@ -75,7 +75,19 @@ resource "aws_iam_role_policy" "wildfly-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/${var.target_stack}/containers/pic-sure-wildfly.tar.gz"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/${var.target_stack}/containers/pic-sure-gateway.tar.gz"
+    },{
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/${var.target_stack}/containers/pic-sure-operations-service.tar.gz"
+    },{
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/${var.target_stack}/containers/pic-sure-hpds-query-service.tar.gz"
     },{
       "Action": [
         "s3:GetObject"
@@ -93,13 +105,19 @@ resource "aws_iam_role_policy" "wildfly-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/${var.target_stack}/configs/wildfly/standalone.xml"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/gateway/${var.target_stack}/gateway.env"
     },{
       "Action": [
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/${var.target_stack}/configs/wildfly/aggregate-resource.properties"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/operations/${var.target_stack}/operations.env"
+    },{
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/query/${var.target_stack}/query.env"
     },{
       "Action": [
         "s3:GetObject"
@@ -135,7 +153,19 @@ resource "aws_iam_role_policy" "wildfly-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/${var.target_stack}/scripts/deploy-wildfly.sh"
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/${var.target_stack}/scripts/deploy-gateway.sh"
+    },{
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/${var.target_stack}/scripts/deploy-operations.sh"
+    },{
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/${var.target_stack}/scripts/deploy-query.sh"
     },{
       "Action": [
         "s3:GetObject"
