@@ -21,19 +21,19 @@ variable "env_private_dns_name" {
 variable "render_auth_hpds" {
   description = "Whether to render and upload the auth HPDS env file"
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "render_open_hpds" {
   description = "Whether to render and upload the open HPDS env file"
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "render_visualization" {
   description = "Whether to render and upload the visualization env file"
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "render_gateway" {
