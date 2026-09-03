@@ -157,7 +157,7 @@ variable "psama_datasource_username" {
 }
 
 # ---- PSAMA behaviour flags: supply these, never guess them -------------------
-# Three flags whose value has to come off the live psama.env rather than out of a
+# Four flags whose value has to come off the live psama.env rather than out of a
 # source default, because getting one wrong is either an authorization hole or an
 # outage.
 #
@@ -170,22 +170,43 @@ variable "psama_datasource_username" {
 # from this list and DENIES on one present in it, so a short list silently converts
 # denies into grants (memory/empty-access-rules-fail-open-or-closed.md).
 #
+# CONSENT_BASED_AUTHORIZATION_ENABLED decides whether consent is evaluated for
+# authorization at all. user_consents is the sole consent source for v3 queries, so
+# turning it off stops per-consent scoping and changes who can see which studies. It is
+# also the other half of the ENABLE_PUBLIC_ACCESS finding: that unscoped read needed
+# both flags.
+#
 # TOS_ENABLED does not fail open, but it cannot be guessed either. Pinning it to the
 # source default of true would turn terms-of-service acceptance on and block every
 # login on first render if the live file says false, and the compare job that guards
 # this migration diffs key sets only, so it cannot catch a wrong value.
 #
-# All three default to the empty string and are asserted non-empty by preconditions on
+# All four default to the empty string and are asserted non-empty by preconditions on
 # aws_s3_object.psama_env, which is what makes a forgotten value fail the render
 # instead of rendering a guess. The empty default rather than no default at all is
 # deliberate: Terraform requires a value for a no-default variable on every invocation
 # of the module regardless of which resources count in, which would break the six
 # renders that never touch PSAMA.
+#
+# The three boolean flags additionally restrict their value to exactly "true" or
+# "false" through a validation block. A non-empty check alone is not enough: Spring's
+# string-to-boolean conversion also accepts "yes", "on", and "1" as true, so a
+# read-back that returned "yes" would satisfy every precondition here and still flip
+# the flag on. Validation is the right mechanism rather than another precondition
+# because it runs against the variable itself no matter what any resource's count is,
+# so a bad value is rejected on every render and not only on PSAMA ones.
+# strict_authorization_applications deliberately has no validation: it is a
+# comma-separated application list, and any allowlist for it would be guesswork.
 
 variable "enable_public_access" {
   description = "PSAMA ENABLE_PUBLIC_ACCESS, as the literal string \"true\" or \"false\". Fails open; read it off the live psama.env"
   type        = string
   default     = ""
+
+  validation {
+    condition     = contains(["", "true", "false"], var.enable_public_access)
+    error_message = "enable_public_access must be exactly \"true\" or \"false\", or empty (which the render_psama precondition then rejects). Spring also reads \"yes\", \"on\", and \"1\" as true, so anything looser here could open the auth backend."
+  }
 }
 
 variable "strict_authorization_applications" {
@@ -194,10 +215,26 @@ variable "strict_authorization_applications" {
   default     = ""
 }
 
+variable "consent_based_authorization_enabled" {
+  description = "PSAMA CONSENT_BASED_AUTHORIZATION_ENABLED, as the literal string \"true\" or \"false\". Read it off the live psama.env; it decides whether consent is evaluated for authorization at all"
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = contains(["", "true", "false"], var.consent_based_authorization_enabled)
+    error_message = "consent_based_authorization_enabled must be exactly \"true\" or \"false\", or empty (which the render_psama precondition then rejects). Spring also reads \"yes\", \"on\", and \"1\" as true, so anything looser here could change how consent is evaluated."
+  }
+}
+
 variable "tos_enabled" {
   description = "PSAMA TOS_ENABLED, as the literal string \"true\" or \"false\". Read it off the live psama.env; a wrong value blocks every login until each user accepts"
   type        = string
   default     = ""
+
+  validation {
+    condition     = contains(["", "true", "false"], var.tos_enabled)
+    error_message = "tos_enabled must be exactly \"true\" or \"false\", or empty (which the render_psama precondition then rejects). Spring also reads \"yes\", \"on\", and \"1\" as true."
+  }
 }
 
 # ---- PSAMA secrets that cannot be minted ------------------------------------
