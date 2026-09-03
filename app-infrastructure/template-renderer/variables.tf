@@ -36,8 +36,20 @@ variable "render_visualization" {
   default     = true
 }
 
-variable "render_picsure_services" {
-  description = "Render gateway/operations/query env files. All three render together: the shared tokens are minted per apply and must stay identical across the files."
+variable "render_gateway" {
+  description = "Whether to render and upload the gateway env file"
+  type        = bool
+  default     = false
+}
+
+variable "render_operations" {
+  description = "Whether to render and upload the operations env file"
+  type        = bool
+  default     = false
+}
+
+variable "render_query" {
+  description = "Whether to render and upload the query env file"
   type        = bool
   default     = false
 }
@@ -46,6 +58,27 @@ variable "picsure_token_introspection_token" {
   description = "PSAMA_APPLICATION service JWT for gateway token introspection"
   type        = string
   default     = ""
+}
+
+variable "picsure_application_token" {
+  description = "Shared application token consumed by gateway.env, operations.env, and query.env"
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
+variable "query_service_internal_token" {
+  description = "Internal query-service token consumed by gateway.env, operations.env, and query.env"
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
+variable "aggregate_obfuscation_salt" {
+  description = "Aggregate obfuscation salt consumed by query.env"
+  type        = string
+  default     = ""
+  sensitive   = true
 }
 
 variable "logging_api_key" {
