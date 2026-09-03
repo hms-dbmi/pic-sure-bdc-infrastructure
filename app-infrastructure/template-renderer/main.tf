@@ -37,6 +37,13 @@ resource "aws_s3_object" "visualization_env" {
 
   content_type           = "text/plain"
   server_side_encryption = "AES256"
+
+  lifecycle {
+    precondition {
+      condition     = var.logging_api_key != ""
+      error_message = "logging_api_key is empty; check the render job's TF_VAR_logging_api_key export."
+    }
+  }
 }
 
 # ---- Gateway-rewrite service env files -------------------------------------
@@ -79,6 +86,10 @@ resource "aws_s3_object" "gateway_env" {
     precondition {
       condition     = var.query_service_internal_token != ""
       error_message = "query_service_internal_token is empty; check the render job's TF_VAR_query_service_internal_token export."
+    }
+    precondition {
+      condition     = var.logging_api_key != ""
+      error_message = "logging_api_key is empty; check the render job's TF_VAR_logging_api_key export."
     }
   }
 }
@@ -141,9 +152,12 @@ resource "aws_s3_object" "query_env" {
   }
 }
 
-# ---- Stack-independent shared service env files ------------------------------
-# One logging service and one dictionary service serve every stack, so unlike the six
-# resources above these two S3 keys carry no target_stack segment. The paths below are
+# ---- Shared-object service env files -----------------------------------------
+# What these two share is the S3 object, not the service: unlike the six resources above,
+# their keys carry no target_stack segment, so every stack's deploy pulls the same file.
+# Each stack still runs its own pic-sure-logging and picsure-dictionary container on its
+# own wildfly host. That is why a change to either object reaches every stack at once,
+# and why LOGGING_API_KEY cannot be re-minted for one stack alone. The paths below are
 # the ones deploy-logging.sh and deploy-dictionary.sh already fetch; changing them
 # breaks every deploy.
 
