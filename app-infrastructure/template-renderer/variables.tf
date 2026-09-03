@@ -156,9 +156,10 @@ variable "psama_datasource_username" {
   default     = ""
 }
 
-# ---- PSAMA authorization posture: two flags that fail OPEN -------------------
-# These two decide whether PSAMA authorizes anything at all, and both fail in the
-# permissive direction when wrong.
+# ---- PSAMA behaviour flags: supply these, never guess them -------------------
+# Three flags whose value has to come off the live psama.env rather than out of a
+# source default, because getting one wrong is either an authorization hole or an
+# outage.
 #
 # ENABLE_PUBLIC_ACCESS=true drops PSAMA's auth-path guard; with consent-based
 # authorization also off, a tokenless caller read every synthetic patient in the
@@ -169,25 +170,46 @@ variable "psama_datasource_username" {
 # from this list and DENIES on one present in it, so a short list silently converts
 # denies into grants (memory/empty-access-rules-fail-open-or-closed.md).
 #
-# Both therefore have NO default. A caller that forgets one gets a hard Terraform
-# error, and the preconditions on aws_s3_object.psama_env reject an explicitly blank
-# value, so neither can ever be rendered from a permissive fallback.
+# TOS_ENABLED does not fail open, but it cannot be guessed either. Pinning it to the
+# source default of true would turn terms-of-service acceptance on and block every
+# login on first render if the live file says false, and the compare job that guards
+# this migration diffs key sets only, so it cannot catch a wrong value.
+#
+# All three default to the empty string and are asserted non-empty by preconditions on
+# aws_s3_object.psama_env, which is what makes a forgotten value fail the render
+# instead of rendering a guess. The empty default rather than no default at all is
+# deliberate: Terraform requires a value for a no-default variable on every invocation
+# of the module regardless of which resources count in, which would break the six
+# renders that never touch PSAMA.
 
 variable "enable_public_access" {
-  description = "PSAMA ENABLE_PUBLIC_ACCESS, as the literal string \"true\" or \"false\". Fails open: no default, must be stated on every render"
+  description = "PSAMA ENABLE_PUBLIC_ACCESS, as the literal string \"true\" or \"false\". Fails open; read it off the live psama.env"
   type        = string
+  default     = ""
 }
 
 variable "strict_authorization_applications" {
-  description = "Comma-separated PSAMA connections that require both access rules and privilege rules (application.properties fallback: OKTA,FENCE,OPEN,RAS). Fails open: no default, must be stated on every render"
+  description = "Comma-separated PSAMA connections that require both access rules and privilege rules (application.properties fallback: OKTA,FENCE,OPEN,RAS). Fails open; read it off the live psama.env"
   type        = string
+  default     = ""
+}
+
+variable "tos_enabled" {
+  description = "PSAMA TOS_ENABLED, as the literal string \"true\" or \"false\". Read it off the live psama.env; a wrong value blocks every login until each user accepts"
+  type        = string
+  default     = ""
 }
 
 # ---- PSAMA secrets that cannot be minted ------------------------------------
 # Okta, Gen3 Fence, NIH RAS, and the mail provider issue these. Nothing in this module
 # can regenerate one, so read-back is abort-only: each defaults to the empty string and
-# the matching precondition on aws_s3_object.psama_env fails the render when it stays
-# empty. Never give one of these a generated fallback or a non-empty default.
+# a precondition on aws_s3_object.psama_env fails the render when it stays empty. Never
+# give one of these a generated fallback or a non-empty default.
+#
+# The three IdP client secrets gate conditionally, each on its own provider flag: a
+# provider that is switched off needs no secret, and demanding one anyway would only
+# teach operators to invent a placeholder. application_client_secret and email_password
+# have no provider flag and gate unconditionally.
 
 variable "application_client_secret" {
   description = "PSAMA APPLICATION_CLIENT_SECRET; signs the PIC-SURE JWTs and has no fallback in application.properties"
@@ -224,8 +246,15 @@ variable "email_password" {
   sensitive   = true
 }
 
+# ---- PSAMA devtools secret: carried but not gated ---------------------------
+# spring-boot-devtools is an optional dependency and the Boot repackage goal drops it
+# from the deployed jar, so spring.devtools.remote.secret is inert in the artifact BDC
+# runs. The key stays in the template so the compare job does not report it as a key
+# the template lacks, but there is no precondition: nobody should have to supply a
+# value for something nothing reads.
+
 variable "devtools_secret" {
-  description = "PSAMA spring.devtools.remote.secret; inert in the deployed jar but required non-empty because the application.properties fallback is the guessable string \"false\""
+  description = "PSAMA spring.devtools.remote.secret; inert because the Boot repackage goal excludes devtools from the deployed jar, so this is carried unenforced"
   type        = string
   default     = ""
   sensitive   = true
@@ -268,11 +297,18 @@ variable "user_activation_reply_to" {
 }
 
 # ---- PSAMA identity providers ------------------------------------------------
-# Each enablement flag defaults to false, which is the fail-closed direction: a missing
-# flag removes a login route rather than opening one. The ids, connection ids, and
-# provider URIs are inert while their provider is disabled, which is why they default
-# to the empty string and carry no precondition. PSAMA's open IdP is not listed here:
-# the template reuses include_open_hpds so the open-access decision is stated once.
+# Each enablement flag is a bool defaulting to false, which is both the fail-closed
+# direction -- a missing flag removes a login route rather than opening one -- and a
+# real default, so none of these is required on a render that does not touch PSAMA.
+#
+# Each flag also gates its provider's client-secret precondition, so switching a
+# provider off drops the demand for a secret nothing will use. BDC is not expected to
+# run the AIM AHEAD Authorized Access or Auth0 providers at all.
+#
+# The ids, connection ids, and provider URIs are inert while their provider is
+# disabled, which is why they default to the empty string and carry no precondition.
+# PSAMA's open IdP is not listed here: the template reuses include_open_hpds so the
+# open-access decision is stated once.
 
 variable "a4_okta_idp_provider_is_enabled" {
   description = "Whether the AIM AHEAD Authorized Access Okta IdP is enabled in PSAMA"

@@ -16,12 +16,9 @@ resource "aws_s3_object" "hpds_auth_env" {
 resource "aws_s3_object" "hpds_open_env" {
   count = var.render_open_hpds ? 1 : 0
 
-  bucket = var.stack_s3_bucket
-  key    = "configs/hpds/${var.target_stack}/open-hpds.env"
-  content = templatefile("${path.module}/templates/hpds-open.env.tftpl", {
-    target_stack         = var.target_stack
-    env_private_dns_name = var.env_private_dns_name
-  })
+  bucket  = var.stack_s3_bucket
+  key     = "configs/hpds/${var.target_stack}/open-hpds.env"
+  content = templatefile("${path.module}/templates/hpds-open.env.tftpl", {})
 
   content_type           = "text/plain"
   server_side_encryption = "AES256"
@@ -196,11 +193,20 @@ resource "aws_s3_object" "dictionary_env" {
 
 # PSAMA is a different risk class from every other service in this module. Its IdP and
 # application secrets are issued by Okta, Gen3 Fence, NIH RAS, and the mail provider,
-# so nothing here can mint a replacement and every one of them is abort-only: blank
-# fails the render. Its two authorization flags fail OPEN, so they have no default at
-# all and are asserted non-empty below as well, which means a permissive value can
-# never come from a fallback. See the comment blocks in variables.tf and
-# templates/psama.env.tftpl for the individual failure modes.
+# so nothing here can mint a replacement and each one is abort-only: blank fails the
+# render rather than falling back to a generated or defaulted value. The three IdP
+# client secrets are gated on their own provider flag, because demanding a secret for
+# a provider that is switched off would only teach operators to invent placeholders.
+# application_client_secret and email_password have no provider flag, so they gate
+# unconditionally.
+#
+# Its three behaviour flags -- enable_public_access, strict_authorization_applications,
+# and tos_enabled -- all default to the empty string and are asserted non-empty below.
+# Each is read off the live object rather than guessed here: the first two fail OPEN,
+# and a guessed tos_enabled can block every login. The empty default is deliberate: a
+# variable with no default at all is required on every invocation of this module,
+# which would break the six renders that never touch PSAMA. See the comment blocks in
+# variables.tf and templates/psama.env.tftpl for the individual failure modes.
 
 resource "aws_s3_object" "psama_env" {
   count  = var.render_psama ? 1 : 0
@@ -211,6 +217,7 @@ resource "aws_s3_object" "psama_env" {
     psama_datasource_username         = var.psama_datasource_username
     enable_public_access              = var.enable_public_access
     strict_authorization_applications = var.strict_authorization_applications
+    tos_enabled                       = var.tos_enabled
     application_client_secret         = var.application_client_secret
     stack_specific_application_id     = var.stack_specific_application_id
     admin_users                       = var.admin_users
@@ -254,28 +261,28 @@ resource "aws_s3_object" "psama_env" {
       error_message = "strict_authorization_applications is empty; check the render job's TF_VAR_strict_authorization_applications export. This flag fails open and must never be rendered from a fallback."
     }
     precondition {
+      condition     = var.tos_enabled != ""
+      error_message = "tos_enabled is empty; check the render job's TF_VAR_tos_enabled export. Read it off the live psama.env rather than guessing: turning terms-of-service acceptance on blocks every login until each user accepts."
+    }
+    precondition {
       condition     = var.application_client_secret != ""
       error_message = "application_client_secret is empty; check the render job's TF_VAR_application_client_secret export. It cannot be regenerated."
     }
     precondition {
-      condition     = var.a4_okta_client_secret != ""
-      error_message = "a4_okta_client_secret is empty; check the render job's TF_VAR_a4_okta_client_secret export. Okta issues it and it cannot be regenerated."
+      condition     = !var.a4_okta_idp_provider_is_enabled || var.a4_okta_client_secret != ""
+      error_message = "a4_okta_idp_provider_is_enabled is true but a4_okta_client_secret is empty; check the render job's TF_VAR_a4_okta_client_secret export. Okta issues it and it cannot be regenerated."
     }
     precondition {
-      condition     = var.ras_okta_client_secret != ""
-      error_message = "ras_okta_client_secret is empty; check the render job's TF_VAR_ras_okta_client_secret export. Okta issues it and it cannot be regenerated."
+      condition     = !var.ras_okta_idp_provider_is_enabled || var.ras_okta_client_secret != ""
+      error_message = "ras_okta_idp_provider_is_enabled is true but ras_okta_client_secret is empty; check the render job's TF_VAR_ras_okta_client_secret export. Okta issues it and it cannot be regenerated."
     }
     precondition {
-      condition     = var.fence_client_secret != ""
-      error_message = "fence_client_secret is empty; check the render job's TF_VAR_fence_client_secret export. Gen3 Fence issues it and it cannot be regenerated."
+      condition     = !var.fence_idp_provider_is_enabled || var.fence_client_secret != ""
+      error_message = "fence_idp_provider_is_enabled is true but fence_client_secret is empty; check the render job's TF_VAR_fence_client_secret export. Gen3 Fence issues it and it cannot be regenerated."
     }
     precondition {
       condition     = var.email_password != ""
       error_message = "email_password is empty; check the render job's TF_VAR_email_password export. The mail provider issues it and it cannot be regenerated."
-    }
-    precondition {
-      condition     = var.devtools_secret != ""
-      error_message = "devtools_secret is empty; check the render job's TF_VAR_devtools_secret export."
     }
     precondition {
       condition     = var.psama_datasource_url != ""
