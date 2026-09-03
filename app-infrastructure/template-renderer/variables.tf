@@ -197,6 +197,11 @@ variable "psama_datasource_username" {
 # so a bad value is rejected on every render and not only on PSAMA ones.
 # strict_authorization_applications deliberately has no validation: it is a
 # comma-separated application list, and any allowlist for it would be guesswork.
+#
+# These four are not the whole read-back set. Three identity and token-claim values in
+# the next section are read off the live file for the same reason, making seven in
+# total: four booleans carrying validation, three list-or-name values with a
+# precondition only.
 
 variable "enable_public_access" {
   description = "PSAMA ENABLE_PUBLIC_ACCESS, as the literal string \"true\" or \"false\". Fails open; read it off the live psama.env"
@@ -235,6 +240,54 @@ variable "tos_enabled" {
     condition     = contains(["", "true", "false"], var.tos_enabled)
     error_message = "tos_enabled must be exactly \"true\" or \"false\", or empty (which the render_psama precondition then rejects). Spring also reads \"yes\", \"on\", and \"1\" as true."
   }
+}
+
+# ---- PSAMA identity and token claims: read these off the live file too --------
+# Three more values that cannot be guessed, for the same reason as the behaviour flags
+# above: each shapes authentication or authorization, and a key-set comparison cannot
+# see a wrong value.
+#
+# APPLICATION_CLIENT_SECRET_IS_BASE_64 decides whether the signing secret is
+# base64-decoded before use (JWTUtil.getDecodedClientSecret). A wrong value makes PSAMA
+# sign and verify with different key bytes: every outstanding token stops validating
+# and nothing logs an error anywhere. It is the worst failure signature in the set,
+# which is why it carries the same true/false validation as the boolean flags above on
+# top of its precondition.
+#
+# USER_ID_CLAIM names the JWT claim the request filter reads to identify the caller
+# (JWTFilter takes jws.getPayload().get(userClaimId) on every request). A wrong claim
+# name means either a null user id and blanket denial, or callers resolving to
+# different backend accounts than they do today. No validation: sub and
+# preferred_username are the immutable RAS identifiers, but other claims are
+# legitimate, so an allowlist would reject a valid configuration.
+#
+# TOKEN_INCLUSION_ROLES is the allowlist deciding which of a user's roles are embedded
+# in the JWT (UserService.addRoleClaims filters on it). Every downstream service reads
+# those claims for authorization, so adding a name widens what the rest of PIC-SURE
+# sees about a caller and removing one strips it. A comma-separated list, so
+# precondition only.
+
+variable "application_client_secret_is_base_64" {
+  description = "PSAMA APPLICATION_CLIENT_SECRET_IS_BASE_64, as the literal string \"true\" or \"false\". Read it off the live psama.env; a wrong value silently invalidates every issued token"
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = contains(["", "true", "false"], var.application_client_secret_is_base_64)
+    error_message = "application_client_secret_is_base_64 must be exactly \"true\" or \"false\", or empty (which the render_psama precondition then rejects). Spring also reads \"yes\", \"on\", and \"1\" as true, and a wrong value here changes the JWT signing key bytes."
+  }
+}
+
+variable "user_id_claim" {
+  description = "PSAMA USER_ID_CLAIM: the JWT claim naming the caller, read by JWTFilter on every request. Read it off the live psama.env"
+  type        = string
+  default     = ""
+}
+
+variable "token_inclusion_roles" {
+  description = "Comma-separated allowlist of PSAMA role names embedded in issued JWTs and read downstream for authorization. Read it off the live psama.env"
+  type        = string
+  default     = ""
 }
 
 # ---- PSAMA secrets that cannot be minted ------------------------------------

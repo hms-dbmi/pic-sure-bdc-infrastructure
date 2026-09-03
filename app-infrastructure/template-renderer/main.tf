@@ -200,57 +200,64 @@ resource "aws_s3_object" "dictionary_env" {
 # application_client_secret and email_password have no provider flag, so they gate
 # unconditionally.
 #
-# Its four behaviour flags -- enable_public_access, strict_authorization_applications,
-# consent_based_authorization_enabled, and tos_enabled -- all default to the empty
-# string and are asserted non-empty below. Each is read off the live object rather than
-# guessed here: the first two fail OPEN, the third decides whether consent is evaluated
-# for authorization at all, and a guessed tos_enabled can block every login. The empty
+# Seven of its values are read off the live psama.env rather than guessed here, because
+# each shapes authentication or authorization and a key-set comparison cannot see a
+# wrong value. Four are booleans -- enable_public_access,
+# consent_based_authorization_enabled, tos_enabled, and
+# application_client_secret_is_base_64 -- and carry variable validation pinning them to
+# exactly true or false, which unlike a precondition applies on every render regardless
+# of count. Three are lists or claim names -- strict_authorization_applications,
+# token_inclusion_roles, and user_id_claim -- and carry a precondition only, because any
+# allowlist for them would reject a valid configuration.
+#
+# All seven default to the empty string and are asserted non-empty below. The empty
 # default is deliberate: a variable with no default at all is required on every
 # invocation of this module, which would break the six renders that never touch PSAMA.
-# The three boolean ones also carry variable validation pinning them to exactly true or
-# false, which unlike a precondition applies on every render regardless of count. See
-# the comment blocks in variables.tf and templates/psama.env.tftpl for the individual
-# failure modes.
+# See the comment blocks in variables.tf and templates/psama.env.tftpl for the
+# individual failure modes.
 
 resource "aws_s3_object" "psama_env" {
   count  = var.render_psama ? 1 : 0
   bucket = var.stack_s3_bucket
   key    = "configs/psama/psama.env"
   content = templatefile("${path.module}/templates/psama.env.tftpl", {
-    psama_datasource_url                = var.psama_datasource_url
-    psama_datasource_username           = var.psama_datasource_username
-    enable_public_access                = var.enable_public_access
-    strict_authorization_applications   = var.strict_authorization_applications
-    consent_based_authorization_enabled = var.consent_based_authorization_enabled
-    tos_enabled                         = var.tos_enabled
-    application_client_secret           = var.application_client_secret
-    stack_specific_application_id       = var.stack_specific_application_id
-    admin_users                         = var.admin_users
-    email_address                       = var.email_address
-    email_password                      = var.email_password
-    grant_email_subject                 = var.grant_email_subject
-    user_activation_reply_to            = var.user_activation_reply_to
-    include_open_hpds                   = var.include_open_hpds
-    a4_okta_idp_provider_is_enabled     = var.a4_okta_idp_provider_is_enabled
-    a4_okta_client_id                   = var.a4_okta_client_id
-    a4_okta_client_secret               = var.a4_okta_client_secret
-    a4_okta_connection_id               = var.a4_okta_connection_id
-    a4_okta_idp_provider_uri            = var.a4_okta_idp_provider_uri
-    fence_idp_provider_is_enabled       = var.fence_idp_provider_is_enabled
-    fence_idp_provider_uri              = var.fence_idp_provider_uri
-    fence_client_id                     = var.fence_client_id
-    fence_client_secret                 = var.fence_client_secret
-    auth0_idp_provider_is_enabled       = var.auth0_idp_provider_is_enabled
-    auth0_host                          = var.auth0_host
-    auth0_denied_email_enabled          = var.auth0_denied_email_enabled
-    ras_okta_idp_provider_is_enabled    = var.ras_okta_idp_provider_is_enabled
-    ras_okta_idp_provider_uri           = var.ras_okta_idp_provider_uri
-    ras_okta_connection_id              = var.ras_okta_connection_id
-    ras_okta_client_id                  = var.ras_okta_client_id
-    ras_okta_client_secret              = var.ras_okta_client_secret
-    ras_idp_uri                         = var.ras_idp_uri
-    ras_passport_issuer                 = var.ras_passport_issuer
-    devtools_secret                     = var.devtools_secret
+    psama_datasource_url                 = var.psama_datasource_url
+    psama_datasource_username            = var.psama_datasource_username
+    enable_public_access                 = var.enable_public_access
+    strict_authorization_applications    = var.strict_authorization_applications
+    consent_based_authorization_enabled  = var.consent_based_authorization_enabled
+    tos_enabled                          = var.tos_enabled
+    application_client_secret            = var.application_client_secret
+    application_client_secret_is_base_64 = var.application_client_secret_is_base_64
+    user_id_claim                        = var.user_id_claim
+    token_inclusion_roles                = var.token_inclusion_roles
+    stack_specific_application_id        = var.stack_specific_application_id
+    admin_users                          = var.admin_users
+    email_address                        = var.email_address
+    email_password                       = var.email_password
+    grant_email_subject                  = var.grant_email_subject
+    user_activation_reply_to             = var.user_activation_reply_to
+    include_open_hpds                    = var.include_open_hpds
+    a4_okta_idp_provider_is_enabled      = var.a4_okta_idp_provider_is_enabled
+    a4_okta_client_id                    = var.a4_okta_client_id
+    a4_okta_client_secret                = var.a4_okta_client_secret
+    a4_okta_connection_id                = var.a4_okta_connection_id
+    a4_okta_idp_provider_uri             = var.a4_okta_idp_provider_uri
+    fence_idp_provider_is_enabled        = var.fence_idp_provider_is_enabled
+    fence_idp_provider_uri               = var.fence_idp_provider_uri
+    fence_client_id                      = var.fence_client_id
+    fence_client_secret                  = var.fence_client_secret
+    auth0_idp_provider_is_enabled        = var.auth0_idp_provider_is_enabled
+    auth0_host                           = var.auth0_host
+    auth0_denied_email_enabled           = var.auth0_denied_email_enabled
+    ras_okta_idp_provider_is_enabled     = var.ras_okta_idp_provider_is_enabled
+    ras_okta_idp_provider_uri            = var.ras_okta_idp_provider_uri
+    ras_okta_connection_id               = var.ras_okta_connection_id
+    ras_okta_client_id                   = var.ras_okta_client_id
+    ras_okta_client_secret               = var.ras_okta_client_secret
+    ras_idp_uri                          = var.ras_idp_uri
+    ras_passport_issuer                  = var.ras_passport_issuer
+    devtools_secret                      = var.devtools_secret
   })
 
   content_type           = "text/plain"
@@ -276,6 +283,18 @@ resource "aws_s3_object" "psama_env" {
     precondition {
       condition     = var.application_client_secret != ""
       error_message = "application_client_secret is empty; check the render job's TF_VAR_application_client_secret export. It cannot be regenerated."
+    }
+    precondition {
+      condition     = var.application_client_secret_is_base_64 != ""
+      error_message = "application_client_secret_is_base_64 is empty; check the render job's TF_VAR_application_client_secret_is_base_64 export. Read it off the live psama.env rather than guessing: a wrong value changes the JWT signing key bytes and silently invalidates every issued token."
+    }
+    precondition {
+      condition     = var.user_id_claim != ""
+      error_message = "user_id_claim is empty; check the render job's TF_VAR_user_id_claim export. Read it off the live psama.env rather than guessing: it names the JWT claim that identifies the caller on every request."
+    }
+    precondition {
+      condition     = var.token_inclusion_roles != ""
+      error_message = "token_inclusion_roles is empty; check the render job's TF_VAR_token_inclusion_roles export. Read it off the live psama.env rather than guessing: it is the allowlist of roles embedded in issued JWTs and read downstream for authorization."
     }
     precondition {
       condition     = !var.a4_okta_idp_provider_is_enabled || var.a4_okta_client_secret != ""
