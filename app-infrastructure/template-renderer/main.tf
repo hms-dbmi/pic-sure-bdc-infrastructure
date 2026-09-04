@@ -46,7 +46,6 @@ resource "aws_s3_object" "visualization_env" {
   }
 }
 
-# Gateway-rewrite service env files
 # picsure_application_token and query_service_internal_token must be byte-identical
 # across gateway.env, operations.env, and query.env.
 
