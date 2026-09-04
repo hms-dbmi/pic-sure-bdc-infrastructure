@@ -115,12 +115,10 @@ variable "render_dictionary" {
   default     = false
 }
 
-# ---- Dictionary datasource ---------------------------------------------------
-# The bdc profile drives the AWS Secrets Manager PostgreSQL JDBC driver, so the
-# username is a Secrets Manager secret id and the driver reads the real username and
-# password out of that secret. No database password is a variable here, by design.
-# Neither value is marked sensitive, matching app_user_secret_name; the render job
-# should still pass both as TF_VAR_* rather than -var so they stay off the command line.
+# The bdc profile uses the AWS Secrets Manager PostgreSQL JDBC driver, so
+# dictionary_datasource_username holds a secret id rather than a username. The driver
+# reads the real username and password out of that secret. No database password belongs
+# in this module.
 
 variable "dictionary_datasource_url" {
   description = "Bare database host for picsure-dictionary; application-bdc.properties wraps it into the jdbc-secretsmanager URL"

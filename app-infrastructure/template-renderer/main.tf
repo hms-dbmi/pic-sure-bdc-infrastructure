@@ -46,11 +46,9 @@ resource "aws_s3_object" "visualization_env" {
   }
 }
 
-# ---- Gateway-rewrite service env files -------------------------------------
-# Each of the three renders behind its own flag now. query_service_internal_token,
-# picsure_application_token, and (for query.env) aggregate_obfuscation_salt are
-# supplied by the caller and must be byte-identical across gateway.env,
-# operations.env, and query.env.
+# Gateway-rewrite service env files
+# picsure_application_token and query_service_internal_token must be byte-identical
+# across gateway.env, operations.env, and query.env.
 
 data "aws_secretsmanager_secret_version" "picsure_app_user" {
   count     = var.render_operations ? 1 : 0
@@ -152,14 +150,12 @@ resource "aws_s3_object" "query_env" {
   }
 }
 
-# ---- Shared-object service env files -----------------------------------------
-# What these two share is the S3 object, not the service: unlike the six resources above,
-# their keys carry no target_stack segment, so every stack's deploy pulls the same file.
-# Each stack still runs its own pic-sure-logging and picsure-dictionary container on its
-# own wildfly host. That is why a change to either object reaches every stack at once,
-# and why LOGGING_API_KEY cannot be re-minted for one stack alone. The paths below are
-# the ones deploy-logging.sh and deploy-dictionary.sh already fetch; changing them
-# breaks every deploy.
+# Shared-object service env files
+# These two keys carry no target_stack segment, so one object serves every stack. Each
+# stack still runs its own pic-sure-logging and picsure-dictionary container. A change to
+# either object therefore reaches every stack at once, and LOGGING_API_KEY cannot be
+# re-minted for one stack alone. deploy-logging.sh and deploy-dictionary.sh already fetch
+# these paths; changing them breaks every deploy.
 
 resource "aws_s3_object" "logging_env" {
   count  = var.render_logging ? 1 : 0
