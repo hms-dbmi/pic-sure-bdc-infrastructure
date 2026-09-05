@@ -16,7 +16,6 @@ stack_s3_bucket="${stack_s3_bucket}"
 stack_githash="${stack_githash}"
 dataset_s3_object_key="${dataset_s3_object_key}"
 gss_prefix="${gss_prefix}"
-bootstrap_standard_critical_artifacts="${bootstrap_standard_critical_artifacts}"
 
 # This is added to our /etc/environment to make them available to our deploy script
 # when executed by our ssm command. Doing this allows us to make values optional.
@@ -95,17 +94,13 @@ sudo chmod +x /opt/picsure/deploy-logging.sh
 sudo chmod +x /opt/picsure/deploy-visualization.sh
 
 
-if [[ "$bootstrap_standard_critical_artifacts" == "true" ]]; then
-  sudo /opt/picsure/deploy-operations.sh --stack_s3_bucket "${stack_s3_bucket}" --target_stack "${target_stack}"
-  sudo /opt/picsure/deploy-query.sh --stack_s3_bucket "${stack_s3_bucket}" --target_stack "${target_stack}"
-  sudo /opt/picsure/deploy-psama.sh --stack_s3_bucket "${stack_s3_bucket}" --target_stack "${target_stack}" --dataset_s3_object_key "${dataset_s3_object_key}"
-fi
+sudo /opt/picsure/deploy-operations.sh --stack_s3_bucket "${stack_s3_bucket}" --target_stack "${target_stack}"
+sudo /opt/picsure/deploy-query.sh --stack_s3_bucket "${stack_s3_bucket}" --target_stack "${target_stack}"
+sudo /opt/picsure/deploy-psama.sh --stack_s3_bucket "${stack_s3_bucket}" --target_stack "${target_stack}" --dataset_s3_object_key "${dataset_s3_object_key}"
 sudo /opt/picsure/deploy-dictionary.sh --stack_s3_bucket "${stack_s3_bucket}" --target_stack "${target_stack}"
 sudo /opt/picsure/deploy-logging.sh --stack_s3_bucket "${stack_s3_bucket}" --target_stack "${target_stack}"
 sudo /opt/picsure/deploy-visualization.sh --stack_s3_bucket "${stack_s3_bucket}" --target_stack "${target_stack}"
-if [[ "$bootstrap_standard_critical_artifacts" == "true" ]]; then
-  sudo /opt/picsure/deploy-gateway.sh --stack_s3_bucket "${stack_s3_bucket}" --target_stack "${target_stack}"
-fi
+sudo /opt/picsure/deploy-gateway.sh --stack_s3_bucket "${stack_s3_bucket}" --target_stack "${target_stack}"
 
 tag_init_complete true
 

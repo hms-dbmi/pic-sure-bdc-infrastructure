@@ -15,6 +15,4 @@ ip-vars.properties
 
 .idea/
 *.iml
-__pycache__/
-*.py[cod]
 .terraform.lock.hcl

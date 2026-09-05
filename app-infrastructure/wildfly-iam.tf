@@ -99,21 +99,6 @@ resource "aws_iam_role_policy" "wildfly-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": [
-        "arn:aws:s3:::${var.stack_s3_bucket}/${var.target_stack}/banner-rollout/forward/*/containers/pic-sure-operations-service.tar.gz",
-        "arn:aws:s3:::${var.stack_s3_bucket}/${var.target_stack}/banner-rollout/forward/*/containers/pic-sure-hpds-query-service.tar.gz",
-        "arn:aws:s3:::${var.stack_s3_bucket}/${var.target_stack}/banner-rollout/forward/*/containers/psama.tar.gz",
-        "arn:aws:s3:::${var.stack_s3_bucket}/${var.target_stack}/banner-rollout/forward/*/containers/pic-sure-gateway.tar.gz",
-        "arn:aws:s3:::${var.stack_s3_bucket}/${var.target_stack}/banner-rollout/rollback/*/containers/pic-sure-operations-service.tar.gz",
-        "arn:aws:s3:::${var.stack_s3_bucket}/${var.target_stack}/banner-rollout/rollback/*/containers/pic-sure-hpds-query-service.tar.gz",
-        "arn:aws:s3:::${var.stack_s3_bucket}/${var.target_stack}/banner-rollout/rollback/*/containers/psama.tar.gz",
-        "arn:aws:s3:::${var.stack_s3_bucket}/${var.target_stack}/banner-rollout/rollback/*/containers/pic-sure-gateway.tar.gz"
-      ]
-    },{
-      "Action": [
-        "s3:GetObject"
-      ],
-      "Effect": "Allow",
       "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/data/*/fence_mapping.json"
     },{
       "Action": [
@@ -244,8 +229,6 @@ resource "aws_iam_role_policy" "wildfly-deployment-s3-policy" {
             "configs/*",
             "data/*",
             "${var.target_stack}/containers/*",
-            "${var.target_stack}/banner-rollout/forward/*/containers/*",
-            "${var.target_stack}/banner-rollout/rollback/*/containers/*",
             "${var.target_stack}/scripts/*",
             "certs/wildfly/*",
             "${var.target_stack}/certs/wildfly/*"

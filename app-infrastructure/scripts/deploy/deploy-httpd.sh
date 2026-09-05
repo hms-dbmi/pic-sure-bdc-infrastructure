@@ -1,8 +1,6 @@
 #!/bin/bash
 set -euo pipefail
 
-artifact_etag=""
-
 while [[ $# -gt 0 ]]; do
   case $1 in
     --stack_s3_bucket)
@@ -15,14 +13,6 @@ while [[ $# -gt 0 ]]; do
        ;;
     --dataset_s3_object_key)
        dataset_s3_object_key="$2"
-       shift 2
-       ;;
-    --artifact_prefix)
-       artifact_prefix="$2"
-       shift 2
-       ;;
-    --artifact_etag)
-       artifact_etag="$2"
        shift 2
        ;;
     *)
@@ -41,7 +31,6 @@ fi
 
 stack_s3_bucket=${stack_s3_bucket:-${STACK_S3_BUCKET:-}}
 target_stack=${target_stack:-${TARGET_STACK:-}}
-artifact_prefix=${artifact_prefix:-${target_stack}/containers}
 
 if [[ -z "$stack_s3_bucket" || -z "$target_stack" ]]; then
   echo "Error: --stack_s3_bucket and --target_stack are required."
@@ -60,29 +49,7 @@ s3_copy() {
   exit 1
 }
 
-s3_get_exact() {
-  local bucket="$1"
-  local key="$2"
-  local etag="$3"
-  local destination="$4"
-  for i in {1..5}; do
-    sudo /usr/bin/aws --region us-east-1 s3api get-object \
-      --bucket "$bucket" \
-      --key "$key" \
-      --if-match "$etag" \
-      "$destination" >/dev/null && return 0
-    sleep 30
-  done
-  echo "ERROR: exact S3 artifact download failed after 5 attempts: s3://${bucket}/${key}" >&2
-  exit 1
-}
-
-if [[ "$artifact_prefix" == "${target_stack}/banner-rollout/"* ]]; then
-  [[ -n "$artifact_etag" ]] || { echo "ERROR: banner frontend deploy requires the verified artifact ETag." >&2; exit 2; }
-  s3_get_exact "$stack_s3_bucket" "$artifact_prefix/pic-sure-frontend.tar.gz" "$artifact_etag" "/opt/picsure/pic-sure-frontend.tar.gz"
-else
-  s3_copy "s3://${stack_s3_bucket}/${artifact_prefix}/pic-sure-frontend.tar.gz" "/opt/picsure/pic-sure-frontend.tar.gz"
-fi
+s3_copy "s3://${stack_s3_bucket}/${target_stack}/containers/pic-sure-frontend.tar.gz" "/opt/picsure/pic-sure-frontend.tar.gz"
 s3_copy "s3://${stack_s3_bucket}/${target_stack}/configs/httpd/httpd-vhosts.conf" "/usr/local/docker-config/httpd-vhosts.conf"
 s3_copy "s3://${stack_s3_bucket}/configs/pic-sure-frontend/bdc.env" "/opt/picsure/bdc.env"
 s3_copy "s3://${stack_s3_bucket}/certs/httpd/" "/usr/local/docker-config/cert/" --recursive

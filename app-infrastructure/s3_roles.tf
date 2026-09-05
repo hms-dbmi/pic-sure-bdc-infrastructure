@@ -21,15 +21,6 @@ resource "aws_iam_role_policy" "httpd-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": [
-        "arn:aws:s3:::${var.stack_s3_bucket}/${var.target_stack}/banner-rollout/forward/*/containers/pic-sure-frontend.tar.gz",
-        "arn:aws:s3:::${var.stack_s3_bucket}/${var.target_stack}/banner-rollout/rollback/*/containers/pic-sure-frontend.tar.gz"
-      ]
-    },{
-      "Action": [
-        "s3:GetObject"
-      ],
-      "Effect": "Allow",
       "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/certs/httpd/server.crt"
     },{
       "Action": [
@@ -113,8 +104,6 @@ resource "aws_iam_role_policy" "httpd-deployment-s3-policy" {
             "${var.target_stack}/certs/httpd/*",
             "data/*",
             "certs/httpd/*",
-            "${var.target_stack}/banner-rollout/forward/*/containers/*",
-            "${var.target_stack}/banner-rollout/rollback/*/containers/*",
             "${var.target_stack}/scripts/*"
           ]
         }
@@ -428,3 +417,4 @@ resource "aws_iam_role_policy_attachment" "attach-cloudwatch-ssm-policy-to-open-
 locals {
   project_no_space     = replace(var.env_project, " ", "-")
 }
+
