@@ -1,7 +1,0 @@
-{
-  "repository": "https://github.com/hms-dbmi/pic-sure-all-in-one.git",
-  "commit": "52adb20a8160a2c956b9dd7fc642a30cd1a79ac9",
-  "path": "tests/banner-local-integration/contract.json",
-  "gitBlob": "955498265a7b16212946334032198d83f724b440",
-  "sha256": "28885897e199529ac3c0957d4e87a492328fd5480936a7cd3e740c7cf57d49be"
-}
