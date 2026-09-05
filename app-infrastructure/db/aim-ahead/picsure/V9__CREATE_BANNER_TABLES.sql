@@ -70,6 +70,5 @@ CREATE TABLE banner_priority_allocator
     CONSTRAINT chk_banner_priority_allocator_singleton CHECK (id = 1)
 ) ENGINE = InnoDB;
 
--- The banner tables are created empty in this same migration, so the allocator starts at 1.
 INSERT INTO banner_priority_allocator (id, next_priority)
 VALUES (1, 1);
