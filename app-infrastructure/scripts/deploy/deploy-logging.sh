@@ -44,7 +44,7 @@ s3_copy() {
   exit 1
 }
 
-s3_copy "s3://${stack_s3_bucket}/configs/pic-sure-logging/logging.env" "/opt/picsure/logging.env"
+s3_copy "s3://${stack_s3_bucket}/configs/pic-sure-logging/${target_stack}/logging.env" "/opt/picsure/logging.env"
 s3_copy "s3://${stack_s3_bucket}/${target_stack}/containers/pic-sure-logging.tar.gz" "/opt/picsure/pic-sure-logging.tar.gz"
 
 LOGGING_IMAGE=$(podman load < /opt/picsure/pic-sure-logging.tar.gz | cut -d ' ' -f 3)

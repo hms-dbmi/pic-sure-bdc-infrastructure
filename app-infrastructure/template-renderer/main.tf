@@ -149,17 +149,14 @@ resource "aws_s3_object" "query_env" {
   }
 }
 
-# Shared-object service env files
-# These two keys carry no target_stack segment, so one object serves every stack. Each
-# stack still runs its own pic-sure-logging and picsure-dictionary container. A change to
-# either object therefore reaches every stack at once, and LOGGING_API_KEY cannot be
-# re-minted for one stack alone. deploy-logging.sh and deploy-dictionary.sh already fetch
-# these paths; changing them breaks every deploy.
+# picsure-dictionary.env carries no target_stack segment, so one object serves every stack
+# and a change to it reaches every stack at once. deploy-dictionary.sh fetches that path;
+# changing it breaks every deploy.
 
 resource "aws_s3_object" "logging_env" {
   count  = var.render_logging ? 1 : 0
   bucket = var.stack_s3_bucket
-  key    = "configs/pic-sure-logging/logging.env"
+  key    = "configs/pic-sure-logging/${var.target_stack}/logging.env"
   content = templatefile("${path.module}/templates/logging.env.tftpl", {
     logging_api_key  = var.logging_api_key
     environment_name = var.environment_name
