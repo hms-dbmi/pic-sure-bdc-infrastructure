@@ -77,6 +77,10 @@ resource "aws_s3_object" "gateway_env" {
 
   lifecycle {
     precondition {
+      condition     = var.picsure_token_introspection_token != ""
+      error_message = "picsure_token_introspection_token is empty; gateway.env would publish a blank TOKEN_INTROSPECTION_TOKEN, PSAMA rejects the gateway's introspection calls, and users see 502 on every authenticated route. Check the render job's TF_VAR_picsure_token_introspection_token export."
+    }
+    precondition {
       condition     = var.picsure_application_token != ""
       error_message = "picsure_application_token is empty; check the render job's TF_VAR_picsure_application_token export."
     }
