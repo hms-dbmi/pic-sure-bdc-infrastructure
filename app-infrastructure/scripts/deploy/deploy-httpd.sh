@@ -49,9 +49,63 @@ s3_copy() {
   exit 1
 }
 
+# Migration fallback. These config objects moved from a stack-independent key to a per-stack one.
+# Prefer the per-stack object, accept the pre-migration one while the copy is outstanding, and
+# stop with instructions when neither exists. Writes always target the per-stack key, so the
+# fallback retires itself once the object has been copied.
+s3_object_exists() {
+  sudo /usr/bin/aws --region us-east-1 s3api head-object \
+    --bucket "$stack_s3_bucket" --key "$1" >/dev/null 2>&1
+}
+
+s3_copy_stack_or_legacy() {
+  local stack_key=$1
+  local legacy_key=$2
+  local destination=$3
+  shift 3
+
+  if s3_object_exists "$stack_key"; then
+    s3_copy "s3://${stack_s3_bucket}/${stack_key}" "$destination"
+    return 0
+  fi
+
+  if s3_object_exists "$legacy_key"; then
+    echo "WARNING: s3://${stack_s3_bucket}/${stack_key} is missing; using s3://${stack_s3_bucket}/${legacy_key} instead." >&2
+    echo "WARNING: that object has no stack segment, so every stack reads it. Copy it to the per-stack key to finish the migration." >&2
+    s3_copy "s3://${stack_s3_bucket}/${legacy_key}" "$destination"
+    return 0
+  fi
+
+  echo "ERROR: no configuration file found for stack ${target_stack}." >&2
+  echo "ERROR:   looked for s3://${stack_s3_bucket}/${stack_key}" >&2
+  echo "ERROR:   and        s3://${stack_s3_bucket}/${legacy_key}" >&2
+  echo "ERROR:" >&2
+  echo "ERROR: A container started without it would come up misconfigured, so this deploy stops here." >&2
+  echo "ERROR: To fix it:" >&2
+  local step
+  for step in "$@"; do
+    echo "ERROR:   ${step}" >&2
+  done
+  echo "ERROR:" >&2
+  echo "ERROR: Then re-run this deploy. If you believe the object does exist, check that the" >&2
+  echo "ERROR: instance role grants s3:GetObject on both keys above; a denied read looks identical" >&2
+  echo "ERROR: to a missing object here." >&2
+  exit 1
+}
+
 s3_copy "s3://${stack_s3_bucket}/${target_stack}/containers/pic-sure-frontend.tar.gz" "/opt/picsure/pic-sure-frontend.tar.gz"
 s3_copy "s3://${stack_s3_bucket}/${target_stack}/configs/httpd/httpd-vhosts.conf" "/usr/local/docker-config/httpd-vhosts.conf"
-s3_copy "s3://${stack_s3_bucket}/configs/pic-sure-frontend/${target_stack}/bdc.env" "/opt/picsure/bdc.env"
+s3_copy_stack_or_legacy \
+  "configs/pic-sure-frontend/${target_stack}/bdc.env" \
+  "configs/pic-sure-frontend/bdc.env" \
+  "/opt/picsure/bdc.env" \
+  "1. Get a starting file: run 'Download PIC-SURE-Frontend Configuration' against a stack that" \
+  "   has one, or copy PIC-SURE-Frontend/.env.example from the frontend repository." \
+  "2. Set LOGGING_API_KEY to the value in this stack's rendered" \
+  "   configs/pic-sure-logging/${target_stack}/logging.env. A mismatch is not fatal to the" \
+  "   frontend, but pic-sure-logging answers its audit events with 401 and they are dropped." \
+  "3. Upload it with 'Upload PIC-SURE-Frontend Configuration', TARGET_STACK=${target_stack}." \
+  "   bdc.env is per stack; configuration.json on that job is shared and does not need changing."
 s3_copy "s3://${stack_s3_bucket}/certs/httpd/" "/usr/local/docker-config/cert/" --recursive
 
 CONTAINER_NAME=httpd
