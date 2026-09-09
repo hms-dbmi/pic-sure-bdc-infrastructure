@@ -132,6 +132,7 @@ resource "aws_s3_object" "query_env" {
     aggregate_obfuscation_salt   = var.aggregate_obfuscation_salt
     picsure_application_token    = var.picsure_application_token
     query_service_internal_token = var.query_service_internal_token
+    include_open_hpds            = var.include_open_hpds
   })
 
   content_type           = "text/plain"
