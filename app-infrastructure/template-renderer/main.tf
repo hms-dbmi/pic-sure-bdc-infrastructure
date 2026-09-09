@@ -116,6 +116,7 @@ resource "aws_s3_object" "query_env" {
   content = templatefile("${path.module}/templates/query.env.tftpl", {
     target_stack                 = var.target_stack
     env_private_dns_name         = var.env_private_dns_name
+    include_open_hpds            = var.include_open_hpds
     aggregate_obfuscation_salt   = random_password.aggregate_obfuscation_salt[0].result
     picsure_application_token    = random_password.picsure_application_token[0].result
     query_service_internal_token = random_password.query_service_internal_token[0].result
