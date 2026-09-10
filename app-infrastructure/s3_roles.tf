@@ -75,7 +75,10 @@ resource "aws_iam_role_policy" "httpd-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/pic-sure-frontend/bdc.env"
+      "Resource": [
+        "arn:aws:s3:::${var.stack_s3_bucket}/configs/pic-sure-frontend/${var.target_stack}/bdc.env",
+        "arn:aws:s3:::${var.stack_s3_bucket}/configs/pic-sure-frontend/bdc.env"
+      ]
     },
     {
       "Action": [
@@ -415,6 +418,6 @@ resource "aws_iam_role_policy_attachment" "attach-cloudwatch-ssm-policy-to-open-
 
 
 locals {
-  project_no_space     = replace(var.env_project, " ", "-")
+  project_no_space = replace(var.env_project, " ", "-")
 }
 

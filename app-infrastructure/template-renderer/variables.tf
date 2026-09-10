@@ -21,23 +21,35 @@ variable "env_private_dns_name" {
 variable "render_auth_hpds" {
   description = "Whether to render and upload the auth HPDS env file"
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "render_open_hpds" {
   description = "Whether to render and upload the open HPDS env file"
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "render_visualization" {
   description = "Whether to render and upload the visualization env file"
   type        = bool
-  default     = true
+  default     = false
 }
 
-variable "render_picsure_services" {
-  description = "Render gateway/operations/query env files. All three render together: the shared tokens are minted per apply and must stay identical across the files."
+variable "render_gateway" {
+  description = "Whether to render and upload the gateway env file"
+  type        = bool
+  default     = false
+}
+
+variable "render_operations" {
+  description = "Whether to render and upload the operations env file"
+  type        = bool
+  default     = false
+}
+
+variable "render_query" {
+  description = "Whether to render and upload the query env file"
   type        = bool
   default     = false
 }
@@ -46,12 +58,35 @@ variable "picsure_token_introspection_token" {
   description = "PSAMA_APPLICATION service JWT for gateway token introspection"
   type        = string
   default     = ""
+  sensitive   = true
+}
+
+variable "picsure_application_token" {
+  description = "Shared application token consumed by gateway.env, operations.env, and query.env"
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
+variable "query_service_internal_token" {
+  description = "Internal query-service token consumed by gateway.env, operations.env, and query.env"
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
+variable "aggregate_obfuscation_salt" {
+  description = "Aggregate obfuscation salt consumed by query.env"
+  type        = string
+  default     = ""
+  sensitive   = true
 }
 
 variable "logging_api_key" {
   description = "API key for the pic-sure-logging service"
   type        = string
   default     = ""
+  sensitive   = true
 }
 
 variable "app_user_secret_name" {
@@ -67,3 +102,33 @@ variable "include_open_hpds" {
   # missing -var must never silently enable GATEWAY_OPEN_ACCESS_ENABLED.
   default = false
 }
+
+variable "render_logging" {
+  description = "Whether to render and upload the pic-sure-logging env file"
+  type        = bool
+  default     = false
+}
+
+variable "render_dictionary" {
+  description = "Whether to render and upload the picsure-dictionary env file"
+  type        = bool
+  default     = false
+}
+
+# The bdc profile uses the AWS Secrets Manager PostgreSQL JDBC driver, so
+# dictionary_datasource_username holds a secret id rather than a username. The driver
+# reads the real username and password out of that secret. No database password belongs
+# in this module.
+
+variable "dictionary_datasource_url" {
+  description = "Bare database host for picsure-dictionary; application-bdc.properties wraps it into the jdbc-secretsmanager URL"
+  type        = string
+  default     = ""
+}
+
+variable "dictionary_datasource_username" {
+  description = "Secrets Manager secret id holding the picsure-dictionary database credentials"
+  type        = string
+  default     = ""
+}
+
