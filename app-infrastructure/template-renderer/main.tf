@@ -49,15 +49,6 @@ resource "aws_s3_object" "visualization_env" {
 # picsure_application_token and query_service_internal_token must be byte-identical
 # across gateway.env, operations.env, and query.env.
 
-data "aws_secretsmanager_secret_version" "picsure_app_user" {
-  count     = var.render_operations ? 1 : 0
-  secret_id = var.app_user_secret_name
-}
-
-locals {
-  picsure_app_user = var.render_operations ? jsondecode(data.aws_secretsmanager_secret_version.picsure_app_user[0].secret_string) : {}
-}
-
 resource "aws_s3_object" "gateway_env" {
   count  = var.render_gateway ? 1 : 0
   bucket = var.stack_s3_bucket
@@ -100,9 +91,8 @@ resource "aws_s3_object" "operations_env" {
   bucket = var.stack_s3_bucket
   key    = "configs/operations/${var.target_stack}/operations.env"
   content = templatefile("${path.module}/templates/operations.env.tftpl", {
-    picsure_db_host              = local.picsure_app_user["host"]
-    picsure_db_username          = local.picsure_app_user["username"]
-    picsure_db_password          = local.picsure_app_user["password"]
+    picsure_db_host              = var.picsure_db_host
+    app_user_secret_name         = var.app_user_secret_name
     picsure_application_token    = var.picsure_application_token
     query_service_internal_token = var.query_service_internal_token
   })
@@ -111,6 +101,14 @@ resource "aws_s3_object" "operations_env" {
   server_side_encryption = "AES256"
 
   lifecycle {
+    precondition {
+      condition     = var.picsure_db_host != ""
+      error_message = "picsure_db_host is empty; check the render job's TF_VAR_picsure_db_host export."
+    }
+    precondition {
+      condition     = var.app_user_secret_name != ""
+      error_message = "app_user_secret_name is empty; operations.env would name no secret and the datasource could not authenticate. Check the render job's TF_VAR_app_user_secret_name export."
+    }
     precondition {
       condition     = var.picsure_application_token != ""
       error_message = "picsure_application_token is empty; check the render job's TF_VAR_picsure_application_token export."

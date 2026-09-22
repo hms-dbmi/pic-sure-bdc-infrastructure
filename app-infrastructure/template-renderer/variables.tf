@@ -90,7 +90,13 @@ variable "logging_api_key" {
 }
 
 variable "app_user_secret_name" {
-  description = "Secrets Manager secret holding the picsure app DB user (username/password/host)"
+  description = "Secrets Manager secret id for the picsure app DB user. operations.env passes it to the Secrets Manager JDBC driver as the username; this module never reads the secret."
+  type        = string
+  default     = ""
+}
+
+variable "picsure_db_host" {
+  description = "picsure MySQL host (host or host:port); operations.env wraps it into the jdbc-secretsmanager URL"
   type        = string
   default     = ""
 }
