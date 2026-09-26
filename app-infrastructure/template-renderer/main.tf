@@ -95,6 +95,7 @@ resource "aws_s3_object" "operations_env" {
     app_user_secret_name         = var.app_user_secret_name
     picsure_application_token    = var.picsure_application_token
     query_service_internal_token = var.query_service_internal_token
+    logging_api_key              = var.logging_api_key
   })
 
   content_type           = "text/plain"
