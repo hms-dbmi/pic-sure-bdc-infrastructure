@@ -3,8 +3,7 @@
     {
       "id": "datastage",
       "name": "datastage",
-      "basePath": "/picsure",
-      "findPath": "/PIC-SURE/search"
+      "basePath": "/picsure"
     }
   ],
   "queryExportType": "EXPORT_ASYNC",
