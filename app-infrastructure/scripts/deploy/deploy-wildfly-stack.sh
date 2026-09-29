@@ -13,6 +13,7 @@ set -euo pipefail
 deploy_gateway=false
 deploy_operations=false
 deploy_query=false
+deploy_mcp=false
 deploy_psama=false
 deploy_dictionary=false
 deploy_visualization=false
@@ -34,6 +35,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --deploy_query)
       deploy_query=true
+      shift
+      ;;
+    --deploy_mcp)
+      deploy_mcp=true
       shift
       ;;
     --deploy_psama)
@@ -92,6 +97,13 @@ fi
 if [[ "$deploy_query" == "true" ]]; then
   echo "=== Deploying pic-sure-hpds-query-service ==="
   /opt/picsure/deploy-query.sh \
+    --stack_s3_bucket "$stack_s3_bucket" \
+    --target_stack "$target_stack" || failed=true
+fi
+
+if [[ "$deploy_mcp" == "true" ]]; then
+  echo "=== Deploying pic-sure-mcp ==="
+  /opt/picsure/deploy-mcp.sh \
     --stack_s3_bucket "$stack_s3_bucket" \
     --target_stack "$target_stack" || failed=true
 fi
