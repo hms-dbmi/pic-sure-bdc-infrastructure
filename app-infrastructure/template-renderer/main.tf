@@ -61,6 +61,8 @@ resource "aws_s3_object" "gateway_env" {
     include_open_hpds                 = var.include_open_hpds
     picsure_application_token         = var.picsure_application_token
     query_service_internal_token      = var.query_service_internal_token
+    mcp_service_token                 = var.mcp_service_token
+    mcp_service_token_previous        = var.mcp_service_token_previous
   })
 
   content_type           = "text/plain"
@@ -82,6 +84,10 @@ resource "aws_s3_object" "gateway_env" {
     precondition {
       condition     = var.logging_api_key != ""
       error_message = "logging_api_key is empty; check the render job's TF_VAR_logging_api_key export."
+    }
+    precondition {
+      condition     = var.mcp_service_token != ""
+      error_message = "mcp_service_token is empty; check the render job's TF_VAR_mcp_service_token export."
     }
   }
 }
@@ -149,6 +155,35 @@ resource "aws_s3_object" "query_env" {
     precondition {
       condition     = var.aggregate_obfuscation_salt != ""
       error_message = "aggregate_obfuscation_salt is empty; check the render job's TF_VAR_aggregate_obfuscation_salt export."
+    }
+  }
+}
+
+resource "aws_s3_object" "mcp_env" {
+  count  = var.render_mcp ? 1 : 0
+  bucket = var.stack_s3_bucket
+  key    = "configs/mcp/${var.target_stack}/mcp.env"
+  content = templatefile("${path.module}/templates/mcp.env.tftpl", {
+    env_public_dns_name = var.env_public_dns_name
+    mcp_service_token   = var.mcp_service_token
+    logging_api_key     = var.logging_api_key
+  })
+
+  content_type           = "text/plain"
+  server_side_encryption = "AES256"
+
+  lifecycle {
+    precondition {
+      condition     = var.mcp_service_token != ""
+      error_message = "mcp_service_token is empty; check the render job's TF_VAR_mcp_service_token export."
+    }
+    precondition {
+      condition     = var.env_public_dns_name != ""
+      error_message = "env_public_dns_name is empty; check the render job's TF_VAR_env_public_dns_name export."
+    }
+    precondition {
+      condition     = var.logging_api_key != ""
+      error_message = "logging_api_key is empty; check the render job's TF_VAR_logging_api_key export."
     }
   }
 }
