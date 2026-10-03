@@ -9,6 +9,9 @@
 -- The migration fails on purpose if any listed role is missing and so did not receive the privilege. A renamed
 -- role would otherwise ship as a silent denial for its users. The failure duplicates the rule's own
 -- primary key, which errors 1062 in every sql_mode, and nothing half-applies.
+--
+-- Flyway still records the failed version 29 in flyway_schema_history, so after fixing the role the next run
+-- needs FLYWAY_REPAIR=true on the Database Migrations job.
 use auth;
 
 SET @mcpRequests = unhex(REPLACE(UUID(),'-',''));
