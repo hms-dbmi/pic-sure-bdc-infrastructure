@@ -70,7 +70,7 @@ systemctl restart nftables
 
 systemctl enable --now podman
 
-sudo mkdir -p /var/log/picsure/{gateway,operations,query,mcp,psama,dictionary,logging,visualization}
+sudo mkdir -p /var/log/picsure/{gateway,operations,query,psama,dictionary,logging,visualization}
 
 s3_copy "s3://${stack_s3_bucket}/${target_stack}/scripts/deploy-gateway.sh" "/opt/picsure/deploy-gateway.sh"
 s3_copy "s3://${stack_s3_bucket}/${target_stack}/scripts/deploy-operations.sh" "/opt/picsure/deploy-operations.sh"
