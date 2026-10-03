@@ -101,13 +101,6 @@ if [[ "$deploy_query" == "true" ]]; then
     --target_stack "$target_stack" || failed=true
 fi
 
-if [[ "$deploy_mcp" == "true" ]]; then
-  echo "=== Deploying pic-sure-mcp ==="
-  /opt/picsure/deploy-mcp.sh \
-    --stack_s3_bucket "$stack_s3_bucket" \
-    --target_stack "$target_stack" || failed=true
-fi
-
 if [[ "$deploy_psama" == "true" ]]; then
   echo "=== Deploying psama ==="
   /opt/picsure/deploy-psama.sh \
@@ -135,6 +128,13 @@ fi
 if [[ "$deploy_gateway" == "true" ]]; then
   echo "=== Deploying gateway ==="
   /opt/picsure/deploy-gateway.sh \
+    --stack_s3_bucket "$stack_s3_bucket" \
+    --target_stack "$target_stack" || failed=true
+fi
+
+if [[ "$deploy_mcp" == "true" ]]; then
+  echo "=== Deploying pic-sure-mcp ==="
+  /opt/picsure/deploy-mcp.sh \
     --stack_s3_bucket "$stack_s3_bucket" \
     --target_stack "$target_stack" || failed=true
 fi

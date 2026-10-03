@@ -85,10 +85,6 @@ resource "aws_s3_object" "gateway_env" {
       condition     = var.logging_api_key != ""
       error_message = "logging_api_key is empty; check the render job's TF_VAR_logging_api_key export."
     }
-    precondition {
-      condition     = var.mcp_service_token != ""
-      error_message = "mcp_service_token is empty; check the render job's TF_VAR_mcp_service_token export."
-    }
   }
 }
 
@@ -164,9 +160,11 @@ resource "aws_s3_object" "mcp_env" {
   bucket = var.stack_s3_bucket
   key    = "configs/mcp/${var.target_stack}/mcp.env"
   content = templatefile("${path.module}/templates/mcp.env.tftpl", {
-    env_public_dns_name = var.env_public_dns_name
-    mcp_service_token   = var.mcp_service_token
-    logging_api_key     = var.logging_api_key
+    env_public_dns_name            = var.env_public_dns_name
+    mcp_service_token              = var.mcp_service_token
+    logging_api_key                = var.logging_api_key
+    mcp_adapter_python_min_version = var.mcp_adapter_python_min_version
+    mcp_adapter_r_tag              = var.mcp_adapter_r_tag
   })
 
   content_type           = "text/plain"
@@ -179,7 +177,7 @@ resource "aws_s3_object" "mcp_env" {
     }
     precondition {
       condition     = var.env_public_dns_name != ""
-      error_message = "env_public_dns_name is empty; check the render job's TF_VAR_env_public_dns_name export."
+      error_message = "env_public_dns_name is empty; check the render job's -var=env_public_dns_name argument, which it takes from the env_public_dns_name controller global."
     }
     precondition {
       condition     = var.logging_api_key != ""

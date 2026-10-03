@@ -95,6 +95,18 @@ variable "env_public_dns_name" {
   default     = ""
 }
 
+variable "mcp_adapter_python_min_version" {
+  description = "Oldest picsure Python adapter release the code pic-sure-mcp generates supports; blank lets pic-sure-mcp use its built-in default"
+  type        = string
+  default     = ""
+}
+
+variable "mcp_adapter_r_tag" {
+  description = "R adapter release tag the R code pic-sure-mcp generates installs; blank lets pic-sure-mcp use its built-in default"
+  type        = string
+  default     = ""
+}
+
 variable "render_mcp" {
   description = "Whether to render and upload the pic-sure-mcp env file"
   type        = bool
