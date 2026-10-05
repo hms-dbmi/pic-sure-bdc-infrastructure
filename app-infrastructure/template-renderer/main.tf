@@ -161,7 +161,7 @@ resource "aws_s3_object" "query_env" {
 resource "aws_s3_object" "logging_env" {
   count  = var.render_logging ? 1 : 0
   bucket = var.stack_s3_bucket
-  key    = "configs/pic-sure-logging/${var.target_stack}/logging.env"
+  key    = "configs/pic-sure-logging/logging.env"
   content = templatefile("${path.module}/templates/logging.env.tftpl", {
     logging_api_key  = var.logging_api_key
     environment_name = var.environment_name
@@ -185,6 +185,7 @@ resource "aws_s3_object" "dictionary_env" {
   content = templatefile("${path.module}/templates/picsure-dictionary.env.tftpl", {
     dictionary_datasource_url      = var.dictionary_datasource_url
     dictionary_datasource_username = var.dictionary_datasource_username
+    logging_api_key                = var.logging_api_key
   })
 
   content_type           = "text/plain"
@@ -198,6 +199,10 @@ resource "aws_s3_object" "dictionary_env" {
     precondition {
       condition     = var.dictionary_datasource_username != ""
       error_message = "dictionary_datasource_username is empty; check the render job's TF_VAR_dictionary_datasource_username export."
+    }
+    precondition {
+      condition     = var.logging_api_key != ""
+      error_message = "logging_api_key is empty; check the render job's TF_VAR_logging_api_key export."
     }
   }
 }

@@ -44,36 +44,36 @@ s3_copy() {
   exit 1
 }
 
-# Migration fallback. These config objects moved from a stack-independent key to a per-stack one.
-# Prefer the per-stack object, accept the pre-migration one while the copy is outstanding, and
-# stop with instructions when neither exists. Writes always target the per-stack key, so the
-# fallback retires itself once the object has been copied.
+# Migration fallback. logging.env moved from a per-stack key back to one stackless key, because a
+# single LOGGING_API_KEY now serves every stack. Prefer the shared object, accept this stack's
+# per-stack object until the Render job has written the shared one, and stop with instructions
+# when neither exists.
 s3_object_exists() {
   sudo /usr/bin/aws --region us-east-1 s3api head-object \
     --bucket "$stack_s3_bucket" --key "$1" >/dev/null 2>&1
 }
 
-s3_copy_stack_or_legacy() {
-  local stack_key=$1
-  local legacy_key=$2
+s3_copy_shared_or_stack() {
+  local shared_key=$1
+  local stack_key=$2
   local destination=$3
   shift 3
 
+  if s3_object_exists "$shared_key"; then
+    s3_copy "s3://${stack_s3_bucket}/${shared_key}" "$destination"
+    return 0
+  fi
+
   if s3_object_exists "$stack_key"; then
+    echo "WARNING: s3://${stack_s3_bucket}/${shared_key} is missing; using s3://${stack_s3_bucket}/${stack_key} instead." >&2
+    echo "WARNING: run 'Render PIC-SURE Configuration' with RENDER_LOGGING to write the shared object every stack reads." >&2
     s3_copy "s3://${stack_s3_bucket}/${stack_key}" "$destination"
     return 0
   fi
 
-  if s3_object_exists "$legacy_key"; then
-    echo "WARNING: s3://${stack_s3_bucket}/${stack_key} is missing; using s3://${stack_s3_bucket}/${legacy_key} instead." >&2
-    echo "WARNING: that object has no stack segment, so every stack reads it. Copy it to the per-stack key to finish the migration." >&2
-    s3_copy "s3://${stack_s3_bucket}/${legacy_key}" "$destination"
-    return 0
-  fi
-
   echo "ERROR: no configuration file found for stack ${target_stack}." >&2
-  echo "ERROR:   looked for s3://${stack_s3_bucket}/${stack_key}" >&2
-  echo "ERROR:   and        s3://${stack_s3_bucket}/${legacy_key}" >&2
+  echo "ERROR:   looked for s3://${stack_s3_bucket}/${shared_key}" >&2
+  echo "ERROR:   and        s3://${stack_s3_bucket}/${stack_key}" >&2
   echo "ERROR:" >&2
   echo "ERROR: A container started without it would come up misconfigured, so this deploy stops here." >&2
   echo "ERROR: To fix it:" >&2
@@ -88,20 +88,21 @@ s3_copy_stack_or_legacy() {
   exit 1
 }
 
-s3_copy_stack_or_legacy \
-  "configs/pic-sure-logging/${target_stack}/logging.env" \
+s3_copy_shared_or_stack \
   "configs/pic-sure-logging/logging.env" \
+  "configs/pic-sure-logging/${target_stack}/logging.env" \
   "/opt/picsure/logging.env" \
   "1. In Jenkins, run 'Render PIC-SURE Configuration' with TARGET_STACK=${target_stack} and" \
-  "   RENDER_LOGGING, RENDER_GATEWAY and RENDER_VISUALIZATION all true. On a first render it" \
-  "   mints a LOGGING_API_KEY and writes the per-stack logging.env; all three must render" \
-  "   together so they agree on the key." \
-  "2. Redeploy this stack's gateway, visualization and pic-sure-logging so every container" \
-  "   carries that key. 'Rotate PIC-SURE Stack Secrets' does the render and the redeploys in" \
-  "   one run if you would rather not sequence them by hand." \
+  "   RENDER_LOGGING, RENDER_GATEWAY, RENDER_OPERATIONS, RENDER_VISUALIZATION and" \
+  "   RENDER_DICTIONARY all true. On a first render it mints the shared LOGGING_API_KEY and" \
+  "   writes configs/pic-sure-logging/logging.env; the consumers must render together so they" \
+  "   agree on the key." \
+  "2. Re-upload psama.env through 'Upload PSAMA Configuration', which adds the key, then redeploy" \
+  "   pic-sure-logging, gateway, operations, visualization, dictionary-api and psama." \
   "3. Put the same key in configs/pic-sure-frontend/${target_stack}/bdc.env via 'Upload" \
   "   PIC-SURE-Frontend Configuration' and redeploy the frontend, or its audit events are" \
   "   answered with 401 and dropped."
+
 s3_copy "s3://${stack_s3_bucket}/${target_stack}/containers/pic-sure-logging.tar.gz" "/opt/picsure/pic-sure-logging.tar.gz"
 
 LOGGING_IMAGE=$(podman load < /opt/picsure/pic-sure-logging.tar.gz | cut -d ' ' -f 3)
