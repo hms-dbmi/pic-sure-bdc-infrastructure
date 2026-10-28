@@ -302,7 +302,9 @@ JOIN tmp_cleanup_rule_signature s
  AND CAST(ar.description AS BINARY) = CAST(s.description AS BINARY)
  AND CAST(ar.rule AS BINARY) = CAST(s.rule_text AS BINARY)
  AND ar.type = s.rule_type
- AND (CAST(ar.value AS BINARY) <=> CAST(s.rule_value AS BINARY))
+ AND (CAST(ar.value AS BINARY) <=> CAST(s.rule_value AS BINARY)
+   OR (s.family = 'phenotype_underscore'
+       AND CAST(ar.value AS BINARY) = CAST(REPLACE(s.rule_value, CHAR(92), CONCAT(CHAR(92), CHAR(92))) AS BINARY)))
  AND ar.checkMapKeyOnly = s.map_key AND ar.checkMapNode = s.map_node
 WHERE ar.isGateAnyRelation = 0 AND ar.isEvaluateOnlyByGates = 0
   AND ar.subAccessRuleParent_uuid IS NULL;
@@ -330,8 +332,8 @@ INSERT INTO tmp_cleanup_rule_shape (uuid, name, family)
 SELECT DISTINCT ar.uuid, ar.name, s.family
 FROM access_rule ar JOIN tmp_cleanup_consent_shape s
  ON CAST(ar.rule AS BINARY) = CAST(s.path AS BINARY)
- AND CAST(ar.name AS BINARY) = CAST(CONCAT(s.name_prefix, REPLACE(ar.value, '.', '_'), s.name_suffix) AS BINARY)
- AND CAST(ar.description AS BINARY) = CAST(CONCAT('MANAGED AR for ', ar.value,
+ AND CAST(ar.name AS BINARY) = CAST(CONCAT(s.name_prefix, REPLACE(IF(CAST(ar.value AS BINARY) = CAST('Nhanes' AS BINARY), 'nhanes', ar.value), '.', '_'), s.name_suffix) AS BINARY)
+ AND CAST(ar.description AS BINARY) = CAST(CONCAT('MANAGED AR for ', IF(CAST(ar.value AS BINARY) = CAST('Nhanes' AS BINARY), 'nhanes', ar.value),
      IF(s.family = 'topmed_empty', '.', ''),
      IF(s.family IN ('topmed','topmed_empty'), ' Topmed data', ' clinical concepts')) AS BINARY)
 WHERE ar.type = 5 AND ar.checkMapKeyOnly = 0 AND ar.checkMapNode = 0
@@ -369,7 +371,7 @@ WHERE CAST(LEFT(ar.name,9) AS BINARY) = CAST('AR_PHENO_' AS BINARY)
  AND LEFT(ar.value,1) = CHAR(92) AND RIGHT(ar.value,1) = CHAR(92)
  AND REGEXP_LIKE(SUBSTRING(ar.value,2,CHAR_LENGTH(ar.value)-2), '^[A-Za-z0-9][A-Za-z0-9_-]*$', 'c')
  AND CAST(RIGHT(SUBSTRING(ar.name,10,CHAR_LENGTH(ar.name)-10-CHAR_LENGTH(s.label)),CHAR_LENGTH(ar.value)-1) AS BINARY)
-       = CAST(CONCAT('_',SUBSTRING(ar.value,2,CHAR_LENGTH(ar.value)-2)) AS BINARY)
+       = CAST(CONCAT('_',IF(CAST(SUBSTRING(ar.value,2,CHAR_LENGTH(ar.value)-2) AS BINARY) = CAST('Nhanes' AS BINARY), 'nhanes', SUBSTRING(ar.value,2,CHAR_LENGTH(ar.value)-2))) AS BINARY)
  AND CHAR_LENGTH(SUBSTRING(ar.name,10,CHAR_LENGTH(ar.name)-10-CHAR_LENGTH(s.label))) > CHAR_LENGTH(ar.value)-1
  AND ar.isGateAnyRelation = 0 AND ar.isEvaluateOnlyByGates = 0 AND ar.subAccessRuleParent_uuid IS NULL;
 
@@ -495,6 +497,22 @@ FROM tmp_cleanup_rule_classification WHERE family='ambiguous';
 /* The migration must hard-assert this count is zero before the first base-table DELETE. */
 SELECT entity_type, HEX(uuid) AS uuid_hex, name, reason
 FROM tmp_cleanup_classification_blocker ORDER BY entity_type,name,uuid;
+SELECT 'blocked_rule' AS diagnostic, HEX(ar.uuid) AS uuid_hex, ar.name, ar.description, ar.rule, ar.type, ar.value,
+ ar.checkMapKeyOnly+0 AS map_key, ar.checkMapNode+0 AS map_node,
+ ar.isGateAnyRelation+0 AS gate_any, ar.isEvaluateOnlyByGates+0 AS gates_only, HEX(ar.subAccessRuleParent_uuid) AS parent_hex
+FROM access_rule ar JOIN tmp_cleanup_classification_blocker b ON b.uuid=ar.uuid AND b.entity_type='access_rule'
+ORDER BY ar.name;
+SELECT 'blocked_rule_vs_signature' AS diagnostic, ar.name,
+ CAST(ar.description AS BINARY)<=>CAST(s.description AS BINARY) AS description_ok,
+ CAST(ar.rule AS BINARY)<=>CAST(s.rule_text AS BINARY) AS rule_ok,
+ ar.type<=>s.rule_type AS type_ok,
+ CAST(ar.value AS BINARY)<=>CAST(s.rule_value AS BINARY) AS value_ok,
+ ar.checkMapKeyOnly=s.map_key AS map_key_ok, ar.checkMapNode=s.map_node AS map_node_ok,
+ ar.isGateAnyRelation=0 AND ar.isEvaluateOnlyByGates=0 AND ar.subAccessRuleParent_uuid IS NULL AS flags_ok
+FROM access_rule ar
+JOIN tmp_cleanup_classification_blocker b ON b.uuid=ar.uuid AND b.entity_type='access_rule'
+JOIN tmp_cleanup_rule_signature s ON CAST(s.name AS BINARY)=CAST(ar.name AS BINARY)
+ORDER BY ar.name;
 
 INSERT INTO tmp_cleanup_assert (check_name, passed) SELECT 'no_orphan_accessRule_gate_gate_id', IF((NOT EXISTS (SELECT 1 FROM `accessRule_gate` c LEFT JOIN `access_rule` p ON p.`uuid`=c.`gate_id` WHERE c.`gate_id` IS NOT NULL AND p.`uuid` IS NULL)),1,0);
 
