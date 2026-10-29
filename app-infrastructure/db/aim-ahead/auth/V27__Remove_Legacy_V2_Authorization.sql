@@ -299,7 +299,9 @@ SELECT ar.uuid, ar.name, s.family
 FROM access_rule ar
 JOIN tmp_cleanup_rule_signature s
   ON CAST(ar.name AS BINARY) = CAST(s.name AS BINARY)
- AND CAST(ar.description AS BINARY) = CAST(s.description AS BINARY)
+ AND (CAST(ar.description AS BINARY) = CAST(s.description AS BINARY)
+   OR (s.family = 'topmed_restricted'
+       AND CAST(ar.description AS BINARY) = CAST(REPLACE(s.description, 'restricting', 'retricting') AS BINARY)))
  AND CAST(ar.rule AS BINARY) = CAST(s.rule_text AS BINARY)
  AND ar.type = s.rule_type
  AND (CAST(ar.value AS BINARY) <=> CAST(s.rule_value AS BINARY)
