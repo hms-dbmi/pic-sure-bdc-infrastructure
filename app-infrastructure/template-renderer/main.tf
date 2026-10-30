@@ -86,8 +86,8 @@ resource "aws_s3_object" "gateway_env" {
       error_message = "logging_api_key is empty; check the render job's TF_VAR_logging_api_key export."
     }
     precondition {
-      condition     = !var.rate_limit_enabled || trimspace(var.rate_limit_trusted_proxies) != ""
-      error_message = "rate_limit_enabled is true but rate_limit_trusted_proxies is empty; the gateway refuses to start that way. Set it to the hops in front of the gateway (see gateway.env.tftpl)."
+      condition     = !var.rate_limit_enabled || length([for c in split(",", var.rate_limit_trusted_proxies) : c if trimspace(c) != ""]) > 0
+      error_message = "rate_limit_enabled is true but rate_limit_trusted_proxies has no non-blank entry; the gateway refuses to start that way. Set it to the hops in front of the gateway (see gateway.env.tftpl)."
     }
   }
 }
