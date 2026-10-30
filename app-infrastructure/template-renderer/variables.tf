@@ -138,3 +138,15 @@ variable "dictionary_datasource_username" {
   default     = ""
 }
 
+
+variable "rate_limit_enabled" {
+  description = "Turns on the gateway's open-access rate limiter (RATE_LIMIT_ENABLED). Needs rate_limit_trusted_proxies set first."
+  type        = bool
+  default     = false
+}
+
+variable "rate_limit_trusted_proxies" {
+  description = "Comma-separated CIDRs of the hops in front of the gateway (RATE_LIMIT_TRUSTED_PROXIES); see gateway.env.tftpl"
+  type        = string
+  default     = ""
+}
