@@ -138,7 +138,6 @@ variable "dictionary_datasource_username" {
   default     = ""
 }
 
-
 variable "rate_limit_enabled" {
   description = "Turns on the gateway's open-access rate limiter (RATE_LIMIT_ENABLED). Needs rate_limit_trusted_proxies set first."
   type        = bool
