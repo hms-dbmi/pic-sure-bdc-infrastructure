@@ -13,6 +13,7 @@ set -euo pipefail
 deploy_gateway=false
 deploy_operations=false
 deploy_query=false
+deploy_mcp=false
 deploy_psama=false
 deploy_dictionary=false
 deploy_visualization=false
@@ -34,6 +35,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --deploy_query)
       deploy_query=true
+      shift
+      ;;
+    --deploy_mcp)
+      deploy_mcp=true
       shift
       ;;
     --deploy_psama)
@@ -81,6 +86,7 @@ if [[ -z "$stack_s3_bucket" || -z "$target_stack" ]]; then
 fi
 
 failed=false
+gateway_failed=false
 
 if [[ "$deploy_operations" == "true" ]]; then
   echo "=== Deploying pic-sure-operations-service ==="
@@ -124,7 +130,18 @@ if [[ "$deploy_gateway" == "true" ]]; then
   echo "=== Deploying gateway ==="
   /opt/picsure/deploy-gateway.sh \
     --stack_s3_bucket "$stack_s3_bucket" \
-    --target_stack "$target_stack" || failed=true
+    --target_stack "$target_stack" || { failed=true; gateway_failed=true; }
+fi
+
+if [[ "$deploy_mcp" == "true" ]]; then
+  if [[ "$gateway_failed" == "true" ]]; then
+    echo "=== Skipping pic-sure-mcp: the gateway deploy failed in this run, so pic-sure-mcp keeps its current container. Redeploy it once the gateway is up. ==="
+  else
+    echo "=== Deploying pic-sure-mcp ==="
+    /opt/picsure/deploy-mcp.sh \
+      --stack_s3_bucket "$stack_s3_bucket" \
+      --target_stack "$target_stack" || failed=true
+  fi
 fi
 
 if [[ "$failed" == "true" ]]; then

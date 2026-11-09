@@ -93,6 +93,12 @@ resource "aws_iam_role_policy" "wildfly-deployment-s3-policy" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/${var.target_stack}/containers/pic-sure-mcp.tar.gz"
+    },{
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
       "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/${var.target_stack}/containers/psama.tar.gz"
     },{
       "Action": [
@@ -118,6 +124,12 @@ resource "aws_iam_role_policy" "wildfly-deployment-s3-policy" {
       ],
       "Effect": "Allow",
       "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/query/${var.target_stack}/query.env"
+    },{
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/configs/mcp/${var.target_stack}/mcp.env"
     },{
       "Action": [
         "s3:GetObject"
@@ -166,6 +178,12 @@ resource "aws_iam_role_policy" "wildfly-deployment-s3-policy" {
       ],
       "Effect": "Allow",
       "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/${var.target_stack}/scripts/deploy-query.sh"
+    },{
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.stack_s3_bucket}/${var.target_stack}/scripts/deploy-mcp.sh"
     },{
       "Action": [
         "s3:GetObject"

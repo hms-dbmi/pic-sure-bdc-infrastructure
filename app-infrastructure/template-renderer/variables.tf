@@ -75,6 +75,44 @@ variable "query_service_internal_token" {
   sensitive   = true
 }
 
+variable "mcp_service_token" {
+  description = "Service token the gateway presents to pic-sure-mcp, consumed by gateway.env and mcp.env"
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
+variable "mcp_service_token_previous" {
+  description = "Previous service token the gateway still accepts during rotation, consumed by gateway.env"
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
+variable "env_public_dns_name" {
+  description = "The public DNS name of the environment, used as the pic-sure-mcp adapter base URL"
+  type        = string
+  default     = ""
+}
+
+variable "mcp_adapter_python_min_version" {
+  description = "Oldest picsure Python adapter release the code pic-sure-mcp generates supports; blank lets pic-sure-mcp use its built-in default"
+  type        = string
+  default     = ""
+}
+
+variable "mcp_adapter_r_tag" {
+  description = "R adapter release tag the R code pic-sure-mcp generates installs; blank lets pic-sure-mcp use its built-in default"
+  type        = string
+  default     = ""
+}
+
+variable "render_mcp" {
+  description = "Whether to render and upload the pic-sure-mcp env file"
+  type        = bool
+  default     = false
+}
+
 variable "aggregate_obfuscation_salt" {
   description = "Aggregate obfuscation salt consumed by query.env"
   type        = string

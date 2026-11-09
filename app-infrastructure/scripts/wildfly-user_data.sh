@@ -102,6 +102,14 @@ sudo /opt/picsure/deploy-logging.sh --stack_s3_bucket "${stack_s3_bucket}" --tar
 sudo /opt/picsure/deploy-visualization.sh --stack_s3_bucket "${stack_s3_bucket}" --target_stack "${target_stack}"
 sudo /opt/picsure/deploy-gateway.sh --stack_s3_bucket "${stack_s3_bucket}" --target_stack "${target_stack}"
 
+if (s3_copy "s3://${stack_s3_bucket}/${target_stack}/scripts/deploy-mcp.sh" "/opt/picsure/deploy-mcp.sh") &&
+  sudo chmod +x /opt/picsure/deploy-mcp.sh &&
+  sudo /opt/picsure/deploy-mcp.sh --stack_s3_bucket "${stack_s3_bucket}" --target_stack "${target_stack}"; then
+  echo "pic-sure-mcp deployed"
+else
+  echo "WARNING: pic-sure-mcp did not deploy; the output above names the cause. PSAMA, the gateway and the other services are up, and initialization continues." >&2
+fi
+
 tag_init_complete true
 
 echo "user-data progress starting update"
