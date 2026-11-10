@@ -61,6 +61,8 @@ resource "aws_s3_object" "gateway_env" {
     include_open_hpds                 = var.include_open_hpds
     picsure_application_token         = var.picsure_application_token
     query_service_internal_token      = var.query_service_internal_token
+    rate_limit_enabled                = var.rate_limit_enabled
+    rate_limit_trusted_proxies        = var.rate_limit_trusted_proxies
   })
 
   content_type           = "text/plain"
@@ -82,6 +84,10 @@ resource "aws_s3_object" "gateway_env" {
     precondition {
       condition     = var.logging_api_key != ""
       error_message = "logging_api_key is empty; check the render job's TF_VAR_logging_api_key export."
+    }
+    precondition {
+      condition     = !var.rate_limit_enabled || length([for c in split(",", var.rate_limit_trusted_proxies) : c if trimspace(c) != ""]) > 0
+      error_message = "rate_limit_enabled is true but rate_limit_trusted_proxies has no non-blank entry; the gateway refuses to start that way. Set it to the hops in front of the gateway (see gateway.env.tftpl)."
     }
   }
 }
