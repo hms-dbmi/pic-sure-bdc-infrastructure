@@ -62,6 +62,7 @@ podman create --privileged --name=$CONTAINER_NAME \
       --env-file /opt/picsure/picsure-dictionary.env \
        -v /var/log/picsure/dictionary/:/var/log/:Z \
       --network picsure \
+      -p 8085:80 \
       --log-opt tag=$CONTAINER_NAME \
       -e JAVA_OPTS="$JAVA_OPTS" \
       "$DICTIONARY_API_IMAGE"

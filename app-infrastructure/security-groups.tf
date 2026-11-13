@@ -84,6 +84,37 @@ resource "aws_security_group" "inbound-wildfly-from-hpds" {
   }
 }
 
+resource "aws_security_group" "auth-hpds-host" {
+  name        = "auth_hpds_host_${local.uniq_name}"
+  description = "Carries no rules. Marks the auth hpds host so other groups can name it as a traffic source"
+  vpc_id      = local.target_vpc
+
+  tags = {
+    Owner       = "Avillach_Lab"
+    Environment = var.environment_name
+    Name        = "auth-hpds-host Security Group - ${var.target_stack} - ${local.uniq_name}"
+  }
+}
+
+resource "aws_security_group" "inbound-dictionary-from-auth-hpds" {
+  name        = "allow_inbound_from_auth_hpds_to_dictionary_${local.uniq_name}"
+  description = "Allow inbound traffic from the auth hpds host to the dictionary on port 8085 of wildfly"
+  vpc_id      = local.target_vpc
+
+  ingress {
+    from_port       = 8085
+    to_port         = 8085
+    protocol        = "tcp"
+    security_groups = [aws_security_group.auth-hpds-host.id]
+  }
+
+  tags = {
+    Owner       = "Avillach_Lab"
+    Environment = var.environment_name
+    Name        = "inbound-dictionary Security Group - ${var.target_stack} - ${local.uniq_name}"
+  }
+}
+
 resource "aws_security_group" "inbound-mysql-from-wildfly" {
   name        = "allow_inbound_from_wildfly_to_mysql_${local.uniq_name}"
   description = "Allow inbound traffic from wildfly to mysql on port 3306"
