@@ -75,6 +75,13 @@ variable "query_service_internal_token" {
   sensitive   = true
 }
 
+variable "picsure_internal_token" {
+  description = "Shared secret sent as X-PIC-SURE-INTERNAL-TOKEN on /internal calls. Consumed by auth-hpds.env and picsure-dictionary.env, and must be byte-identical in both. picsure-dictionary.env is one object for every stack, so every stack's auth-hpds.env has to carry the same value."
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
 variable "aggregate_obfuscation_salt" {
   description = "Aggregate obfuscation salt consumed by query.env"
   type        = string
