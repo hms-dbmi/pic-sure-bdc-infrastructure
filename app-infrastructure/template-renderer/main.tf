@@ -63,6 +63,8 @@ resource "aws_s3_object" "gateway_env" {
     query_service_internal_token      = var.query_service_internal_token
     mcp_service_token                 = var.mcp_service_token
     mcp_service_token_previous        = var.mcp_service_token_previous
+    ai_service_token                  = var.ai_service_token
+    ai_service_token_previous         = var.ai_service_token_previous
   })
 
   content_type           = "text/plain"
@@ -182,6 +184,30 @@ resource "aws_s3_object" "mcp_env" {
     precondition {
       condition     = var.logging_api_key != ""
       error_message = "logging_api_key is empty; check the render job's TF_VAR_logging_api_key export."
+    }
+  }
+}
+
+resource "aws_s3_object" "ai_service_env" {
+  count  = var.render_ai_service ? 1 : 0
+  bucket = var.stack_s3_bucket
+  key    = "configs/ai-service/${var.target_stack}/ai-service.env"
+  content = templatefile("${path.module}/templates/ai-service.env.tftpl", {
+    target_stack         = var.target_stack
+    env_private_dns_name = var.env_private_dns_name
+    ai_service_token   = var.ai_service_token
+    ai_service_enabled = var.ai_service_enabled
+    bedrock_region     = var.ai_service_bedrock_region
+    bedrock_model_id   = var.ai_service_bedrock_model_id
+  })
+
+  content_type           = "text/plain"
+  server_side_encryption = "AES256"
+
+  lifecycle {
+    precondition {
+      condition     = var.ai_service_token != ""
+      error_message = "ai_service_token is empty; check the render job's TF_VAR_ai_service_token export."
     }
   }
 }

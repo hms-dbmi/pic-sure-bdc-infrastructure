@@ -31,11 +31,14 @@ resource "aws_instance" "wildfly-ec2" {
 
   user_data = data.template_cloudinit_config.wildfly-user-data.rendered
 
-  vpc_security_group_ids = [
-    aws_security_group.outbound-to-internet.id,
-    aws_security_group.inbound-wildfly-from-httpd.id,
-    aws_security_group.inbound-wildfly-from-hpds.id
-  ]
+  vpc_security_group_ids = concat(
+    [
+      aws_security_group.outbound-to-internet.id,
+      aws_security_group.inbound-wildfly-from-httpd.id,
+      aws_security_group.inbound-wildfly-from-hpds.id
+    ],
+    aws_security_group.inbound-wildfly-from-ai-service[*].id
+  )
 
   root_block_device {
     delete_on_termination = true

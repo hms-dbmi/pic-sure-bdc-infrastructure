@@ -65,6 +65,12 @@ variable "include_auth_hpds" {
   type    = bool
 }
 
+variable "include_ai_service" {
+  description = "Whether to launch the pic-sure-ai-service host"
+  type        = bool
+  default     = false
+}
+
 variable "include_open_hpds" {
   type    = bool
 }

@@ -113,6 +113,44 @@ variable "render_mcp" {
   default     = false
 }
 
+variable "ai_service_token" {
+  description = "Service token pic-sure-ai-service presents to the gateway on /mcp calls, consumed by gateway.env and ai-service.env"
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
+variable "ai_service_token_previous" {
+  description = "Previous AI service token the gateway still accepts during rotation, consumed by gateway.env"
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
+variable "ai_service_enabled" {
+  description = "Whether pic-sure-ai-service registers its chat endpoint (AI_ENABLED)"
+  type        = bool
+  default     = true
+}
+
+variable "ai_service_bedrock_region" {
+  description = "AWS region of the Bedrock endpoint pic-sure-ai-service calls"
+  type        = string
+  default     = "us-east-1"
+}
+
+variable "ai_service_bedrock_model_id" {
+  description = "Bedrock model id pic-sure-ai-service uses; the instance role's Bedrock policy must allow it"
+  type        = string
+  default     = "openai.gpt-oss-120b-1:0"
+}
+
+variable "render_ai_service" {
+  description = "Whether to render and upload the pic-sure-ai-service env file"
+  type        = bool
+  default     = false
+}
+
 variable "aggregate_obfuscation_salt" {
   description = "Aggregate obfuscation salt consumed by query.env"
   type        = string
