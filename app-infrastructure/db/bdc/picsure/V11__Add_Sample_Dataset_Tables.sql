@@ -11,7 +11,7 @@ ALTER TABLE `query`
     ADD COLUMN `consents` JSON NULL,
     ADD COLUMN `query_to_variant_uuid` binary(16) NULL,
     ADD COLUMN `sample` bit(1) NOT NULL DEFAULT 0,
-    ADD COLUMN `result_type` varchar(64) NULL,
+    ADD COLUMN `result_type` varchar(64) COLLATE utf8_bin NULL,
     ADD COLUMN `created_at` datetime(3) NULL,
     ALGORITHM=INSTANT;
 
