@@ -187,29 +187,34 @@ recover_interrupted_swap() {
 }
 
 # Auth host: HPDS must never run with the authorization filter off. Refuse an env
-# file that names requireAuthorizationFilter (any case, any line) with a value other
-# than true.
+# file in which ANY mention of requireAuthorizationFilter (any case, any line, a -D
+# token, the env-var form or a JSON key) has a value other than exactly true. Every
+# mention is checked at its own position, so a later mention cannot vouch for an
+# earlier one.
 refuse_filter_not_true() {
-  local env_file=$1 line rest value re named matched
-  re="requireAuthorizationFilter[[:space:]]*[=:][[:space:]]*[\"']?([^[:space:]\"']*)"
+  local env_file=$1 line rest lc pre tail value="" re_plain re_json
+  re_plain="^requireAuthorizationFilter[[:space:]]*[=:][[:space:]]*[\"']?([^[:space:]\"']*)"
+  re_json="^requireAuthorizationFilter[\"'][[:space:]]*[=:][[:space:]]*[\"']?([^][:space:]\"',}]*)"
   while IFS= read -r line || [[ -n "$line" ]]; do
     rest=$line
     while true; do
-      # Names and values are matched case-insensitively for the name only: the value
-      # must be exactly "true".
+      lc=$(printf '%s' "$rest" | tr '[:upper:]' '[:lower:]')
+      pre=${lc%%requireauthorizationfilter*}
+      [[ "$pre" != "$lc" ]] || break
+      tail=${rest:${#pre}}
       shopt -s nocasematch
-      named=1
-      matched=1
-      [[ "$rest" == *requireAuthorizationFilter* ]] || named=0
-      if [[ $named -eq 1 ]]; then
-        [[ "$rest" =~ $re ]] || matched=0
+      if [[ "${tail:26:1}" == '"' || "${tail:26:1}" == "'" ]]; then
+        [[ "$tail" =~ $re_json ]] || value="?"
+      else
+        [[ "$tail" =~ $re_plain ]] || value="?"
       fi
       shopt -u nocasematch
-      [[ $named -eq 1 ]] || break
-      [[ $matched -eq 1 ]] || die "${env_file} names requireAuthorizationFilter without a value that can be checked; refusing to deploy the auth host"
+      if [[ "${value:-}" == "?" ]]; then
+        die "${env_file} names requireAuthorizationFilter without a value that can be checked; refusing to deploy the auth host"
+      fi
       value=${BASH_REMATCH[1]}
       [[ "$value" == "true" ]] || die "${env_file} sets requireAuthorizationFilter to '${value}'; the auth host must run with it true, refusing to deploy"
-      rest=${rest#*"${BASH_REMATCH[0]}"}
+      rest=${tail:${#BASH_REMATCH[0]}}
     done
   done <"$env_file"
 }
@@ -303,7 +308,7 @@ deploy_per_file_dataset() {
   local manifest="${DEPLOY_ROOT}/opt/picsure/manifest-${HPDS_VARIANT}.tsv"
   local line lineno=0 variant_seen="" header_seen=false layout="flat"
   local layout_lines=0 layout_seen="" partitions_lines=0 partitions_seen=""
-  local removed_seen="" override_seen=""
+  local removed_seen="" override_seen="" removed_lines=0 override_lines=0
   local dest bytes sha etag src
   local -a dests=() sizes=() shas=() pids=()
   local total=0 need avail_kb idx running seen seen_dests="" dup failed=0
@@ -337,8 +342,14 @@ deploy_per_file_dataset() {
           partitions_lines=$((partitions_lines + 1))
           partitions_seen=${line#"# partitions="}
           ;;
-        "# stigvars_removed="*) removed_seen=${line#"# stigvars_removed="} ;;
-        "# stigvars_override="*) override_seen=${line#"# stigvars_override="} ;;
+        "# stigvars_removed="*)
+          removed_lines=$((removed_lines + 1))
+          removed_seen=${line#"# stigvars_removed="}
+          ;;
+        "# stigvars_override="*)
+          override_lines=$((override_lines + 1))
+          override_seen=${line#"# stigvars_override="}
+          ;;
       esac
       continue
     fi
@@ -363,18 +374,28 @@ deploy_per_file_dataset() {
 
   [[ "$header_seen" == "true" ]] || die "manifest.tsv has no header line"
   [[ ${#dests[@]} -gt 0 ]] || die "manifest.tsv lists no files"
-  dup=$(printf '%s' "$seen_dests" | sort | uniq -d | head -n 1)
+  dup=$(printf '%s' "$seen_dests" | sort | uniq -d)
+  dup=${dup%%$'\n'*}
   [[ -z "$dup" ]] || die "duplicate dest in manifest.tsv: ${dup}"
-
-  # A dev-only open dataset (stigmatized variables not removed) needs its override.
-  if [[ "$HPDS_VARIANT" == "open" && "$removed_seen" == "false" && "$override_seen" != "true" ]]; then
-    die "manifest.tsv has '# stigvars_removed=false' without '# stigvars_override=true'; refusing to serve it on the open host"
-  fi
 
   [[ $layout_lines -le 1 ]] || die "manifest.tsv has more than one '# layout=' header"
   if [[ $layout_lines -eq 1 ]]; then
     [[ "$layout_seen" == "partitioned" ]] || die "unknown layout '${layout_seen}' in manifest.tsv"
     layout=partitioned
+  fi
+
+  # Open host: a dataset whose stigmatized variables were not removed (dev only) must say
+  # so with exactly one '# stigvars_removed=false' and one '# stigvars_override=true'.
+  # Partitioned open manifests always need both (this phase never removes them); a flat
+  # one needs them only when it carries a stigvars_removed header (absent or true pass).
+  if [[ "$HPDS_VARIANT" == "open" ]]; then
+    if [[ "$layout" == "partitioned" || $removed_lines -gt 0 || $override_lines -gt 0 ]]; then
+      if [[ "$layout" != "partitioned" && $removed_lines -eq 1 && "$removed_seen" == "true" && $override_lines -eq 0 ]]; then
+        :
+      elif [[ $removed_lines -ne 1 || "$removed_seen" != "false" || $override_lines -ne 1 || "$override_seen" != "true" ]]; then
+        die "manifest.tsv for the open host needs exactly one '# stigvars_removed=false' and one '# stigvars_override=true' (or, flat only, no stigvars headers or '# stigvars_removed=true'); refusing to serve it"
+      fi
+    fi
   fi
 
   if [[ "$layout" == "partitioned" ]]; then

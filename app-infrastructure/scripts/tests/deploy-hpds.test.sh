@@ -280,6 +280,7 @@ refused() { [[ $RC -ne 0 ]] && unchanged_all && out_has "$1"; }
 # stage_partitioned <variant> <key>: a layout=partitioned dataset in the fake bucket.
 # Knobs (env): PART_NAMES, PART_TAG (content tag), PART_DECLARED (number or "none"),
 # PART_LAYOUT_LINE (default "# layout=partitioned", empty = omit), PART_EXTRA_HEADERS,
+# PART_STIG_HEADERS (open only, printf %b; default: removed=false + override=true),
 # PART_EXTRA_ROWS (printf %b rows), PART_SKIP_ROW (dest left out of the manifest),
 # PART_DASH_SHA (dest whose sha256 is written as "-").
 stage_partitioned() {
@@ -298,6 +299,7 @@ stage_partitioned() {
     if [[ -n ${PART_LAYOUT_LINE-"# layout=partitioned"} ]]; then printf '%s\n' "${PART_LAYOUT_LINE-"# layout=partitioned"}"; fi
     if [[ $declared != none ]]; then printf '# partitions=%s\n' "$declared"; fi
     printf '# dataset_id=2026-11-17T0930Z\n# source=s3://example/pheno-partitioned/datasets/2026-11-17T0930Z/\n# manifest_sha256=abc\n'
+    if [[ $variant == open ]]; then printf '%b' "${PART_STIG_HEADERS-# stigvars_removed=false\n# stigvars_override=true\n}"; fi
     if [[ -n ${PART_EXTRA_HEADERS:-} ]]; then printf '%b' "$PART_EXTRA_HEADERS"; fi
     printf 'dest\tbytes\tsha256\tetag\tsrc\n'
     for dest in "${dests[@]}"; do
@@ -627,7 +629,12 @@ for bad in \
   'JAVA_OPTS="-Xmx1g -DrequireAuthorizationFilter=no"\n' \
   'JAVA_OPTS=-Dhpds.requireAuthorizationFilter=TRUE\n' \
   'JAVA_OPTS=-Dhpds.requireAuthorizationFilter=\n' \
-  '# HPDS_requireAuthorizationFilter\n'; do
+  '# HPDS_requireAuthorizationFilter\n' \
+  'SPRING_APPLICATION_JSON={"hpds.requireAuthorizationFilter":false,"x":"-Dhpds.requireAuthorizationFilter=true"}\n' \
+  'JAVA_OPTS=-Dhpds.requireAuthorizationFilter=true -Dhpds.REQUIREAUTHORIZATIONFILTER=false\n' \
+  'SPRING_APPLICATION_JSON={"hpds.requireAuthorizationFilter":false}\n' \
+  'SPRING_APPLICATION_JSON={"hpds.requireAuthorizationFilter":"false","y":1}\n' \
+  'A=1\nHPDS_REQUIREAUTHORIZATIONFILTER=true\nHPDS_REQUIREAUTHORIZATIONFILTER=false\n'; do
   n=$((n + 1))
   new_env "a-filter-$n"
   put_env auth "$bad"
@@ -657,6 +664,18 @@ skip_genomic
 run_deploy auth
 check "env that already sets the filter true is accepted" rc_is_zero
 check "env with the filter true: still appended" env_has auth "JAVA_OPTS=-Xmx1g -Dhpds.requireAuthorizationFilter=true -Dhpds.requireAuthorizationFilter=true"
+new_env a-filter-json
+put_env auth 'SPRING_APPLICATION_JSON={"hpds.requireAuthorizationFilter":true,"x":"y"}\nJAVA_OPTS=-Xmx1g\n'
+stage_partitioned auth "$KEY"
+skip_genomic
+run_deploy auth
+check "a JSON key with the value true is accepted" rc_is_zero
+new_env a-filter-json-quoted
+put_env auth 'SPRING_APPLICATION_JSON={"hpds.requireAuthorizationFilter":"true"}\n'
+stage_partitioned auth "$KEY"
+skip_genomic
+run_deploy auth
+check "a JSON key with the string true is accepted" rc_is_zero
 
 echo "# the kept manifest is installed only after a successful swap"
 new_env kept
@@ -935,42 +954,63 @@ skip_genomic
 run_deploy auth
 check "control: a well-formed partitioned manifest passes" rc_is_zero
 
-echo "# open host: stigmatized variables not removed need the override"
-new_env stig-refuse
-stage_partitioned open "$KEY"
-awk 'NR==2{print; print "# stigvars_removed=false"; next} {print}' "$(stage_dir open "$KEY")/manifest.tsv" >"${CASE}/m" && cat "${CASE}/m" >"$(stage_dir open "$KEY")/manifest.tsv"
-snap
-run_deploy open
-check "stigvars_removed=false without override: refused" refused "stigvars_override=true"
-check "stigvars_removed=false without override: container not started" not_in_log 'systemctl start'
-new_env stig-override
-stage_partitioned open "$KEY"
-awk 'NR==2{print; print "# stigvars_removed=false"; print "# stigvars_override=true"; next} {print}' "$(stage_dir open "$KEY")/manifest.tsv" >"${CASE}/m" && cat "${CASE}/m" >"$(stage_dir open "$KEY")/manifest.tsv"
-run_deploy open
-check "stigvars_removed=false with override: deployed" rc_is_zero
-new_env stig-override-false
-stage_partitioned open "$KEY"
-awk 'NR==2{print; print "# stigvars_removed=false"; print "# stigvars_override=false"; next} {print}' "$(stage_dir open "$KEY")/manifest.tsv" >"${CASE}/m" && cat "${CASE}/m" >"$(stage_dir open "$KEY")/manifest.tsv"
-snap
-run_deploy open
-check "override=false: refused" refused "stigvars_override=true"
-new_env stig-flat
-stage_variant open "$KEY"
-awk 'NR==2{print; print "# stigvars_removed=false"; next} {print}' "$(stage_dir open "$KEY")/manifest.tsv" >"${CASE}/m" && cat "${CASE}/m" >"$(stage_dir open "$KEY")/manifest.tsv"
-snap
-run_deploy open
-check "flat open manifest with stigvars_removed=false, no override: refused" refused "stigvars_override=true"
-new_env stig-removed
-stage_partitioned open "$KEY"
-awk 'NR==2{print; print "# stigvars_removed=true"; next} {print}' "$(stage_dir open "$KEY")/manifest.tsv" >"${CASE}/m" && cat "${CASE}/m" >"$(stage_dir open "$KEY")/manifest.tsv"
-run_deploy open
-check "stigvars_removed=true: deployed" rc_is_zero
+echo "# open host: stigmatized variables not removed need exactly one removed=false and one override=true"
+stig_case() { # stig_case <label> <accept|refuse> <printf %b headers for a partitioned open manifest>
+  new_env "stig-$1"
+  PART_STIG_HEADERS=$3 stage_partitioned open "$KEY"
+  snap
+  run_deploy open
+  if [[ $2 == accept ]]; then
+    check "open partitioned, $1: deployed" rc_is_zero
+  else
+    check "open partitioned, $1: refused" refused "stigvars_override=true"
+    check "open partitioned, $1: container not started" not_in_log 'systemctl start'
+  fi
+}
+stig_case both-headers accept '# stigvars_removed=false\n# stigvars_override=true\n'
+stig_case no-headers refuse ''
+stig_case no-override refuse '# stigvars_removed=false\n'
+stig_case no-removed refuse '# stigvars_override=true\n'
+stig_case removed-true refuse '# stigvars_removed=true\n'
+stig_case removed-true-override refuse '# stigvars_removed=true\n# stigvars_override=true\n'
+stig_case removed-upper refuse '# stigvars_removed=FALSE\n# stigvars_override=true\n'
+stig_case removed-trailing-space refuse '# stigvars_removed=false \n# stigvars_override=true\n'
+stig_case override-false refuse '# stigvars_removed=false\n# stigvars_override=false\n'
+stig_case override-upper refuse '# stigvars_removed=false\n# stigvars_override=TRUE\n'
+stig_case override-trailing-space refuse '# stigvars_removed=false\n# stigvars_override=true \n'
+stig_case duplicate-removed refuse '# stigvars_removed=false\n# stigvars_removed=false\n# stigvars_override=true\n'
+stig_case duplicate-override refuse '# stigvars_removed=false\n# stigvars_override=true\n# stigvars_override=true\n'
+stig_case removed-conflict refuse '# stigvars_removed=false\n# stigvars_removed=true\n# stigvars_override=true\n'
+stig_case removed-empty refuse '# stigvars_removed=\n# stigvars_override=true\n'
+
+# flat open manifests: no header, removed=true pass; removed=false needs the override; anything else refused
+stig_flat() { # stig_flat <label> <accept|refuse> <printf %b headers inserted after line 2>
+  new_env "stigflat-$1"
+  stage_variant open "$KEY"
+  { head -n 2 "$(stage_dir open "$KEY")/manifest.tsv"; printf '%b' "$3"; tail -n +3 "$(stage_dir open "$KEY")/manifest.tsv"; } >"${CASE}/m"
+  cat "${CASE}/m" >"$(stage_dir open "$KEY")/manifest.tsv"
+  snap
+  run_deploy open
+  if [[ $2 == accept ]]; then
+    check "open flat, $1: deployed" rc_is_zero
+  else
+    check "open flat, $1: refused" refused "stigvars_override=true"
+  fi
+}
+stig_flat no-headers accept ''
+stig_flat removed-true accept '# stigvars_removed=true\n'
+stig_flat removed-false-override accept '# stigvars_removed=false\n# stigvars_override=true\n'
+stig_flat removed-false refuse '# stigvars_removed=false\n'
+stig_flat removed-false-override-false refuse '# stigvars_removed=false\n# stigvars_override=false\n'
+stig_flat removed-other refuse '# stigvars_removed=maybe\n'
+stig_flat removed-upper refuse '# stigvars_removed=False\n'
+stig_flat removed-duplicate refuse '# stigvars_removed=true\n# stigvars_removed=true\n'
+stig_flat override-alone refuse '# stigvars_override=true\n'
 new_env stig-auth
 stage_partitioned auth "$KEY"
 skip_genomic
 run_deploy auth
-check "auth manifest without the header is not affected" rc_is_zero
-
+check "auth manifest without the headers is not affected" rc_is_zero
 
 echo
 echo "passed: ${pass}, failed: ${failed}"
