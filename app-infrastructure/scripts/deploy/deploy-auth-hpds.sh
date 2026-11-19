@@ -412,6 +412,9 @@ deploy_per_file_dataset() {
     ! grep -Eq '^phenotypic(/|$)' <<<"$seen_dests" || die "a flat manifest.tsv must not list phenotypic/"
   fi
 
+  # Per-host check of the validated dest list (one dest per line), defined by the script.
+  variant_check_dests "$seen_dests"
+
   # The new set is written next to the live one (two sets are on disk until the swap
   # is done), so the free space must hold the whole new set.
   need=$((total + total / 10))
@@ -496,6 +499,31 @@ LEGACY_TAR=javabins_rekeyed.tar
 CONTAINER_NAME="auth-hpds"
 HPDS_REQUIRE_AUTH_FILTER=true
 
+# Auth host: the manifest must not list the global partition (phenotypic/global/, any
+# case). Authorization grants only fence-mapping keys and HPDS serves a partition
+# directory by exact name, all or nothing, so a "global" partition here would expose
+# every patient's global rows to whoever is granted "global". The open host serves it.
+# Called by deploy_per_file_dataset on the dest list it validated (the very manifest it
+# deploys), before any dataset file is downloaded or anything on the host is replaced.
+# A grep error (status above 1) refuses too, so the check never fails open.
+variant_check_dests() {
+  local hit rc=0
+  hit=$(grep -iE '^phenotypic/global(/|$)' <<<"$1") || rc=$?
+  [[ $rc -eq 1 ]] && return 0
+  [[ $rc -eq 0 ]] || die "could not check manifest.tsv for the global partition (grep status ${rc}); refusing to deploy"
+  die "manifest.tsv for the auth host lists the global partition (${hit%%$'\n'*}); the auth host must never serve it, refusing to deploy"
+}
+
+# Dests of a manifest.tsv already on disk, one per line, split like the shared block does.
+kept_manifest_dests() {
+  local line dest rest
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    [[ "$line" != '#'* && "$line" != $'dest\tbytes\tsha256\tetag\tsrc' ]] || continue
+    IFS=$'\t' read -r dest rest <<<"$line"
+    [[ -z "$dest" ]] || printf '%s\n' "$dest"
+  done <"$1"
+}
+
 s3_copy "s3://${stack_s3_bucket}/${target_stack}/containers/pic-sure-hpds.tar.gz" "${DEPLOY_ROOT}/opt/picsure/pic-sure-hpds.tar.gz"
 s3_copy "s3://${stack_s3_bucket}/configs/hpds/${target_stack}/auth-hpds.env" "${DEPLOY_ROOT}/opt/picsure/auth-hpds.env"
 
@@ -527,6 +555,9 @@ else
   # The layout of what is on disk is the one of the kept manifest (none = flat).
   kept_manifest="${DEPLOY_ROOT}/opt/picsure/manifest-${HPDS_VARIANT}.tsv"
   if [[ -f "$kept_manifest" ]]; then
+    # A global partition deployed before the guard existed is refused, not kept served.
+    kept_dests=$(kept_manifest_dests "$kept_manifest") || die "could not read the kept ${kept_manifest} to check it for the global partition"
+    variant_check_dests "$kept_dests"
     HPDS_LAYOUT=$(read_manifest_layout "$kept_manifest")
   fi
   if [[ "$HPDS_LAYOUT" == "partitioned" && ! -d "${HPDS_DIR}/phenotypic" ]]; then

@@ -380,6 +380,9 @@ deploy_per_file_dataset() {
     ! grep -Eq '^phenotypic(/|$)' <<<"$seen_dests" || die "a flat manifest.tsv must not list phenotypic/"
   fi
 
+  # Per-host check of the validated dest list (one dest per line), defined by the script.
+  variant_check_dests "$seen_dests"
+
   # The new set is written next to the live one (two sets are on disk until the swap
   # is done), so the free space must hold the whole new set.
   need=$((total + total / 10))
@@ -463,6 +466,9 @@ STAGE_PREFIX=destigmatized_javabins_rekeyed/
 LEGACY_TAR=destigmatized_javabins_rekeyed.tar
 CONTAINER_NAME=open-hpds
 HPDS_REQUIRE_AUTH_FILTER=false
+
+# The open host serves every partition, including global.
+variant_check_dests() { :; }
 
 echo "Downloading Files"
 s3_copy "s3://${stack_s3_bucket}/${target_stack}/containers/pic-sure-hpds.tar.gz" "${DEPLOY_ROOT}/opt/picsure/pic-sure-hpds.tar.gz"

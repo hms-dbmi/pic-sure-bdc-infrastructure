@@ -1012,6 +1012,132 @@ skip_genomic
 run_deploy auth
 check "auth manifest without the headers is not affected" rc_is_zero
 
+echo "# auth host refuses the global partition; the open host serves it"
+for gname in global Global GLOBAL; do
+  new_env "g-auth-${gname}"
+  put_env auth "$ENV_TEMPLATE"
+  echo "old-kept" >"$(kept_of auth)"
+  PART_NAMES="$P1 $gname $P2" stage_partitioned auth "$KEY"
+  skip_genomic
+  snap
+  run_deploy auth
+  check "auth, partition '${gname}': refused" refused "lists the global partition"
+  check "auth, partition '${gname}': no dataset file downloaded" not_in_log 'allObservationsStore'
+  check "auth, partition '${gname}': container not started" not_in_log 'systemctl start'
+  check "auth, partition '${gname}': old kept manifest still there" file_is "$(kept_of auth)" "old-kept"
+done
+new_env g-auth-others
+put_env auth "$ENV_TEMPLATE"
+PART_NAMES="$P1 globalx global-2 $P2" stage_partitioned auth "$KEY"
+skip_genomic
+run_deploy auth
+check "auth, partitions merely starting with global: accepted" rc_is_zero
+new_env g-auth-flat
+stage_variant auth "$KEY"
+EXTRA_ROWS='phenotypic/global/columnMeta.javabin\t1\t-\t"etag"\tx\n' stage_variant auth "$KEY"
+skip_genomic
+snap
+run_deploy auth
+check "auth, flat manifest listing phenotypic/global/: refused" refused "a flat manifest.tsv must not list phenotypic/"
+for gname in global Global; do
+  new_env "g-open-${gname}"
+  put_env open "$ENV_TEMPLATE"
+  PART_NAMES="$P1 $gname $P2" stage_partitioned open "$KEY"
+  run_deploy open
+  check "open, partition '${gname}': exits 0" rc_is_zero
+  check "open, partition '${gname}': store deployed" file_is "$(part_path "$gname" allObservationsStore.javabin)" "open:p1:phenotypic/${gname}/allObservationsStore.javabin"
+  check "open, partition '${gname}': 3 partition directories" [ "$(part_count)" = 3 ]
+  check "open, partition '${gname}': container started" in_log 'systemctl start'
+done
+
+echo "# global guard: leading-tab rows, grep failure, kept manifest"
+# A row with a leading tab is split by the shared block like any other (leading tabs are
+# dropped), so the guard sees the same dest that would be deployed.
+lead_tab() { awk -v p="$1" 'BEGIN{FS=OFS="\t"} index($1, p) == 1 {printf "\t"} {print}' "$2" >"$2.new" && mv "$2.new" "$2"; }
+new_env g-auth-tab
+put_env auth "$ENV_TEMPLATE"
+echo "old-kept" >"$(kept_of auth)"
+PART_NAMES="$P1 global $P2" stage_partitioned auth "$KEY"
+lead_tab phenotypic/global/ "$(stage_dir auth "$KEY")/manifest.tsv"
+skip_genomic
+snap
+run_deploy auth
+check "auth, leading-tab global rows: refused" refused "lists the global partition"
+check "auth, leading-tab global rows: no dataset file downloaded" not_in_log 'allObservationsStore'
+check "auth, leading-tab global rows: container not started" not_in_log 'systemctl start'
+new_env g-auth-tab-multi
+put_env auth "$ENV_TEMPLATE"
+PART_NAMES="$P1 global $P2" stage_partitioned auth "$KEY"
+sed 's/\t/\t\t/' "$(stage_dir auth "$KEY")/manifest.tsv" >"${CASE}/m" && cp "${CASE}/m" "$(stage_dir auth "$KEY")/manifest.tsv"
+skip_genomic
+run_deploy auth
+check "auth, tab-run manifest: refused (by the guard or the shared block)" rc_is_nonzero
+check "auth, tab-run manifest: container not started" not_in_log 'systemctl start'
+new_env g-open-tab
+put_env open "$ENV_TEMPLATE"
+PART_NAMES="$P1 global $P2" stage_partitioned open "$KEY"
+lead_tab phenotypic/global/ "$(stage_dir open "$KEY")/manifest.tsv"
+run_deploy open
+check "open, leading-tab global rows: exits 0" rc_is_zero
+check "open, leading-tab global rows: store deployed" file_is "$(part_path global allObservationsStore.javabin)" "open:p1:phenotypic/global/allObservationsStore.javabin"
+
+# grep failing (status 2) while checking the dest list must refuse, never pass.
+new_env g-auth-grepfail
+put_env auth "$ENV_TEMPLATE"
+echo "old-kept" >"$(kept_of auth)"
+stage_partitioned auth "$KEY"
+skip_genomic
+snap
+REAL_GREP=$(command -v grep)
+cat >"${FAKEBIN}/grep" <<EOT
+#!/usr/bin/env bash
+for a in "\$@"; do
+  if [[ "\$a" == *'phenotypic/global'* ]]; then echo "grep: fake failure" >&2; exit 2; fi
+done
+exec "$REAL_GREP" "\$@"
+EOT
+chmod +x "${FAKEBIN}/grep"
+run_deploy auth
+rm -f "${FAKEBIN}/grep"
+check "auth, grep error in the guard: refused" refused "could not check manifest.tsv for the global partition"
+check "auth, grep error in the guard: container not started" not_in_log 'systemctl start'
+
+# The kept manifest of an unchanged dataset key is checked too.
+for kept_row in 'phenotypic/global/allObservationsStore.javabin' 'phenotypic/GLOBAL/columnMeta.javabin' '\tphenotypic/global/columnMeta.javabin'; do
+  new_env "g-auth-kept"
+  stage_variant auth "$KEY"
+  {
+    printf '# bdc-hpds-deploy/1\n# variant=auth\n# layout=partitioned\n# partitions=2\n'
+    printf 'dest\tbytes\tsha256\tetag\tsrc\n'
+    printf '%b\t1\t-\t"etag"\tx\n' "$kept_row"
+    printf 'phenotypic/p1/columnMeta.javabin\t1\t-\t"etag"\tx\n'
+  } >"$(kept_of auth)"
+  mkdir -p "${ROOT_DIR}/opt/local/hpds/phenotypic/global"
+  cat >"${ROOT_DIR}/opt/picsure/deploy-script-last-execution-values.txt" <<EOT
+export dataset_s3_object_key="${KEY}"
+export genomic_dataset_s3_object_key="${GKEY}"
+EOT
+  snap
+  run_deploy auth
+  check "auth, kept manifest '${kept_row}', key unchanged: refused" refused "lists the global partition"
+  check "auth, kept manifest '${kept_row}': container not started" not_in_log 'systemctl start'
+done
+new_env g-auth-kept-ok
+stage_variant auth "$KEY"
+{
+  printf '# bdc-hpds-deploy/1\n# variant=auth\n# layout=partitioned\n# partitions=2\n'
+  printf 'dest\tbytes\tsha256\tetag\tsrc\n'
+  printf 'phenotypic/globalx/columnMeta.javabin\t1\t-\t"etag"\tx\n'
+  printf 'phenotypic/p1/columnMeta.javabin\t1\t-\t"etag"\tx\n'
+} >"$(kept_of auth)"
+mkdir -p "${ROOT_DIR}/opt/local/hpds/phenotypic/p1"
+cat >"${ROOT_DIR}/opt/picsure/deploy-script-last-execution-values.txt" <<EOT
+export dataset_s3_object_key="${KEY}"
+export genomic_dataset_s3_object_key="${GKEY}"
+EOT
+run_deploy auth
+check "auth, kept manifest without global, key unchanged: kept" rc_zero_and_out_has "Skipping javabins download"
+
 echo
 echo "passed: ${pass}, failed: ${failed}"
 [[ $failed -eq 0 ]]
