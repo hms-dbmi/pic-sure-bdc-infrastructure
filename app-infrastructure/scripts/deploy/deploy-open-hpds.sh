@@ -300,6 +300,13 @@ deploy_per_file_dataset() {
       continue
     fi
     if [[ "$line" == "#"* ]]; then
+      if [[ "$header_seen" == "true" ]]; then
+        case "$line" in
+          "# layout="* | "# partitions="* | "# stigvars_removed="* | "# stigvars_override="*)
+            die "manifest.tsv line ${lineno}: '${line%%=*}=' after the column header"
+            ;;
+        esac
+      fi
       case "$line" in
         "# variant="*) variant_seen=${line#"# variant="} ;;
         "# layout="*)
@@ -352,16 +359,24 @@ deploy_per_file_dataset() {
     layout=partitioned
   fi
 
-  # Open host: a dataset whose stigmatized variables were not removed (dev only) must say
-  # so with exactly one '# stigvars_removed=false' and one '# stigvars_override=true'.
-  # Partitioned open manifests always need both (this phase never removes them); a flat
-  # one needs them only when it carries a stigvars_removed header (absent or true pass).
+  # Open host, partitioned: exactly one '# stigvars_removed=true' and no override line (the
+  # release removed the stigmatized variables), or exactly one '# stigvars_removed=false' with
+  # exactly one '# stigvars_override=true' (not removed, dev only). Flat: no stigvars headers
+  # or '# stigvars_removed=true' pass; 'false' needs the override.
   if [[ "$HPDS_VARIANT" == "open" ]]; then
-    if [[ "$layout" == "partitioned" || $removed_lines -gt 0 || $override_lines -gt 0 ]]; then
-      if [[ "$layout" != "partitioned" && $removed_lines -eq 1 && "$removed_seen" == "true" && $override_lines -eq 0 ]]; then
+    if [[ "$layout" == "partitioned" ]]; then
+      if [[ $removed_lines -eq 1 && "$removed_seen" == "true" && $override_lines -eq 0 ]]; then
+        :
+      elif [[ $removed_lines -eq 1 && "$removed_seen" == "false" && $override_lines -eq 1 && "$override_seen" == "true" ]]; then
+        :
+      else
+        die "a partitioned manifest.tsv for the open host needs exactly one '# stigvars_removed=true' and no '# stigvars_override', or exactly one '# stigvars_removed=false' and one '# stigvars_override=true'; refusing to serve it"
+      fi
+    elif [[ $removed_lines -gt 0 || $override_lines -gt 0 ]]; then
+      if [[ $removed_lines -eq 1 && "$removed_seen" == "true" && $override_lines -eq 0 ]]; then
         :
       elif [[ $removed_lines -ne 1 || "$removed_seen" != "false" || $override_lines -ne 1 || "$override_seen" != "true" ]]; then
-        die "manifest.tsv for the open host needs exactly one '# stigvars_removed=false' and one '# stigvars_override=true' (or, flat only, no stigvars headers or '# stigvars_removed=true'); refusing to serve it"
+        die "a flat manifest.tsv for the open host needs no stigvars headers, '# stigvars_removed=true', or '# stigvars_removed=false' with '# stigvars_override=true'; refusing to serve it"
       fi
     fi
   fi
