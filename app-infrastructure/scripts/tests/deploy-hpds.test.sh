@@ -1012,6 +1012,44 @@ skip_genomic
 run_deploy auth
 check "auth manifest without the headers is not affected" rc_is_zero
 
+echo "# auth host refuses the global partition; the open host serves it"
+for gname in global Global GLOBAL; do
+  new_env "g-auth-${gname}"
+  put_env auth "$ENV_TEMPLATE"
+  echo "old-kept" >"$(kept_of auth)"
+  PART_NAMES="$P1 $gname $P2" stage_partitioned auth "$KEY"
+  skip_genomic
+  snap
+  run_deploy auth
+  check "auth, partition '${gname}': refused" refused "lists the global partition"
+  check "auth, partition '${gname}': no dataset file downloaded" not_in_log 'allObservationsStore'
+  check "auth, partition '${gname}': container not started" not_in_log 'systemctl start'
+  check "auth, partition '${gname}': old kept manifest still there" file_is "$(kept_of auth)" "old-kept"
+done
+new_env g-auth-others
+put_env auth "$ENV_TEMPLATE"
+PART_NAMES="$P1 globalx global-2 $P2" stage_partitioned auth "$KEY"
+skip_genomic
+run_deploy auth
+check "auth, partitions merely starting with global: accepted" rc_is_zero
+new_env g-auth-flat
+stage_variant auth "$KEY"
+EXTRA_ROWS='phenotypic/global/columnMeta.javabin\t1\t-\t"etag"\tx\n' stage_variant auth "$KEY"
+skip_genomic
+snap
+run_deploy auth
+check "auth, flat manifest listing phenotypic/global/: refused" refused "lists the global partition"
+for gname in global Global; do
+  new_env "g-open-${gname}"
+  put_env open "$ENV_TEMPLATE"
+  PART_NAMES="$P1 $gname $P2" stage_partitioned open "$KEY"
+  run_deploy open
+  check "open, partition '${gname}': exits 0" rc_is_zero
+  check "open, partition '${gname}': store deployed" file_is "$(part_path "$gname" allObservationsStore.javabin)" "open:p1:phenotypic/${gname}/allObservationsStore.javabin"
+  check "open, partition '${gname}': 3 partition directories" [ "$(part_count)" = 3 ]
+  check "open, partition '${gname}': container started" in_log 'systemctl start'
+done
+
 echo
 echo "passed: ${pass}, failed: ${failed}"
 [[ $failed -eq 0 ]]

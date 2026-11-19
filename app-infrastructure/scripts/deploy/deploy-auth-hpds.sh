@@ -496,6 +496,21 @@ LEGACY_TAR=javabins_rekeyed.tar
 CONTAINER_NAME="auth-hpds"
 HPDS_REQUIRE_AUTH_FILTER=true
 
+# Auth host: the manifest must not list the global partition (phenotypic/global/, any
+# case). Authorization grants only fence-mapping keys and HPDS serves a partition
+# directory by exact name, all or nothing, so a "global" partition here would expose
+# every patient's global rows to whoever is granted "global". The open host serves it.
+# Only the small manifest is fetched, to a scratch file, so this runs before any
+# dataset file is downloaded or anything on the host is replaced.
+refuse_global_partition() {
+  local dataset_key=$1 scratch listed
+  scratch=$(mktemp) || die "could not create a scratch file for the manifest check"
+  s3_copy "s3://${stack_s3_bucket}/data/${dataset_key}/${STAGE_PREFIX}manifest.tsv" "$scratch"
+  listed=$(awk -F'\t' '/^#/ { next } { print tolower($1) }' "$scratch" | grep -E '^phenotypic/global(/|$)' | head -n 1 || true)
+  rm -f "$scratch"
+  [[ -z "$listed" ]] || die "manifest.tsv for the auth host lists the global partition (${listed}); the auth host must never serve it, refusing to deploy"
+}
+
 s3_copy "s3://${stack_s3_bucket}/${target_stack}/containers/pic-sure-hpds.tar.gz" "${DEPLOY_ROOT}/opt/picsure/pic-sure-hpds.tar.gz"
 s3_copy "s3://${stack_s3_bucket}/configs/hpds/${target_stack}/auth-hpds.env" "${DEPLOY_ROOT}/opt/picsure/auth-hpds.env"
 
@@ -513,6 +528,7 @@ fi
 
 if [[ "$download_dataset" == "true" ]]; then
   if staged_manifest_exists "$dataset_s3_object_key"; then
+    refuse_global_partition "$dataset_s3_object_key"
     deploy_per_file_dataset "$dataset_s3_object_key"
   else
     echo "No per-file manifest for ${dataset_s3_object_key}; using the legacy ${LEGACY_TAR}"
