@@ -556,7 +556,8 @@ else
   kept_manifest="${DEPLOY_ROOT}/opt/picsure/manifest-${HPDS_VARIANT}.tsv"
   if [[ -f "$kept_manifest" ]]; then
     # A global partition deployed before the guard existed is refused, not kept served.
-    variant_check_dests "$(kept_manifest_dests "$kept_manifest")"
+    kept_dests=$(kept_manifest_dests "$kept_manifest") || die "could not read the kept ${kept_manifest} to check it for the global partition"
+    variant_check_dests "$kept_dests"
     HPDS_LAYOUT=$(read_manifest_layout "$kept_manifest")
   fi
   if [[ "$HPDS_LAYOUT" == "partitioned" && ! -d "${HPDS_DIR}/phenotypic" ]]; then
