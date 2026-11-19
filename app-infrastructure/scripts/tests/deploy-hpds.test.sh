@@ -281,10 +281,11 @@ refused() { [[ $RC -ne 0 ]] && unchanged_all && out_has "$1"; }
 # Knobs (env): PART_NAMES, PART_TAG (content tag), PART_DECLARED (number or "none"),
 # PART_LAYOUT_LINE (default "# layout=partitioned", empty = omit), PART_EXTRA_HEADERS,
 # PART_STIG_HEADERS (open only, printf %b; default: removed=false + override=true),
+# PART_OPEN_META_SRC (non-empty: partition columnMeta rows get src open/partitions/<p>/columnMeta.javabin),
 # PART_EXTRA_ROWS (printf %b rows), PART_SKIP_ROW (dest left out of the manifest),
 # PART_DASH_SHA (dest whose sha256 is written as "-").
 stage_partitioned() {
-  local variant=$1 key=$2 dir dest f part tag=${PART_TAG:-p1} declared
+  local variant=$1 key=$2 dir dest f part tag=${PART_TAG:-p1} declared src
   local -a names=() dests=()
   read -ra names <<<"${PART_NAMES-phs000000.c1 phs999999.c2 phs123456.c1}"
   declared=${PART_DECLARED:-${#names[@]}}
@@ -310,7 +311,9 @@ stage_partitioned() {
       if [[ ${PART_DASH_SHA:-} == "$dest" ]]; then
         printf '%s\t%s\t-\t"etag"\t%s\n' "$dest" "$(size "$f")" "$dest"
       else
-        printf '%s\t%s\t%s\t"etag"\t%s\n' "$dest" "$(size "$f")" "$(sha "$f")" "$dest"
+        src=$dest
+        [[ -z ${PART_OPEN_META_SRC:-} || $dest != */columnMeta.javabin || $dest != phenotypic/* ]] || src="open/partitions/${dest#phenotypic/}"
+        printf '%s\t%s\t%s\t"etag"\t%s\n' "$dest" "$(size "$f")" "$(sha "$f")" "$src"
       fi
     done
     if [[ -n ${PART_EXTRA_ROWS:-} ]]; then printf '%b' "$PART_EXTRA_ROWS"; fi
@@ -954,7 +957,7 @@ skip_genomic
 run_deploy auth
 check "control: a well-formed partitioned manifest passes" rc_is_zero
 
-echo "# open host: stigmatized variables not removed need exactly one removed=false and one override=true"
+echo "# open host, partitioned: removed=true alone, or removed=false with override=true"
 stig_case() { # stig_case <label> <accept|refuse> <printf %b headers for a partitioned open manifest>
   new_env "stig-$1"
   PART_STIG_HEADERS=$3 stage_partitioned open "$KEY"
@@ -971,7 +974,13 @@ stig_case both-headers accept '# stigvars_removed=false\n# stigvars_override=tru
 stig_case no-headers refuse ''
 stig_case no-override refuse '# stigvars_removed=false\n'
 stig_case no-removed refuse '# stigvars_override=true\n'
-stig_case removed-true refuse '# stigvars_removed=true\n'
+stig_case removed-true accept '# stigvars_removed=true\n'
+stig_case removed-true-upper refuse '# stigvars_removed=TRUE\n'
+stig_case removed-yes refuse '# stigvars_removed=yes\n'
+stig_case removed-true-trailing-space refuse '# stigvars_removed=true \n'
+stig_case removed-true-duplicate refuse '# stigvars_removed=true\n# stigvars_removed=true\n'
+stig_case removed-true-override-false refuse '# stigvars_removed=true\n# stigvars_override=false\n'
+stig_case override-alone refuse '# stigvars_override=true\n'
 stig_case removed-true-override refuse '# stigvars_removed=true\n# stigvars_override=true\n'
 stig_case removed-upper refuse '# stigvars_removed=FALSE\n# stigvars_override=true\n'
 stig_case removed-trailing-space refuse '# stigvars_removed=false \n# stigvars_override=true\n'
@@ -982,6 +991,14 @@ stig_case duplicate-removed refuse '# stigvars_removed=false\n# stigvars_removed
 stig_case duplicate-override refuse '# stigvars_removed=false\n# stigvars_override=true\n# stigvars_override=true\n'
 stig_case removed-conflict refuse '# stigvars_removed=false\n# stigvars_removed=true\n# stigvars_override=true\n'
 stig_case removed-empty refuse '# stigvars_removed=\n# stigvars_override=true\n'
+
+# a changed partition whose columnMeta.javabin row carries the removal-release src
+new_env stig-removed-src
+PART_STIG_HEADERS='# stigvars_removed=true\n' PART_OPEN_META_SRC=1 stage_partitioned open "$KEY"
+grep -q "open/partitions/${P1}/columnMeta.javabin\$" "$(stage_dir open "$KEY")/manifest.tsv" || { echo "fixture lacks the open/partitions src row"; exit 1; }
+run_deploy open
+check "open partitioned, removed=true, open/partitions src rows: deployed" rc_is_zero
+check "open partitioned, removed=true, open/partitions src rows: columnMeta deployed" file_is "${ROOT_DIR}/opt/local/hpds/phenotypic/${P1}/columnMeta.javabin" "open:p1:phenotypic/${P1}/columnMeta.javabin"
 
 # flat open manifests: no header, removed=true pass; removed=false needs the override; anything else refused
 stig_flat() { # stig_flat <label> <accept|refuse> <printf %b headers inserted after line 2>
