@@ -332,6 +332,13 @@ deploy_per_file_dataset() {
       continue
     fi
     if [[ "$line" == "#"* ]]; then
+      if [[ "$header_seen" == "true" ]]; then
+        case "$line" in
+          "# layout="* | "# partitions="* | "# stigvars_removed="* | "# stigvars_override="*)
+            die "manifest.tsv line ${lineno}: '${line%%=*}=' after the column header"
+            ;;
+        esac
+      fi
       case "$line" in
         "# variant="*) variant_seen=${line#"# variant="} ;;
         "# layout="*)
