@@ -36,6 +36,7 @@ resource "aws_instance" "open-hpds-ec2" {
   vpc_security_group_ids = [
     aws_security_group.outbound-to-internet.id,
     aws_security_group.inbound-hpds-from-wildfly.id,
+    aws_security_group.open-hpds-host[0].id
   ]
 
   root_block_device {
