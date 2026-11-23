@@ -27,12 +27,20 @@ resource "aws_s3_object" "hpds_open_env" {
   bucket = var.stack_s3_bucket
   key    = "configs/hpds/${var.target_stack}/open-hpds.env"
   content = templatefile("${path.module}/templates/hpds-open.env.tftpl", {
-    target_stack         = var.target_stack
-    env_private_dns_name = var.env_private_dns_name
+    target_stack           = var.target_stack
+    env_private_dns_name   = var.env_private_dns_name
+    picsure_internal_token = var.picsure_internal_token
   })
 
   content_type           = "text/plain"
   server_side_encryption = "AES256"
+
+  lifecycle {
+    precondition {
+      condition     = var.picsure_internal_token != ""
+      error_message = "picsure_internal_token is empty; open-hpds.env would publish a blank PICSURE_INTERNAL_TOKEN and every PFB export served by the open HPDS would fail. Check the render job's TF_VAR_picsure_internal_token export."
+    }
+  }
 }
 
 resource "aws_s3_object" "visualization_env" {
