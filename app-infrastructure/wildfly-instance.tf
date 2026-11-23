@@ -35,7 +35,7 @@ resource "aws_instance" "wildfly-ec2" {
     aws_security_group.outbound-to-internet.id,
     aws_security_group.inbound-wildfly-from-httpd.id,
     aws_security_group.inbound-wildfly-from-hpds.id,
-    aws_security_group.inbound-dictionary-from-auth-hpds.id
+    aws_security_group.inbound-dictionary-from-hpds.id
   ]
 
   root_block_device {
