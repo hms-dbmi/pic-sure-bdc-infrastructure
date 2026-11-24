@@ -83,7 +83,7 @@ sudo journalctl -u container-$CONTAINER_NAME.service --no-pager -n 50 || true
 # Fail the script if the container is not running, so Jenkins reports the real error.
 if ! podman ps --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
   echo "ERROR: Container '$CONTAINER_NAME' is not running after startup."
-  echo "--- Full container inspect ---"
-  podman inspect $CONTAINER_NAME 2>&1 || true
+  echo "--- Container state ---"
+  podman inspect --format 'status={{.State.Status}} exit_code={{.State.ExitCode}} oom_killed={{.State.OOMKilled}} user={{.Config.User}}' $CONTAINER_NAME 2>&1 || true
   exit 1
 fi
