@@ -111,6 +111,7 @@ CONTAINER_NAME=pic-sure-logging
 podman rm -f $CONTAINER_NAME || true
 podman run --privileged --name=$CONTAINER_NAME \
       --dns=10.89.0.1 \
+      --sysctl net.ipv4.ip_unprivileged_port_start=80 \
       --env-file /opt/picsure/logging.env \
       -e LOG_DIR=/app/logs \
       -v /var/log/picsure/logging/:/app/logs:U,Z \
