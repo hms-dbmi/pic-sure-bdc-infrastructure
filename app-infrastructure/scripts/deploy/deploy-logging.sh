@@ -113,7 +113,7 @@ podman run --privileged --name=$CONTAINER_NAME \
       --dns=10.89.0.1 \
       --env-file /opt/picsure/logging.env \
       -e LOG_DIR=/app/logs \
-      -v /var/log/picsure/logging/:/app/logs \
+      -v /var/log/picsure/logging/:/app/logs:U,Z \
       --network picsure \
       --log-opt tag=$CONTAINER_NAME \
       -d "$LOGGING_IMAGE"
@@ -135,7 +135,9 @@ sudo systemctl status container-$CONTAINER_NAME.service --no-pager || true
 # Fail the script if the container is not running, so Jenkins reports the real error.
 if ! podman ps --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
   echo "ERROR: Container '$CONTAINER_NAME' is not running after startup."
-  echo "--- Full container inspect ---"
-  podman inspect $CONTAINER_NAME 2>&1 || true
+  echo "--- Container state ---"
+  podman inspect --format 'status={{.State.Status}} exit_code={{.State.ExitCode}} oom_killed={{.State.OOMKilled}} user={{.Config.User}}' $CONTAINER_NAME 2>&1 || true
+  echo "--- Container logs ---"
+  podman logs --tail 100 $CONTAINER_NAME 2>&1 || true
   exit 1
 fi
