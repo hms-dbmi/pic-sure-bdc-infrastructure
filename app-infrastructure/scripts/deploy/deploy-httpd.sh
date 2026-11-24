@@ -128,9 +128,12 @@ sudo systemctl stop container-$CONTAINER_NAME.service 2>/dev/null || true
 podman rm -f $CONTAINER_NAME || true
 
 # Create the container without starting it — systemd will handle startup.
+# XFF_DEPTH=2: the frontend sees "<client>, <ALB>" because the ALB appends the client and httpd appends the ALB, so the
+# client is second from the right. The image defaults to 1, which would log the ALB as every user's address.
 podman create --privileged -u root --name=$CONTAINER_NAME \
 --log-opt tag=$CONTAINER_NAME \
 --env-file /opt/picsure/bdc.env \
+-e XFF_DEPTH=2 \
 -v /var/log/picsure/httpd/:/usr/local/apache2/logs/:Z \
 -v /usr/local/docker-config/cert:/usr/local/apache2/cert/:Z \
 -v /usr/local/docker-config/httpd-vhosts.conf:/usr/local/apache2/conf/extra/httpd-vhosts.conf:Z \
